@@ -1,9 +1,10 @@
 import { RegisterStep } from "@/types/register";
 import { UserType } from "@/types/shared";
+import { REGISTER_STEPS } from "../../constants/register/steps";
 
 export interface RegistrationStoreState {
   userType: UserType;
-  currentStep: RegisterStep;
+  currentStep: typeof REGISTER_STEPS[keyof typeof REGISTER_STEPS];
   nextStep: RegisterStep | null;
 }
 

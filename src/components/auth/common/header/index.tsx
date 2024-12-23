@@ -12,7 +12,7 @@ const Header = () => {
   const { push } = useRouter();
   const goToHome = () => push("/");
   return (
-    <header className="text-blue-500 mx-auto flex justify-between items-center p-4 w-11/12 border-2 border-green-500">
+    <header className="text-blue-500 mx-auto flex justify-between items-center p-4 w-11/12 lg:hidden">
       <button onClick={goToHome} className="w-8">
         <FontAwesomeIcon size="xl" icon={faChevronLeft} />
       </button>

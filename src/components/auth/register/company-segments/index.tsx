@@ -1,76 +1,62 @@
-import { FC } from "react";
-import {
-  faBuilding,
-  faPeopleArrows,
-  faBuildingCircleArrowRight,
-} from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Select from "@/components/ui/select";
+import { USER_TYPES } from "@/constants/auth";
+import { useRegistrationStore } from "@/store/registration";
+import { UserType } from "@/types/shared";
 
-interface CompanyTypesProps {
-  userType: "natural" | "empresa" | null;
-  setUserType: React.Dispatch<
-    React.SetStateAction<"natural" | "empresa" | null>
-  >;
-}
+const { INSURANCE_BROKER, EXCLUSIVE_AGENT, BROKERAGE_SOCIETY, INTERMEDIARY } =
+  USER_TYPES;
 
-const CompanySegments: FC<CompanyTypesProps> = ({ userType, setUserType }) => {
+const companySegments = [
+  {
+    label: "Intermediario",
+    disabled: true,
+    hidden: true,
+    value: INTERMEDIARY,
+  },
+  {
+    label: "Corredor de seguros",
+    value: INSURANCE_BROKER,
+  },
+  {
+    label: "Sociedad de corretaje",
+    value: BROKERAGE_SOCIETY,
+  },
+  {
+    label: "Agente exclusivo",
+    value: EXCLUSIVE_AGENT,
+  },
+];
+
+const CompanySegments = () => {
+  const userType = useRegistrationStore((state) => state.userType);
+  const setUserType = useRegistrationStore((state) => state.setUserType);
+
+  const handleSelectChange = (selectedUserType: UserType) => {
+    if (userType === selectedUserType) {
+      return;
+    }
+    setUserType(selectedUserType);
+  };
+
   return (
-    <>
-      <header className="text-center w-11/12 flex flex-col items-center gap-4">
-        <h1 className="text-2xl">
-          Como empresa elige entre nuestras opciones{" "}
+    <div className="w-11/12 pt-10 pb-28 lg:w-full lg:pt-14 lg:pb-4">
+      <header className="text-center flex flex-col items-center gap-2 mb-4 lg:gap-4 lg:mb-12">
+        <h1 className="text-3xl font-normal text-balance lg:text-5xl">
+          ¿Cuál es tu sector?
         </h1>
+        <h2 className="text-sm font-century-gothic lg:text-xl">
+          Elige entre nuestra opciones
+        </h2>
       </header>
-      <div className="w-11/12 flex justify-evenly items-center text-base">
-        <button
-          className="flex flex-col items-center gap-3"
-          onClick={() => setUserType(userType === "natural" ? null : "natural")}
-        >
-          <div
-            className={`w-24 h-24 border-2 rounded-xl flex items-center justify-center transition-all ${
-              userType === "natural"
-                ? "border-blue-500 scale-105"
-                : "border-gray-300"
-            }`}
-          >
-            <FontAwesomeIcon size="3x" icon={faPeopleArrows} />
-          </div>
-          <span>Intermediario</span>
-        </button>
 
-        <button
-          className="flex flex-col items-center gap-3"
-          onClick={() => setUserType(userType === "natural" ? null : "natural")}
-        >
-          <div
-            className={`w-24 h-24 border-2 rounded-xl flex items-center justify-center transition-all ${
-              userType === "natural"
-                ? "border-blue-500 scale-105"
-                : "border-gray-300"
-            }`}
-          >
-            <FontAwesomeIcon size="3x" icon={faBuilding} />
-          </div>
-          <span>Compañía de seguros</span>
-        </button>
-
-        <button
-          className="flex flex-col items-center gap-3"
-          onClick={() => setUserType(userType === "empresa" ? null : "empresa")}
-        >
-          <div
-            className={`w-24 h-24 border-2 rounded-xl flex items-center justify-center transition-all ${
-              userType === "empresa"
-                ? "border-blue-500 scale-105"
-                : "border-gray-300"
-            }`}
-          >
-            <FontAwesomeIcon size="3x" icon={faBuildingCircleArrowRight} />
-          </div>
-          <span>Proveedor</span>
-        </button>
-      </div>
-    </>
+      <Select
+        wrapperClassName="lg:max-w-xs lg:mx-auto"
+        className="font-bold"
+        options={companySegments}
+        value={userType || ""}
+        onChange={(e) => handleSelectChange(e.target.value as UserType)}
+      />
+    </div>
   );
 };
 

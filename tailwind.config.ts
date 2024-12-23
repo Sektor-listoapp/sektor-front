@@ -9,6 +9,17 @@ export default {
   ],
   theme: {
     extend: {
+      screens: {
+        "3xl": "1920px",
+      },
+      fontFamily: {
+        "arial-rounded": [
+          "Arial Rounded MT Bold",
+          "Arial Rounded MT",
+          "sans-serif",
+        ],
+        "century-gothic": ["Century Gothic", "sans-serif"],
+      },
       colors: {
         blue: {
           50: "#F0F9FF",

@@ -12,7 +12,7 @@ export const registrationStoreActions = (
     );
   },
   setUserType: (userType) => {
-    return set({ userType }, false, "setUserId");
+    return set({ userType }, false, "setUserType");
   },
   setCurrentRegistrationStep: (currentStep) => {
     return set({ currentStep }, false, "setCurrentRegistrationStep");

@@ -1,5 +1,5 @@
 import { create, StateCreator } from "zustand";
-import { devtools, persist } from "zustand/middleware";
+import { devtools } from "zustand/middleware";
 
 import { registrationStoreActions } from "./actions";
 import { initialRegistrationStoreState } from "./initial-state";
@@ -8,11 +8,11 @@ import { RegistrationStore } from "./types";
 const registrationStore: StateCreator<
   RegistrationStore,
   [["zustand/devtools", never]]
-> = (set, get) => ({
+> = (set) => ({
   ...initialRegistrationStoreState,
-  ...registrationStoreActions(set, get),
+  ...registrationStoreActions(set),
 });
 
 export const useRegistrationStore = create<RegistrationStore>()(
-  devtools(persist(registrationStore, { name: "registration-store" }))
+  devtools(registrationStore, { name: "registration-store" })
 );

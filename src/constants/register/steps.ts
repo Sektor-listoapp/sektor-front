@@ -1,4 +1,6 @@
+import { RegisterStep } from "@/types/register";
 import { USER_TYPES } from "../auth";
+import { REGISTER_COMPONENTS_MAP, REGISTER_COMPONENTS } from "./components";
 
 const {
   CUSTOMER,
@@ -7,68 +9,102 @@ const {
   BROKERAGE_SOCIETY,
   INSURANCE_COMPANY,
   SUPPLIER,
+  INTERMEDIARY,
 } = USER_TYPES;
 
-export const REGISTER_STEPS = {
+const {
+  CUSTOMER_FORM,
+  COMPANY_TYPES,
+  COMPANY_SEGMENTS,
+  INSURANCE_BROKER_FORM,
+  INSURANCE_COMPANY_FORM,
+  SUPPLIER_FORM,
+  SENT_EMAIL_VERIFICATION,
+  EXCLUSIVE_AGENT_FORM,
+  BROKERAGE_SOCIETY_FORM,
+  EMAIL_VERIFICATION_SUCCESS,
+} = REGISTER_COMPONENTS;
+
+export const REGISTER_STEPS: Record<
+  keyof typeof REGISTER_COMPONENTS_MAP,
+  RegisterStep
+> = {
   UserTypes: {
     index: 0,
-    component: "UserTypes",
+    component: REGISTER_COMPONENTS.USER_TYPES,
     nextStep: {
-      [CUSTOMER]: "CustomerForm",
-      [INSURANCE_COMPANY]: "CompanyTypes",
+      [CUSTOMER]: CUSTOMER_FORM,
+      [INSURANCE_COMPANY]: COMPANY_TYPES,
     },
   },
   CompanyTypes: {
     index: 0,
-    component: "CompanyTypes",
-    nextStep: "CompanySegments",
+    component: COMPANY_TYPES,
+    nextStep: {
+      [INTERMEDIARY]: COMPANY_SEGMENTS,
+      [INSURANCE_COMPANY]: INSURANCE_COMPANY_FORM,
+      [SUPPLIER]: SUPPLIER_FORM,
+    },
   },
   CompanySegments: {
     index: 0,
-    component: "CompanySegments",
+    component: COMPANY_SEGMENTS,
     nextStep: {
-      [INSURANCE_BROKER]: "InsuranceBrokerForm",
-      [EXCLUSIVE_AGENT]: "ExclusiveAgentForm",
-      [SUPPLIER]: "SupplierForm",
-      [BROKERAGE_SOCIETY]: "BrokerageSocietyForm",
+      [INSURANCE_BROKER]: INSURANCE_BROKER_FORM,
+      [BROKERAGE_SOCIETY]: BROKERAGE_SOCIETY_FORM,
+      [EXCLUSIVE_AGENT]: EXCLUSIVE_AGENT_FORM,
     },
   },
   CustomerForm: {
     index: 1,
-    userType: CUSTOMER,
-    component: "CustomerForm",
-    nextStep: "SentEmailVerification",
+    component: CUSTOMER_FORM,
+    nextStep: {
+      [CUSTOMER]: SENT_EMAIL_VERIFICATION,
+    },
   },
   InsuranceBrokerForm: {
     index: 1,
-    userType: INSURANCE_BROKER,
-    component: "InsuranceBrokerForm",
-    nextStep: "SentEmailVerification",
+    component: INSURANCE_BROKER_FORM,
+    nextStep: {
+      [INSURANCE_BROKER]: SENT_EMAIL_VERIFICATION,
+    },
+  },
+  InsuranceCompanyForm: {
+    index: 1,
+    component: INSURANCE_COMPANY_FORM,
+    nextStep: {
+      [INSURANCE_COMPANY]: SENT_EMAIL_VERIFICATION,
+    },
   },
   ExclusiveAgentForm: {
     index: 1,
-    userType: EXCLUSIVE_AGENT,
-    component: "ExclusiveAgentForm",
-    nextStep: "SentEmailVerification",
+    component: EXCLUSIVE_AGENT_FORM,
+    nextStep: {
+      [EXCLUSIVE_AGENT]: SENT_EMAIL_VERIFICATION,
+    },
   },
   SupplierForm: {
     index: 1,
-    userType: SUPPLIER,
-    component: "SupplierForm",
-    nextStep: "SentEmailVerification",
+    component: SUPPLIER_FORM,
+    nextStep: {
+      [SUPPLIER]: SENT_EMAIL_VERIFICATION,
+    },
   },
   BrokerageSocietyForm: {
     index: 1,
-    userType: BROKERAGE_SOCIETY,
-    component: "BrokerageSocietyForm",
-    nextStep: "SentEmailVerification",
+    component: BROKERAGE_SOCIETY_FORM,
+    nextStep: {
+      [BROKERAGE_SOCIETY]: SENT_EMAIL_VERIFICATION,
+    },
   },
   SentEmailVerification: {
     index: 2,
-    component: "SentEmailVerification",
+    component: SENT_EMAIL_VERIFICATION,
+    nextStep: {},
   },
-  EmailVerification: {
+  EmailVerificationSuccess: {
     index: 3,
-    component: "EmailVerification",
+    component: EMAIL_VERIFICATION_SUCCESS,
+    nextStep: {},
   },
 } as const;

@@ -1,0 +1,25 @@
+.datePicker {
+  background-color: white;
+  border: 1px solid #182f48;
+  padding: 12px 20px;
+  padding-inline-start: 3rem;
+  border-radius: 12px;
+  color: #182f48;
+}
+.datePicker div input {
+  color: #182f48 !important;
+  font-family: "Century Gothic", sans-serif !important;
+}
+
+.datePicker:hover {
+  border-color: #182f48 !important;
+}
+
+.datePicker div input::placeholder {
+  color: #182f48 !important;
+  font-family: "Century Gothic", sans-serif !important;
+}
+
+.datePicker div span {
+  display: none;
+}

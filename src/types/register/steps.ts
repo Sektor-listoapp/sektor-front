@@ -1,10 +1,10 @@
 import { REGISTER_STEPS } from "../../constants/register/steps";
-import { UserType } from "../shared";
+import { REGISTER_COMPONENTS_MAP } from "../../constants/register/components";
 
 export type RegisterSteps = typeof REGISTER_STEPS;
 
 export type RegisterStep = {
   index: number;
-  component: string;
-  nextStep: string | Record<string, string>;
+  component: keyof typeof REGISTER_COMPONENTS_MAP;
+  nextStep: Record<string, keyof typeof REGISTER_COMPONENTS_MAP>;
 };

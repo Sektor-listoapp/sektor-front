@@ -5,6 +5,7 @@ export const USER_TYPES = {
   EXCLUSIVE_AGENT: "exclusive_agent", // agente exclusivo
   SUPPLIER: "supplier", // proveedor
   INSURANCE_COMPANY: "insurance_company", // compañía de seguros
+  INTERMEDIARY: "intermediary", // intermediario
 } as const;
 
 export const SERVICE_SUPPLIER_TYPES = {
@@ -23,5 +24,4 @@ export const USER_GROUPS = {
 export const GENRES = {
   MALE: "Male",
   FEMALE: "Female",
-  PREFER_NOT_TO_SAY: "PreferNotSay",
 } as const;
