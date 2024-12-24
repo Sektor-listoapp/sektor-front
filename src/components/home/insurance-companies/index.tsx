@@ -65,8 +65,8 @@ const InsuranceCompaniesInfo = ({
               key={`insurance-company-${index}`}
               className="w-11/12 h-32 m-auto max-w-full object-contain md:h-60 xl:h-36"
               src={image}
-              width={100}
-              height={100}
+              width={700}
+              height={700}
               alt=""
             />
           ))}

@@ -14,7 +14,7 @@ const Navbar = () => {
   const { push } = useRouter();
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  console.log(pathname);
+
   const showDrawer = () => {
     setOpen(true);
   };

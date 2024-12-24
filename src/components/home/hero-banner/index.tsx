@@ -20,7 +20,7 @@ const HeroBanner = () => {
           iconPosition="end"
           icon={faMagnifyingGlass}
           iconProps={{ className: "opacity-40" }}
-          wrapperClassName="md:max-w-lg xl:max-w-5xl"
+          wrapperClassName="md:max-w-lg xl:max-w-5xl relative"
           className="rounded-3xl border-opacity-50 md:max-w-lg xl:max-w-5xl md:text-lg"
           placeholder="Busca aquí el seguro de tu preferencia"
         />

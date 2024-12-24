@@ -100,8 +100,8 @@ const Intermediaries = ({
                     <Image
                       className="w-full h-10 sm:h-20 object-cover object-top"
                       src={image}
-                      width={100}
-                      height={100}
+                      width={400}
+                      height={400}
                       alt=""
                     />
                     <h4 className="text-[6px] text-center px-1">
@@ -173,8 +173,8 @@ const Intermediaries = ({
                     <Image
                       className="w-full h-32 object-cover object-top"
                       src={image}
-                      width={100}
-                      height={100}
+                      width={700}
+                      height={700}
                       alt=""
                     />
                     <h4 className="text-[10px] text-start px-2">
