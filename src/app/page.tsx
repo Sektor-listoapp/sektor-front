@@ -1,11 +1,14 @@
-import Navbar from "@/components/ui/navbar";
+import HeroBanner from "@/components/home/hero-banner";
+import InsuranceCompaniesInfo from "@/components/home/insurance-companies";
+import Intermediaries from "@/components/home/intermediaries";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-blue-500 text-white">
-      <Navbar />
-      <main className="flex items-center justify-center">
-        <h1 className="text-4xl sr-only">Hello, Sektor!</h1>
+    <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start">
+      <HeroBanner />
+      <main className="text-blue-500 w-full max-w-screen-xl flex flex-col items-center justify-center py-10 px-7 2xl:px-0">
+        <InsuranceCompaniesInfo />
+        <Intermediaries />
       </main>
     </div>
   );

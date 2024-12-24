@@ -13,11 +13,12 @@ body {
 
 .primary-gradient {
   background: linear-gradient(
-    252.99deg,
-    rgba(255, 255, 255, 0.5) -19.98%,
-    rgba(183, 217, 226, 0.7) -6.35%,
-    #182f48 59.87%
-  );
+      252.99deg,
+      rgba(255, 255, 255, 0.5) -19.98%,
+      rgba(183, 217, 226, 0.7) -6.35%,
+      #182f48 59.87%
+    ),
+    url("/images/primary-bg.webp") no-repeat center/cover;
 }
 
 .secondary-gradient {
@@ -26,7 +27,7 @@ body {
       rgba(24, 47, 72, 0.8) -16.52%,
       rgba(255, 255, 255, 0.8) 81.93%
     ),
-    url("../assets/images/secondary-bg.webp") no-repeat center/cover;
+    url("/images/secondary-bg.webp") no-repeat center/cover;
 }
 
 @media (min-width: 768px) {
@@ -36,6 +37,12 @@ body {
         rgba(24, 47, 72, 0.8) -12.4%,
         rgba(255, 255, 255, 0.8) 71.45%
       ),
-      url("../assets/images/secondary-bg.webp") no-repeat center/cover;
+      url("/images/secondary-bg.webp") no-repeat center/cover;
+  }
+}
+
+@media (min-width: 1600px) {
+  .primary-gradient {
+    background-position-y: 30%;
   }
 }

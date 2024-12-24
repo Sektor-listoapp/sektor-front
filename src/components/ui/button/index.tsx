@@ -1,4 +1,4 @@
-import clsx from "clsx";
+import { cn } from "@/utils/class-name";
 import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -8,7 +8,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  base: "py-3 px-6 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-3xl border border-transparent transition-all font-arial-rounded text-base shadow-lg",
+  base: "py-2 px-6 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-3xl border border-transparent transition-all font-arial-rounded text-base shadow-lg",
   solid:
     "bg-white text-blue-500 hover:bg-blue-100 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none",
   "solid-blue":
@@ -32,7 +32,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       type="button"
-      className={clsx(variants.base, variants[variant], className)}
+      className={cn(variants.base, variants[variant], className)}
       {...props}
     >
       {children}
