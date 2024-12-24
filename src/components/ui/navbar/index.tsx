@@ -25,10 +25,62 @@ const Navbar = () => {
 
   return (
     <nav className="w-full">
-      <Drawer title="Basic Drawer" onClose={onClose} open={open}>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
-        <p>Some contents...</p>
+      <Drawer
+        title={null}
+        onClose={onClose}
+        open={open}
+        closeIcon={null}
+        width={250}
+        rootStyle={{ color: "#182F48" }}
+        footer={
+          <div className="flex flex-col gap-6 pb-8">
+            <Button variant="solid-blue" onClick={() => push("/register")}>
+              Registrarte
+            </Button>
+            <Button variant="solid-blue" onClick={() => push("/login")}>
+              Iniciar sesión
+            </Button>
+          </div>
+        }
+      >
+        <div className="text-blue-500 pt-6 flex flex-col gap-8 items-center justify-center font-arial-rounded">
+          <h3 className=" font-bold text-lg">Menu</h3>
+          <nav className="flex flex-col gap-4 p-4 w-full font-century-gothic">
+            <Link
+              className={cn(
+                " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
+                {
+                  "font-bold": pathname === "/",
+                }
+              )}
+              href="#"
+            >
+              Inicio
+            </Link>
+            <Link
+              className={cn(
+                " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
+                {
+                  "font-bold": pathname === "/insurance",
+                }
+              )}
+              href="#"
+            >
+              Seguros
+            </Link>
+            <Link
+              className={cn(
+                " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
+                {
+                  "font-bold": pathname === "/about-us",
+                }
+              )}
+              href="#"
+            >
+              Nosotros
+            </Link>
+          </nav>
+        </div>
       </Drawer>
 
       {/* Mobile/Tablet version */}
