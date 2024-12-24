@@ -5,6 +5,9 @@ import PrelineScript from "@/components/scripts/preline";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { ConfigProvider } from "antd";
 import es from "antd/locale/es_ES";
+import { config } from '@fortawesome/fontawesome-svg-core'
+import '@fortawesome/fontawesome-svg-core/styles.css'
+config.autoAddCss = false
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
