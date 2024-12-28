@@ -38,7 +38,7 @@ const Intermediaries = ({
   return (
     <section
       className={cn(
-        "w-full flex flex-col items-center justify-center gap-5 md:gap-8",
+        "w-full z-10 flex flex-col items-center justify-center gap-5 md:gap-8",
         className
       )}
       {...props}

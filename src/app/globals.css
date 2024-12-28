@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: "Arial Rounded MT";
+  src: url("/fonts/Arial-Rounded-MT.ttf");
+}
+
 :root {
   scroll-behavior: smooth;
   background: #ffffff;

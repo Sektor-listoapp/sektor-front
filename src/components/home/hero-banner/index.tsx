@@ -4,7 +4,7 @@ import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 
 const HeroBanner = () => {
   return (
-    <header className="bg-blue-500 primary-gradient min-h-fit rounded-b-3xl px-7 w-full py-8 border-2 border-cyan sm:gap-8 sm:pb-12 xl:pb-28">
+    <header className="bg-blue-500 primary-gradient min-h-fit rounded-b-3xl px-7 w-full py-8 border-l-2 border-r-2 border-white sm:gap-8 sm:pb-12 xl:pb-28">
       <div className="max-w-screen-xl w-full flex flex-col items-start justify-start gap-5 xl:items-center md:gap-20 xl:gap-28 mx-auto">
         <Navbar />
         <div className="w-[80%] text-start flex flex-col items-start justify-start gap-2 lg:w-[70%] md:gap-6 xl:mr-auto 2xl:w-3/4 xl:gap-10">
