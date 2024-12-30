@@ -9,9 +9,11 @@ import {
 
 function makeClient() {
   const httpLink = new HttpLink({
-    // this needs to be an absolute url, as relative urls cannot be used in SSR
     uri: process.env.NEXT_PUBLIC_SEKTOR_API_URL,
-    fetchOptions: { cache: "no-store" },
+    credentials: "include",
+    headers: {
+      "Apollo-Require-Preflight": "true",
+    },
   });
 
   return new ApolloClient({

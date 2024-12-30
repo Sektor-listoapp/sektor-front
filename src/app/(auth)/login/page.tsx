@@ -1,11 +1,10 @@
 "use client";
 
+import LoginForm from "@/components/auth/login/login-form";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
-import Button from "@/components/ui/button";
 import { useRegistrationStore } from "@/store/registration";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import clsx from "clsx";
 import Link from "next/link";
 import React from "react";
 
@@ -15,11 +14,10 @@ const Login = () => {
   );
 
   return (
-    <main className="w-full lg:grid lg:grid-cols-12 lg:items-start lg:justify-center lg:relative lg:gap-4 border-2">
+    <main className="w-full lg:grid lg:grid-cols-12 lg:items-start lg:justify-center lg:relative lg:gap-4">
       <section className="bg-white p-4 pt-8 w-11/12  max-w-lg rounded-3xl mx-auto pb-40 text-blue-500 flex flex-col items-center gap-4 h-full lg:col-span-6 xl:col-span-5 lg:w-full lg:order-1 lg:h-fit lg:mt-20 lg:pb-10 lg:z-10 xl:max-w-[700px] xl:px-8 lg:mb-10">
-        <Button variant="solid-blue" className={clsx("px-12 mt-4")}>
-          Iniciar sesión
-        </Button>
+        <LoginForm />
+
         <Link
           href="/"
           className="hidden lg:flex gap-2 justify-center items-center text-blue-500 font-bold text-sm hover:underline mr-auto ml-2 mt-10"
