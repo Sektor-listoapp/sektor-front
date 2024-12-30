@@ -40,8 +40,12 @@ const Suppliers = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const router = useRouter();
-  const { data } = useSuspenseQuery(PUBLIC_INSURANCE_BROKERS_QUERY);
+  const { data, error } = useSuspenseQuery(PUBLIC_INSURANCE_BROKERS_QUERY);
   console.log("Client data", data);
+
+  if (error) {
+    console.error("Client Error", error);
+  }
 
   return (
     <section

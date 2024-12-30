@@ -10,7 +10,6 @@ import {
 function makeClient() {
   const httpLink = new HttpLink({
     uri: process.env.NEXT_PUBLIC_SEKTOR_API_URL,
-    credentials: "include",
     headers: {
       "Apollo-Require-Preflight": "true",
     },

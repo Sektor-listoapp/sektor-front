@@ -10,9 +10,15 @@ import { PUBLIC_INSURANCE_BROKERS_QUERY } from "@/lib/sektor-api/queries";
 
 export default async function Home() {
   const client = getClient();
-  const { data } = await client.query({ query: PUBLIC_INSURANCE_BROKERS_QUERY });
+  const { data, error } = await client.query({
+    query: PUBLIC_INSURANCE_BROKERS_QUERY,
+  });
 
   console.log("Data", data);
+
+  if (error) {
+    console.error("Error", error);
+  }
 
   return (
     <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start overflow-hidden">
