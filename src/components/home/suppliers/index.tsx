@@ -1,7 +1,9 @@
 "use client";
 
 import Button from "@/components/ui/button";
+import { PUBLIC_INSURANCE_BROKERS_QUERY } from "@/lib/sektor-api/queries";
 import { cn } from "@/utils/class-name";
+import { useSuspenseQuery } from "@apollo/client";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -38,6 +40,8 @@ const Suppliers = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const router = useRouter();
+  const { data } = useSuspenseQuery(PUBLIC_INSURANCE_BROKERS_QUERY);
+  console.log("Client data", data);
 
   return (
     <section

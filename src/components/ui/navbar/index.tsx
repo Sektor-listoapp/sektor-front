@@ -95,7 +95,7 @@ const Navbar = () => {
 
       {/* Desktop version */}
       <div className="hidden lg:flex items-center justify-between w-full max-w-screen-2xl mx-auto">
-        <SektorFullHorizontalLogo width={180} className="lg:w-60" />
+        <SektorFullHorizontalLogo width={200} className="lg:w-52" />
 
         <div className="transition-all duration-300 flex items-center justify-center gap-8 font-century-gothic xl:ml-auto xl: mr-20">
           <Link

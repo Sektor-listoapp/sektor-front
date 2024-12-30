@@ -5,8 +5,15 @@ import InsuranceCompaniesInfo from "@/components/home/insurance-companies";
 import Intermediaries from "@/components/home/intermediaries";
 import JoinOurTeam from "@/components/home/join-our-team";
 import Suppliers from "@/components/home/suppliers";
+import { getClient } from "@/lib/sektor-api/configs";
+import { PUBLIC_INSURANCE_BROKERS_QUERY } from "@/lib/sektor-api/queries";
 
-export default function Home() {
+export default async function Home() {
+  const client = getClient();
+  const { data } = await client.query({ query: PUBLIC_INSURANCE_BROKERS_QUERY });
+
+  console.log("Data", data);
+
   return (
     <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start overflow-hidden">
       <HeroBanner />
