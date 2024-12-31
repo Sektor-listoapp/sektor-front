@@ -1,12 +1,10 @@
-"use client";
-
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faChevronLeft } from "@fortawesome/free-solid-svg-icons";
-import { useRouter } from "next/navigation";
 
 import React from "react";
 import { useRegistrationStore } from "@/store/registration";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
+import { useRouter } from "next/router";
 
 const Header = () => {
   const { push } = useRouter();

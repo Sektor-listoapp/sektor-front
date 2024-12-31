@@ -7,6 +7,11 @@
   src: url("/fonts/Arial-Rounded-MT.ttf");
 }
 
+@font-face {
+  font-family: "Century Gothic";
+  src: url("/fonts/CenturyGothic.ttf");
+}
+
 :root {
   scroll-behavior: smooth;
   background: #ffffff;

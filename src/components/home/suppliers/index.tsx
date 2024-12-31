@@ -1,9 +1,7 @@
-"use client";
-
 import Button from "@/components/ui/button";
 import { cn } from "@/utils/class-name";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/router";
 import React from "react";
 
 const suppliersData = [
@@ -38,12 +36,6 @@ const Suppliers = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const router = useRouter();
-  // const { data, error } = useSuspenseQuery(PUBLIC_INSURANCE_BROKERS_QUERY);
-  // console.log("Client data", data);
-
-  // if (error) {
-  //   console.error("Client Error", error);
-  // }
 
   return (
     <section

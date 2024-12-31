@@ -1,12 +1,12 @@
-import Footer from "@/components/home/footer";
 import HeroBanner from "@/components/home/hero-banner";
-import InsuranceBrokers from "@/components/home/insurance-brokers";
 import InsuranceCompaniesInfo from "@/components/home/insurance-companies";
 import Intermediaries from "@/components/home/intermediaries";
-import JoinOurTeam from "@/components/home/join-our-team";
+import InsuranceBrokers from "@/components/home/insurance-brokers";
 import Suppliers from "@/components/home/suppliers";
+import JoinOurTeam from "@/components/home/join-our-team";
+import Footer from "@/components/home/footer";
 
-export default async function Home() {
+export default function Home() {
   return (
     <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start overflow-hidden">
       <HeroBanner />

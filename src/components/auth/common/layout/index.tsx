@@ -1,10 +1,11 @@
-import Header from "@/components/auth/common/header";
+import React from "react";
+import Header from "../header";
 
-export default function AuthLayout({
+const AuthLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
+}>) => {
   return (
     <div className="min-h-svh secondary-gradient w-full flex flex-col justify-between items-start gap-8 lg:block lg:relative lg:overflow-hidden">
       <Header />
@@ -13,4 +14,6 @@ export default function AuthLayout({
       {children}
     </div>
   );
-}
+};
+
+export default AuthLayout;

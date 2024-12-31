@@ -1,14 +1,13 @@
-"use client";
-
 import { useState } from "react";
 import Link from "next/link";
 import Button from "../button";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
 import { Drawer } from "antd";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cn } from "@/utils/class-name";
+import { useRouter } from "next/router";
 
 const Navbar = () => {
   const { push } = useRouter();
