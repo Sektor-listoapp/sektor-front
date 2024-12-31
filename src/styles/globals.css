@@ -2,20 +2,57 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@font-face {
+  font-family: "Arial Rounded MT";
+  src: url("/fonts/Arial-Rounded-MT.ttf");
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@font-face {
+  font-family: "Century Gothic";
+  src: url("/fonts/CenturyGothic.ttf");
+}
+
+:root {
+  scroll-behavior: smooth;
+  background: #ffffff;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Arial Rounded MT", Arial, Helvetica, sans-serif;
+}
+
+.primary-gradient {
+  background: linear-gradient(
+      252.99deg,
+      rgba(255, 255, 255, 0.5) -19.98%,
+      rgba(183, 217, 226, 0.7) -6.35%,
+      #182f48 59.87%
+    ),
+    url("/images/primary-bg.webp") no-repeat center/cover;
+}
+
+.secondary-gradient {
+  background: linear-gradient(
+      180.14deg,
+      rgba(24, 47, 72, 0.8) -16.52%,
+      rgba(255, 255, 255, 0.8) 81.93%
+    ),
+    url("/images/secondary-bg.webp") no-repeat center/cover;
+}
+
+@media (min-width: 768px) {
+  .secondary-gradient {
+    background: linear-gradient(
+        243.39deg,
+        rgba(24, 47, 72, 0.8) -12.4%,
+        rgba(255, 255, 255, 0.8) 71.45%
+      ),
+      url("/images/secondary-bg.webp") no-repeat center/cover;
+  }
+}
+
+@media (min-width: 1600px) {
+  .primary-gradient {
+    background-position-y: 30%;
+  }
 }
