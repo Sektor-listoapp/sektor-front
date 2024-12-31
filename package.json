@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "1.0.2",
-    "@apollo/client": "^3.12.4",
-    "@apollo/experimental-nextjs-app-support": "^0.11.7",
     "@fortawesome/fontawesome-svg-core": "6.7.1",
     "@fortawesome/free-brands-svg-icons": "6.7.1",
     "@fortawesome/free-regular-svg-icons": "6.7.1",

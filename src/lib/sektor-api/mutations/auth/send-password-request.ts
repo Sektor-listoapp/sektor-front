@@ -1,6 +1,4 @@
-import { gql } from "@apollo/client";
-
-export const SEND_PASSWORD_RESET_REQUEST = gql`
+export const SEND_PASSWORD_RESET_REQUEST = `
   mutation sendPasswordResetRequest($email: String!) {
     sendPasswordResetRequest(email: $email)
   }

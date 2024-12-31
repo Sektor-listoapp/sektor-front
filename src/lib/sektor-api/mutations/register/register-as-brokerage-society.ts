@@ -1,6 +1,4 @@
-import { gql } from "@apollo/client";
-
-export const REGISTER_AS_BROKERAGE_SOCIETY = gql`
+export const REGISTER_AS_BROKERAGE_SOCIETY = `
   mutation registerAsBrokerageSociety(
     $input: RegisterAsBrokerageSocietyInputType!
   ) {
