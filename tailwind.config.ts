@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindForms from "@tailwindcss/forms";
 
 export default {
   content: [
@@ -40,6 +41,5 @@ export default {
       },
     },
   },
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  plugins: [require("@tailwindcss/forms"), require("preline/plugin")],
+  plugins: [tailwindForms],
 } satisfies Config;
