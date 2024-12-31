@@ -1,6 +1,5 @@
-import { gql } from "@apollo/client";
 
-export const PUBLIC_INSURANCE_BROKERS_QUERY = gql`
+export const PUBLIC_INSURANCE_BROKERS_QUERY =`
   query getPublicInsuranceBrokers {
     getPublicInsuranceBrokers {
       items {
