@@ -6,7 +6,7 @@ import Suppliers from "@/components/home/suppliers";
 import JoinOurTeam from "@/components/home/join-our-team";
 import Footer from "@/components/home/footer";
 
-export default function Home() {
+const Home = () => {
   return (
     <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start overflow-hidden">
       <HeroBanner />
@@ -20,4 +20,6 @@ export default function Home() {
       <Footer />
     </div>
   );
-}
+};
+
+export default Home;
