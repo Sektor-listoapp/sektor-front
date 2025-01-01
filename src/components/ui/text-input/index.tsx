@@ -11,6 +11,8 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   icon?: IconDefinition;
   iconPosition?: "start" | "end";
   iconProps?: Omit<FontAwesomeIconProps, "icon">;
+  error?: boolean;
+  errors?: string[];
 }
 
 const TextInput = ({
@@ -18,6 +20,8 @@ const TextInput = ({
   iconPosition = "start",
   iconProps,
   wrapperClassName,
+  error = false,
+  errors,
   className,
   ...props
 }: TextInputProps) => {
@@ -27,11 +31,13 @@ const TextInput = ({
       <input
         type="text"
         autoComplete="off"
+        spellCheck="false"
         className={cn(
           "py-3 px-5 block w-full bg-white border-blue-500 rounded-xl text-blue-500 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none font-century-gothic",
+          className,
           { "ps-12": icon && iconPosition === "start" },
           { "pe-12": icon && iconPosition === "end" },
-          className
+          { "border-red-500 text-red-500": error }
         )}
         {...props}
       />
@@ -45,6 +51,13 @@ const TextInput = ({
             iconClassName
           )}
         />
+      )}
+      {error && (
+        <ul className="absolute bottom-0 left-0 right-0 text-red-500 text-sm font-century-gothic">
+          {errors?.map((error, index) => (
+            <li key={index}>{error}</li>
+          ))}
+        </ul>
       )}
     </div>
   );

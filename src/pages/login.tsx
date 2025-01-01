@@ -1,27 +1,50 @@
 import AuthLayout from "@/components/auth/common/layout";
 import LoginForm from "@/components/auth/login/login-form";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
+import { ROUTES } from "@/constants/router";
 import { useRegistrationStore } from "@/store/registration";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import React from "react";
 
 const Login = () => {
+  const { push } = useRouter();
+
   const resetRegistrationStore = useRegistrationStore(
     (state) => state.resetRegistrationStore
   );
 
+  const handleGoBack = () => {
+    resetRegistrationStore();
+    push(ROUTES.HOME);
+  };
+
   return (
     <AuthLayout>
       <main className="w-full lg:grid lg:grid-cols-12 lg:items-start lg:justify-center lg:relative lg:gap-4">
-        <section className="bg-white p-4 pt-8 w-11/12  max-w-lg rounded-3xl mx-auto pb-40 text-blue-500 flex flex-col items-center gap-4 h-full lg:col-span-6 xl:col-span-5 lg:w-full lg:order-1 lg:h-fit lg:mt-20 lg:pb-10 lg:z-10 xl:max-w-[700px] xl:px-8 lg:mb-10">
+        <section className="bg-white p-4 pt-8 w-11/12 relative z-10 pb-14 max-w-lg rounded-3xl mx-auto text-blue-500 flex flex-col items-center gap-10 h-full lg:col-span-6 xl:col-span-5 lg:w-full lg:order-1 lg:h-fit lg:mt-20 lg:pb-10 xl:max-w-[700px] xl:px-8 lg:mb-10 border-4 border-red-500">
+          <header className="w-full flex flex-col items-center gap-2 border px-10 text-center text-balance">
+            <h1 className="font-bold text-xl">
+              ¿Listo para seguir? <br /> Inicia sesión.
+            </h1>
+            <h2 className="font-century-gothic">¡Seguro aquí lo encuentras!</h2>
+          </header>
+
           <LoginForm />
+
+          <h3 className="font-century-gothic text-sm text-balance">
+            ¿Aún no tienes una cuenta?{" "}
+            <b className="underline" onClick={() => push(ROUTES.REGISTER)}>
+              Crear cuenta
+            </b>
+          </h3>
 
           <Link
             href="/"
             className="hidden lg:flex gap-2 justify-center items-center text-blue-500 font-bold text-sm hover:underline mr-auto ml-2 mt-10"
-            onClick={resetRegistrationStore}
+            onClick={handleGoBack}
           >
             <FontAwesomeIcon size="lg" icon={faArrowLeft} />
             Volver al inicio
@@ -42,7 +65,7 @@ const Login = () => {
               d="M0,256L120,229.3C240,203,480,149,720,149.3C960,149,1200,203,1320,229.3L1440,256L1440,320L1320,320C1200,320,960,320,720,320C480,320,240,320,120,320L0,320Z"
             ></path>
           </svg>
-          <div className="bg-blue-500 px-4 pt-6 pb-12 flex flex-col items-center justify-start gap-8 -mt-1 lg:bg-transparent lg:pt-12">
+          <div className="bg-blue-500 px-4 pt-36 pb-12 flex flex-col items-center justify-start gap-8 -mt-1 lg:bg-transparent lg:pt-12">
             <div className="w-full max-w-md lg:max-w-full lg:w-3/4">
               <SektorFullHorizontalLogo className="hidden lg:block w-44 text-white lg:mb-16" />
             </div>
