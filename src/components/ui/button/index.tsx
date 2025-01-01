@@ -1,10 +1,12 @@
 import { cn } from "@/utils/class-name";
 import React from "react";
+import Spinner from "../spinner";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: keyof typeof variants;
   size?: "small" | "medium" | "large";
   children?: React.ReactNode;
+  loading?: boolean;
 }
 
 const variants = {
@@ -27,6 +29,7 @@ const Button: React.FC<ButtonProps> = ({
   children = "",
   className = "",
   variant = "solid",
+  loading = false,
   ...props
 }) => {
   return (
@@ -35,7 +38,7 @@ const Button: React.FC<ButtonProps> = ({
       className={cn(variants.base, variants[variant], className)}
       {...props}
     >
-      {children}
+      {loading ? <Spinner /> : <>{children}</>}
     </button>
   );
 };

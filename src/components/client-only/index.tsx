@@ -4,8 +4,6 @@ interface ClientOnlyProps {
   children: React.ReactNode;
 }
 
-// Based on https://www.apollographql.com/blog/next-js-getting-started
-
 const ClientOnly = ({ children }: ClientOnlyProps) => {
   const [hasMounted, setHasMounted] = useState(false);
 

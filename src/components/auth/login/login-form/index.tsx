@@ -3,84 +3,88 @@ import PasswordInput from "@/components/ui/password-input";
 import TextInput from "@/components/ui/text-input";
 import { ROUTES } from "@/constants/router";
 import { INPUT_ERROR_MESSAGES, REGEX } from "@/constants/validations";
+import { setAccessToken } from "@/helpers/auth";
+import { LOGIN } from "@/lib/sektor-api/mutations";
+import { useMutation } from "@apollo/client";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
+import { toast } from "react-toastify";
 
-const { EMAIL } = INPUT_ERROR_MESSAGES;
+const { EMAIL, PASSWORD } = INPUT_ERROR_MESSAGES;
 
 const LoginForm = () => {
   const { push } = useRouter();
+  const [login, { loading }] = useMutation(LOGIN);
 
-  // const [login] = useMutation(LOGIN);
-
-  // const handleLogin = async () => {
-  //   try {
-  //     const response = await login({
-  //       variables: {
-  //         input: {
-  //           email: "test@test.com",
-  //           password: "Sektor2025",
-  //         },
-  //       },
-  //     });
-  //     console.log(response);
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [input, setInput] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<Record<string, string[]>>({
     email: [],
     password: [],
   });
 
-  const handleLogin = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    console.log({ email, password });
-  };
+  const handleChange = (e: FormEvent<HTMLInputElement>) => {
+    const { name, value } = e.currentTarget;
+    setInput((prev) => ({ ...prev, [name]: value }));
 
-  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    if (!REGEX.EMAIL.test(value)) {
+    if (name === "email") {
       setErrors((prev) => ({
         ...prev,
-        email: [EMAIL.EXAMPLE],
+        email: REGEX.EMAIL.test(value) ? [] : [EMAIL.EXAMPLE],
       }));
-      return;
     }
-    setEmail(value);
+
+    if (name === "password") {
+      setErrors((prev) => ({
+        ...prev,
+        password: value.trim().length >= 8 ? [] : [PASSWORD.MIN_LENGTH],
+      }));
+    }
   };
 
-  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setPassword(value);
+  const handleLogin = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    login({ variables: { input } })
+      .then((response) => {
+        console.log(response);
+        setAccessToken(response.data.login.token);
+      })
+      .catch((error) => {
+        console.log("Error on login", error?.message);
+        toast.error(
+          error?.message ||
+            "Ocurrió un error al iniciar sesión, por favor intenta de nuevo más tarde."
+        );
+      });
   };
 
   return (
-    <form onSubmit={handleLogin} className="border-2 border-blue-500 w-full">
+    <form
+      onSubmit={handleLogin}
+      className="w-full max-w-sm flex flex-col items-center lg:mt-4"
+    >
       <TextInput
         placeholder="Correo electrónico"
         name="email"
-        className="mb-10"
-        value={email}
+        wrapperClassName={errors.email.length ? "mb-4" : "mb-10"}
         icon={faUser}
-        onChange={handleEmailChange}
         required
         error={Boolean(errors.email.length)}
         errors={errors.email}
+        disabled={loading}
+        onChange={handleChange}
+        value={input.email}
       />
       <PasswordInput
-        placeholder="Contraseña"
-        name="password"
-        value={password}
-        onChange={handlePasswordChange}
         required
+        name="password"
+        placeholder="Contraseña"
+        error={Boolean(errors.password.length)}
+        errors={errors.password}
+        disabled={loading}
+        onChange={handleChange}
+        value={input.password}
       />
       <Button
         variant="link"
@@ -89,7 +93,13 @@ const LoginForm = () => {
       >
         Olvide mi contraseña
       </Button>
-      <Button variant="solid-blue" className="w-full mt-12" type="submit">
+      <Button
+        variant="solid-blue"
+        className="w-full mt-12 md:w-fit md:px-12 lg:mt-16"
+        type="submit"
+        disabled={loading}
+        loading={loading}
+      >
         Iniciar sesión
       </Button>
     </form>

@@ -21,41 +21,47 @@ const TextInput = ({
   iconProps,
   wrapperClassName,
   error = false,
-  errors,
+  errors = [],
   className,
   ...props
 }: TextInputProps) => {
   const { className: iconClassName } = iconProps || {};
   return (
     <div className={cn("relative w-full", wrapperClassName)}>
-      <input
-        type="text"
-        autoComplete="off"
-        spellCheck="false"
-        className={cn(
-          "py-3 px-5 block w-full bg-white border-blue-500 rounded-xl text-blue-500 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none font-century-gothic",
-          className,
-          { "ps-12": icon && iconPosition === "start" },
-          { "pe-12": icon && iconPosition === "end" },
-          { "border-red-500 text-red-500": error }
-        )}
-        {...props}
-      />
-      {icon && (
-        <FontAwesomeIcon
-          size="lg"
-          icon={icon}
+      <div className={"relative w-full"}>
+        <input
+          type="text"
+          autoComplete="off"
+          spellCheck="false"
           className={cn(
-            "absolute inset-y-0 flex items-center pointer-events-none peer-disabled:opacity-50 peer-disabled:pointer-events-none my-auto text-blue-500",
-            iconPosition === "start" ? "start-0 ps-4" : "end-0 pe-4",
-            iconClassName
+            "py-3 px-5 block w-full bg-white border-blue-500 rounded-xl text-blue-500 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none font-century-gothic",
+            className,
+            { "ps-12": icon && iconPosition === "start" },
+            { "pe-12": icon && iconPosition === "end" },
+            { "border-red-500 text-red-500 placeholder:text-red-500": error }
           )}
+          {...props}
         />
-      )}
-      {error && (
-        <ul className="absolute bottom-0 left-0 right-0 text-red-500 text-sm font-century-gothic">
+        {icon && (
+          <FontAwesomeIcon
+            size="lg"
+            icon={icon}
+            className={cn(
+              "absolute inset-y-0 flex items-center pointer-events-none peer-disabled:opacity-50 peer-disabled:pointer-events-none my-auto text-blue-500",
+              iconPosition === "start" ? "start-0 ps-4" : "end-0 pe-4",
+              iconClassName,
+              { "text-red-500": error }
+            )}
+          />
+        )}
+      </div>
+
+      {error && errors?.length && (
+        <ul className="text-red-500 text-xs font-century-gothic mt-2">
           {errors?.map((error, index) => (
-            <li key={index}>{error}</li>
+            <li key={index} className="list-disc list-inside text-balance">
+              {error}
+            </li>
           ))}
         </ul>
       )}
