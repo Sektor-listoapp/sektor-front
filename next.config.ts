@@ -11,6 +11,7 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   transpilePackages: [
+    "apollo-upload-client",
     // antd & deps
     "@ant-design",
     "@rc-component",

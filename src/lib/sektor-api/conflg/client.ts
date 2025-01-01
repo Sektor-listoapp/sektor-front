@@ -1,13 +1,32 @@
+import { getAccessToken } from "@/helpers/auth";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
 const createSektorApiClient = () => {
-  return new ApolloClient({
+  const authLink = setContext((_, { headers }) => {
+    const token = getAccessToken();
+    return {
+      headers: {
+        ...headers,
+        authorization: token ? `Bearer ${token}` : "",
+      },
+    };
+  });
+
+  const httpLink = createUploadLink({
     uri: process.env.NEXT_PUBLIC_SEKTOR_API_URL || "",
-    cache: new InMemoryCache(),
     headers: {
       "Apollo-Require-Preflight": "true",
     },
   });
+
+  const client = new ApolloClient({
+    cache: new InMemoryCache(),
+    link: authLink.concat(httpLink),
+  });
+
+  return client;
 };
 
 export default createSektorApiClient;
