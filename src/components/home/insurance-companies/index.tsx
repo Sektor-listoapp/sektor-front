@@ -1,20 +1,29 @@
 import Button from "@/components/ui/button";
+import { PUBLIC_ORGANIZATIONS_QUERY } from "@/lib/sektor-api/queries";
 import { PublicOrganizationType } from "@/types/public";
 import { cn } from "@/utils/class-name";
-import { Carousel } from "antd";
+import { useQuery } from "@apollo/client";
+import { Carousel, Spin } from "antd";
 import Image from "next/image";
 import React from "react";
 
-interface InsuranceCompaniesInfoProps
-  extends React.HTMLAttributes<HTMLDivElement> {
-  insuranceCompanies: PublicOrganizationType[];
-}
-
 const InsuranceCompaniesInfo = ({
   className,
-  insuranceCompanies,
   ...props
-}: InsuranceCompaniesInfoProps) => {
+}: React.HTMLAttributes<HTMLDivElement>) => {
+  const { data, loading, error } = useQuery(PUBLIC_ORGANIZATIONS_QUERY, {
+    variables: { type: "InsuranceCompany" },
+  });
+
+  if (error) {
+    console.error(error);
+    return null;
+  }
+
+  const insuranceCompanies = (data?.getPublicOrganizations?.items ||
+    []) as PublicOrganizationType[];
+
+  console.log(insuranceCompanies);
   return (
     <section
       className={cn(
@@ -47,24 +56,28 @@ const InsuranceCompaniesInfo = ({
         </p>
       </div>
       <div className="w-11/12 max-w-sm md:max-w-full">
-        <Carousel
-          autoplay
-          dots={false}
-          draggable
-          speed={1000}
-          className="flex items-center justify-center w-full relative h-36 md:h-60 xl:h-36"
-        >
-          {insuranceCompanies?.map(({ id, logoUrl, name }, index) => (
-            <Image
-              key={`insurance-company-${id}-${index}`}
-              className="w-11/12 h-32 m-auto max-w-full object-contain md:h-60 xl:h-36"
-              src={logoUrl}
-              width={700}
-              height={700}
-              alt={name}
-            />
-          ))}
-        </Carousel>
+        {loading ? (
+          <Spin className="m-auto w-full" size="large" />
+        ) : (
+          <Carousel
+            autoplay
+            dots={false}
+            draggable
+            speed={1000}
+            className="flex items-center justify-center w-full relative h-36 md:h-60 xl:h-36"
+          >
+            {insuranceCompanies?.map(({ id, logoUrl, name }, index) => (
+              <Image
+                key={`insurance-company-${id}-${index}`}
+                className="w-11/12 h-32 m-auto max-w-full object-contain md:h-60 xl:h-36"
+                src={logoUrl}
+                width={700}
+                height={700}
+                alt={name}
+              />
+            ))}
+          </Carousel>
+        )}
       </div>
       <footer className="w-full max-w-sm md:col-span-2 md:max-w-full flex items-center justify-center">
         <Button variant="solid-blue" className="w-full md:max-w-sm">
