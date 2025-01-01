@@ -5,11 +5,17 @@ import es from "antd/locale/es_ES";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
 config.autoAddCss = false;
+import { ApolloProvider } from "@apollo/client";
+import createSektorApiClient from "@/lib/sektor-api/conflg/client";
+
+const sektorApiClient = createSektorApiClient();
 
 export default function App({ Component, pageProps }: AppProps) {
   return (
-    <ConfigProvider locale={es}>
-      <Component {...pageProps} />
-    </ConfigProvider>
+    <ApolloProvider client={sektorApiClient}>
+      <ConfigProvider locale={es}>
+        <Component {...pageProps} />
+      </ConfigProvider>
+    </ApolloProvider>
   );
 }
