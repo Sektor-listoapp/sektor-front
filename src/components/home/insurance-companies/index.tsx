@@ -17,7 +17,6 @@ const InsuranceCompaniesInfo = ({
 
   if (error) {
     console.error(error);
-    return null;
   }
 
   const insuranceCompanies = (data?.getPublicOrganizations?.items ||
