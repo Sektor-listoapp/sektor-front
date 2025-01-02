@@ -1,15 +1,21 @@
 import Button from "@/components/ui/button";
 import TextInput from "@/components/ui/text-input";
+import { ROUTES } from "@/constants/router";
 import { INPUT_ERROR_MESSAGES, REGEX } from "@/constants/validations";
 import { SEND_PASSWORD_RESET_REQUEST } from "@/lib/sektor-api/mutations";
 import { useMutation } from "@apollo/client";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { toast } from "react-toastify";
 
 const { EMAIL, GENERAL } = INPUT_ERROR_MESSAGES;
 
+const GENERIC_ERROR_MESSAGE =
+  "Ocurrió un error al enviar el correo de recuperación de contraseña, por favor intente de nuevo más tarde.";
+
 const SendRecoveryLinkForm = () => {
+  const { replace } = useRouter();
   const [sendPasswordResetRequest, { loading }] = useMutation(
     SEND_PASSWORD_RESET_REQUEST
   );
@@ -19,8 +25,9 @@ const SendRecoveryLinkForm = () => {
 
   const handleEmailChange = (e: FormEvent<HTMLInputElement>) => {
     const { value } = e.currentTarget;
-    setEmail(value);
-    setEmailErrors(REGEX.EMAIL.test(value) ? [] : [EMAIL.EXAMPLE]);
+    const trimmedValue = value.trim();
+    setEmail(trimmedValue);
+    setEmailErrors(REGEX.EMAIL.test(trimmedValue) ? [] : [EMAIL.EXAMPLE]);
   };
 
   const handleLogin = (e: FormEvent<HTMLFormElement>) => {
@@ -31,16 +38,27 @@ const SendRecoveryLinkForm = () => {
       return;
     }
 
+    if (emailErrors.length) {
+      return;
+    }
+
     sendPasswordResetRequest({ variables: { email } })
       .then((response) => {
-        console.log("Password reset request sent", response);
+        const wasEmailSent = response?.data?.sendPasswordResetRequest;
+
+        if (!wasEmailSent) {
+          toast.error(GENERIC_ERROR_MESSAGE);
+          return;
+        }
+        toast.success(
+          "Si tu cuenta se encuentra registrada, recibirás un correo que te permitirá cambiar tu contraseña",
+          {
+            onClose: () => replace(ROUTES.HOME),
+          }
+        );
       })
       .catch((error) => {
-        console.log("Error on sending password reset request", error?.message);
-        toast.error(
-          error?.message ||
-            "Ocurrió un error al enviar el correo de recuperación de contraseña, por favor intente de nuevo más tarde."
-        );
+        toast.error(error?.message || GENERIC_ERROR_MESSAGE);
       });
   };
 

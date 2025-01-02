@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import { FormEvent, useState } from "react";
 import { toast } from "react-toastify";
 
-const { EMAIL, PASSWORD } = INPUT_ERROR_MESSAGES;
+const { EMAIL, PASSWORD, GENERAL } = INPUT_ERROR_MESSAGES;
 
 const LoginForm = () => {
   const { push } = useRouter();
@@ -28,25 +28,42 @@ const LoginForm = () => {
 
   const handleChange = (e: FormEvent<HTMLInputElement>) => {
     const { name, value } = e.currentTarget;
-    setInput((prev) => ({ ...prev, [name]: value }));
+    const trimmedValue = value.trim();
+    setInput((prev) => ({ ...prev, [name]: trimmedValue }));
 
     if (name === "email") {
       setErrors((prev) => ({
         ...prev,
-        email: REGEX.EMAIL.test(value) ? [] : [EMAIL.EXAMPLE],
+        email: REGEX.EMAIL.test(trimmedValue) ? [] : [EMAIL.EXAMPLE],
       }));
     }
 
     if (name === "password") {
       setErrors((prev) => ({
         ...prev,
-        password: value.trim().length >= 8 ? [] : [PASSWORD.MIN_LENGTH],
+        password: trimmedValue.length >= 8 ? [] : [PASSWORD.MIN_LENGTH],
       }));
     }
   };
 
   const handleLogin = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!input.email.trim().length || !input.password.trim().length) {
+      setErrors((prev) => ({
+        ...prev,
+        email: !input.email.trim().length ? [GENERAL.REQUIRED] : prev.email,
+        password: !input.password.trim().length
+          ? [GENERAL.REQUIRED]
+          : prev.password,
+      }));
+      return;
+    }
+
+    const hasErrors = Object.values(errors).some((error) => error.length > 0);
+    if (hasErrors) {
+      return;
+    }
 
     login({ variables: { input } })
       .then((response) => {
@@ -56,7 +73,6 @@ const LoginForm = () => {
         push(ROUTES.HOME);
       })
       .catch((error) => {
-        console.log("Error on login", error?.message);
         toast.error(
           error?.message ||
             "Ocurrió un error al iniciar sesión, por favor intenta de nuevo más tarde."
@@ -74,7 +90,6 @@ const LoginForm = () => {
         name="email"
         wrapperClassName={errors.email.length ? "mb-4" : "mb-10"}
         icon={faUser}
-        required
         error={Boolean(errors.email.length)}
         errors={errors.email}
         disabled={loading}
@@ -82,7 +97,6 @@ const LoginForm = () => {
         value={input.email}
       />
       <PasswordInput
-        required
         name="password"
         placeholder="Contraseña"
         error={Boolean(errors.password.length)}

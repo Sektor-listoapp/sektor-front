@@ -18,16 +18,22 @@ export default function App({ Component, pageProps }: AppProps) {
       <ConfigProvider locale={es}>
         <ToastContainer
           position="bottom-center"
-          autoClose={5000}
+          autoClose={6000}
           hideProgressBar={false}
           newestOnTop={false}
           closeOnClick={true}
           rtl={false}
-          pauseOnFocusLoss
-          draggable
           pauseOnHover
           theme="light"
           transition={Flip}
+          toastStyle={{
+            width: "80%",
+            fontFamily: "Century Gothic",
+            fontSize: "0.9rem",
+            paddingTop: "2rem",
+            paddingBottom: "2rem",
+            textWrap: "balance",
+          }}
         />
         <Component {...pageProps} />
       </ConfigProvider>

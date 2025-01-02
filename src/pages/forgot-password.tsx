@@ -1,5 +1,6 @@
 import AuthLayout from "@/components/auth/common/layout";
 import SendRecoveryLinkForm from "@/components/auth/forgot-password/send-recovery-link-form";
+import Stepper from "@/components/auth/forgot-password/stepper";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
 import { ROUTES } from "@/constants/router";
 import { useRegistrationStore } from "@/store/registration";
@@ -7,7 +8,6 @@ import { faArrowLeft, faLock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
 
 const ForgotPassword = () => {
   const { push } = useRouter();
@@ -64,7 +64,8 @@ const ForgotPassword = () => {
           </svg>
           <div className="bg-blue-500 px-4 pt-36 pb-12 flex flex-col items-center justify-start gap-8 -mt-1 lg:bg-transparent lg:pt-12">
             <div className="w-full max-w-md lg:max-w-full lg:w-3/4">
-              <SektorFullHorizontalLogo className="hidden lg:block w-44 text-white lg:mb-28" />
+              <SektorFullHorizontalLogo className="hidden lg:block w-44 text-white lg:mb-20" />
+              <Stepper className="py-4 w-full" />
             </div>
           </div>
         </section>
