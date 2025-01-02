@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 import ResetPasswordForm from "@/components/auth/forgot-password/reset-password-form";
 import { useAuthStore } from "@/store/auth";
 
-const ForgotPassword = () => {
+const ResetPassword = () => {
   const { push, query, replace } = useRouter();
   const resetAuthStore = useAuthStore((state) => state.resetAuthStore);
   const setResetPasswordToken = useAuthStore(
@@ -27,8 +27,7 @@ const ForgotPassword = () => {
       setResetPasswordToken(query.token as string);
       replace({ query: {} }, undefined, { shallow: true });
     }
-    return () => resetAuthStore();
-  }, [query.token, replace, resetAuthStore, setResetPasswordToken]);
+  }, [query.token, replace, setResetPasswordToken]);
 
   return (
     <AuthLayout>
@@ -83,4 +82,4 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword;
+export default ResetPassword;

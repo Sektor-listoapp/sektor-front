@@ -79,8 +79,8 @@ const ResetPasswordForm = () => {
     updatePassword({
       variables: {
         input: {
-          token: resetPasswordToken,
-          newPassword: input?.password,
+          token: resetPasswordToken || "",
+          newPassword: input?.password || "",
         },
       },
     })
