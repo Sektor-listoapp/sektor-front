@@ -39,7 +39,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
           key={router.route}
           initial="initial"
           animate="animate"
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.7 }}
           variants={{
             initial: {
               opacity: 0,
