@@ -1,4 +1,7 @@
 export const INPUT_ERROR_MESSAGES = {
+  GENERAL: {
+    REQUIRED: "Este campo es requerido",
+  },
   EMAIL: {
     EXAMPLE: "El correo electrónico debe tener el formato: nombre@dominio.com",
   },
