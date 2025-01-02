@@ -32,7 +32,6 @@ export default function App({ Component, pageProps }: AppProps) {
             fontSize: "0.9rem",
             paddingTop: "2rem",
             paddingBottom: "2rem",
-            textWrap: "balance",
           }}
         />
         <Component {...pageProps} />
