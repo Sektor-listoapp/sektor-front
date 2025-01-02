@@ -23,7 +23,6 @@ const Register = () => {
   const resetRegistrationStore = useRegistrationStore(
     (state) => state.resetRegistrationStore
   );
-  console.log("currentStep", { currentStep, userType });
 
   const RegisterStep = REGISTER_COMPONENTS_MAP[currentStep.component];
 
@@ -34,12 +33,9 @@ const Register = () => {
     !userType || (isIntermediary && isCompanySegmentsStep);
 
   const handleNextStep = () => {
-    console.log("userType", userType);
-    console.log("currentStep", currentStep);
     if (!userType) return;
     const nextStepForUser = currentStep.nextStep[userType];
     const nextRegistrationStep = REGISTER_STEPS[nextStepForUser];
-    console.log("next step", nextRegistrationStep);
     setCurrentRegistrationStep(nextRegistrationStep);
   };
 

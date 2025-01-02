@@ -16,8 +16,8 @@ const Login = () => {
   );
 
   const handleGoBack = () => {
-    resetRegistrationStore();
     push(ROUTES.HOME);
+    resetRegistrationStore();
   };
 
   return (

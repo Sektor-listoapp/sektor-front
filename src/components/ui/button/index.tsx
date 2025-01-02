@@ -10,7 +10,7 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  base: "py-2 px-6 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-3xl border border-transparent transition-all font-arial-rounded text-base shadow-xl",
+  base: "py-2 px-6 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-3xl border border-transparent transition-all font-arial-rounded text-base shadow-xl focus:outline-0",
   solid:
     "bg-white text-blue-500 hover:bg-blue-100 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none",
   "solid-blue":
@@ -22,7 +22,9 @@ const variants = {
   soft: "bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none",
   white:
     "py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-3xl border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none",
-  link: "text-blue-500 underline hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none shadow-none bg-transparent px-0 py-0 font-century-gothic block text-sm",
+  link: "text-white underline hover:text-gray-600 focus:outline-none focus:text-gray-800 disabled:opacity-50 disabled:pointer-events-none shadow-none bg-transparent px-0 py-0 font-century-gothic block",
+  "link-blue":
+    "text-blue-500 underline hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none shadow-none bg-transparent px-0 py-0 font-century-gothic block",
 };
 
 const Button: React.FC<ButtonProps> = ({
@@ -35,10 +37,13 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <button
       type="button"
-      className={cn(variants.base, variants[variant], className)}
+      className={cn(variants.base, variants[variant], className, {
+        "cursor-not-allowed relative text-opacity-0": loading,
+      })}
       {...props}
     >
-      {loading ? <Spinner /> : <>{children}</>}
+      {loading && <Spinner className="absolute inset-0 m-auto" />}
+      {children}
     </button>
   );
 };

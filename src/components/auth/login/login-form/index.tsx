@@ -92,8 +92,8 @@ const LoginForm = () => {
         value={input.password}
       />
       <Button
-        variant="link"
-        className="ml-auto mt-3"
+        variant="link-blue"
+        className="ml-auto mt-3 text-sm"
         onClick={() => push(ROUTES.FORGOT_PASSWORD)}
       >
         Olvide mi contraseña
