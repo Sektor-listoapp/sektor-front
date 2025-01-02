@@ -1,9 +1,10 @@
 import Button from "@/components/ui/button";
+import Spinner from "@/components/ui/spinner";
 import { PUBLIC_ORGANIZATIONS_QUERY } from "@/lib/sektor-api/queries";
 import { PublicOrganizationType } from "@/types/public";
 import { cn } from "@/utils/class-name";
 import { useQuery } from "@apollo/client";
-import { Carousel, Spin } from "antd";
+import { Carousel } from "antd";
 import Image from "next/image";
 import React from "react";
 
@@ -16,13 +17,12 @@ const InsuranceCompaniesInfo = ({
   });
 
   if (error) {
-    console.error(error);
+    console.error("Error fetching insurance companies", error);
   }
 
   const insuranceCompanies = (data?.getPublicOrganizations?.items ||
     []) as PublicOrganizationType[];
 
-  console.log(insuranceCompanies);
   return (
     <section
       className={cn(
@@ -56,7 +56,7 @@ const InsuranceCompaniesInfo = ({
       </div>
       <div className="w-11/12 max-w-sm md:max-w-full">
         {loading ? (
-          <Spin className="m-auto w-full" size="large" />
+          <Spinner className="m-auto w-10 h-10 text-blue-500 transition-all my-24 md:my-auto text-opacity-70" />
         ) : (
           <Carousel
             autoplay
