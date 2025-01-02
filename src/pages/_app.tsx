@@ -9,10 +9,11 @@ import { ApolloProvider } from "@apollo/client";
 import createSektorApiClient from "@/lib/sektor-api/conflg/client";
 import { Flip, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { motion } from "framer-motion";
 
 const sektorApiClient = createSektorApiClient();
 
-export default function App({ Component, pageProps }: AppProps) {
+export default function App({ Component, pageProps, router }: AppProps) {
   return (
     <ApolloProvider client={sektorApiClient}>
       <ConfigProvider locale={es}>
@@ -34,7 +35,22 @@ export default function App({ Component, pageProps }: AppProps) {
             paddingBottom: "2rem",
           }}
         />
-        <Component {...pageProps} />
+        <motion.div
+          key={router.route}
+          initial="initial"
+          animate="animate"
+          transition={{ duration: 0.5 }}
+          variants={{
+            initial: {
+              opacity: 0,
+            },
+            animate: {
+              opacity: 1,
+            },
+          }}
+        >
+          <Component {...pageProps} />
+        </motion.div>
       </ConfigProvider>
     </ApolloProvider>
   );
