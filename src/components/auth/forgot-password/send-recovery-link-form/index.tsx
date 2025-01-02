@@ -63,7 +63,6 @@ const SendRecoveryLinkForm = () => {
         error={Boolean(emailErrors.length)}
         errors={emailErrors}
         disabled={loading}
-        required
         onChange={handleEmailChange}
         value={email}
       />
