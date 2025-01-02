@@ -8,8 +8,6 @@ interface PasswordInputProps
   wrapperClassName?: string;
   hideLeftIcon?: boolean;
   hideRightIcon?: boolean;
-  isPasswordConfirmationInput?: boolean;
-  passwordToMatch?: string;
   error?: boolean;
   errors?: string[];
 }

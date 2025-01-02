@@ -11,7 +11,7 @@ import { useAuthStore } from "@/store/auth";
 import { ROUTES } from "@/constants/router";
 
 const Navbar = () => {
-  const { push, asPath } = useRouter();
+  const { push, pathname } = useRouter();
   const [open, setOpen] = useState(false);
 
   const isAuthenticated = useAuthStore((state) => state.getIsAuthenticated)();
@@ -70,7 +70,7 @@ const Navbar = () => {
             <Link
               className={cn(
                 " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
-                { "font-bold": asPath === "/" }
+                { "font-bold": pathname === "/" }
               )}
               href="#"
             >
@@ -79,7 +79,7 @@ const Navbar = () => {
             <Link
               className={cn(
                 " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
-                { "font-bold": asPath === "/insurance" }
+                { "font-bold": pathname === "/insurance" }
               )}
               href="#"
             >
@@ -88,7 +88,7 @@ const Navbar = () => {
             <Link
               className={cn(
                 " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
-                { "font-bold": asPath === "/about-us" }
+                { "font-bold": pathname === "/about-us" }
               )}
               href="#"
             >
@@ -115,7 +115,7 @@ const Navbar = () => {
         <div className="transition-all duration-300 flex items-center justify-center gap-8 font-century-gothic xl:ml-auto xl: mr-20">
           <Link
             className={cn(" hover:text-gray-200 focus:outline-none", {
-              "font-bold": asPath === "/",
+              "font-bold": pathname === "/",
             })}
             href="#"
           >
@@ -123,7 +123,7 @@ const Navbar = () => {
           </Link>
           <Link
             className={cn(" hover:text-gray-200 focus:outline-none", {
-              "font-bold": asPath === "/insurance",
+              "font-bold": pathname === "/insurance",
             })}
             href="#"
           >
@@ -131,7 +131,7 @@ const Navbar = () => {
           </Link>
           <Link
             className={cn(" hover:text-gray-200 focus:outline-none", {
-              "font-bold": asPath === "/about-us",
+              "font-bold": pathname === "/about-us",
             })}
             href="#"
           >

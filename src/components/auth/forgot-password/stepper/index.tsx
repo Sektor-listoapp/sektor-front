@@ -19,7 +19,7 @@ const steps = [
 ];
 
 const Stepper: FC<StepperProps> = ({ className = "" }) => {
-  const { asPath } = useRouter();
+  const { pathname } = useRouter();
 
   return (
     <ul
@@ -29,7 +29,7 @@ const Stepper: FC<StepperProps> = ({ className = "" }) => {
       )}
     >
       {steps.map((step, index) => {
-        const isActive = asPath === step.index;
+        const isActive = pathname === step.index;
         return (
           <li
             key={`step-${index}-${step.label}`}

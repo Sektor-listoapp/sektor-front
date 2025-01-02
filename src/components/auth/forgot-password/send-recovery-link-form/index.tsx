@@ -30,7 +30,7 @@ const SendRecoveryLinkForm = () => {
     setEmailErrors(REGEX.EMAIL.test(trimmedValue) ? [] : [EMAIL.EXAMPLE]);
   };
 
-  const handleLogin = (e: FormEvent<HTMLFormElement>) => {
+  const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (email.trim().length === 0) {
@@ -64,7 +64,7 @@ const SendRecoveryLinkForm = () => {
 
   return (
     <form
-      onSubmit={handleLogin}
+      onSubmit={handleFormSubmit}
       className="w-full max-w-sm flex flex-col items-center my-4"
     >
       <label

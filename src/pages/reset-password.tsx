@@ -1,24 +1,34 @@
-import React from "react";
+import { useEffect } from "react";
 import AuthLayout from "@/components/auth/common/layout";
 import Stepper from "@/components/auth/forgot-password/stepper";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
 import { ROUTES } from "@/constants/router";
-import { useRegistrationStore } from "@/store/registration";
 import { faArrowLeft, faLock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import ResetPasswordForm from "@/components/auth/forgot-password/reset-password-form";
+import { useAuthStore } from "@/store/auth";
 
 const ForgotPassword = () => {
-  const { push, query } = useRouter();
-  const resetRegistrationStore = useRegistrationStore(
-    (state) => state.resetRegistrationStore
+  const { push, query, replace } = useRouter();
+  const resetAuthStore = useAuthStore((state) => state.resetAuthStore);
+  const setResetPasswordToken = useAuthStore(
+    (state) => state.setResetPasswordToken
   );
 
   const handleGoBack = () => {
     push(ROUTES.HOME);
-    resetRegistrationStore();
+    resetAuthStore();
   };
+
+  useEffect(() => {
+    if (query?.token) {
+      setResetPasswordToken(query.token as string);
+      replace({ query: {} }, undefined, { shallow: true });
+    }
+    return () => resetAuthStore();
+  }, [query.token, replace, resetAuthStore, setResetPasswordToken]);
 
   return (
     <AuthLayout>
@@ -35,9 +45,7 @@ const ForgotPassword = () => {
             </p>
           </header>
 
-          {/* <SendRecoveryLinkForm /> */}
-
-          <p>{JSON.stringify(query)}</p>
+          <ResetPasswordForm />
 
           <Link
             href="/"
