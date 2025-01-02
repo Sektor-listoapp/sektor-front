@@ -22,7 +22,7 @@ const variants = {
   soft: "bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none",
   white:
     "py-3 px-4 inline-flex items-center gap-x-2 text-sm font-medium rounded-3xl border border-gray-200 bg-white text-gray-800 shadow-sm hover:bg-gray-50 focus:outline-none focus:bg-gray-50 disabled:opacity-50 disabled:pointer-events-none",
-  link: "text-white underline hover:text-gray-600 focus:outline-none focus:text-gray-800 disabled:opacity-50 disabled:pointer-events-none shadow-none bg-transparent px-0 py-0 font-century-gothic block",
+  link: "text-white underline hover:text-gray-100 focus:outline-none focus:text-gray-300 disabled:opacity-50 disabled:pointer-events-none shadow-none bg-transparent px-0 py-0 font-century-gothic block",
   "link-blue":
     "text-blue-500 underline hover:text-blue-800 focus:outline-none focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none shadow-none bg-transparent px-0 py-0 font-century-gothic block",
 };
