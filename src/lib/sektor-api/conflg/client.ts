@@ -1,11 +1,11 @@
-import { getAccessToken } from "@/helpers/auth";
+import { useAuthStore } from "@/store/auth";
 import { ApolloClient, InMemoryCache } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
 const createSektorApiClient = () => {
   const authLink = setContext((_, { headers }) => {
-    const token = getAccessToken();
+    const token = useAuthStore.getState().accessToken;
     return {
       headers: {
         ...headers,

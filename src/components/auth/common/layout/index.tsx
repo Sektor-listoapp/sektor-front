@@ -1,11 +1,23 @@
-import React from "react";
+import { useEffect } from "react";
 import Header from "../header";
+import { useAuthStore } from "@/store/auth";
+import { useRouter } from "next/router";
+import { ROUTES } from "@/constants/router";
 
 const AuthLayout = ({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
+  const { push, isReady } = useRouter();
+  const isAuthenticated = useAuthStore((state) => state.getIsAuthenticated)();
+
+  useEffect(() => {
+    if (isReady && isAuthenticated) {
+      push(ROUTES.HOME);
+    }
+  }, [isAuthenticated, isReady, push]);
+
   return (
     <div className="min-h-svh secondary-gradient w-full flex flex-col justify-between items-start gap-8 lg:block lg:relative lg:overflow-hidden">
       <Header />

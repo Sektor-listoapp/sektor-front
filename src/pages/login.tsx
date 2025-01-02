@@ -1,4 +1,3 @@
-import React from "react";
 import AuthLayout from "@/components/auth/common/layout";
 import LoginForm from "@/components/auth/login/login-form";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";

@@ -1,18 +1,21 @@
 import { useState } from "react";
 import Link from "next/link";
 import Button from "../button";
-import { usePathname } from "next/navigation";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
 import { Drawer } from "antd";
 import { faBars } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cn } from "@/utils/class-name";
 import { useRouter } from "next/router";
+import { useAuthStore } from "@/store/auth";
+import { ROUTES } from "@/constants/router";
 
 const Navbar = () => {
-  const { push } = useRouter();
+  const { push, asPath } = useRouter();
   const [open, setOpen] = useState(false);
-  const pathname = usePathname();
+
+  const isAuthenticated = useAuthStore((state) => state.getIsAuthenticated)();
+  const resetAuthStore = useAuthStore((state) => state.resetAuthStore);
 
   const showDrawer = () => {
     setOpen(true);
@@ -20,6 +23,11 @@ const Navbar = () => {
 
   const onClose = () => {
     setOpen(false);
+  };
+
+  const handleLogout = () => {
+    resetAuthStore();
+    push(ROUTES.HOME);
   };
 
   return (
@@ -33,12 +41,26 @@ const Navbar = () => {
         rootStyle={{ color: "#182F48" }}
         footer={
           <div className="flex flex-col gap-6 pb-8">
-            <Button variant="solid-blue" onClick={() => push("/register")}>
-              Registrarte
-            </Button>
-            <Button variant="solid-blue" onClick={() => push("/login")}>
-              Iniciar sesión
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <Button variant="solid-blue">Mi cuenta</Button>
+                <Button variant="solid-blue" onClick={handleLogout}>
+                  Cerrar sesión
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="solid-blue"
+                  onClick={() => push(ROUTES.REGISTER)}
+                >
+                  Registrarte
+                </Button>
+                <Button variant="solid-blue" onClick={() => push(ROUTES.LOGIN)}>
+                  Iniciar sesión
+                </Button>
+              </>
+            )}
           </div>
         }
       >
@@ -48,9 +70,7 @@ const Navbar = () => {
             <Link
               className={cn(
                 " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
-                {
-                  "font-bold": pathname === "/",
-                }
+                { "font-bold": asPath === "/" }
               )}
               href="#"
             >
@@ -59,9 +79,7 @@ const Navbar = () => {
             <Link
               className={cn(
                 " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
-                {
-                  "font-bold": pathname === "/insurance",
-                }
+                { "font-bold": asPath === "/insurance" }
               )}
               href="#"
             >
@@ -70,9 +88,7 @@ const Navbar = () => {
             <Link
               className={cn(
                 " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
-                {
-                  "font-bold": pathname === "/about-us",
-                }
+                { "font-bold": asPath === "/about-us" }
               )}
               href="#"
             >
@@ -99,7 +115,7 @@ const Navbar = () => {
         <div className="transition-all duration-300 flex items-center justify-center gap-8 font-century-gothic xl:ml-auto xl: mr-20">
           <Link
             className={cn(" hover:text-gray-200 focus:outline-none", {
-              "font-bold": pathname === "/",
+              "font-bold": asPath === "/",
             })}
             href="#"
           >
@@ -107,7 +123,7 @@ const Navbar = () => {
           </Link>
           <Link
             className={cn(" hover:text-gray-200 focus:outline-none", {
-              "font-bold": pathname === "/insurance",
+              "font-bold": asPath === "/insurance",
             })}
             href="#"
           >
@@ -115,7 +131,7 @@ const Navbar = () => {
           </Link>
           <Link
             className={cn(" hover:text-gray-200 focus:outline-none", {
-              "font-bold": pathname === "/about-us",
+              "font-bold": asPath === "/about-us",
             })}
             href="#"
           >
@@ -123,9 +139,23 @@ const Navbar = () => {
           </Link>
         </div>
 
-        <div className="flex items-center gap-4">
-          <Button onClick={() => push("/login")}>Iniciar sesión</Button>
-          <Button onClick={() => push("/register")}>Registrarse</Button>
+        <div className="flex items-center gap-6">
+          {isAuthenticated ? (
+            <>
+              <Button
+                variant="link"
+                className="text-white no-underline text-base"
+              >
+                Mi cuenta
+              </Button>
+              <Button onClick={handleLogout}>Cerrar sesión</Button>
+            </>
+          ) : (
+            <>
+              <Button onClick={() => push(ROUTES.REGISTER)}>Registrarte</Button>
+              <Button onClick={() => push(ROUTES.LOGIN)}>Iniciar sesión</Button>
+            </>
+          )}
         </div>
       </div>
     </nav>

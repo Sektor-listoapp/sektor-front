@@ -3,8 +3,8 @@ import PasswordInput from "@/components/ui/password-input";
 import TextInput from "@/components/ui/text-input";
 import { ROUTES } from "@/constants/router";
 import { INPUT_ERROR_MESSAGES, REGEX } from "@/constants/validations";
-import { setAccessToken } from "@/helpers/auth";
 import { LOGIN } from "@/lib/sektor-api/mutations";
+import { useAuthStore } from "@/store/auth";
 import { useMutation } from "@apollo/client";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
@@ -16,6 +16,9 @@ const { EMAIL, PASSWORD } = INPUT_ERROR_MESSAGES;
 const LoginForm = () => {
   const { push } = useRouter();
   const [login, { loading }] = useMutation(LOGIN);
+
+  const setAccessToken = useAuthStore((state) => state.setAccessToken);
+  const setUser = useAuthStore((state) => state.setUser);
 
   const [input, setInput] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<Record<string, string[]>>({
@@ -47,8 +50,10 @@ const LoginForm = () => {
 
     login({ variables: { input } })
       .then((response) => {
-        console.log(response);
-        setAccessToken(response.data.login.token);
+        const { user, token } = response.data.login;
+        setAccessToken(token);
+        setUser(user);
+        push(ROUTES.HOME);
       })
       .catch((error) => {
         console.log("Error on login", error?.message);
