@@ -47,7 +47,7 @@ const Register = () => {
           <Button
             variant="solid-blue"
             disabled={disableNextStepButton}
-            className={clsx("hidden lg:block lg:px-12 mt-4", {
+            className={clsx("hidden lg:block lg:px-12 mt-auto", {
               invisible: disableNextStepButton,
             })}
             onClick={handleNextStep}
