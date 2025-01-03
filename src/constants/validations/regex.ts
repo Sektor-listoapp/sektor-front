@@ -6,4 +6,5 @@ export const REGEX = {
   EIGHT_CHARACTERS: /^.{8,}$/,
   SPECIAL_CHARACTER: /[^A-Za-z0-9]/,
   LICENSE: /^[a-zA-Z0-9]{6}$/,
+  PHONE: /^[0-9]{10}$/,
 } as const;

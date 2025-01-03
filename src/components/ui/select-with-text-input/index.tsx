@@ -78,9 +78,9 @@ const SelectWithTextInput = ({
         )}
       </div>
       {Boolean(errors?.length) && (
-        <ul className="text-red-500 text-xs font-century-gothic mt-2">
+        <ul className="text-red-500 text-xs font-century-gothic mt-2 w-full">
           {errors?.map((error, index) => (
-            <li key={index} className="list-disc list-inside text-balance">
+            <li key={index} className="list-disc list-inside">
               {error}
             </li>
           ))}

@@ -7,3 +7,4 @@ export * from "./register/register-as-supplier";
 export * from "./register/register-as-exclusive-agent";
 export * from "./register/register-as-insurance-broker";
 export * from "./register/register-as-brokerage-society";
+export * from "./register/register-as-insurance-company";

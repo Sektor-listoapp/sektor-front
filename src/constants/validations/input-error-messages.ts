@@ -16,4 +16,8 @@ export const INPUT_ERROR_MESSAGES = {
   LICENSE: {
     LENGTH: "Tu credencial debe contener 6 digitos",
   },
+  PHONE: {
+    LENGTH:
+      "El teléfono debe contener solo números y tener un máximo de 10 dígitos",
+  },
 };
