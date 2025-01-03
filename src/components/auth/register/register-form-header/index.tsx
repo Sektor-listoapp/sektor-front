@@ -1,5 +1,5 @@
-import clsx from "clsx";
 import React from "react";
+import { cn } from "@/utils/class-name";
 
 const RegisterFormHeader = ({
   className,
@@ -7,8 +7,8 @@ const RegisterFormHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <header
-      className={clsx(
-        "w-full border-2 border-red-500 text-center text-balance flex flex-col items-center gap-2 justify-center lg:gap-4",
+      className={cn(
+        "w-full text-center text-balance flex flex-col items-center gap-2 justify-center lg:gap-4",
         className
       )}
       {...props}

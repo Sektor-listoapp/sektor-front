@@ -3,77 +3,46 @@ import AuthLayout from "@/components/auth/common/layout";
 import Stepper from "@/components/auth/register/stepper";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
 import Button from "@/components/ui/button";
-import { USER_TYPES } from "@/constants/auth";
 import { REGISTER_COMPONENTS_MAP, REGISTER_STEPS } from "@/constants/register";
-import { useRegistrationStore } from "@/store/registration";
 import { cn } from "@/utils/class-name";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
-import { useShallow } from "zustand/shallow";
+import { useRegistrationStore } from "@/store/registration";
+import { useRouter } from "next/router";
+import { ROUTES } from "@/constants/router";
 
-const Register = () => {
-  const [isSubmittingForm, setIsSubmittingForm] = React.useState(false);
-  const userType = useRegistrationStore((state) => state.userType);
-  const currentStep = useRegistrationStore(
-    useShallow((state) => state.currentStep)
-  );
-  const setCurrentRegistrationStep = useRegistrationStore(
-    (state) => state.setCurrentRegistrationStep
-  );
+const VerifiedAccount = () => {
+  const { replace } = useRouter();
   const resetRegistrationStore = useRegistrationStore(
     (state) => state.resetRegistrationStore
   );
+  const currentStep = REGISTER_STEPS.EmailVerificationSuccess;
+  const RegisterStep = REGISTER_COMPONENTS_MAP[
+    currentStep.component
+  ] as React.ComponentType;
 
-  const isFormStep = currentStep.isForm;
-  const formRef = React.useRef<HTMLFormElement>(null);
-  const RegisterStep = REGISTER_COMPONENTS_MAP[currentStep.component];
-  const isIntermediary = userType === USER_TYPES.INTERMEDIARY;
-  const isCompanySegmentsStep =
-    currentStep.component === REGISTER_STEPS.CompanySegments.component;
-  const isSentVerificationEmailStep =
-    currentStep.component === REGISTER_STEPS.SentEmailVerification.component;
-  const disableNextStepButton =
-    !userType ||
-    (isIntermediary && isCompanySegmentsStep) ||
-    isSentVerificationEmailStep;
-
-  const handleNextStep = () => {
-    if (!userType) return;
-    const nextStepForUser = currentStep.nextStep[userType];
-    const nextRegistrationStep = REGISTER_STEPS[nextStepForUser];
-
-    if (isFormStep) {
-      formRef.current?.requestSubmit();
-      return;
-    }
-
-    setCurrentRegistrationStep(nextRegistrationStep);
+  const goToHomePage = () => {
+    resetRegistrationStore();
+    replace(ROUTES.HOME);
   };
 
   return (
     <AuthLayout>
       <main className="w-full lg:grid lg:grid-cols-12 lg:items-start lg:justify-center lg:relative lg:gap-4">
         <section className="bg-white p-4 pt-8 w-11/12  max-w-lg rounded-3xl mx-auto pb-40 text-blue-500 flex flex-col items-center gap-4 h-full lg:col-span-6 xl:col-span-5 lg:w-full lg:order-1 lg:h-fit lg:mt-20 lg:pb-10 lg:z-10 xl:max-w-[700px] xl:px-8 lg:mb-10 transition-all lg:min-h-[600px] lg:justify-between ">
-          <RegisterStep
-            formRef={formRef}
-            setIsSubmittingForm={setIsSubmittingForm}
-          />
+          <RegisterStep />
           <Button
             variant="solid-blue"
-            disabled={disableNextStepButton || isSubmittingForm}
-            loading={isSubmittingForm}
-            className={cn("hidden lg:block lg:px-12 mt-auto", {
-              invisible: disableNextStepButton,
-            })}
-            onClick={handleNextStep}
+            className="hidden lg:block lg:px-12"
+            onClick={goToHomePage}
           >
-            Siguiente
+            Descubre más
           </Button>
           <Link
             href="/"
             className="hidden lg:flex gap-2 justify-center items-center text-blue-500 font-bold text-sm hover:underline mr-auto ml-2 mt-10"
-            onClick={resetRegistrationStore}
+            onClick={goToHomePage}
           >
             <FontAwesomeIcon size="lg" icon={faArrowLeft} />
             Volver al inicio
@@ -98,14 +67,10 @@ const Register = () => {
             <div className="w-full max-w-md lg:max-w-full lg:w-3/4">
               <SektorFullHorizontalLogo className="hidden lg:block w-44 text-white lg:mb-16" />
               <Button
-                disabled={disableNextStepButton || isSubmittingForm}
-                loading={isSubmittingForm}
-                onClick={handleNextStep}
-                className={cn("w-full lg:hidden", {
-                  invisible: disableNextStepButton,
-                })}
+                onClick={goToHomePage}
+                className={cn("w-full mb-4 lg:hidden", {})}
               >
-                Siguiente
+                Descubre más
               </Button>
               <Stepper className="py-4 w-full" currentStep={currentStep} />
             </div>
@@ -116,4 +81,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default VerifiedAccount;

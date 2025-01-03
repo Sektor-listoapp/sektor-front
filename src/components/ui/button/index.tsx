@@ -10,9 +10,9 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const variants = {
-  base: "py-2 px-6 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-3xl border border-transparent transition-all font-arial-rounded text-base shadow-xl focus:outline-0",
+  base: "py-2 px-6 inline-flex items-center justify-center gap-x-2 text-sm font-medium rounded-3xl border border-transparent transition-all font-arial-rounded text-base shadow-xl focus:outline-0 relative",
   solid:
-    "bg-white text-blue-500 hover:bg-blue-100 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none",
+    "bg-white text-blue-500 hover:bg-blue-100 focus:outline-none focus:bg-blue-200 disabled:opacity-70 disabled:pointer-events-none",
   "solid-blue":
     "bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:bg-blue-500 disabled:opacity-50 disabled:pointer-events-none",
   outline:
@@ -38,12 +38,18 @@ const Button: React.FC<ButtonProps> = ({
     <button
       type="button"
       className={cn(variants.base, variants[variant], className, {
-        "cursor-not-allowed relative text-opacity-0": loading,
+        "cursor-not-allowed relative": loading,
       })}
       {...props}
     >
       {loading && <Spinner className="absolute inset-0 m-auto" />}
-      {children}
+      <span
+        className={cn({
+          "opacity-0": loading,
+        })}
+      >
+        {children}
+      </span>
     </button>
   );
 };

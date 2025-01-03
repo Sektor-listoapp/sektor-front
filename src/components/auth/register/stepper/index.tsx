@@ -1,10 +1,10 @@
-import { useRegistrationStore } from "@/store/registration";
+import { RegisterStep } from "@/types/register";
 import clsx from "clsx";
 import { FC } from "react";
-import { useShallow } from "zustand/shallow";
 
 interface StepperProps {
   className?: string;
+  currentStep: RegisterStep;
 }
 
 const steps = [
@@ -26,11 +26,7 @@ const steps = [
   },
 ];
 
-const Stepper: FC<StepperProps> = ({ className = "" }) => {
-  const currentStep = useRegistrationStore(
-    useShallow((state) => state.currentStep)
-  );
-
+const Stepper: FC<StepperProps> = ({ className = "", currentStep }) => {
   return (
     <ul
       className={clsx(
@@ -39,7 +35,7 @@ const Stepper: FC<StepperProps> = ({ className = "" }) => {
       )}
     >
       {steps.map((step, index) => {
-        const isActive = currentStep.index === step.index;
+        const isActive = currentStep.index === index;
         return (
           <li
             key={`step-${index}-${step.label}`}

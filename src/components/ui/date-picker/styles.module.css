@@ -23,3 +23,12 @@
 .datePicker div span {
   display: none;
 }
+
+.datePickerError {
+  border-color: #ff0000 !important;
+  color: #ff0000 !important;
+}
+.datePickerError div input,
+.datePickerError div input::placeholder {
+  color: #ff0000 !important;
+}

@@ -58,6 +58,7 @@ export const REGISTER_STEPS: Record<
   CustomerForm: {
     index: 1,
     component: CUSTOMER_FORM,
+    isForm: true,
     nextStep: {
       [CUSTOMER]: SENT_EMAIL_VERIFICATION,
     },
@@ -72,6 +73,7 @@ export const REGISTER_STEPS: Record<
   InsuranceCompanyForm: {
     index: 1,
     component: INSURANCE_COMPANY_FORM,
+    isForm: true,
     nextStep: {
       [INSURANCE_COMPANY]: SENT_EMAIL_VERIFICATION,
     },
@@ -79,6 +81,7 @@ export const REGISTER_STEPS: Record<
   ExclusiveAgentForm: {
     index: 1,
     component: EXCLUSIVE_AGENT_FORM,
+    isForm: true,
     nextStep: {
       [EXCLUSIVE_AGENT]: SENT_EMAIL_VERIFICATION,
     },
@@ -86,6 +89,7 @@ export const REGISTER_STEPS: Record<
   SupplierForm: {
     index: 1,
     component: SUPPLIER_FORM,
+    isForm: true,
     nextStep: {
       [SUPPLIER]: SENT_EMAIL_VERIFICATION,
     },
@@ -93,6 +97,7 @@ export const REGISTER_STEPS: Record<
   BrokerageSocietyForm: {
     index: 1,
     component: BROKERAGE_SOCIETY_FORM,
+    isForm: true,
     nextStep: {
       [BROKERAGE_SOCIETY]: SENT_EMAIL_VERIFICATION,
     },

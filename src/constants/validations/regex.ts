@@ -4,5 +4,5 @@ export const REGEX = {
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
   CAPITAL_LETTER: /[A-Z]/,
   EIGHT_CHARACTERS: /^.{8,}$/,
-  SPECIAL_CHARACTER: /[@$!%*?&]/,
+  SPECIAL_CHARACTER: /[^A-Za-z0-9]/,
 } as const;

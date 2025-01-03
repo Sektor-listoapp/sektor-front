@@ -36,9 +36,11 @@ const TextInput = ({
           className={cn(
             "py-3 px-5 block w-full bg-white border-blue-500 rounded-xl text-blue-500 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none font-century-gothic",
             className,
-            { "ps-12": icon && iconPosition === "start" },
-            { "pe-12": icon && iconPosition === "end" },
-            { "border-red-500 text-red-500 placeholder:text-red-500": error }
+            {
+              "ps-12": icon && iconPosition === "start",
+              "pe-12": icon && iconPosition === "end",
+              "border-red-500 text-red-500 placeholder:text-red-500": error,
+            }
           )}
           {...props}
         />
@@ -57,9 +59,9 @@ const TextInput = ({
       </div>
 
       {error && errors?.length && (
-        <ul className="text-red-500 text-xs font-century-gothic mt-2">
+        <ul className="text-red-500 text-xs font-century-gothic mt-1 w-full">
           {errors?.map((error, index) => (
-            <li key={index} className="list-disc list-inside text-balance">
+            <li key={index} className="list-disc list-inside w-full">
               {error}
             </li>
           ))}
