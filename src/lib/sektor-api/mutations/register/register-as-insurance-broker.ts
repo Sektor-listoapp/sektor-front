@@ -1,4 +1,6 @@
-export const REGISTER_AS_INSURANCE_BROKER = `
+import { gql } from "@apollo/client";
+
+export const REGISTER_AS_INSURANCE_BROKER = gql`
   mutation registerAsInsuranceBroker(
     $input: RegisterAsInsuranceBrokerInputType!
   ) {

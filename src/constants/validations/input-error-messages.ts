@@ -13,4 +13,7 @@ export const INPUT_ERROR_MESSAGES = {
     LENGTH_AND_SPECIAL_CHARACTERS: "8 caracteres • Un caracter especial",
     CAPITAL_LETTER: "Una letra mayúscula",
   },
+  LICENSE: {
+    LENGTH: "Tu credencial debe contener 6 digitos",
+  },
 };

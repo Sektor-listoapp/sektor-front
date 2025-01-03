@@ -5,4 +5,5 @@ export const REGEX = {
   CAPITAL_LETTER: /[A-Z]/,
   EIGHT_CHARACTERS: /^.{8,}$/,
   SPECIAL_CHARACTER: /[^A-Za-z0-9]/,
+  LICENSE: /^[a-zA-Z0-9]{6}$/,
 } as const;

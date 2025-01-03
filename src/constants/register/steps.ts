@@ -66,6 +66,7 @@ export const REGISTER_STEPS: Record<
   InsuranceBrokerForm: {
     index: 1,
     component: INSURANCE_BROKER_FORM,
+    isForm: true,
     nextStep: {
       [INSURANCE_BROKER]: SENT_EMAIL_VERIFICATION,
     },

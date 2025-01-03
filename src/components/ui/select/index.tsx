@@ -21,6 +21,8 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   icon?: IconDefinition;
   error?: boolean;
   errors?: string[];
+  arrowClassName?: string;
+  showArrow?: boolean;
 }
 
 const Select = ({
@@ -30,6 +32,8 @@ const Select = ({
   error = false,
   errors = [],
   wrapperClassName,
+  arrowClassName,
+  showArrow = true,
   ...props
 }: SelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,21 +71,26 @@ const Select = ({
               key={`${value}-${key}`}
               value={value as string}
               disabled={disabled}
-              className={cn("w-full p-4 appearance-none text-blue-500", { hidden: hidden })}
+              className={cn("w-full p-4 appearance-none text-blue-500", {
+                hidden: hidden,
+              })}
             >
               {label}
             </option>
           ))}
         </select>
-        <FontAwesomeIcon
-          size="lg"
-          icon={isOpen ? faChevronUp : faChevronDown}
-          className={cn(
-            "absolute inset-y-0 end-[10px] flex items-center pointer-events-none ps-4 peer-disabled:opacity-50 peer-disabled:pointer-events-none my-auto transition-all bg-white"
-          )}
-        />
+        {showArrow && (
+          <FontAwesomeIcon
+            size="lg"
+            icon={isOpen ? faChevronUp : faChevronDown}
+            className={cn(
+              "absolute inset-y-0 end-[10px] flex items-center pointer-events-none ps-4 peer-disabled:opacity-50 peer-disabled:pointer-events-none my-auto transition-all bg-white",
+              arrowClassName
+            )}
+          />
+        )}
       </div>
-      {error && errors?.length && (
+      {error && Boolean(errors?.length) && (
         <ul className="text-red-500 text-xs font-century-gothic mt-2">
           {errors?.map((error, index) => (
             <li key={index} className="list-disc list-inside text-balance">

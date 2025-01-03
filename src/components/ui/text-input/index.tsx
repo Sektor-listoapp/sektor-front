@@ -58,7 +58,7 @@ const TextInput = ({
         )}
       </div>
 
-      {error && errors?.length && (
+      {error && Boolean(errors?.length) && (
         <ul className="text-red-500 text-xs font-century-gothic mt-1 w-full">
           {errors?.map((error, index) => (
             <li key={index} className="list-disc list-inside w-full">
