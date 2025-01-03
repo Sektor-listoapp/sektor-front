@@ -19,7 +19,7 @@
     "antd": "5.22.7",
     "apollo-upload-client": "^18.0.1",
     "clsx": "2.1.1",
-    "dayjs": "1.11.13",
+    "dayjs": "1.11.11",
     "framer-motion": "^11.15.0",
     "graphql": "^16.10.0",
     "next": "15.1.3",

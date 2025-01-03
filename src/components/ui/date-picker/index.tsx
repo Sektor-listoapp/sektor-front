@@ -5,6 +5,7 @@ import styles from "./styles.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/utils/class-name";
+import locale from "antd/es/date-picker/locale/es_ES";
 
 interface DatePickerProps extends AntDatePickerProps {
   wrapperClassName?: string;
@@ -23,6 +24,7 @@ const DatePicker = ({
     <div className={cn("relative w-full", wrapperClassName)}>
       <div className={"relative w-full"}>
         <AntdDatePicker
+          locale={locale}
           className={cn(
             "w-full text-blue-500",
             styles.datePicker,

@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
     ],
   },
   reactStrictMode: true,
+  i18n: {
+    locales: ["es"],
+    defaultLocale: "es",
+  },
   transpilePackages: [
     "apollo-upload-client",
     // antd & deps
