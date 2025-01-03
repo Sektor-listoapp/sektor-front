@@ -17,4 +17,7 @@ export const registrationStoreActions = (
   setCurrentRegistrationStep: (currentStep) => {
     return set({ currentStep }, false, "setCurrentRegistrationStep");
   },
+  setNewUser: (newUser) => {
+    return set({ newUser }, false, "setNewUser");
+  },
 });

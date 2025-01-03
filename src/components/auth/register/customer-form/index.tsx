@@ -30,6 +30,7 @@ const CustomerForm = ({ formRef, setIsSubmittingForm }: CustomerFormProps) => {
   const setCurrentRegistrationStep = useRegistrationStore(
     (state) => state.setCurrentRegistrationStep
   );
+  const setNewUser = useRegistrationStore((state) => state.setNewUser);
 
   const [input, setInput] = useState<CustomerFormInput>({
     name: "",
@@ -76,6 +77,7 @@ const CustomerForm = ({ formRef, setIsSubmittingForm }: CustomerFormProps) => {
       },
     })
       .then(() => {
+        setNewUser({ email, name });
         formRef.current?.reset();
         const nextRegistrationStep = REGISTER_STEPS.SentEmailVerification;
         setCurrentRegistrationStep(nextRegistrationStep);

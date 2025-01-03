@@ -2,15 +2,22 @@ import { RegisterStep } from "@/types/register";
 import { UserType } from "@/types/shared";
 import { REGISTER_STEPS } from "../../constants/register/steps";
 
+type NewUser = {
+  email: string | null;
+  name: string | null;
+};
+
 export interface RegistrationStoreState {
   userType: UserType;
-  currentStep: typeof REGISTER_STEPS[keyof typeof REGISTER_STEPS];
+  currentStep: (typeof REGISTER_STEPS)[keyof typeof REGISTER_STEPS];
   nextStep: RegisterStep | null;
+  newUser: NewUser;
 }
 
 export interface RegistrationStoreActions {
   setUserType: (userType: UserType) => void;
   setCurrentRegistrationStep: (currentStep: RegisterStep) => void;
+  setNewUser: (newUser: NewUser) => void;
   resetRegistrationStore: () => void;
 }
 
