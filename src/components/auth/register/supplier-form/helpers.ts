@@ -1,17 +1,17 @@
 import { INPUT_ERROR_MESSAGES, REGEX } from "@/constants/validations";
 import {
-  HandleCustomerFormInputChangeParams,
+  HandleSupplierFormInputChangeParams,
   ValidateFormFields,
 } from "./types";
 
 const { PASSWORD, GENERAL, EMAIL } = INPUT_ERROR_MESSAGES;
 
-export const handleCustomerFormInputChange = ({
+export const handleSupplierFormInputChange = ({
   input,
   event,
   setInput,
   setErrors,
-}: HandleCustomerFormInputChangeParams) => {
+}: HandleSupplierFormInputChangeParams) => {
   const { name, value } = event.currentTarget;
   const trimmedValue = name === "name" ? value : value.trim();
   setInput((prev) => ({ ...prev, [name]: trimmedValue }));
@@ -61,11 +61,11 @@ export const validateFormFields = ({
   errors,
   setErrors,
 }: ValidateFormFields) => {
-  const hasFieldsWithErrors = Object.values(errors).some(
+  const hasFieldsWithErrors = Object.values(errors)?.some(
     (error) => error.length > 0
   );
-  const hasEmptyFields = Object.values(input).some((value) =>
-    typeof value === "string" ? !value.trim().length : !Boolean(value)
+  const hasEmptyFields = Object.values(input).some(
+    (value) => !value?.trim()?.length
   );
   if (!hasFieldsWithErrors && !hasEmptyFields) {
     return true;
@@ -76,8 +76,9 @@ export const validateFormFields = ({
       ...prev,
       name: !input.name.trim().length ? [GENERAL.REQUIRED] : prev.name,
       email: !input.email.trim().length ? [GENERAL.REQUIRED] : prev.email,
-      sex: !input.sex.trim().length ? [GENERAL.REQUIRED] : prev.sex,
-      birthdate: !input.birthdate ? [GENERAL.REQUIRED] : prev.birthdate,
+      serviceType: !input.serviceType.trim().length
+        ? [GENERAL.REQUIRED]
+        : prev.serviceType,
       password: !input.password.trim().length
         ? [GENERAL.REQUIRED]
         : prev.password,

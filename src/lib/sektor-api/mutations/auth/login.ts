@@ -8,7 +8,10 @@ export const LOGIN = gql`
       user {
         id
         email
+        verifiedAt
         name
+        companies
+        group
         __typename
       }
     }
