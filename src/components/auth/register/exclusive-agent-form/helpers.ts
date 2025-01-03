@@ -1,17 +1,17 @@
 import { INPUT_ERROR_MESSAGES, REGEX } from "@/constants/validations";
 import {
-  HandleSupplierFormInputChangeParams,
+  HandleExclusiveAgentFormInputChangeParams,
   ValidateFormFields,
 } from "./types";
 
-const { PASSWORD, GENERAL, EMAIL } = INPUT_ERROR_MESSAGES;
+const { PASSWORD, GENERAL, EMAIL, LICENSE } = INPUT_ERROR_MESSAGES;
 
-export const handleSupplierFormInputChange = ({
+export const handleExclusiveAgentFormInputChange = ({
   input,
   event,
   setInput,
   setErrors,
-}: HandleSupplierFormInputChangeParams) => {
+}: HandleExclusiveAgentFormInputChangeParams) => {
   const { name, value } = event.currentTarget;
   const trimmedValue = name === "name" ? value : value.trim();
   setInput((prev) => ({ ...prev, [name]: trimmedValue }));
@@ -20,6 +20,14 @@ export const handleSupplierFormInputChange = ({
     setErrors((prev) => ({
       ...prev,
       email: REGEX.EMAIL.test(trimmedValue) ? [] : [EMAIL.EXAMPLE],
+    }));
+    return;
+  }
+
+  if (name === "license") {
+    setErrors((prev) => ({
+      ...prev,
+      license: REGEX.LICENSE.test(trimmedValue) ? [] : [LICENSE.LENGTH],
     }));
     return;
   }
@@ -76,9 +84,7 @@ export const validateFormFields = ({
       ...prev,
       name: !input.name.trim().length ? [GENERAL.REQUIRED] : prev.name,
       email: !input.email.trim().length ? [GENERAL.REQUIRED] : prev.email,
-      serviceType: !input.serviceType.trim().length
-        ? [GENERAL.REQUIRED]
-        : prev.serviceType,
+      license: !input.license.trim().length ? [GENERAL.REQUIRED] : prev.license,
       password: !input.password.trim().length
         ? [GENERAL.REQUIRED]
         : prev.password,

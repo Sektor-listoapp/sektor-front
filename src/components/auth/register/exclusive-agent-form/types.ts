@@ -1,32 +1,36 @@
 import { FormEvent } from "react";
 
-export interface SupplierFormInput {
+export interface ExclusiveAgentFormInput {
   name: string;
   email: string;
-  serviceType: string;
+  license: string;
+  licenseType: string;
   password: string;
   confirmPassword: string;
 }
 
-export interface SupplierFormInputErrors {
+export interface ExclusiveAgentFormInputErrors {
   name: string[];
   email: string[];
-  serviceType: string[];
+  license: string[];
+  licenseType: string[];
   password: string[];
   confirmPassword: string[];
 }
 
-export interface HandleSupplierFormInputChangeParams {
-  input: SupplierFormInput;
-  event:
-    | FormEvent<HTMLInputElement | HTMLSelectElement>
-    | { currentTarget: { name: string; value: string } };
-  setInput: (value: React.SetStateAction<SupplierFormInput>) => void;
-  setErrors: (value: React.SetStateAction<SupplierFormInputErrors>) => void;
+export interface HandleExclusiveAgentFormInputChangeParams {
+  input: ExclusiveAgentFormInput;
+  event: FormEvent<HTMLInputElement | HTMLSelectElement>;
+  setInput: (value: React.SetStateAction<ExclusiveAgentFormInput>) => void;
+  setErrors: (
+    value: React.SetStateAction<ExclusiveAgentFormInputErrors>
+  ) => void;
 }
 
 export interface ValidateFormFields {
-  input: SupplierFormInput;
-  errors: SupplierFormInputErrors;
-  setErrors: (value: React.SetStateAction<SupplierFormInputErrors>) => void;
+  input: ExclusiveAgentFormInput;
+  errors: ExclusiveAgentFormInputErrors;
+  setErrors: (
+    value: React.SetStateAction<ExclusiveAgentFormInputErrors>
+  ) => void;
 }

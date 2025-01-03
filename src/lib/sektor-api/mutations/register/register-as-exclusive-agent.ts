@@ -1,4 +1,6 @@
-export const REGISTER_AS_EXCLUSIVE_AGENT = `
+import { gql } from "@apollo/client";
+
+export const REGISTER_AS_EXCLUSIVE_AGENT = gql`
   mutation registerAsExclusiveAgent(
     $input: RegisterAsExclusiveAgentInputType!
   ) {
