@@ -42,10 +42,14 @@ const Register = () => {
     (isIntermediary && isCompanySegmentsStep) ||
     isSentVerificationEmailStep;
 
+  const goToHome = () => {
+    replace(ROUTES.HOME);
+    resetRegistrationStore();
+  };
+
   const handleNextStep = () => {
     if (isFinalStep) {
-      replace(ROUTES.HOME);
-      resetRegistrationStore();
+      goToHome();
       return;
     }
 
@@ -67,8 +71,7 @@ const Register = () => {
       currentStep?.prevStep?.default;
 
     if (!prevStep) {
-      replace(ROUTES.HOME);
-      resetRegistrationStore();
+      goToHome();
       return;
     }
 
@@ -121,7 +124,10 @@ const Register = () => {
           </svg>
           <div className="bg-blue-500 px-4 pt-6 pb-12 flex flex-col items-center justify-start gap-8 -mt-1 lg:bg-transparent lg:pt-12">
             <div className="w-full max-w-md lg:max-w-full lg:w-3/4">
-              <SektorFullHorizontalLogo className="hidden lg:block w-44 text-white lg:mb-16" />
+              <SektorFullHorizontalLogo
+                className="hidden lg:block w-44 text-white lg:mb-16 hover:cursor-pointer hover:scale-105 transition-transform active:scale-100"
+                onClick={goToHome}
+              />
               <Button
                 disabled={disableNextStepButton || isSubmittingForm}
                 loading={isSubmittingForm}
