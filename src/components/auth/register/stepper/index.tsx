@@ -1,32 +1,27 @@
 import { RegisterStep } from "@/types/register";
 import clsx from "clsx";
 import { FC } from "react";
+import {
+  COMMON_REGISTRATION_STEPS,
+  COMPONENTS_TO_SHOW_STEPS_FOR_REGISTRATION_CONFIRMATION,
+  STEPS_FOR_REGISTRATION_CONFIRMATION,
+} from "./constants";
 
 interface StepperProps {
   className?: string;
   currentStep: RegisterStep;
 }
 
-const steps = [
-  {
-    label: "Tipo de usuario",
-    index: 0,
-  },
-  {
-    label: "Ingresa los datos",
-    index: 1,
-  },
-  {
-    label: "Link enviado",
-    index: 2,
-  },
-  {
-    label: "Cuenta verificada",
-    index: 3,
-  },
-];
-
 const Stepper: FC<StepperProps> = ({ className = "", currentStep }) => {
+  const showRegistrationConfirmationSteps =
+    COMPONENTS_TO_SHOW_STEPS_FOR_REGISTRATION_CONFIRMATION.includes(
+      currentStep.component
+    );
+
+  const steps = showRegistrationConfirmationSteps
+    ? STEPS_FOR_REGISTRATION_CONFIRMATION
+    : COMMON_REGISTRATION_STEPS;
+
   return (
     <ul
       className={clsx(

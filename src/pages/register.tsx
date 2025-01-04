@@ -11,8 +11,11 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { useShallow } from "zustand/shallow";
+import { useRouter } from "next/router";
+import { ROUTES } from "@/constants/router";
 
 const Register = () => {
+  const { replace } = useRouter();
   const [isSubmittingForm, setIsSubmittingForm] = React.useState(false);
   const userType = useRegistrationStore((state) => state.userType);
   const currentStep = useRegistrationStore(
@@ -29,6 +32,7 @@ const Register = () => {
   const formRef = React.useRef<HTMLFormElement>(null);
   const RegisterStep = REGISTER_COMPONENTS_MAP[currentStep.component];
   const isIntermediary = userType === USER_TYPES.INTERMEDIARY;
+  const isFinalStep = Boolean(currentStep?.isFinalStep);
   const isCompanySegmentsStep =
     currentStep.component === REGISTER_STEPS.CompanySegments.component;
   const isSentVerificationEmailStep =
@@ -39,12 +43,18 @@ const Register = () => {
     isSentVerificationEmailStep;
 
   const handleNextStep = () => {
+    if (isFinalStep) {
+      replace(ROUTES.HOME);
+      resetRegistrationStore();
+      return;
+    }
+
     if (!userType) return;
-    const nextStepForUser = currentStep.nextStep[userType];
-    const nextRegistrationStep = REGISTER_STEPS[nextStepForUser];
+    const nextStepForUser = currentStep?.nextStep?.[userType];
+    const nextRegistrationStep = REGISTER_STEPS?.[nextStepForUser];
 
     if (isFormStep) {
-      formRef.current?.requestSubmit();
+      formRef?.current?.requestSubmit();
       return;
     }
 
@@ -68,7 +78,7 @@ const Register = () => {
             })}
             onClick={handleNextStep}
           >
-            Siguiente
+            {isFinalStep ? "Descubre más" : "Siguiente"}
           </Button>
           <Link
             href="/"
@@ -105,7 +115,7 @@ const Register = () => {
                   invisible: disableNextStepButton,
                 })}
               >
-                Siguiente
+                {isFinalStep ? "Descubre más" : "Siguiente"}
               </Button>
               <Stepper className="py-4 w-full" currentStep={currentStep} />
             </div>

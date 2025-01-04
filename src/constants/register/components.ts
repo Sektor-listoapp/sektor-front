@@ -12,6 +12,7 @@ export const REGISTER_COMPONENTS = {
   SUPPLIER_FORM: "SupplierForm",
   SENT_EMAIL_VERIFICATION: "SentEmailVerification",
   EMAIL_VERIFICATION_SUCCESS: "EmailVerificationSuccess",
+  DATA_SENT_TO_CONFIRM: "DataSentToConfirm",
 } as const;
 
 export const REGISTER_COMPONENTS_MAP = {
@@ -45,5 +46,8 @@ export const REGISTER_COMPONENTS_MAP = {
   ),
   EmailVerificationSuccess: dynamic(
     () => import("@/components/auth/register/email-verification-success")
+  ),
+  DataSentToConfirm: dynamic(
+    () => import("@/components/auth/register/data-sent-to-confirm")
   ),
 } as const;

@@ -99,7 +99,7 @@ const InsuranceCompanyForm = ({
         setNewUser({ email, name: contactName });
         e?.currentTarget?.reset();
         formRef.current?.reset();
-        const nextRegistrationStep = REGISTER_STEPS.SentEmailVerification;
+        const nextRegistrationStep = REGISTER_STEPS.DataSentToConfirm;
         setCurrentRegistrationStep(nextRegistrationStep);
       })
       .catch((error) => {

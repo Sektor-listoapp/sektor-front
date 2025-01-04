@@ -23,6 +23,7 @@ const {
   EXCLUSIVE_AGENT_FORM,
   BROKERAGE_SOCIETY_FORM,
   EMAIL_VERIFICATION_SUCCESS,
+  DATA_SENT_TO_CONFIRM,
 } = REGISTER_COMPONENTS;
 
 export const REGISTER_STEPS: Record<
@@ -76,7 +77,7 @@ export const REGISTER_STEPS: Record<
     component: INSURANCE_COMPANY_FORM,
     isForm: true,
     nextStep: {
-      [INSURANCE_COMPANY]: SENT_EMAIL_VERIFICATION,
+      [INSURANCE_COMPANY]: DATA_SENT_TO_CONFIRM,
     },
   },
   ExclusiveAgentForm: {
@@ -103,6 +104,12 @@ export const REGISTER_STEPS: Record<
       [BROKERAGE_SOCIETY]: SENT_EMAIL_VERIFICATION,
     },
   },
+  DataSentToConfirm: {
+    index: 2,
+    isFinalStep: true,
+    component: DATA_SENT_TO_CONFIRM,
+    nextStep: {},
+  },
   SentEmailVerification: {
     index: 2,
     component: SENT_EMAIL_VERIFICATION,
@@ -110,6 +117,7 @@ export const REGISTER_STEPS: Record<
   },
   EmailVerificationSuccess: {
     index: 3,
+    isFinalStep: true,
     component: EMAIL_VERIFICATION_SUCCESS,
     nextStep: {},
   },

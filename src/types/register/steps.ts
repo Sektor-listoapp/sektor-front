@@ -7,5 +7,6 @@ export type RegisterStep = {
   index: number;
   component: keyof typeof REGISTER_COMPONENTS_MAP;
   isForm?: boolean;
+  isFinalStep?: boolean;
   nextStep: Record<string, keyof typeof REGISTER_COMPONENTS_MAP>;
 };
