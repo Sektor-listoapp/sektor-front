@@ -9,4 +9,5 @@ export type RegisterStep = {
   isForm?: boolean;
   isFinalStep?: boolean;
   nextStep: Record<string, keyof typeof REGISTER_COMPONENTS_MAP>;
+  prevStep: Record<string, keyof typeof REGISTER_COMPONENTS_MAP>;
 };

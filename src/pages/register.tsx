@@ -9,7 +9,6 @@ import { useRegistrationStore } from "@/store/registration";
 import { cn } from "@/utils/class-name";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Link from "next/link";
 import { useShallow } from "zustand/shallow";
 import { useRouter } from "next/router";
 import { ROUTES } from "@/constants/router";
@@ -18,6 +17,7 @@ const Register = () => {
   const { replace } = useRouter();
   const [isSubmittingForm, setIsSubmittingForm] = React.useState(false);
   const userType = useRegistrationStore((state) => state.userType);
+  const setUserType = useRegistrationStore((state) => state.setUserType);
   const currentStep = useRegistrationStore(
     useShallow((state) => state.currentStep)
   );
@@ -61,6 +61,21 @@ const Register = () => {
     setCurrentRegistrationStep(nextRegistrationStep);
   };
 
+  const handlePrevStep = () => {
+    const prevStep =
+      currentStep?.prevStep?.[userType || "default"] ||
+      currentStep?.prevStep?.default;
+
+    if (!prevStep) {
+      replace(ROUTES.HOME);
+      resetRegistrationStore();
+      return;
+    }
+
+    setCurrentRegistrationStep(REGISTER_STEPS[prevStep]);
+    setUserType(null);
+  };
+
   return (
     <AuthLayout>
       <main className="w-full lg:grid lg:grid-cols-12 lg:items-start lg:justify-center lg:relative lg:gap-4">
@@ -80,14 +95,14 @@ const Register = () => {
           >
             {isFinalStep ? "Descubre más" : "Siguiente"}
           </Button>
-          <Link
-            href="/"
-            className="hidden lg:flex gap-2 justify-center items-center text-blue-500 font-bold text-sm hover:underline mr-auto ml-2 mt-10"
-            onClick={resetRegistrationStore}
+          <Button
+            variant="link-blue"
+            className="hidden lg:flex gap-2 justify-center items-center text-blue-500 font-bold text-sm hover:underline mr-auto ml-2 mt-10 no-underline"
+            onClick={handlePrevStep}
           >
-            <FontAwesomeIcon size="lg" icon={faArrowLeft} />
-            Volver al inicio
-          </Link>
+            <FontAwesomeIcon className="mr-2" size="lg" icon={faArrowLeft} />
+            <span>Volver atrás</span>
+          </Button>
         </section>
 
         <div className="hidden xl:block xl:col-span-1" />

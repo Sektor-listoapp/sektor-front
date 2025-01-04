@@ -37,6 +37,7 @@ export const REGISTER_STEPS: Record<
       [CUSTOMER]: CUSTOMER_FORM,
       [INSURANCE_COMPANY]: COMPANY_TYPES,
     },
+    prevStep: {},
   },
   CompanyTypes: {
     index: 0,
@@ -46,6 +47,7 @@ export const REGISTER_STEPS: Record<
       [INSURANCE_COMPANY]: INSURANCE_COMPANY_FORM,
       [SUPPLIER]: SUPPLIER_FORM,
     },
+    prevStep: { default: REGISTER_COMPONENTS.USER_TYPES },
   },
   CompanySegments: {
     index: 0,
@@ -55,6 +57,7 @@ export const REGISTER_STEPS: Record<
       [BROKERAGE_SOCIETY]: BROKERAGE_SOCIETY_FORM,
       [EXCLUSIVE_AGENT]: EXCLUSIVE_AGENT_FORM,
     },
+    prevStep: { default: COMPANY_TYPES },
   },
   CustomerForm: {
     index: 1,
@@ -63,6 +66,7 @@ export const REGISTER_STEPS: Record<
     nextStep: {
       [CUSTOMER]: SENT_EMAIL_VERIFICATION,
     },
+    prevStep: { default: REGISTER_COMPONENTS.USER_TYPES },
   },
   InsuranceBrokerForm: {
     index: 1,
@@ -71,6 +75,7 @@ export const REGISTER_STEPS: Record<
     nextStep: {
       [INSURANCE_BROKER]: SENT_EMAIL_VERIFICATION,
     },
+    prevStep: { default: COMPANY_SEGMENTS },
   },
   InsuranceCompanyForm: {
     index: 1,
@@ -79,6 +84,7 @@ export const REGISTER_STEPS: Record<
     nextStep: {
       [INSURANCE_COMPANY]: DATA_SENT_TO_CONFIRM,
     },
+    prevStep: { default: COMPANY_TYPES },
   },
   ExclusiveAgentForm: {
     index: 1,
@@ -87,38 +93,40 @@ export const REGISTER_STEPS: Record<
     nextStep: {
       [EXCLUSIVE_AGENT]: SENT_EMAIL_VERIFICATION,
     },
+    prevStep: { default: COMPANY_SEGMENTS },
   },
   SupplierForm: {
     index: 1,
     component: SUPPLIER_FORM,
     isForm: true,
-    nextStep: {
-      [SUPPLIER]: SENT_EMAIL_VERIFICATION,
-    },
+    nextStep: { [SUPPLIER]: SENT_EMAIL_VERIFICATION },
+    prevStep: { default: COMPANY_TYPES },
   },
   BrokerageSocietyForm: {
     index: 1,
     component: BROKERAGE_SOCIETY_FORM,
     isForm: true,
-    nextStep: {
-      [BROKERAGE_SOCIETY]: SENT_EMAIL_VERIFICATION,
-    },
+    nextStep: { [BROKERAGE_SOCIETY]: SENT_EMAIL_VERIFICATION },
+    prevStep: { default: COMPANY_SEGMENTS },
   },
   DataSentToConfirm: {
     index: 2,
     isFinalStep: true,
     component: DATA_SENT_TO_CONFIRM,
     nextStep: {},
+    prevStep: { default: REGISTER_COMPONENTS.USER_TYPES },
   },
   SentEmailVerification: {
     index: 2,
     component: SENT_EMAIL_VERIFICATION,
     nextStep: {},
+    prevStep: { default: REGISTER_COMPONENTS.USER_TYPES },
   },
   EmailVerificationSuccess: {
     index: 3,
     isFinalStep: true,
     component: EMAIL_VERIFICATION_SUCCESS,
     nextStep: {},
+    prevStep: { default: REGISTER_COMPONENTS.USER_TYPES },
   },
 } as const;
