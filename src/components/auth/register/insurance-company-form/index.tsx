@@ -11,11 +11,7 @@ import {
   validateFormFields,
 } from "./helpers";
 import { REGISTER_STEPS } from "@/constants/register";
-import {
-  DEFAULT_PHONE_CODE,
-  GENERIC_ERROR_MESSAGE,
-  PHONE_CODE_OPTIONS,
-} from "./constants";
+import { GENERIC_ERROR_MESSAGE } from "./constants";
 import { toast } from "react-toastify";
 import TextInput from "@/components/ui/text-input";
 import {
@@ -26,6 +22,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { faInstagram } from "@fortawesome/free-brands-svg-icons";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
+import { DEFAULT_PHONE_CODE, PHONE_CODE_OPTIONS } from "@/constants/forms";
 
 interface InsuranceCompanyFormProps {
   formRef: React.RefObject<HTMLFormElement | null>;

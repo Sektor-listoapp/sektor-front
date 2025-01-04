@@ -7,4 +7,5 @@ export const REGEX = {
   SPECIAL_CHARACTER: /[^A-Za-z0-9]/,
   LICENSE: /^[a-zA-Z0-9]{6}$/,
   PHONE: /^[0-9]{10}$/,
+  SCSMP_CODE: /^SCSMP-[a-zA-Z0-9]{6}$/,
 } as const;

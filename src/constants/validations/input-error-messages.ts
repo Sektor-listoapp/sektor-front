@@ -20,4 +20,8 @@ export const INPUT_ERROR_MESSAGES = {
     LENGTH:
       "El teléfono debe contener solo números y tener un máximo de 10 dígitos",
   },
+  SCSMP: {
+    LENGTH: "Tu credencial debe contener 6 caracteres",
+    FORMAT: "Tu credencial debe tener el formato: SCSMP-XXXXXX",
+  },
 };

@@ -3,3 +3,4 @@ export const GENERIC_ERROR_MESSAGE =
 
 export const GENERIC_SUCCESS_MESSAGE =
   "Tu cuenta ha sido creada exitosamente, ahora puedes iniciar sesión.";
+
