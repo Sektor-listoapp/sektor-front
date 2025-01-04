@@ -1,19 +1,9 @@
 import { cn } from "@/utils/class-name";
-import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import {
-  FontAwesomeIcon,
-  FontAwesomeIconProps,
-} from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Popover } from "antd";
 import React from "react";
-
-interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  wrapperClassName?: string;
-  icon?: IconDefinition;
-  iconPosition?: "start" | "end";
-  iconProps?: Omit<FontAwesomeIconProps, "icon">;
-  error?: boolean;
-  errors?: string[];
-}
+import { TextInputProps } from "./types";
+import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons";
 
 const TextInput = ({
   icon,
@@ -23,9 +13,23 @@ const TextInput = ({
   error = false,
   errors = [],
   className,
+  popoverProps,
   ...props
 }: TextInputProps) => {
   const { className: iconClassName } = iconProps || {};
+
+  const {
+    icon: popoverIcon,
+    title: popoverTitle,
+    color: popoverColor,
+    content: popoverContent,
+    className: popoverClassName,
+    overlayStyle: popoverOverlayStyle,
+    placement: popoverPlacement,
+  } = popoverProps || {};
+
+  console.log("popoverProps", popoverProps);
+
   return (
     <div className={cn("relative w-full", wrapperClassName)}>
       <div className={"relative w-full"}>
@@ -40,10 +44,26 @@ const TextInput = ({
               "ps-12": icon && iconPosition === "start",
               "pe-12": icon && iconPosition === "end",
               "border-red-500 text-red-500 placeholder:text-red-500": error,
+              "pe-8": Boolean(popoverContent),
             }
           )}
           {...props}
         />
+        {Boolean(popoverContent) && (
+          <Popover
+            className={cn("inset-y-0 absolute my-auto right-2", popoverClassName)}
+            placement={popoverPlacement || "topRight"}
+            title={popoverTitle || undefined}
+            overlayStyle={popoverOverlayStyle || { width: "200px" }}
+            color={popoverColor || "#1B475D"}
+            content={popoverContent}
+          >
+            <FontAwesomeIcon
+              size="lg"
+              icon={popoverIcon || faExclamationCircle}
+            />
+          </Popover>
+        )}
         {icon && (
           <FontAwesomeIcon
             size="lg"

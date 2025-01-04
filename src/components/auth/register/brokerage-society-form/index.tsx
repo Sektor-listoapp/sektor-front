@@ -250,6 +250,14 @@ const BrokerageSocietyForm = ({
             disabled={loading}
             onChange={handleInputChange}
             value={input.license}
+            popoverProps={{
+              content: (
+                <p className="text-xs max-w-xs text-white font-century-gothic">
+                  Ingresa tus credenciales como<b> sociedad de corretaje. </b>
+                  Con el formato<b> SCSMP-123456</b>
+                </p>
+              ),
+            }}
           />
         </div>
       </form>
