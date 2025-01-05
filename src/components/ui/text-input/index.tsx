@@ -28,8 +28,6 @@ const TextInput = ({
     placement: popoverPlacement,
   } = popoverProps || {};
 
-  console.log("popoverProps", popoverProps);
-
   return (
     <div className={cn("relative w-full", wrapperClassName)}>
       <div className={"relative w-full"}>
