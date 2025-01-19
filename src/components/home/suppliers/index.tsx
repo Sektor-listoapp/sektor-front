@@ -3,39 +3,14 @@ import { cn } from "@/utils/class-name";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
-
-const suppliersData = [
-  {
-    type: "Clinicas",
-    image: "/images/clinicas.webp",
-    url: "#",
-    info: ["Seguros activos", "Ubicaciones"],
-  },
-  {
-    type: "Laboratorios",
-    image: "/images/laboratorios.webp",
-    url: "#",
-    info: ["Seguros activos", "Ubicaciones"],
-  },
-  {
-    type: "Talleres",
-    image: "/images/talleres.webp",
-    url: "#",
-    info: ["Seguros activos", "Ubicaciones"],
-  },
-  {
-    type: "Casas médicas",
-    image: "/images/casas-medicas.webp",
-    url: "#",
-    info: ["Seguros activos", "Ubicaciones"],
-  },
-];
+import { SUPPLIER_SERVICES } from "./constants";
+import { ROUTES } from "@/constants/router";
 
 const Suppliers = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
-  const router = useRouter();
+  const { push } = useRouter();
 
   return (
     <section
@@ -55,7 +30,7 @@ const Suppliers = ({
       </header>
 
       <div className="w-full grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {suppliersData.map(({ image, info, type, url }, index) => (
+        {SUPPLIER_SERVICES.map(({ image, info, type, url }, index) => (
           <article
             key={`${type}-${index}`}
             className="group w-full shadow-2xl h-72 relative rounded-2xl overflow-hidden flex flex-col items-center justify-center p-4 text-white bg-blue-400 bg-opacity-30 hover:bg-opacity-60 transition-all"
@@ -82,7 +57,7 @@ const Suppliers = ({
             </ul>
             <Button
               className="px-10 transition-all absolute bottom-4 opacity-0 group-hover:opacity-100"
-              onClick={() => router.push(url)}
+              onClick={() => push(url)}
             >
               Ver más
             </Button>
@@ -91,7 +66,11 @@ const Suppliers = ({
       </div>
 
       <footer className="w-full flex flex-col items-center justify-center gap-2">
-        <Button variant="solid-blue" className="w-full sm:max-w-fit px-10">
+        <Button
+          variant="solid-blue"
+          className="w-full sm:max-w-fit px-10"
+          onClick={() => push(ROUTES.ORGANIZATIONS)}
+        >
           Ver todos los servicios
         </Button>
       </footer>

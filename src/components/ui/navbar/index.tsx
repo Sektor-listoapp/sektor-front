@@ -10,7 +10,11 @@ import { useRouter } from "next/router";
 import { useAuthStore } from "@/store/auth";
 import { ROUTES } from "@/constants/router";
 
-const Navbar = () => {
+interface NavbarProps extends React.HTMLAttributes<HTMLDivElement> {
+  variant?: "light" | "dark";
+}
+
+const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
   const { push, pathname } = useRouter();
   const [open, setOpen] = useState(false);
 
@@ -31,7 +35,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="w-full">
+    <nav className={cn("w-full", className)} {...props}>
       <Drawer
         title={null}
         onClose={onClose}
@@ -101,38 +105,85 @@ const Navbar = () => {
       {/* Mobile/Tablet version */}
       <div className="flex items-center justify-between lg:hidden">
         <div />
-        <SektorFullHorizontalLogo width={100} className="ml-[15%] sm:ml-[7%]" />
+        <SektorFullHorizontalLogo
+          width={100}
+          className={cn(
+            "ml-[15%] sm:ml-[7%]",
+            variant === "light" ? "text-blue-500" : "text-white",
+            {
+              "cursor-pointer": pathname !== ROUTES.HOME,
+            }
+          )}
+          onClick={() => pathname !== ROUTES.HOME && push(ROUTES.HOME)}
+        />
 
         <Button onClick={showDrawer} variant="base" className="p-0">
-          <FontAwesomeIcon icon={faBars} size="2x" />
+          <FontAwesomeIcon
+            icon={faBars}
+            size="2x"
+            className={variant === "light" ? "text-blue-500" : "text-white"}
+          />
         </Button>
       </div>
 
       {/* Desktop version */}
       <div className="hidden lg:flex items-center justify-between w-full max-w-screen-2xl mx-auto">
-        <SektorFullHorizontalLogo width={200} className="lg:w-52" />
+        <SektorFullHorizontalLogo
+          width={200}
+          onClick={() => pathname !== ROUTES.HOME && push(ROUTES.HOME)}
+          className={cn(
+            "lg:w-52",
+            variant === "light" ? "text-blue-500" : "text-white",
+            {
+              "cursor-pointer": pathname !== ROUTES.HOME,
+            }
+          )}
+        />
 
-        <div className="transition-all duration-300 flex items-center justify-center gap-8 font-century-gothic xl:ml-auto xl: mr-20">
+        <div
+          className={cn(
+            "transition-all duration-300 flex items-center justify-center gap-8 font-century-gothic xl:ml-auto xl: mr-20",
+            variant === "light" ? "text-blue-500" : "text-white"
+          )}
+        >
           <Link
-            className={cn(" hover:text-gray-200 focus:outline-none", {
-              "font-bold": pathname === "/",
-            })}
+            className={cn(
+              "focus:outline-none",
+              variant === "light"
+                ? "hover:text-blue-400"
+                : "hover:text-gray-200",
+              {
+                "font-bold": pathname === "/",
+              }
+            )}
             href="#"
           >
             Inicio
           </Link>
           <Link
-            className={cn(" hover:text-gray-200 focus:outline-none", {
-              "font-bold": pathname === "/insurance",
-            })}
+            className={cn(
+              "focus:outline-none",
+              variant === "light"
+                ? "hover:text-blue-400"
+                : "hover:text-gray-200",
+              {
+                "font-bold": pathname === "/insurance",
+              }
+            )}
             href="#"
           >
             Seguros
           </Link>
           <Link
-            className={cn(" hover:text-gray-200 focus:outline-none", {
-              "font-bold": pathname === "/about-us",
-            })}
+            className={cn(
+              "focus:outline-none",
+              variant === "light"
+                ? "hover:text-blue-400"
+                : "hover:text-gray-200",
+              {
+                "font-bold": pathname === "/about-us",
+              }
+            )}
             href="#"
           >
             Nosotros

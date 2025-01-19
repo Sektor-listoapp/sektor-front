@@ -1,12 +1,16 @@
 import Button from "@/components/ui/button";
+import { ROUTES } from "@/constants/router";
 import { cn } from "@/utils/class-name";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import React from "react";
 
 const InsuranceBrokers = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
+  const {push} = useRouter();
+
   return (
     <section
       className={cn(
@@ -38,6 +42,7 @@ const InsuranceBrokers = ({
         <Button
           variant="solid-blue"
           className="hidden lg:block w-full max-w-fit px-20"
+          onClick={() => push(ROUTES.ORGANIZATIONS)}
         >
           Conecta
         </Button>

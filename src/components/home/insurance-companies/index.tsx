@@ -1,17 +1,20 @@
 import Button from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
+import { ROUTES } from "@/constants/router";
 import { PUBLIC_ORGANIZATIONS_QUERY } from "@/lib/sektor-api/queries";
 import { PublicOrganizationType } from "@/types/public";
 import { cn } from "@/utils/class-name";
 import { useQuery } from "@apollo/client";
 import { Carousel } from "antd";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import React from "react";
 
 const InsuranceCompaniesInfo = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
+  const { push } = useRouter();
   const { data, loading, error } = useQuery(PUBLIC_ORGANIZATIONS_QUERY, {
     variables: { type: "InsuranceCompany" },
   });
@@ -79,7 +82,11 @@ const InsuranceCompaniesInfo = ({
         )}
       </div>
       <footer className="w-full max-w-sm md:col-span-2 md:max-w-full flex items-center justify-center">
-        <Button variant="solid-blue" className="w-full md:max-w-sm">
+        <Button
+          variant="solid-blue"
+          className="w-full md:max-w-sm"
+          onClick={() => push(ROUTES.ORGANIZATIONS)}
+        >
           Ver más
         </Button>
       </footer>
