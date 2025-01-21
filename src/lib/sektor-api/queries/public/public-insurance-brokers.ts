@@ -1,11 +1,11 @@
 import { gql } from "@apollo/client";
 
-export const PUBLIC_ORGANIZATIONS_QUERY = gql`
-  query getPublicOrganizations(
-    $pagination: PaginationType!
-    $filter: PublicOrganizationFilterType!
+export const PUBLIC_INSURANCE_BROKERS_QUERY = gql`
+  query getPublicInsuranceBrokers(
+    $pagination: PaginationType
+    $filter: InsuranceBrokerFilterType
   ) {
-    publicOrganizations(pagination: $pagination, filter: $filter) {
+    publicInsuranceBrokers(pagination: $pagination, filter: $filter) {
       items {
         id
         name
@@ -14,6 +14,7 @@ export const PUBLIC_ORGANIZATIONS_QUERY = gql`
         createdAt
         lineOfBusiness
         modality
+        license
         address {
           street
           city

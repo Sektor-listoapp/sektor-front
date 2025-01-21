@@ -1,29 +1,32 @@
-import Button from "@/components/ui/button";
-import { USER_TYPES } from "@/constants/auth";
+import React from "react";
 import { cn } from "@/utils/class-name";
 import { useRouter } from "next/router";
-import React from "react";
+import { USER_TYPES } from "@/constants/auth";
+import Button from "@/components/ui/button";
 
-interface ExclusiveAgentsProps extends React.HTMLAttributes<HTMLDivElement> {
+interface InsuranceCompaniesProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
 }
 
-const ExclusiveAgents = ({ className, ...props }: ExclusiveAgentsProps) => {
+const InsuranceCompanies = ({
+  className,
+  ...props
+}: InsuranceCompaniesProps) => {
   const { query, replace } = useRouter();
   const orgType = query?.type;
-  const isSelected = orgType === USER_TYPES.EXCLUSIVE_AGENT;
+  const isSelected = orgType === USER_TYPES.INSURANCE_COMPANY;
 
   const handleClick = () => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
     replace({
-      query: { ...newQueryParams, type: USER_TYPES.EXCLUSIVE_AGENT },
+      query: { ...newQueryParams, type: USER_TYPES.INSURANCE_COMPANY },
     });
   };
 
   return (
     <section className={cn("w-full", className)} {...props}>
       <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
-        <h2>Agentes exclusivos</h2>
+        <h2>Compañías de seguros</h2>
         {!isSelected && (
           <Button
             variant="link-blue"
@@ -38,4 +41,4 @@ const ExclusiveAgents = ({ className, ...props }: ExclusiveAgentsProps) => {
   );
 };
 
-export default ExclusiveAgents;
+export default InsuranceCompanies;

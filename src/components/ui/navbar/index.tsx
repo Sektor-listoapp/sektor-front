@@ -21,13 +21,8 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
   const isAuthenticated = useAuthStore((state) => state.getIsAuthenticated)();
   const resetAuthStore = useAuthStore((state) => state.resetAuthStore);
 
-  const showDrawer = () => {
-    setOpen(true);
-  };
-
-  const onClose = () => {
-    setOpen(false);
-  };
+  const showDrawer = () => setOpen(true);
+  const onClose = () => setOpen(false);
 
   const handleLogout = () => {
     resetAuthStore();

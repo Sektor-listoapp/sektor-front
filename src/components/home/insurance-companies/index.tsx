@@ -1,7 +1,7 @@
 import Button from "@/components/ui/button";
 import Spinner from "@/components/ui/spinner";
 import { ROUTES } from "@/constants/router";
-import { PUBLIC_ORGANIZATIONS_QUERY } from "@/lib/sektor-api/queries";
+import { PUBLIC_INSURANCE_COMPANIES_QUERY } from "@/lib/sektor-api/queries";
 import { PublicOrganizationType } from "@/types/public";
 import { cn } from "@/utils/class-name";
 import { useQuery } from "@apollo/client";
@@ -10,14 +10,12 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
 
-const InsuranceCompaniesInfo = ({
+const InsuranceCompanies = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const { push } = useRouter();
-  const { data, loading, error } = useQuery(PUBLIC_ORGANIZATIONS_QUERY, {
-    variables: { type: "InsuranceCompany" },
-  });
+  const { data, loading, error } = useQuery(PUBLIC_INSURANCE_COMPANIES_QUERY);
 
   if (error) {
     console.error("Error fetching insurance companies", error);
@@ -94,4 +92,4 @@ const InsuranceCompaniesInfo = ({
   );
 };
 
-export default InsuranceCompaniesInfo;
+export default InsuranceCompanies;

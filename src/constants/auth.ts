@@ -9,10 +9,10 @@ export const USER_TYPES = {
 } as const;
 
 export const SERVICE_SUPPLIER_TYPES = {
-  CLINIC: "clinic",
-  WORKSHOP: "workshop",
-  MEDICAL_HOUSE: "medical_house",
-  PRIMARY_CARE: "primary_care",
+  CLINIC: "clinic", // clínicas
+  WORKSHOP: "workshop", // talleres
+  MEDICAL_HOUSE: "medical_house", // casas médicas
+  PRIMARY_CARE: "primary_care", // atención primaria
 } as const;
 
 export const USER_GROUPS = {
@@ -24,4 +24,14 @@ export const USER_GROUPS = {
 export const GENRES = {
   MALE: "Male",
   FEMALE: "Female",
+} as const;
+
+export const ORGANIZATION_LINE_OF_BUSINESS = {
+  LIFE: "Life",
+  HEALTH: "Health",
+  AUTO: "Auto",
+  TRAVEL: "Travel",
+  AVIATION: "Aviation",
+  FINANCIAL: "Financial",
+  PROPERTY: "Property",
 } as const;

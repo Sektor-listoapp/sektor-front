@@ -1,0 +1,8 @@
+.slider > div {
+  background-color: #b7d9e2 !important;
+  border-radius: 10px !important;
+}
+
+.slider > div[role="slider"]::after {
+  background-color: #182f48 !important;
+}
