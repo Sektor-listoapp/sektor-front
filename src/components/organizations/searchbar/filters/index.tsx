@@ -12,7 +12,7 @@ import {
   SELECT_LOCATION_OPTIONS,
   SELECT_SUPPLIER_SERVICE_OPTIONS,
 } from "@/constants/forms";
-import { USER_TYPES } from "@/constants/auth";
+import { USER_TYPES } from "@/constants/shared";
 import useDevice from "@/hooks/use-device";
 
 const {

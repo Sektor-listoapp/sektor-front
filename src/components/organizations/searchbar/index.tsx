@@ -12,6 +12,7 @@ import { ALL_ORGANIZATION_TYPES_QUERY } from "@/lib/sektor-api/queries/public/al
 import { getCurrentFiltersFromQuery } from "./helpers";
 import { toast } from "react-toastify";
 import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
+import { usePublicOrganizationsStore } from "@/store/public-organizations";
 
 interface SearchbarProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
@@ -22,6 +23,21 @@ const Searchbar = ({ className, ...props }: SearchbarProps) => {
   const { replace, query } = useRouter();
   const currentFilters = getCurrentFiltersFromQuery(query);
   const [isLoadingOrganizations, setIsLoadingOrganizations] = useState(false);
+  const setPublicBrokerageSocieties = usePublicOrganizationsStore(
+    (state) => state.setPublicBrokerageSocieties
+  );
+  const setPublicExclusiveAgents = usePublicOrganizationsStore(
+    (state) => state.setPublicExclusiveAgents
+  );
+  const setPublicInsuranceBrokers = usePublicOrganizationsStore(
+    (state) => state.setPublicInsuranceBrokers
+  );
+  const setPublicInsuranceCompanies = usePublicOrganizationsStore(
+    (state) => state.setPublicInsuranceCompanies
+  );
+  const setPublicSuppliers = usePublicOrganizationsStore(
+    (state) => state.setPublicSuppliers
+  );
 
   const { refetch: getOrganizations } = useQuery(ALL_ORGANIZATION_TYPES_QUERY, {
     skip: true,
@@ -38,6 +54,18 @@ const Searchbar = ({ className, ...props }: SearchbarProps) => {
     try {
       const organizationsData = await getOrganizations();
       console.log("Organizations data", organizationsData);
+      const {
+        publicSuppliers = {},
+        publicExclusiveAgents = {},
+        publicInsuranceBrokers = {},
+        publicBrokerageSocieties = {},
+        publicInsuranceCompanies = {},
+      } = organizationsData?.data;
+      setPublicSuppliers(publicSuppliers?.items);
+      setPublicExclusiveAgents(publicExclusiveAgents?.items);
+      setPublicInsuranceBrokers(publicInsuranceBrokers?.items);
+      setPublicBrokerageSocieties(publicBrokerageSocieties?.items);
+      setPublicInsuranceCompanies(publicInsuranceCompanies?.items);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
       console.error("Error getting organizations", error);
@@ -70,12 +98,6 @@ const Searchbar = ({ className, ...props }: SearchbarProps) => {
           );
         })}
       </div>
-
-      {isLoadingOrganizations && (
-        <div className="w-full flex items-center justify-center">
-          <h1 className="text-blue-500 text-4xl">Cargando...</h1>
-        </div>
-      )}
 
       <div className="w-full flex items-center justify-between gap-4 lg:gap-8">
         <form

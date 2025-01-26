@@ -1,4 +1,4 @@
-import { USER_TYPES } from "@/constants/auth";
+import { USER_TYPES } from "@/constants/shared";
 import {
   faBuilding,
   faPeopleArrows,

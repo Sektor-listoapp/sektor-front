@@ -1,4 +1,4 @@
-import { USER_TYPES } from "@/constants/auth";
+import { USER_TYPES } from "@/constants/shared";
 import InsuranceCompanyHeroBannerContent from "../insurance-company-hero-banner-content";
 import DefaultHeroBannerContent from "../default-hero-banner-content";
 import SupplierHeroBannerContent from "../suppliers-hero-banner-content";

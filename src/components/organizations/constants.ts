@@ -1,4 +1,4 @@
-import { USER_TYPES } from "@/constants/auth";
+import { USER_TYPES } from "@/constants/shared";
 import InsuranceBrokers from "./insurance-brokers";
 import BrokerageSocieties from "./brokerage-societies";
 import ExclusiveAgents from "./exclusive-agents";

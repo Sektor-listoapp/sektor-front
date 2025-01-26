@@ -1,4 +1,4 @@
-import { USER_TYPES } from "@/constants/auth";
+import { USER_TYPES } from "@/constants/shared";
 
 export type UserType = (typeof USER_TYPES)[keyof typeof USER_TYPES] | null;
 
@@ -16,11 +16,4 @@ export interface User {
   verifiedAt: string;
   companies: string[];
   group: UserGroups;
-}
-
-export interface OrganizationAddress {
-  street: string;
-  city: string;
-  state: string;
-  country: string;
 }

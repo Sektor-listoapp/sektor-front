@@ -3,7 +3,7 @@ import AuthLayout from "@/components/auth/common/layout";
 import Stepper from "@/components/auth/register/stepper";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
 import Button from "@/components/ui/button";
-import { USER_TYPES } from "@/constants/auth";
+import { USER_TYPES } from "@/constants/shared";
 import { REGISTER_COMPONENTS_MAP, REGISTER_STEPS } from "@/constants/register";
 import { useRegistrationStore } from "@/store/registration";
 import { cn } from "@/utils/class-name";

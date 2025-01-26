@@ -1,5 +1,5 @@
 import { RegisterStep } from "@/types/register";
-import { USER_TYPES } from "../auth";
+import { USER_TYPES } from "../shared";
 import { REGISTER_COMPONENTS_MAP, REGISTER_COMPONENTS } from "./components";
 
 const {

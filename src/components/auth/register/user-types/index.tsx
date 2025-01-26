@@ -1,5 +1,5 @@
 import { faBuilding, faUser } from "@fortawesome/free-solid-svg-icons";
-import { USER_TYPES } from "@/constants/auth";
+import { USER_TYPES } from "@/constants/shared";
 import UserTypeButton from "../user-type-button";
 
 const { CUSTOMER, INSURANCE_COMPANY } = USER_TYPES;

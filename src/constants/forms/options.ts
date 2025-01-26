@@ -2,7 +2,7 @@ import {
   GENRES,
   ORGANIZATION_LINE_OF_BUSINESS,
   SERVICE_SUPPLIER_TYPES,
-} from "../auth";
+} from "../shared";
 import venezuelaJson from "@/data/venezuela.json";
 
 const { MALE, FEMALE } = GENRES;

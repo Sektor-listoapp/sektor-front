@@ -1,5 +1,5 @@
 import Select from "@/components/ui/select";
-import { USER_TYPES } from "@/constants/auth";
+import { USER_TYPES } from "@/constants/shared";
 import { useRegistrationStore } from "@/store/registration";
 import { UserType } from "@/types/shared";
 

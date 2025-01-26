@@ -1,1 +1,1 @@
-export * from "./public-organizations";
+export * from "./organizations";
