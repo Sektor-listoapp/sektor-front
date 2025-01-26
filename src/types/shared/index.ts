@@ -17,3 +17,10 @@ export interface User {
   companies: string[];
   group: UserGroups;
 }
+
+export interface OrganizationAddress {
+  street: string;
+  city: string;
+  state: string;
+  country: string;
+}

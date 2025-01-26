@@ -1,5 +1,23 @@
 import { gql } from "@apollo/client";
 
+export const PUBLIC_EXCLUSIVE_AGENT_FIELDS_FRAGMENT = gql`
+  fragment PublicExclusiveAgentFields on ExclusiveAgentType {
+    id
+    name
+    type
+    logoUrl
+    createdAt
+    lineOfBusiness
+    modality
+    address {
+      street
+      city
+      state
+      country
+    }
+  }
+`;
+
 export const PUBLIC_EXCLUSIVE_AGENTS_QUERY = gql`
   query getPublicExclusiveAgents(
     $pagination: PaginationType
@@ -28,5 +46,7 @@ export const PUBLIC_EXCLUSIVE_AGENTS_QUERY = gql`
       count
       pages
     }
+
+    ${PUBLIC_EXCLUSIVE_AGENT_FIELDS_FRAGMENT}
   }
 `;

@@ -1,28 +1,15 @@
-import Button from "@/components/ui/button";
-import Spinner from "@/components/ui/spinner";
-import { ROUTES } from "@/constants/router";
-import { PUBLIC_INSURANCE_COMPANIES_QUERY } from "@/lib/sektor-api/queries";
-import { PublicOrganizationType } from "@/types/public";
-import { cn } from "@/utils/class-name";
-import { useQuery } from "@apollo/client";
-import { Carousel } from "antd";
-import Image from "next/image";
-import { useRouter } from "next/router";
 import React from "react";
+import InsuranceCompaniesCarousel from "@/components/common/insurance-companies-carousel";
+import Button from "@/components/ui/button";
+import { ROUTES } from "@/constants/router";
+import { cn } from "@/utils/class-name";
+import { useRouter } from "next/router";
 
 const InsuranceCompanies = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const { push } = useRouter();
-  const { data, loading, error } = useQuery(PUBLIC_INSURANCE_COMPANIES_QUERY);
-
-  if (error) {
-    console.error("Error fetching insurance companies", error);
-  }
-
-  const insuranceCompanies = (data?.getPublicOrganizations?.items ||
-    []) as PublicOrganizationType[];
 
   return (
     <section
@@ -55,30 +42,7 @@ const InsuranceCompanies = ({
           </span>
         </p>
       </div>
-      <div className="w-11/12 max-w-sm md:max-w-full">
-        {loading ? (
-          <Spinner className="m-auto w-10 h-10 text-blue-500 transition-all my-24 md:my-auto text-opacity-70" />
-        ) : (
-          <Carousel
-            autoplay
-            dots={false}
-            draggable
-            speed={1000}
-            className="flex items-center justify-center w-full relative h-36 md:h-60 xl:h-36"
-          >
-            {insuranceCompanies?.map(({ id, logoUrl, name }, index) => (
-              <Image
-                key={`insurance-company-${id}-${index}`}
-                className="w-11/12 h-32 m-auto max-w-full object-contain md:h-60 xl:h-36"
-                src={logoUrl}
-                width={700}
-                height={700}
-                alt={name}
-              />
-            ))}
-          </Carousel>
-        )}
-      </div>
+      <InsuranceCompaniesCarousel />
       <footer className="w-full max-w-sm md:col-span-2 md:max-w-full flex items-center justify-center">
         <Button
           variant="solid-blue"

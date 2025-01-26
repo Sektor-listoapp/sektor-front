@@ -7,6 +7,9 @@ const nextConfig: NextConfig = {
       {
         hostname: "s3-alpha-sig.figma.com",
       },
+      {
+        hostname: "web-api.s3.us-east-1.amazonaws.com",
+      },
     ],
   },
   reactStrictMode: true,
