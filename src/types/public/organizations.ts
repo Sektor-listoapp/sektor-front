@@ -21,7 +21,7 @@ export interface CommonPublicOrganizationFields {
   createdAt: string;
   address: OrganizationAddress;
   modality: keyof typeof ORGANIZATION_MODALITY;
-  lineOfBusiness: keyof typeof ORGANIZATION_LINE_OF_BUSINESS;
+  lineOfBusiness: Array<keyof typeof ORGANIZATION_LINE_OF_BUSINESS>;
 }
 
 export interface PublicSupplier extends CommonPublicOrganizationFields {
@@ -29,10 +29,12 @@ export interface PublicSupplier extends CommonPublicOrganizationFields {
 }
 
 export interface PublicInsuranceCompany extends CommonPublicOrganizationFields {
+  startDate: string;
   contact: string;
 }
 
 export interface PublicBrokerageSociety extends CommonPublicOrganizationFields {
+  startDate: string;
   rif: string;
   license: string;
 }
@@ -49,6 +51,7 @@ export interface PublicExclusiveAgent extends CommonPublicOrganizationFields {
   license: string;
   birthdate: string;
   startDate: string;
+  organizationLogoUrl: string;
   sex: keyof typeof GENRES;
   serviceType: keyof typeof SERVICE_SUPPLIER_TYPES;
 }

@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { useShallow } from "zustand/shallow";
 import SupplierCard from "./card";
+import CardCarousel from "@/components/ui/card-carousel";
 
 interface SuppliersProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
@@ -48,7 +49,18 @@ const Suppliers = ({ className, ...props }: SuppliersProps) => {
         )}
       </header>
 
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <CardCarousel className="w-full lg:hidden relative items-stretch">
+        {suppliers?.map((item, index) => (
+          <div
+            className="w-auto h-full"
+            key={`insurance-company-card-${item?.id}-${index}`}
+          >
+            <SupplierCard data={item} />
+          </div>
+        ))}
+      </CardCarousel>
+
+      <div className="hidden lg:grid w-full grid-cols-2 gap-10 justify-items-center 2xl::justify-items-start">
         {suppliers?.map((item, index) => (
           <SupplierCard
             data={item}

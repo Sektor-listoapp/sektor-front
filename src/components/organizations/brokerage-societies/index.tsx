@@ -6,6 +6,7 @@ import React from "react";
 import BrokerageSocietyCard from "./card";
 import { usePublicOrganizationsStore } from "@/store/public-organizations";
 import { useShallow } from "zustand/shallow";
+import CardCarousel from "@/components/ui/card-carousel";
 
 interface BrokerageSocietiesProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
@@ -51,7 +52,18 @@ const BrokerageSocieties = ({
         )}
       </header>
 
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <CardCarousel className="w-full lg:hidden relative items-stretch">
+        {brokerageSocieties?.map((item, index) => (
+          <div
+            className="w-auto h-full"
+            key={`insurance-company-card-${item?.id}-${index}`}
+          >
+            <BrokerageSocietyCard data={item} />
+          </div>
+        ))}
+      </CardCarousel>
+
+      <div className="hidden lg:grid w-full grid-cols-2 gap-10 justify-items-center 2xl::justify-items-start">
         {brokerageSocieties?.map((item, index) => (
           <BrokerageSocietyCard
             data={item}

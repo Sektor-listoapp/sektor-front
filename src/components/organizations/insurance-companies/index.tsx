@@ -6,6 +6,7 @@ import Button from "@/components/ui/button";
 import { usePublicOrganizationsStore } from "@/store/public-organizations";
 import { useShallow } from "zustand/shallow";
 import InsuranceCompanyCard from "./card";
+import CardCarousel from "@/components/ui/card-carousel";
 
 interface InsuranceCompaniesProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
@@ -51,7 +52,18 @@ const InsuranceCompanies = ({
         )}
       </header>
 
-      <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <CardCarousel className="w-full md:hidden">
+        {insuranceCompanies?.map((item, index) => (
+          <div
+            className="w-full"
+            key={`insurance-company-card-${item?.id}-${index}`}
+          >
+            <InsuranceCompanyCard data={item} />
+          </div>
+        ))}
+      </CardCarousel>
+
+      <div className="hidden md:grid w-full grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center 2xl::justify-items-start">
         {insuranceCompanies?.map((item, index) => (
           <InsuranceCompanyCard
             data={item}

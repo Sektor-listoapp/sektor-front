@@ -18,6 +18,7 @@ export const ALL_ORGANIZATION_TYPES_QUERY = gql`
         createdAt
         lineOfBusiness
         modality
+        serviceType
         address {
           street
           city
@@ -37,7 +38,9 @@ export const ALL_ORGANIZATION_TYPES_QUERY = gql`
         name
         type
         logoUrl
+        organizationLogoUrl
         createdAt
+        startDate
         lineOfBusiness
         modality
         address {
@@ -60,6 +63,7 @@ export const ALL_ORGANIZATION_TYPES_QUERY = gql`
         type
         logoUrl
         createdAt
+        startDate
         lineOfBusiness
         modality
         address {
@@ -82,6 +86,7 @@ export const ALL_ORGANIZATION_TYPES_QUERY = gql`
         type
         logoUrl
         createdAt
+        startDate
         lineOfBusiness
         modality
         address {
@@ -104,6 +109,7 @@ export const ALL_ORGANIZATION_TYPES_QUERY = gql`
         type
         logoUrl
         createdAt
+        startDate
         lineOfBusiness
         modality
         address {

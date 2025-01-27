@@ -1,11 +1,11 @@
 import React from "react";
 import Spinner from "@/components/ui/spinner";
 import { PUBLIC_INSURANCE_COMPANIES_QUERY } from "@/lib/sektor-api/queries";
-import { PublicInsuranceCompany } from "@/types/public/public-insurance-companies";
 import { useQuery } from "@apollo/client";
 import { Carousel } from "antd";
 import Image from "next/image";
 import { cn } from "@/utils/class-name";
+import { PublicInsuranceCompany } from "@/types/public";
 
 interface InsuranceCompaniesCarouselProps
   extends React.HTMLAttributes<HTMLDivElement> {
