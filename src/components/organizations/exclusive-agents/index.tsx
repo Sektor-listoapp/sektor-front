@@ -7,6 +7,7 @@ import React from "react";
 import { useShallow } from "zustand/shallow";
 import ExclusiveAgentCard from "./card";
 import CardCarousel from "@/components/ui/card-carousel";
+import { Empty } from "antd";
 
 interface ExclusiveAgentsProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
@@ -23,9 +24,11 @@ const ExclusiveAgents = ({ className, ...props }: ExclusiveAgentsProps) => {
 
   const handleClick = () => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
-    replace({
-      query: { ...newQueryParams, type: USER_TYPES.EXCLUSIVE_AGENT },
-    });
+    replace(
+      { query: { ...newQueryParams, type: USER_TYPES.EXCLUSIVE_AGENT } },
+      undefined,
+      { scroll: false }
+    );
   };
 
   return (
@@ -49,25 +52,31 @@ const ExclusiveAgents = ({ className, ...props }: ExclusiveAgentsProps) => {
         )}
       </header>
 
-      <CardCarousel className="w-full md:hidden relative items-stretch">
-        {exclusiveAgents?.map((item, index) => (
-          <div
-            className="w-full h-full"
-            key={`insurance-company-card-${item?.id}-${index}`}
-          >
-            <ExclusiveAgentCard data={item} />
-          </div>
-        ))}
-      </CardCarousel>
+      {Boolean(exclusiveAgents?.length) ? (
+        <>
+          <CardCarousel className="w-full md:hidden relative items-stretch">
+            {exclusiveAgents?.map((item, index) => (
+              <div
+                className="w-full h-full"
+                key={`insurance-company-card-${item?.id}-${index}`}
+              >
+                <ExclusiveAgentCard data={item} />
+              </div>
+            ))}
+          </CardCarousel>
 
-      <div className="hidden md:grid w-full grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center 2xl::justify-items-start">
-        {exclusiveAgents?.map((item, index) => (
-          <ExclusiveAgentCard
-            data={item}
-            key={`exclusive-agent-card-${item?.id}-${index}`}
-          />
-        ))}
-      </div>
+          <div className="hidden md:grid w-full grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center 2xl::justify-items-start">
+            {exclusiveAgents?.map((item, index) => (
+              <ExclusiveAgentCard
+                data={item}
+                key={`exclusive-agent-card-${item?.id}-${index}`}
+              />
+            ))}
+          </div>
+        </>
+      ) : (
+        <Empty description="No hay agentes exclusivos disponibles" />
+      )}
     </section>
   );
 };

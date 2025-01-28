@@ -21,10 +21,12 @@ const OrganizationTypeButton = ({
   const handleClick = (type: string) => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
     if (query?.type === type) {
-      replace({ query: newQueryParams });
+      replace({ query: newQueryParams }, undefined, { scroll: false });
       return;
     }
-    replace({ query: { ...newQueryParams, type } });
+    replace({ query: { ...newQueryParams, type } }, undefined, {
+      scroll: false,
+    });
   };
 
   return (

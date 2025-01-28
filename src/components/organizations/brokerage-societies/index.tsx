@@ -7,6 +7,7 @@ import BrokerageSocietyCard from "./card";
 import { usePublicOrganizationsStore } from "@/store/public-organizations";
 import { useShallow } from "zustand/shallow";
 import CardCarousel from "@/components/ui/card-carousel";
+import { Empty } from "antd";
 
 interface BrokerageSocietiesProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
@@ -26,9 +27,11 @@ const BrokerageSocieties = ({
 
   const handleClick = () => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
-    replace({
-      query: { ...newQueryParams, type: USER_TYPES.BROKERAGE_SOCIETY },
-    });
+    replace(
+      { query: { ...newQueryParams, type: USER_TYPES.BROKERAGE_SOCIETY } },
+      undefined,
+      { scroll: false }
+    );
   };
 
   return (
@@ -52,25 +55,31 @@ const BrokerageSocieties = ({
         )}
       </header>
 
-      <CardCarousel className="w-full lg:hidden relative items-stretch">
-        {brokerageSocieties?.map((item, index) => (
-          <div
-            className="w-auto h-full"
-            key={`insurance-company-card-${item?.id}-${index}`}
-          >
-            <BrokerageSocietyCard data={item} />
-          </div>
-        ))}
-      </CardCarousel>
+      {Boolean(brokerageSocieties?.length) ? (
+        <>
+          <CardCarousel className="w-full lg:hidden relative items-stretch">
+            {brokerageSocieties?.map((item, index) => (
+              <div
+                className="w-auto h-full"
+                key={`insurance-company-card-${item?.id}-${index}`}
+              >
+                <BrokerageSocietyCard data={item} />
+              </div>
+            ))}
+          </CardCarousel>
 
-      <div className="hidden lg:grid w-full grid-cols-2 gap-10 justify-items-center 2xl::justify-items-start">
-        {brokerageSocieties?.map((item, index) => (
-          <BrokerageSocietyCard
-            data={item}
-            key={`brokerage-society-card-${item?.id}-${index}`}
-          />
-        ))}
-      </div>
+          <div className="hidden lg:grid w-full grid-cols-2 gap-10 justify-items-center 2xl::justify-items-start">
+            {brokerageSocieties?.map((item, index) => (
+              <BrokerageSocietyCard
+                data={item}
+                key={`brokerage-society-card-${item?.id}-${index}`}
+              />
+            ))}
+          </div>
+        </>
+      ) : (
+        <Empty description="No hay sociedades de corretaje disponibles" />
+      )}
     </section>
   );
 };

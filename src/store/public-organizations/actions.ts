@@ -7,6 +7,13 @@ import {
 export const publicRegistrationsStoreActions = (
   set: PublicOrganizationsStoreSetter
 ): PublicOrganizationsStoreActions => ({
+  setIsLoadingPublicOrganizations: (isLoadingPublicOrganizations) => {
+    set(
+      { isLoadingPublicOrganizations },
+      false,
+      "setIsLoadingPublicOrganizations"
+    );
+  },
   setPublicOrganizations: (publicOrganizations) => {
     set({ publicOrganizations }, false, "setPublicOrganizations");
   },

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { cn } from "@/utils/class-name";
 import { ORGANIZATION_TYPE_OPTIONS } from "./constants";
 import OrganizationTypeButton from "./organization-type-button";
@@ -22,7 +22,6 @@ const Searchbar = ({ className, ...props }: SearchbarProps) => {
   const isClient = useIsClient();
   const { replace, query } = useRouter();
   const currentFilters = getCurrentFiltersFromQuery(query);
-  const [isLoadingOrganizations, setIsLoadingOrganizations] = useState(false);
   const setPublicBrokerageSocieties = usePublicOrganizationsStore(
     (state) => state.setPublicBrokerageSocieties
   );
@@ -38,6 +37,12 @@ const Searchbar = ({ className, ...props }: SearchbarProps) => {
   const setPublicSuppliers = usePublicOrganizationsStore(
     (state) => state.setPublicSuppliers
   );
+  const setIsLoadingPublicOrganizations = usePublicOrganizationsStore(
+    (state) => state.setIsLoadingPublicOrganizations
+  );
+  const isLoadingPublicOrganizations = usePublicOrganizationsStore(
+    (state) => state.isLoadingPublicOrganizations
+  );
 
   const { refetch: getOrganizations } = useQuery(ALL_ORGANIZATION_TYPES_QUERY, {
     skip: true,
@@ -48,12 +53,10 @@ const Searchbar = ({ className, ...props }: SearchbarProps) => {
     },
   });
 
-  const handleGetOrganizations = async () => {
-    console.log("Getting organizations");
-    setIsLoadingOrganizations(true);
+  const handleGetPublicOrganizations = async () => {
+    setIsLoadingPublicOrganizations(true);
     try {
       const organizationsData = await getOrganizations();
-      console.log("Organizations data", organizationsData);
       const {
         publicSuppliers = {},
         publicExclusiveAgents = {},
@@ -68,15 +71,14 @@ const Searchbar = ({ className, ...props }: SearchbarProps) => {
       setPublicInsuranceCompanies(publicInsuranceCompanies?.items);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
-      console.error("Error getting organizations", error);
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
     } finally {
-      setIsLoadingOrganizations(false);
+      setIsLoadingPublicOrganizations(false);
     }
   };
 
   useEffect(() => {
-    handleGetOrganizations();
+    handleGetPublicOrganizations();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query?.type]);
 
@@ -104,21 +106,24 @@ const Searchbar = ({ className, ...props }: SearchbarProps) => {
           className="w-full"
           onSubmit={(e) => {
             e.preventDefault();
-            if (!query?.search) return;
-            handleGetOrganizations();
+            handleGetPublicOrganizations();
           }}
         >
           <TextInput
             iconPosition="end"
             icon={faMagnifyingGlass}
-            disabled={isLoadingOrganizations}
+            disabled={isLoadingPublicOrganizations}
             iconProps={{ className: "opacity-40" }}
             wrapperClassName="w-full relative"
             className="rounded-3xl border-opacity-50 md:text-lg shadow-xl placeholder:text-gray-400"
             placeholder="Busca intermediario, seguros o ramos"
             value={(query?.search as string) || ""}
             onChange={(e) => {
-              replace({ query: { ...query, search: e?.target?.value } });
+              replace(
+                { query: { ...query, search: e?.target?.value } },
+                undefined,
+                { scroll: false }
+              );
             }}
           />
         </form>

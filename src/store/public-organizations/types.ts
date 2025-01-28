@@ -9,9 +9,11 @@ import {
 
 export interface PublicOrganizationsStoreState {
   publicOrganizations: PublicOrganizations | null;
+  isLoadingPublicOrganizations: boolean;
 }
 
 export interface PublicOrganizationsStoreActions {
+  setIsLoadingPublicOrganizations: (isLoading: boolean) => void;
   setPublicOrganizations: (organizations: PublicOrganizations | null) => void;
   setPublicSuppliers: (suppliers: PublicSupplier[]) => void;
   setPublicExclusiveAgents: (exclusiveAgents: PublicExclusiveAgent[]) => void;

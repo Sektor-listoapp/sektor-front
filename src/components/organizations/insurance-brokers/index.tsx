@@ -7,6 +7,7 @@ import React from "react";
 import { useShallow } from "zustand/shallow";
 import InsuranceBrokerCard from "./card";
 import CardCarousel from "@/components/ui/card-carousel";
+import { Empty } from "antd";
 
 interface InsuranceBrokersProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
@@ -23,9 +24,11 @@ const InsuranceBrokers = ({ className, ...props }: InsuranceBrokersProps) => {
 
   const handleClick = () => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
-    replace({
-      query: { ...newQueryParams, type: USER_TYPES.INSURANCE_BROKER },
-    });
+    replace(
+      { query: { ...newQueryParams, type: USER_TYPES.INSURANCE_BROKER } },
+      undefined,
+      { scroll: false }
+    );
   };
 
   return (
@@ -49,25 +52,31 @@ const InsuranceBrokers = ({ className, ...props }: InsuranceBrokersProps) => {
         )}
       </header>
 
-      <CardCarousel className="w-full md:hidden">
-        {insuranceBrokers?.map((item, index) => (
-          <div
-            className="w-full"
-            key={`insurance-company-card-${item?.id}-${index}`}
-          >
-            <InsuranceBrokerCard data={item} />
-          </div>
-        ))}
-      </CardCarousel>
+      {Boolean(insuranceBrokers?.length) ? (
+        <>
+          <CardCarousel className="w-full md:hidden">
+            {insuranceBrokers?.map((item, index) => (
+              <div
+                className="w-full"
+                key={`insurance-company-card-${item?.id}-${index}`}
+              >
+                <InsuranceBrokerCard data={item} />
+              </div>
+            ))}
+          </CardCarousel>
 
-      <div className="hidden md:grid w-full grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center 2xl::justify-items-start">
-        {insuranceBrokers?.map((item, index) => (
-          <InsuranceBrokerCard
-            data={item}
-            key={`insurance-broker-card-${item.id}-${index}`}
-          />
-        ))}
-      </div>
+          <div className="hidden md:grid w-full grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center 2xl::justify-items-start">
+            {insuranceBrokers?.map((item, index) => (
+              <InsuranceBrokerCard
+                data={item}
+                key={`insurance-broker-card-${item.id}-${index}`}
+              />
+            ))}
+          </div>
+        </>
+      ) : (
+        <Empty description="No hay corredores de seguros disponibles" />
+      )}
     </section>
   );
 };
