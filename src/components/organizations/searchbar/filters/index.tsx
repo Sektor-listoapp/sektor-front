@@ -1,52 +1,74 @@
 import React, { useState } from "react";
-import Button from "@/components/ui/button";
-import { faArrowLeft, faFilter } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Drawer } from "antd";
-import Range from "@/components/ui/range";
-import Select from "@/components/ui/select";
 import { useRouter } from "next/router";
+import Range from "@/components/ui/range";
+import useDevice from "@/hooks/use-device";
+import Button from "@/components/ui/button";
+import Select from "@/components/ui/select";
+import { checkAllowedFilter, getRangeQueries } from "./utils";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import usePublicOrganizations from "@/hooks/use-public-organizations";
+import { faArrowLeft, faFilter } from "@fortawesome/free-solid-svg-icons";
 import {
   SELECT_GENRE_OPTIONS,
   SELECT_LINE_OF_BUSINESS_OPTIONS,
   SELECT_LOCATION_OPTIONS,
   SELECT_SUPPLIER_SERVICE_OPTIONS,
 } from "@/constants/forms";
-import { USER_TYPES } from "@/constants/shared";
-import useDevice from "@/hooks/use-device";
+import {
+  ALLOWED_FILTERS_BY_USER_TYPE,
+  ORGANIZATION_FILTER_FIELD_NAMES,
+} from "./constants";
 
-const {
-  SUPPLIER,
-  EXCLUSIVE_AGENT,
-  INSURANCE_BROKER,
-  BROKERAGE_SOCIETY,
-  INSURANCE_COMPANY,
-} = USER_TYPES;
+const { AGE_RANGE, EXPERIENCE_RANGE, GENRE, SEGMENT, SERVICE_TYPE } =
+  ORGANIZATION_FILTER_FIELD_NAMES;
 
 const OrganizationFilters = () => {
+  const { isMobile } = useDevice();
   const { query, replace } = useRouter();
   const [openDrawer, setOpenDrawer] = useState(false);
-  const handleShowDrawer = () => setOpenDrawer(true);
   const handleCloseDrawer = () => setOpenDrawer(false);
-  const isMobile = useDevice().isMobile;
+
+  const { handleGetPublicOrganizations, isLoadingPublicOrganizations } =
+    usePublicOrganizations({});
 
   const {
-    type = "",
+    type,
     genre = "",
     segment = "",
     location = "",
-    supplierType = "",
-    minAge = 25,
+    serviceType = "",
+    minAge = 0,
     maxAge = 50,
     minExperience = 0,
     maxExperience = 50,
   } = query;
 
-  const ageRange = [Number(minAge), Number(maxAge)];
-  const experienceRange = [Number(minExperience), Number(maxExperience)];
+  const organizationType = type as keyof typeof ALLOWED_FILTERS_BY_USER_TYPE;
+  const [ageRange, setAgeRange] = useState([Number(minAge), Number(maxAge)]);
+  const [experienceRange, setExperienceRange] = useState([
+    Number(minExperience),
+    Number(maxExperience),
+  ]);
 
   const handleFilterChange = (key: string, value: string) => {
-    replace({ query: { ...query, [key]: value } });
+    replace({ query: { ...query, [key]: value } }, undefined, {
+      scroll: false,
+    });
+  };
+
+  const handleShowDrawer = () => {
+    const rangeQueries = getRangeQueries({
+      ageRange,
+      experienceRange,
+      organizationType,
+    });
+
+    setOpenDrawer(true);
+
+    replace({ query: { ...query, ...rangeQueries } }, undefined, {
+      scroll: false,
+    });
   };
 
   return (
@@ -84,14 +106,7 @@ const OrganizationFilters = () => {
               defaultValue={SELECT_LOCATION_OPTIONS[0].value}
             />
 
-            {(
-              [
-                EXCLUSIVE_AGENT,
-                INSURANCE_BROKER,
-                BROKERAGE_SOCIETY,
-                INSURANCE_COMPANY,
-              ] as string[]
-            ).includes(type as string) && (
+            {checkAllowedFilter(organizationType, SEGMENT) && (
               <Select
                 wrapperClassName="w-full"
                 value={segment || ""}
@@ -103,9 +118,7 @@ const OrganizationFilters = () => {
               />
             )}
 
-            {([EXCLUSIVE_AGENT, INSURANCE_BROKER] as string[]).includes(
-              type as string
-            ) && (
+            {checkAllowedFilter(organizationType, GENRE) && (
               <Select
                 wrapperClassName="w-full"
                 value={genre || ""}
@@ -115,64 +128,61 @@ const OrganizationFilters = () => {
               />
             )}
 
-            {([SUPPLIER] as string[]).includes(type as string) && (
+            {checkAllowedFilter(organizationType, SERVICE_TYPE) && (
               <Select
                 wrapperClassName="w-full"
                 options={SELECT_SUPPLIER_SERVICE_OPTIONS}
-                value={supplierType || ""}
+                value={serviceType || ""}
                 onChange={(e) =>
-                  handleFilterChange("supplierType", e?.target?.value)
+                  handleFilterChange("serviceType", e?.target?.value)
                 }
                 defaultValue={SELECT_SUPPLIER_SERVICE_OPTIONS[0].value}
               />
             )}
 
-            {(
-              [
-                EXCLUSIVE_AGENT,
-                INSURANCE_BROKER,
-                BROKERAGE_SOCIETY,
-                INSURANCE_COMPANY,
-              ] as string[]
-            ).includes(type as string) && (
+            {checkAllowedFilter(organizationType, EXPERIENCE_RANGE) && (
               <Range
                 label="Experiencia"
                 min={0}
                 max={50}
-                value={
-                  minExperience && maxExperience ? experienceRange : undefined
-                }
-                onChange={(value) => {
-                  const [min, max] = value;
-                  handleFilterChange("minExperience", min.toString());
-                  handleFilterChange("maxExperience", max.toString());
-                }}
-                minRangeLabel={`${experienceRange[0]} ${
-                  experienceRange[0] === 1 ? "año" : "años"
-                }`}
+                value={experienceRange}
+                minRangeLabel={`${experienceRange[0]} años`}
                 maxRangeLabel={`${experienceRange[1]} años`}
+                onChange={(value) => {
+                  const [minExperience, maxExperience] = value;
+                  setExperienceRange(value);
+                  replace(
+                    { query: { ...query, minExperience, maxExperience } },
+                    undefined,
+                    { scroll: false }
+                  );
+                }}
               />
             )}
 
-            {([EXCLUSIVE_AGENT, INSURANCE_BROKER] as string[]).includes(
-              type as string
-            ) && (
+            {checkAllowedFilter(organizationType, AGE_RANGE) && (
               <Range
                 label="Edad"
                 max={70}
-                defaultValue={ageRange}
-                value={minAge && maxAge ? ageRange : undefined}
+                value={ageRange}
                 minRangeLabel={`${ageRange[0]} años`}
                 maxRangeLabel={`${ageRange[1]} años`}
                 onChange={(value) => {
-                  const [min, max] = value;
-                  handleFilterChange("minAge", min.toString());
-                  handleFilterChange("maxAge", max.toString());
+                  const [minAge, maxAge] = value;
+                  setAgeRange(value);
+                  replace({ query: { ...query, minAge, maxAge } }, undefined, {
+                    scroll: false,
+                  });
                 }}
               />
             )}
 
-            <Button variant="solid-blue" className="w-full">
+            <Button
+              variant="solid-blue"
+              className="w-full"
+              disabled={isLoadingPublicOrganizations}
+              onClick={handleGetPublicOrganizations}
+            >
               Aplicar filtros
             </Button>
           </section>

@@ -56,11 +56,3 @@ export const ORGANIZATION_FILTER_COMPONENTS = {
   [INSURANCE_COMPANY]: dynamic(() => import("./insurance-company-filters")),
   [SUPPLIER]: dynamic(() => import("./supplier-filters")),
 } as const;
-
-export const ORGANIZATION_FILTER_KEYS = {
-  [SUPPLIER]: "publicSupplierFilters",
-  [BROKERAGE_SOCIETY]: "publicBrokerageSocietyFilters",
-  [EXCLUSIVE_AGENT]: "publicExclusiveAgentFilters",
-  [INSURANCE_BROKER]: "publicInsuranceBrokersFilters",
-  [INSURANCE_COMPANY]: "publicInsuranceCompanyFilters",
-};

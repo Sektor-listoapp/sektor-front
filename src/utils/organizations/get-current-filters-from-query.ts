@@ -1,6 +1,6 @@
 import { pickBy } from "lodash";
 import { ParsedUrlQuery } from "querystring";
-import { ORGANIZATION_FILTER_KEYS } from "./constants";
+import { ORGANIZATION_FILTER_KEYS } from "@/constants/organizations";
 
 export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
   const hasQueries =
@@ -16,7 +16,7 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
     search,
     segment,
     location,
-    supplierType,
+    serviceType,
     minAge,
     maxAge,
     minExperience,
@@ -43,7 +43,7 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
       sex: genre,
       name: search,
       lineOfBusiness: segment,
-      serviceType: supplierType,
+      serviceType: serviceType,
       address: location ? { city: location } : undefined,
     },
     (value) => Boolean(value)
