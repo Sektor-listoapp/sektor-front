@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -54,6 +53,20 @@ export type BrokerageSocietyType = {
   rif: Scalars['String']['output'];
   startDate: Scalars['DateTime']['output'];
   type: OrganizationTypes;
+};
+
+export type CityType = {
+  __typename?: 'CityType';
+  id: Scalars['Float']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type CountryType = {
+  __typename?: 'CountryType';
+  code: Scalars['String']['output'];
+  id: Scalars['Float']['output'];
+  name: Scalars['String']['output'];
+  states: Array<StateType>;
 };
 
 export type ExclusiveAgentFilterType = {
@@ -302,6 +315,7 @@ export type PublicOrganizationType = {
 
 export type Query = {
   __typename?: 'Query';
+  getCountryByCode?: Maybe<CountryType>;
   profile: UserType;
   publicBrokerageSocieties: BrokerageSocietyPaginatedType;
   publicExclusiveAgents: ExclusiveAgentPaginatedType;
@@ -309,6 +323,11 @@ export type Query = {
   publicInsuranceCompanies: InsuranceCompanyPaginatedType;
   publicOrganizations: PublicOrganizationPaginatedType;
   publicSuppliers: SupplierPaginatedType;
+};
+
+
+export type QueryGetCountryByCodeArgs = {
+  code: Scalars['String']['input'];
 };
 
 
@@ -419,6 +438,13 @@ export enum Sexes {
   Male = 'Male',
   PreferNotToSay = 'PreferNotToSay'
 }
+
+export type StateType = {
+  __typename?: 'StateType';
+  cities: Array<CityType>;
+  id: Scalars['Float']['output'];
+  name: Scalars['String']['output'];
+};
 
 export type SupplierFilterType = {
   address?: InputMaybe<PublicOrganizationFilterAddressType>;

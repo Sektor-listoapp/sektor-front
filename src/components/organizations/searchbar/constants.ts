@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import { USER_TYPES } from "@/constants/shared";
 import {
   faBuilding,
@@ -6,7 +7,6 @@ import {
   faTruckFieldUn,
   faUserTie,
 } from "@fortawesome/free-solid-svg-icons";
-import dynamic from "next/dynamic";
 
 const {
   INSURANCE_BROKER,

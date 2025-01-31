@@ -1,14 +1,21 @@
 import React from "react";
 import Range from "@/components/ui/range";
 import Select from "@/components/ui/select";
-import {
-  SELECT_LINE_OF_BUSINESS_OPTIONS,
-  SELECT_LOCATION_OPTIONS,
-} from "@/constants/forms";
+import { SELECT_LINE_OF_BUSINESS_OPTIONS } from "@/constants/forms";
+import { COUNTRY_BY_CODE_QUERY } from "@/lib/sektor-api/queries";
+import { Query } from "@/lib/sektor-api/__generated__/graphql";
+import { useQuery } from "@apollo/client";
+import { getLocationOptions } from "@/utils/organizations";
 
-const InsuranceCompanyFiltersFilters = () => {
+const InsuranceCompanyFilters = () => {
+  const { data: countryData, loading: isLoadingCountryData } = useQuery<Query>(
+    COUNTRY_BY_CODE_QUERY,
+    { variables: { code: "VE" } }
+  );
+  const locationOptions = getLocationOptions(countryData?.getCountryByCode);
+
   const [filters, setFilters] = React.useState({
-    location: SELECT_LOCATION_OPTIONS[0].value,
+    location: locationOptions[0].value,
     segment: SELECT_LINE_OF_BUSINESS_OPTIONS[0].value,
     experienceRange: [10, 30],
   });
@@ -18,12 +25,13 @@ const InsuranceCompanyFiltersFilters = () => {
       <Select
         name="location"
         wrapperClassName="w-full"
-        options={SELECT_LOCATION_OPTIONS}
+        options={locationOptions}
+        disabled={isLoadingCountryData}
         value={filters.location}
         onChange={(e) =>
           setFilters((prev) => ({ ...prev, location: e.target.value }))
         }
-        defaultValue={SELECT_LOCATION_OPTIONS[0].value}
+        defaultValue={locationOptions[0].value}
       />
 
       <Select
@@ -55,4 +63,4 @@ const InsuranceCompanyFiltersFilters = () => {
   );
 };
 
-export default InsuranceCompanyFiltersFilters;
+export default InsuranceCompanyFilters;

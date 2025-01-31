@@ -12,13 +12,16 @@ import { faArrowLeft, faFilter } from "@fortawesome/free-solid-svg-icons";
 import {
   SELECT_GENRE_OPTIONS,
   SELECT_LINE_OF_BUSINESS_OPTIONS,
-  SELECT_LOCATION_OPTIONS,
   SELECT_SUPPLIER_SERVICE_OPTIONS,
 } from "@/constants/forms";
 import {
   ALLOWED_FILTERS_BY_USER_TYPE,
   ORGANIZATION_FILTER_FIELD_NAMES,
 } from "./constants";
+import { useQuery } from "@apollo/client";
+import { COUNTRY_BY_CODE_QUERY } from "@/lib/sektor-api/queries/public/country-by-code";
+import { Query } from "@/lib/sektor-api/__generated__/graphql";
+import { getLocationOptions } from "@/utils/organizations";
 
 const { AGE_RANGE, EXPERIENCE_RANGE, GENRE, SEGMENT, SERVICE_TYPE } =
   ORGANIZATION_FILTER_FIELD_NAMES;
@@ -28,6 +31,12 @@ const OrganizationFilters = () => {
   const { query, replace } = useRouter();
   const [openDrawer, setOpenDrawer] = useState(false);
   const handleCloseDrawer = () => setOpenDrawer(false);
+
+  const { data: countryData, loading: isLoadingCountryData } = useQuery<Query>(
+    COUNTRY_BY_CODE_QUERY,
+    { variables: { code: "VE" } }
+  );
+  const locationOptions = getLocationOptions(countryData?.getCountryByCode);
 
   const { handleGetPublicOrganizations, isLoadingPublicOrganizations } =
     usePublicOrganizations({});
@@ -101,9 +110,10 @@ const OrganizationFilters = () => {
             <Select
               wrapperClassName="w-full"
               value={location || ""}
-              options={SELECT_LOCATION_OPTIONS}
+              disabled={isLoadingCountryData}
+              options={locationOptions}
               onChange={(e) => handleFilterChange("location", e?.target?.value)}
-              defaultValue={SELECT_LOCATION_OPTIONS[0].value}
+              defaultValue={locationOptions[0].value}
             />
 
             {checkAllowedFilter(organizationType, SEGMENT) && (

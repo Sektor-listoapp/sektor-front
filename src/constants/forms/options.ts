@@ -3,7 +3,6 @@ import {
   ORGANIZATION_LINE_OF_BUSINESS,
   SERVICE_SUPPLIER_TYPES,
 } from "../shared";
-import venezuelaJson from "@/data/venezuela.json";
 
 const { MALE, FEMALE } = GENRES;
 const { CLINIC, MEDICAL_HOUSE, PRIMARY_CARE, WORKSHOP } =
@@ -35,21 +34,6 @@ export const SELECT_GENRE_OPTIONS = [
   },
   { label: "Femenino", value: FEMALE },
   { label: "Masculino", value: MALE },
-];
-
-const venezuelaStates = venezuelaJson.map((state) => ({
-  label: state.estado,
-  value: state.id_estado,
-}));
-
-export const SELECT_LOCATION_OPTIONS = [
-  {
-    label: "Ubicación",
-    value: "",
-    disabled: true,
-    hidden: true,
-  },
-  ...venezuelaStates,
 ];
 
 export const SELECT_LINE_OF_BUSINESS_OPTIONS = [
