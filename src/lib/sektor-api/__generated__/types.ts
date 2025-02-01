@@ -15,13 +15,23 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
 };
 
-export type Address = {
-  __typename?: 'Address';
-  city: Scalars['String']['output'];
-  country: Scalars['String']['output'];
-  postalCode: Scalars['String']['output'];
-  state: Scalars['String']['output'];
+export type AddressType = {
+  __typename?: 'AddressType';
+  city: CityType;
+  country: CountryType;
+  state: StateType;
   street: Scalars['String']['output'];
+};
+
+export type BrokerageSocietyContactInputType = {
+  name: Scalars['String']['input'];
+  position: Scalars['String']['input'];
+};
+
+export type BrokerageSocietyContactType = {
+  __typename?: 'BrokerageSocietyContactType';
+  name: Scalars['String']['output'];
+  position: Scalars['String']['output'];
 };
 
 export type BrokerageSocietyFilterType = {
@@ -42,17 +52,25 @@ export type BrokerageSocietyPaginatedType = {
 
 export type BrokerageSocietyType = {
   __typename?: 'BrokerageSocietyType';
-  address: Address;
-  createdAt: Scalars['DateTime']['output'];
+  allies: Array<OrganizationTypes>;
+  clients: Array<OrganizationClientType>;
+  contact: BrokerageSocietyContactType;
+  coverageStates: Array<Scalars['Float']['output']>;
+  group: Scalars['String']['output'];
   id: Scalars['String']['output'];
+  insuranceCompanies: Array<InsuranceCompanyType>;
+  isActive: Scalars['Boolean']['output'];
   license: Scalars['String']['output'];
   lineOfBusiness: Array<OrganizationLineOfBusiness>;
   logoUrl?: Maybe<Scalars['String']['output']>;
   modality: OrganizationModality;
   name: Scalars['String']['output'];
+  offices: Array<OrganizationOfficeType>;
+  phone: Scalars['String']['output'];
+  recognitions: Array<Scalars['String']['output']>;
   rif: Scalars['String']['output'];
-  startDate: Scalars['DateTime']['output'];
   type: OrganizationTypes;
+  workTeam: Array<OrganizationTeamMemberType>;
 };
 
 export type CityType = {
@@ -68,6 +86,17 @@ export type CountryType = {
   name: Scalars['String']['output'];
   states: Array<StateType>;
 };
+
+/** Days of the week */
+export enum DayOfWeek {
+  Friday = 'Friday',
+  Monday = 'Monday',
+  Saturday = 'Saturday',
+  Sunday = 'Sunday',
+  Thursday = 'Thursday',
+  Tuesday = 'Tuesday',
+  Wednesday = 'Wednesday'
+}
 
 export type ExclusiveAgentFilterType = {
   address?: InputMaybe<PublicOrganizationFilterAddressType>;
@@ -89,18 +118,22 @@ export type ExclusiveAgentPaginatedType = {
 
 export type ExclusiveAgentType = {
   __typename?: 'ExclusiveAgentType';
-  address: Address;
+  address?: Maybe<AddressType>;
+  allies: Array<OrganizationTypes>;
   birthDate: Scalars['DateTime']['output'];
-  createdAt: Scalars['DateTime']['output'];
+  clients: Array<OrganizationClientType>;
+  coverageStates: Array<Scalars['Float']['output']>;
+  group: Scalars['String']['output'];
   id: Scalars['String']['output'];
+  isActive: Scalars['Boolean']['output'];
   license: Scalars['String']['output'];
   lineOfBusiness: Array<OrganizationLineOfBusiness>;
   logoUrl?: Maybe<Scalars['String']['output']>;
   modality: OrganizationModality;
   name: Scalars['String']['output'];
-  organizationLogoUrl?: Maybe<Scalars['String']['output']>;
+  phone: Scalars['String']['output'];
+  recognitions: Array<Scalars['String']['output']>;
   sex: Sexes;
-  startDate: Scalars['DateTime']['output'];
   type: OrganizationTypes;
 };
 
@@ -124,18 +157,29 @@ export type InsuranceBrokerPaginatedType = {
 
 export type InsuranceBrokerType = {
   __typename?: 'InsuranceBrokerType';
-  address: Address;
+  address?: Maybe<AddressType>;
+  allies: Array<OrganizationTypes>;
   birthDate: Scalars['DateTime']['output'];
-  createdAt: Scalars['DateTime']['output'];
+  clients: Array<OrganizationClientType>;
+  coverageStates: Array<Scalars['Float']['output']>;
+  group: Scalars['String']['output'];
   id: Scalars['String']['output'];
+  isActive: Scalars['Boolean']['output'];
   license: Scalars['String']['output'];
   lineOfBusiness: Array<OrganizationLineOfBusiness>;
   logoUrl?: Maybe<Scalars['String']['output']>;
   modality: OrganizationModality;
   name: Scalars['String']['output'];
+  phone: Scalars['String']['output'];
+  recognitions: Array<Scalars['String']['output']>;
   sex: Sexes;
-  startDate: Scalars['DateTime']['output'];
   type: OrganizationTypes;
+};
+
+export type InsuranceCompanyContactType = {
+  __typename?: 'InsuranceCompanyContactType';
+  links: Array<SocialMediaLinkType>;
+  name: Scalars['String']['output'];
 };
 
 export type InsuranceCompanyFilterType = {
@@ -156,15 +200,18 @@ export type InsuranceCompanyPaginatedType = {
 
 export type InsuranceCompanyType = {
   __typename?: 'InsuranceCompanyType';
-  address: Address;
-  contact: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
+  contact: InsuranceCompanyContactType;
+  coverageStates: Array<Scalars['Float']['output']>;
+  group: Scalars['String']['output'];
   id: Scalars['String']['output'];
+  isActive: Scalars['Boolean']['output'];
   lineOfBusiness: Array<OrganizationLineOfBusiness>;
   logoUrl?: Maybe<Scalars['String']['output']>;
   modality: OrganizationModality;
+  motto?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
-  startDate: Scalars['DateTime']['output'];
+  offices: Array<OrganizationOfficeType>;
+  phone: Scalars['String']['output'];
   type: OrganizationTypes;
 };
 
@@ -243,11 +290,11 @@ export type MutationUpdatePasswordArgs = {
   input: UpdatePasswordInputType;
 };
 
-export type OrganizationContactInputType = {
-  email?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  phone?: InputMaybe<Scalars['String']['input']>;
-  position?: InputMaybe<Scalars['String']['input']>;
+export type OrganizationClientType = {
+  __typename?: 'OrganizationClientType';
+  id: Scalars['String']['output'];
+  logoUrl?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
 };
 
 export enum OrganizationLineOfBusiness {
@@ -266,6 +313,29 @@ export enum OrganizationModality {
   Physical = 'Physical'
 }
 
+export type OrganizationOfficeScheduleType = {
+  __typename?: 'OrganizationOfficeScheduleType';
+  day: DayOfWeek;
+  from: Scalars['String']['output'];
+  to: Scalars['String']['output'];
+};
+
+export type OrganizationOfficeType = {
+  __typename?: 'OrganizationOfficeType';
+  address: AddressType;
+  id: Scalars['String']['output'];
+  phone: Scalars['String']['output'];
+  schedule: Array<OrganizationOfficeScheduleType>;
+};
+
+export type OrganizationTeamMemberType = {
+  __typename?: 'OrganizationTeamMemberType';
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  photoUrl?: Maybe<Scalars['String']['output']>;
+  position: Scalars['String']['output'];
+};
+
 export enum OrganizationTypes {
   Admin = 'Admin',
   BrokerageSociety = 'BrokerageSociety',
@@ -283,7 +353,7 @@ export type PaginationType = {
 };
 
 export type PublicOrganizationFilterAddressType = {
-  city?: InputMaybe<Scalars['String']['input']>;
+  city?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type PublicOrganizationFilterType = {
@@ -303,13 +373,15 @@ export type PublicOrganizationPaginatedType = {
 
 export type PublicOrganizationType = {
   __typename?: 'PublicOrganizationType';
-  address: Address;
-  createdAt: Scalars['DateTime']['output'];
+  coverageStates: Array<Scalars['Float']['output']>;
+  group: Scalars['String']['output'];
   id: Scalars['String']['output'];
+  isActive: Scalars['Boolean']['output'];
   lineOfBusiness: Array<OrganizationLineOfBusiness>;
   logoUrl?: Maybe<Scalars['String']['output']>;
   modality: OrganizationModality;
   name: Scalars['String']['output'];
+  phone: Scalars['String']['output'];
   type: OrganizationTypes;
 };
 
@@ -367,7 +439,7 @@ export type QueryPublicSuppliersArgs = {
 };
 
 export type RegisterAsBrokerageSocietyInputType = {
-  contact: OrganizationContactInputType;
+  contact: BrokerageSocietyContactInputType;
   email: Scalars['String']['input'];
   license: Scalars['String']['input'];
   name: Scalars['String']['input'];
@@ -439,6 +511,21 @@ export enum Sexes {
   PreferNotToSay = 'PreferNotToSay'
 }
 
+export type SocialMediaLinkType = {
+  __typename?: 'SocialMediaLinkType';
+  platform: SocialMediaPlatform;
+  url: Scalars['String']['output'];
+};
+
+/** Social media platform */
+export enum SocialMediaPlatform {
+  Facebook = 'Facebook',
+  Instagram = 'Instagram',
+  Twitter = 'Twitter',
+  Website = 'Website',
+  Whatsapp = 'Whatsapp'
+}
+
 export type StateType = {
   __typename?: 'StateType';
   cities: Array<CityType>;
@@ -462,16 +549,28 @@ export type SupplierPaginatedType = {
   pages: Scalars['Int']['output'];
 };
 
+export type SupplierServiceType = {
+  __typename?: 'SupplierServiceType';
+  description: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type SupplierType = {
   __typename?: 'SupplierType';
-  address: Address;
-  createdAt: Scalars['DateTime']['output'];
+  coverageStates: Array<Scalars['Float']['output']>;
+  group: Scalars['String']['output'];
   id: Scalars['String']['output'];
+  isActive: Scalars['Boolean']['output'];
   lineOfBusiness: Array<OrganizationLineOfBusiness>;
   logoUrl?: Maybe<Scalars['String']['output']>;
   modality: OrganizationModality;
+  motto?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
+  offices: Array<OrganizationOfficeType>;
+  phone: Scalars['String']['output'];
   serviceType: ServiceSupplierTypes;
+  services: Array<SupplierServiceType>;
   type: OrganizationTypes;
 };
 
@@ -488,7 +587,6 @@ export enum UserGroups {
 
 export type UserType = {
   __typename?: 'UserType';
-  companies?: Maybe<Array<Scalars['String']['output']>>;
   deletedAt?: Maybe<Scalars['DateTime']['output']>;
   email: Scalars['String']['output'];
   group?: Maybe<UserGroups>;

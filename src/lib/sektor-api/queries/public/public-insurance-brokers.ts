@@ -1,22 +1,5 @@
 import { gql } from "@apollo/client";
-
-export const PUBLIC_INSURANCE_BROKER_FIELDS_FRAGMENT = gql`
-  fragment PublicInsuranceBrokerFields on InsuranceBrokerType {
-    id
-    name
-    type
-    logoUrl
-    createdAt
-    lineOfBusiness
-    modality
-    address {
-      street
-      city
-      state
-      country
-    }
-  }
-`;
+import { INSURANCE_BROKER_FIELDS_FRAGMENT } from "../../fragments";
 
 export const PUBLIC_INSURANCE_BROKERS_QUERY = gql`
   query getPublicInsuranceBrokers(
@@ -25,12 +8,12 @@ export const PUBLIC_INSURANCE_BROKERS_QUERY = gql`
   ) {
     publicInsuranceBrokers(pagination: $pagination, filter: $filter) {
       items {
-        ...PublicInsuranceBrokerFields
+        ...InsuranceBrokerFields
       }
       count
       pages
     }
+  }
 
-    ${PUBLIC_INSURANCE_BROKER_FIELDS_FRAGMENT}
-    }
+  ${INSURANCE_BROKER_FIELDS_FRAGMENT}
 `;

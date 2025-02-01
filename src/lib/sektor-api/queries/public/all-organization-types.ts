@@ -1,4 +1,11 @@
 import { gql } from "@apollo/client";
+import {
+  BROKERAGE_SOCIETY_FIELDS_FRAGMENT,
+  EXCLUSIVE_AGENT_FIELDS_FRAGMENT,
+  INSURANCE_BROKER_FIELDS_FRAGMENT,
+  INSURANCE_COMPANY_FIELDS_FRAGMENT,
+  SUPPLIER_FIELDS_FRAGMENT,
+} from "../../fragments";
 
 export const ALL_ORGANIZATION_TYPES_QUERY = gql`
   query getAllOrganizations(
@@ -11,20 +18,7 @@ export const ALL_ORGANIZATION_TYPES_QUERY = gql`
   ) {
     publicSuppliers(pagination: $pagination, filter: $publicSupplierFilters) {
       items {
-        id
-        name
-        type
-        logoUrl
-        createdAt
-        lineOfBusiness
-        modality
-        serviceType
-        address {
-          street
-          city
-          state
-          country
-        }
+        ...SupplierFields
       }
       count
       pages
@@ -34,21 +28,7 @@ export const ALL_ORGANIZATION_TYPES_QUERY = gql`
       filter: $publicExclusiveAgentFilters
     ) {
       items {
-        id
-        name
-        type
-        logoUrl
-        organizationLogoUrl
-        createdAt
-        startDate
-        lineOfBusiness
-        modality
-        address {
-          street
-          city
-          state
-          country
-        }
+        ...ExclusiveAgentFields
       }
       count
       pages
@@ -58,20 +38,7 @@ export const ALL_ORGANIZATION_TYPES_QUERY = gql`
       filter: $publicInsuranceBrokersFilters
     ) {
       items {
-        id
-        name
-        type
-        logoUrl
-        createdAt
-        startDate
-        lineOfBusiness
-        modality
-        address {
-          street
-          city
-          state
-          country
-        }
+        ...InsuranceBrokerFields
       }
       count
       pages
@@ -81,20 +48,7 @@ export const ALL_ORGANIZATION_TYPES_QUERY = gql`
       filter: $publicInsuranceCompanyFilters
     ) {
       items {
-        id
-        name
-        type
-        logoUrl
-        createdAt
-        startDate
-        lineOfBusiness
-        modality
-        address {
-          street
-          city
-          state
-          country
-        }
+        ...InsuranceCompanyFields
       }
       count
       pages
@@ -104,23 +58,16 @@ export const ALL_ORGANIZATION_TYPES_QUERY = gql`
       filter: $publicBrokerageSocietyFilters
     ) {
       items {
-        id
-        name
-        type
-        logoUrl
-        createdAt
-        startDate
-        lineOfBusiness
-        modality
-        address {
-          street
-          city
-          state
-          country
-        }
+        ...BrokerageSocietyFields
       }
       count
       pages
     }
   }
+
+  ${SUPPLIER_FIELDS_FRAGMENT}
+  ${EXCLUSIVE_AGENT_FIELDS_FRAGMENT}
+  ${INSURANCE_BROKER_FIELDS_FRAGMENT}
+  ${INSURANCE_COMPANY_FIELDS_FRAGMENT}
+  ${BROKERAGE_SOCIETY_FIELDS_FRAGMENT}
 `;

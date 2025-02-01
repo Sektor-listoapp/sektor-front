@@ -1,22 +1,5 @@
 import { gql } from "@apollo/client";
-
-export const PUBLIC_EXCLUSIVE_AGENT_FIELDS_FRAGMENT = gql`
-  fragment PublicExclusiveAgentFields on ExclusiveAgentType {
-    id
-    name
-    type
-    logoUrl
-    createdAt
-    lineOfBusiness
-    modality
-    address {
-      street
-      city
-      state
-      country
-    }
-  }
-`;
+import { EXCLUSIVE_AGENT_FIELDS_FRAGMENT } from "../../fragments";
 
 export const PUBLIC_EXCLUSIVE_AGENTS_QUERY = gql`
   query getPublicExclusiveAgents(
@@ -25,28 +8,12 @@ export const PUBLIC_EXCLUSIVE_AGENTS_QUERY = gql`
   ) {
     publicExclusiveAgents(pagination: $pagination, filter: $filter) {
       items {
-        id
-        name
-        type
-        logoUrl
-        createdAt
-        lineOfBusiness
-        modality
-        license
-        birthDate
-        sex
-        startDate
-        address {
-          street
-          city
-          state
-          country
-        }
+        ...ExclusiveAgentFields
       }
       count
       pages
     }
-
-    ${PUBLIC_EXCLUSIVE_AGENT_FIELDS_FRAGMENT}
   }
+
+  ${EXCLUSIVE_AGENT_FIELDS_FRAGMENT}
 `;

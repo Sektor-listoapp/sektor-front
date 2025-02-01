@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { PUBLIC_ORGANIZATION_FIELDS_FRAGMENT } from "../../fragments";
 
 export const PUBLIC_ORGANIZATIONS_QUERY = gql`
   query getPublicOrganizations(
@@ -7,22 +8,12 @@ export const PUBLIC_ORGANIZATIONS_QUERY = gql`
   ) {
     publicOrganizations(pagination: $pagination, filter: $filter) {
       items {
-        id
-        name
-        type
-        logoUrl
-        createdAt
-        lineOfBusiness
-        modality
-        address {
-          street
-          city
-          state
-          country
-        }
+        ...PublicOrganizationFields
       }
       count
       pages
     }
   }
+
+  ${PUBLIC_ORGANIZATION_FIELDS_FRAGMENT}
 `;

@@ -1,22 +1,5 @@
 import { gql } from "@apollo/client";
-
-export const PUBLIC_BROKERAGE_SOCIETY_FIELDS_FRAGMENT = gql`
-  fragment PublicBrokerageSocietyFields on BrokerageSocietyType {
-    id
-    name
-    type
-    logoUrl
-    createdAt
-    lineOfBusiness
-    modality
-    address {
-      street
-      city
-      state
-      country
-    }
-  }
-`;
+import { BROKERAGE_SOCIETY_FIELDS_FRAGMENT } from "../../fragments/brokerage-society-fields";
 
 export const PUBLIC_BROKERAGE_SOCIETY_QUERY = gql`
   query getPublicBrokerageSocieties(
@@ -25,12 +8,12 @@ export const PUBLIC_BROKERAGE_SOCIETY_QUERY = gql`
   ) {
     publicBrokerageSocieties(pagination: $pagination, filter: $filter) {
       items {
-        ...PublicBrokerageSocietyFields
+        ...BrokerageSocietyFields
       }
       count
       pages
     }
-
-    ${PUBLIC_BROKERAGE_SOCIETY_FIELDS_FRAGMENT}
   }
+
+  ${BROKERAGE_SOCIETY_FIELDS_FRAGMENT}
 `;

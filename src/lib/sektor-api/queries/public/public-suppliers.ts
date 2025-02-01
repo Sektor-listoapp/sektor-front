@@ -1,22 +1,5 @@
 import { gql } from "@apollo/client";
-
-export const PUBLIC_SUPPLIER_FIELDS_FRAGMENT = gql`
-  fragment PublicSupplierFields on SupplierType {
-    id
-    name
-    type
-    logoUrl
-    createdAt
-    lineOfBusiness
-    modality
-    address {
-      street
-      city
-      state
-      country
-    }
-  }
-`;
+import { SUPPLIER_FIELDS_FRAGMENT } from "../../fragments";
 
 export const PUBLIC_SUPPLIERS_QUERY = gql`
   query getPublicSuppliers(
@@ -25,12 +8,12 @@ export const PUBLIC_SUPPLIERS_QUERY = gql`
   ) {
     publicSuppliers(pagination: $pagination, filter: $filter) {
       items {
-        ...PublicSupplierFields
+        ...SupplierFields
       }
       count
       pages
     }
   }
 
-  ${PUBLIC_SUPPLIER_FIELDS_FRAGMENT}
+  ${SUPPLIER_FIELDS_FRAGMENT}
 `;
