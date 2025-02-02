@@ -1,5 +1,5 @@
 import React from "react";
-import InsuranceCompaniesCarousel from "@/components/common/insurance-companies-carousel";
+import InsuranceCompaniesCarousel from "@/components/shared/insurance-companies-carousel";
 import Button from "@/components/ui/button";
 import { ROUTES } from "@/constants/router";
 import { cn } from "@/utils/class-name";

@@ -1,4 +1,4 @@
-import InsuranceCompaniesCarousel from "@/components/common/insurance-companies-carousel";
+import InsuranceCompaniesCarousel from "@/components/shared/insurance-companies-carousel";
 
 const InsuranceCompanyHeroBannerContent = () => {
   return (
