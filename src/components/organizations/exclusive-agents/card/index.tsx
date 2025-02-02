@@ -5,6 +5,8 @@ import OrganizationModality from "../../modality";
 import LineOfBusiness from "../../line-of-business";
 import { getFormattedYearsOfExperience } from "@/utils/formatters";
 import { ExclusiveAgentType } from "@/lib/sektor-api/__generated__/types";
+import { showOrganizationDetails } from "@/utils/organizations";
+import { useRouter } from "next/router";
 
 interface ExclusiveAgentCardProps extends React.HTMLAttributes<HTMLDivElement> {
   data: ExclusiveAgentType;
@@ -15,6 +17,7 @@ const ExclusiveAgentCard = ({
   className,
   ...props
 }: ExclusiveAgentCardProps) => {
+  const router = useRouter();
   const { name } = data;
   const foundationYear = data?.foundationYear;
   const yearsOfExperience = Boolean(foundationYear)
@@ -26,9 +29,10 @@ const ExclusiveAgentCard = ({
   return (
     <article
       className={cn(
-        "w-full h-full min-w-60 min-h-64 overflow-hidden rounded-2xl shadow-lg font-century-gothic flex flex-col justify-between relative md:max-w-80 2xl:max-w-96",
+        "w-full h-full min-w-60 min-h-64 overflow-hidden rounded-2xl shadow-lg font-century-gothic flex flex-col justify-between relative md:max-w-80 2xl:max-w-96 md:hover:shadow-xl md:hover:cursor-pointer transition-shadow duration-300 md:active:shadow-sm",
         className
       )}
+      onClick={() => showOrganizationDetails({ router, data })}
       {...props}
     >
       {Boolean(yearsOfExperience) && (

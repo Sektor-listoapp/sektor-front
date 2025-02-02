@@ -5,6 +5,8 @@ import LineOfBusiness from "../../line-of-business";
 import { cn } from "@/utils/class-name";
 import { getFormattedYearsOfExperience } from "@/utils/formatters";
 import { InsuranceBrokerType } from "@/lib/sektor-api/__generated__/types";
+import { useRouter } from "next/router";
+import { showOrganizationDetails } from "@/utils/organizations";
 
 interface InsuranceBrokerCardProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -16,6 +18,7 @@ const InsuranceBrokerCard = ({
   className,
   ...props
 }: InsuranceBrokerCardProps) => {
+  const router = useRouter();
   const { name } = data;
   const foundationYear = data?.foundationYear;
   const yearsOfExperience = Boolean(foundationYear)
@@ -25,9 +28,10 @@ const InsuranceBrokerCard = ({
   return (
     <article
       className={cn(
-        "w-full min-w-60 min-h-64 overflow-hidden rounded-2xl shadow-lg font-century-gothic flex flex-col justify-between relative md:max-w-80 2xl:max-w-96",
+        "w-full min-w-60 min-h-64 overflow-hidden rounded-2xl shadow-lg font-century-gothic flex flex-col justify-between relative md:max-w-80 2xl:max-w-96 md:hover:shadow-xl md:hover:cursor-pointer transition-shadow duration-300 md:active:shadow-sm",
         className
       )}
+      onClick={() => showOrganizationDetails({ router, data })}
       {...props}
     >
       {Boolean(yearsOfExperience) && (

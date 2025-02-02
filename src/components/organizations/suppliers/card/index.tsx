@@ -5,12 +5,15 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { SUPPLIER_SERVICE_TYPE_LABEL } from "../constants";
 import { SupplierType } from "@/lib/sektor-api/__generated__/types";
+import { showOrganizationDetails } from "@/utils/organizations";
+import { useRouter } from "next/router";
 
 interface SupplierCardProps extends React.HTMLAttributes<HTMLDivElement> {
   data: SupplierType;
 }
 
 const SupplierCard = ({ data, className, ...props }: SupplierCardProps) => {
+  const router = useRouter();
   const { name } = data;
 
   const address = data?.offices?.[0]?.address || {};
@@ -29,9 +32,10 @@ const SupplierCard = ({ data, className, ...props }: SupplierCardProps) => {
   return (
     <article
       className={cn(
-        "w-full h-full min-w-96 overflow-hidden rounded-2xl shadow-lg font-century-gothic grid grid-cols-3 relative sm:min-w-[500px] lg:min-w-full",
+        "w-full h-full min-w-96 overflow-hidden rounded-2xl shadow-lg font-century-gothic grid grid-cols-3 relative sm:min-w-[500px] lg:min-w-full md:hover:shadow-xl md:hover:cursor-pointer transition-shadow duration-300 md:active:shadow-sm",
         className
       )}
+      onClick={() => showOrganizationDetails({ router, data })}
       {...props}
     >
       <div className="w-fit rounded-2xl px-2 sm:px-4 rounded-e-none absolute top-0 right-0 bg-blue-500 text-white text-[10px] md:text-xs font-bold p-1 rounded-t-2xl lg:text-xs">

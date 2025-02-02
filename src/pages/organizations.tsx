@@ -1,6 +1,7 @@
 import { ORGANIZATION_COMPONENTS } from "@/components/organizations/constants";
 import HeroBanner from "@/components/organizations/hero-banner";
 import Searchbar from "@/components/organizations/searchbar";
+import OrganizationDetailsModal from "@/components/shared/organization-details-modal";
 import Spinner from "@/components/ui/spinner";
 import { usePublicOrganizationsStore } from "@/store/public-organizations";
 import { useRouter } from "next/router";
@@ -36,6 +37,7 @@ const Organizations = () => {
           )
         )}
       </main>
+      <OrganizationDetailsModal />
     </div>
   );
 };

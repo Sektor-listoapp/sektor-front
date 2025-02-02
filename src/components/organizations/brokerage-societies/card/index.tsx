@@ -5,6 +5,8 @@ import { getFormattedYearsOfExperience } from "@/utils/formatters";
 import LineOfBusiness from "../../line-of-business";
 import OrganizationModality from "../../modality";
 import { BrokerageSocietyType } from "@/lib/sektor-api/__generated__/types";
+import { showOrganizationDetails } from "@/utils/organizations";
+import { useRouter } from "next/router";
 
 interface BrokerageSocietyCardProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -16,6 +18,7 @@ const BrokerageSocietyCard = ({
   className,
   ...props
 }: BrokerageSocietyCardProps) => {
+  const router = useRouter();
   const { name } = data;
   const foundationYear = data?.foundationYear;
   const yearsOfExperience = Boolean(foundationYear)
@@ -27,9 +30,10 @@ const BrokerageSocietyCard = ({
   return (
     <article
       className={cn(
-        "w-full h-full min-w-96 overflow-hidden rounded-2xl shadow-lg font-century-gothic grid grid-cols-3 relative sm:min-w-[500px] lg:min-w-full",
+        "w-full h-full min-w-96 overflow-hidden rounded-2xl shadow-lg font-century-gothic grid grid-cols-3 relative sm:min-w-[500px] lg:min-w-full md:hover:shadow-xl md:hover:cursor-pointer transition-shadow duration-300 md:active:shadow-sm",
         className
       )}
+      onClick={() => showOrganizationDetails({ router, data })}
       {...props}
     >
       {Boolean(yearsOfExperience) && (
