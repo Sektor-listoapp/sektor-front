@@ -1,15 +1,15 @@
 import React from "react";
 import { cn } from "@/utils/class-name";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { ORGANIZATION_MODALITY } from "@/constants/shared";
 import {
   ORGANIZATION_MODALITY_ICON,
   ORGANIZATION_MODALITY_LABEL,
 } from "./constants";
+import { OrganizationModality as OrganizationModalityType } from "@/lib/sektor-api/__generated__/types";
 
 interface OrganizationModalityProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  modality: keyof typeof ORGANIZATION_MODALITY;
+  modality: OrganizationModalityType;
 }
 
 const OrganizationModality = ({

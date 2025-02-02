@@ -1,14 +1,14 @@
-import { PublicBrokerageSociety } from "@/types/public";
+import React from "react";
+import Image from "next/image";
 import { cn } from "@/utils/class-name";
 import { getFormattedYearsOfExperience } from "@/utils/formatters";
-import Image from "next/image";
-import React from "react";
 import LineOfBusiness from "../../line-of-business";
 import OrganizationModality from "../../modality";
+import { BrokerageSocietyType } from "@/lib/sektor-api/__generated__/types";
 
 interface BrokerageSocietyCardProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  data: PublicBrokerageSociety;
+  data: BrokerageSocietyType;
 }
 
 const BrokerageSocietyCard = ({
@@ -17,7 +17,12 @@ const BrokerageSocietyCard = ({
   ...props
 }: BrokerageSocietyCardProps) => {
   const { name } = data;
-  const yearsOfExperience = getFormattedYearsOfExperience(data?.startDate);
+  const foundationYear = data?.foundationYear;
+  const yearsOfExperience = Boolean(foundationYear)
+    ? getFormattedYearsOfExperience(foundationYear as number)
+    : null;
+
+  const allies = data?.allies?.slice(0, 3) || [];
 
   return (
     <article
@@ -27,12 +32,14 @@ const BrokerageSocietyCard = ({
       )}
       {...props}
     >
-      <div className="w-fit rounded-2xl px-2 sm:px-4 rounded-e-none absolute top-0 right-0 bg-blue-500 text-white text-[10px] md:text-xs font-bold p-1 rounded-t-2xl lg:text-xs">
-        {yearsOfExperience}
-      </div>
+      {Boolean(yearsOfExperience) && (
+        <div className="w-fit rounded-2xl px-2 sm:px-4 rounded-e-none absolute top-0 right-0 bg-blue-500 text-white text-[10px] md:text-xs font-bold p-1 rounded-t-2xl lg:text-xs">
+          {yearsOfExperience}
+        </div>
+      )}
       <Image
         className="w-full h-full object-cover object-center rounded-l-2xl"
-        src={data?.logoUrl}
+        src={data?.logoUrl || "/images/placeholder.png"}
         alt={name}
         width={500}
         height={400}
@@ -44,14 +51,16 @@ const BrokerageSocietyCard = ({
         >
           {name}
         </h3>
-        <div className="w-full text-xs sm:text-sm">
-          <h4 className="text-sm sm:text-base">Trabaja con</h4>
-          <ul className="list-disc list-inside pl-2">
-            <li>Partner 1</li>
-            <li>Partner 2</li>
-            <li>Partner 3</li>
-          </ul>
-        </div>
+        {Boolean(allies.length) && (
+          <div className="w-full text-xs sm:text-sm">
+            <h4 className="text-sm sm:text-base">Trabaja con</h4>
+            <ul className="list-disc list-inside pl-2">
+              {allies.map((ally, index) => (
+                <li key={`${ally?.name}-${index}`}>{ally?.name}</li>
+              ))}
+            </ul>
+          </div>
+        )}
         <div className="w-full flex justify-between gap-2">
           <OrganizationModality modality={data?.modality} />
           <LineOfBusiness lineOfBusiness={data?.lineOfBusiness} />

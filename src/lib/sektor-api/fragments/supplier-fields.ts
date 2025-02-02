@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import { ORGANIZATION_OFFICE_FIELDS_FRAGMENT } from "./organization-fields";
+import { PUBLIC_ORGANIZATION_FIELDS_FRAGMENT } from "./public-organization-fields";
 
 export const SUPPLIER_SERVICE_FIELDS_FRAGMENT = gql`
   fragment SupplierServiceFields on SupplierServiceType {
@@ -13,16 +14,17 @@ export const SUPPLIER_FIELDS_FRAGMENT = gql`
   fragment SupplierFields on SupplierType {
     id
     name
-    group
     logoUrl
     type
     isActive
     lineOfBusiness
     coverageStates
     modality
-    phone
     serviceType
     motto
+    allies {
+      ...PublicOrganizationFields
+    }
     offices {
       ...OrganizationOfficeFields
     }
@@ -31,6 +33,7 @@ export const SUPPLIER_FIELDS_FRAGMENT = gql`
     }
   }
 
+  ${PUBLIC_ORGANIZATION_FIELDS_FRAGMENT}
   ${ORGANIZATION_OFFICE_FIELDS_FRAGMENT}
   ${SUPPLIER_SERVICE_FIELDS_FRAGMENT}
 `;

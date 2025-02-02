@@ -1,25 +1,30 @@
 import React from "react";
-import { PublicSupplier } from "@/types/public";
-import { cn } from "@/utils/class-name";
 import Image from "next/image";
+import { cn } from "@/utils/class-name";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import { SUPPLIER_SERVICE_TYPE_LABEL } from "../constants";
+import { SupplierType } from "@/lib/sektor-api/__generated__/types";
 
 interface SupplierCardProps extends React.HTMLAttributes<HTMLDivElement> {
-  data: PublicSupplier;
+  data: SupplierType;
 }
 
 const SupplierCard = ({ data, className, ...props }: SupplierCardProps) => {
   const { name } = data;
 
-  const { city = "", state = "" } = data?.address;
-  const address = `${city}${state ? `, ${state}` : ""}`;
+  const address = data?.offices?.[0]?.address || {};
+  const { city, state } = address;
+  const stateName = state?.name || "";
+  const cityName = city?.name || "";
+  const formattedAddress = `${cityName}${stateName ? `, ${stateName}` : ""}`;
 
   const supplierServiceType =
     SUPPLIER_SERVICE_TYPE_LABEL[
       data?.serviceType as keyof typeof SUPPLIER_SERVICE_TYPE_LABEL
     ];
+
+  const allies = data?.allies?.slice(0, 3) || [];
 
   return (
     <article
@@ -34,7 +39,7 @@ const SupplierCard = ({ data, className, ...props }: SupplierCardProps) => {
       </div>
       <Image
         className="w-full h-full object-cover object-center rounded-l-2xl"
-        src={data?.logoUrl}
+        src={data?.logoUrl || "/images/placeholder.png"}
         alt={name}
         width={500}
         height={400}
@@ -46,18 +51,21 @@ const SupplierCard = ({ data, className, ...props }: SupplierCardProps) => {
         >
           {name}
         </h3>
-        <div className="w-full text-xs sm:text-sm">
-          <h4 className="text-sm sm:text-base">Trabaja con</h4>
-          <ul className="list-disc list-inside pl-2">
-            <li>Partner 1</li>
-            <li>Partner 2</li>
-            <li>Partner 3</li>
-          </ul>
-        </div>
+        {Boolean(allies.length) && (
+          <div className="w-full text-xs sm:text-sm">
+            <h4 className="text-sm sm:text-base">Trabaja con</h4>
+            <ul className="list-disc list-inside pl-2">
+              {allies.map((ally, index) => (
+                <li key={`${ally?.name}-${index}`}>{ally?.name}</li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {address && (
           <div className="w-full flex justify-start items-center gap-2">
             <FontAwesomeIcon icon={faLocationDot} size="lg" />
-            <span>{address}</span>
+            <span>{formattedAddress}</span>
           </div>
         )}
       </div>

@@ -1,14 +1,14 @@
 import React from "react";
 import Image from "next/image";
-import { PublicInsuranceCompany } from "@/types/public";
 import { cn } from "@/utils/class-name";
 import OrganizationModality from "../../modality";
 import LineOfBusiness from "../../line-of-business";
 import { getFormattedYearsOfExperience } from "@/utils/formatters";
+import { InsuranceCompanyType } from "@/lib/sektor-api/__generated__/types";
 
 interface InsuranceCompanyCardProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  data: PublicInsuranceCompany;
+  data: InsuranceCompanyType;
 }
 
 const InsuranceCompanyCard = ({
@@ -17,7 +17,10 @@ const InsuranceCompanyCard = ({
   ...props
 }: InsuranceCompanyCardProps) => {
   const { name } = data;
-  const yearsOfExperience = getFormattedYearsOfExperience(data?.startDate);
+  const foundationYear = data?.foundationYear;
+  const yearsOfExperience = Boolean(foundationYear)
+    ? getFormattedYearsOfExperience(foundationYear as number)
+    : null;
 
   return (
     <article
@@ -27,12 +30,14 @@ const InsuranceCompanyCard = ({
       )}
       {...props}
     >
-      <div className="w-fit rounded-2xl px-4 rounded-e-none absolute top-0 right-0 bg-blue-500 text-white text-xs font-bold p-1 rounded-t-2xl">
-        {yearsOfExperience}
-      </div>
+      {Boolean(yearsOfExperience) && (
+        <div className="w-fit rounded-2xl px-4 rounded-e-none absolute top-0 right-0 bg-blue-500 text-white text-xs font-bold p-1 rounded-t-2xl">
+          {yearsOfExperience}
+        </div>
+      )}
       <Image
         className="w-full h-full object-cover object-center 2xl:h-72 rounded-t-2xl"
-        src={data?.logoUrl}
+        src={data?.logoUrl || "/images/placeholder.png"}
         alt={name}
         width={500}
         height={400}

@@ -21,11 +21,10 @@ export const INSURANCE_COMPANY_FIELDS_FRAGMENT = gql`
     logoUrl
     lineOfBusiness
     modality
-    group
     isActive
     coverageStates
-    phone
     motto
+    foundationYear
     offices {
       ...OrganizationOfficeFields
     }

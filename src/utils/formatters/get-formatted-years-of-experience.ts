@@ -1,13 +1,13 @@
 import dayjs from "dayjs";
 
-export const getFormattedYearsOfExperience = (startDate: string) => {
-  if (!startDate) return;
+export const getFormattedYearsOfExperience = (yearsOfExperience: number) => {
+  if (!yearsOfExperience) return;
 
-  const yearsOfExperience = dayjs().diff(startDate, "year");
-  if (yearsOfExperience === 0) {
+  const diff = dayjs().diff(yearsOfExperience, "year");
+  if (diff === 0) {
     return "Menos de un año";
   }
-  if (yearsOfExperience === 1) {
+  if (diff === 1) {
     return "1 año de experiencia";
   }
 
