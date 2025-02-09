@@ -30,6 +30,7 @@ export const ORGANIZATION_OFFICE_FIELDS_FRAGMENT = gql`
   fragment OrganizationOfficeFields on OrganizationOfficeType {
     id
     phone
+    photoUrl
     address {
       ...AddressFields
     }

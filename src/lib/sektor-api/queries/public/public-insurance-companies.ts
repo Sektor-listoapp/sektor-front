@@ -17,3 +17,13 @@ export const PUBLIC_INSURANCE_COMPANIES_QUERY = gql`
 
   ${INSURANCE_COMPANY_FIELDS_FRAGMENT}
 `;
+
+export const PUBLIC_INSURANCE_COMPANY_BY_ID_QUERY = gql`
+  query getInsuranceCompanyById($id: String!) {
+    publicInsuranceCompanyById(id: $id) {
+      ...InsuranceCompanyFields
+    }
+  }
+
+  ${INSURANCE_COMPANY_FIELDS_FRAGMENT}
+`;

@@ -1,6 +1,7 @@
 import { gql } from "@apollo/client";
 import { ADDRESS_FIELDS_FRAGMENT } from "./address-fields";
 import { ORGANIZATION_CLIENT_FIELDS_FRAGMENT } from "./organization-fields";
+import { PUBLIC_ORGANIZATION_FIELDS_FRAGMENT } from "./public-organization-fields";
 
 export const INSURANCE_BROKER_FIELDS_FRAGMENT = gql`
   fragment InsuranceBrokerFields on InsuranceBrokerType {
@@ -17,6 +18,9 @@ export const INSURANCE_BROKER_FIELDS_FRAGMENT = gql`
     sex
     foundationYear
     recognitions
+    allies {
+      ...PublicOrganizationFields
+    }
     clients {
       ...OrganizationClientFields
     }
@@ -24,7 +28,8 @@ export const INSURANCE_BROKER_FIELDS_FRAGMENT = gql`
       ...AddressFields
     }
   }
-
+  
+  ${PUBLIC_ORGANIZATION_FIELDS_FRAGMENT}
   ${ADDRESS_FIELDS_FRAGMENT}
   ${ORGANIZATION_CLIENT_FIELDS_FRAGMENT}
 `;

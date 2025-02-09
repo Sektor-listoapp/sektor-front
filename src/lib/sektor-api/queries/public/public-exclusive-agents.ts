@@ -17,3 +17,13 @@ export const PUBLIC_EXCLUSIVE_AGENTS_QUERY = gql`
 
   ${EXCLUSIVE_AGENT_FIELDS_FRAGMENT}
 `;
+
+export const PUBLIC_EXCLUSIVE_AGENT_BY_ID_QUERY = gql`
+  query getExclusiveAgentById($id: String!) {
+    publicExclusiveAgentById(id: $id) {
+      ...ExclusiveAgentFields
+    }
+  }
+
+  ${EXCLUSIVE_AGENT_FIELDS_FRAGMENT}
+`;

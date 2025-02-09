@@ -7,7 +7,7 @@ import { usePublicOrganizationsStore } from "@/store/public-organizations";
 import { useRouter } from "next/router";
 
 const Organizations = () => {
-  const { query } = useRouter();
+  const { query, isReady } = useRouter();
   const organizationType = query?.type;
   const isLoadingPublicOrganizations = usePublicOrganizationsStore(
     (state) => state.isLoadingPublicOrganizations
@@ -37,7 +37,7 @@ const Organizations = () => {
           )
         )}
       </main>
-      <OrganizationDetailsModal />
+      {isReady && query?.details && <OrganizationDetailsModal />}
     </div>
   );
 };

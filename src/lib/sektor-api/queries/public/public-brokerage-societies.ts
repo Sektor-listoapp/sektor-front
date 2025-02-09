@@ -17,3 +17,13 @@ export const PUBLIC_BROKERAGE_SOCIETY_QUERY = gql`
 
   ${BROKERAGE_SOCIETY_FIELDS_FRAGMENT}
 `;
+
+export const PUBLIC_BROKERAGE_SOCIETY_BY_ID_QUERY = gql`
+  query getBrokerageSocietyById($id: String!) {
+    publicBrokerageSocietyById(id: $id) {
+      ...BrokerageSocietyFields
+    }
+  }
+
+  ${BROKERAGE_SOCIETY_FIELDS_FRAGMENT}
+`;

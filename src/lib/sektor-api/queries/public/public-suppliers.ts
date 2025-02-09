@@ -17,3 +17,13 @@ export const PUBLIC_SUPPLIERS_QUERY = gql`
 
   ${SUPPLIER_FIELDS_FRAGMENT}
 `;
+
+export const PUBLIC_SUPPLIER_BY_ID_QUERY = gql`
+  query getSupplierById($id: String!) {
+    publicSupplierById(id: $id) {
+      ...SupplierFields
+    }
+  }
+
+  ${SUPPLIER_FIELDS_FRAGMENT}
+`;

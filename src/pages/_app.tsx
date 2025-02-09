@@ -32,7 +32,18 @@ const sektorApiClient = createSektorApiClient();
 export default function App({ Component, pageProps, router }: AppProps) {
   return (
     <ApolloProvider client={sektorApiClient}>
-      <ConfigProvider locale={es}>
+      <ConfigProvider
+        locale={es}
+        theme={{
+          token: {
+            fontFamily: "Century Gothic",
+            colorPrimaryBorder: "#182F48",
+            colorPrimary: "#182F48",
+            colorText: "#182F48",
+            colorPrimaryActive: "#182F48",
+          },
+        }}
+      >
         <ToastContainer
           position="bottom-center"
           autoClose={6000}
