@@ -35,6 +35,7 @@ const SupplierDetails = () => {
 
   const {
     name = "",
+    motto = "",
     logoUrl = "",
     allies = [],
     offices = [],
@@ -96,6 +97,11 @@ const SupplierDetails = () => {
       <section className="col-span-6 w-full flex flex-col gap-6 lg:col-span-2">
         <header className="w-full flex flex-col gap-2 text-xl text-blue-500 font-century-gothic font-semibold md:text-center lg:hidden">
           <h2 className="w-full">{name}</h2>
+          {motto && (
+            <h3 className="w-full font-century-gothic font-light text-2xl">
+              {motto}
+            </h3>
+          )}
           <div className="flex items-center gap-2">
             <FontAwesomeIcon icon={faLocationDot} />
             <span>{offices?.[0]?.address?.state?.name}</span>
@@ -114,6 +120,12 @@ const SupplierDetails = () => {
       <div className="col-span-6 w-full lg:col-span-4">
         <header className="hidden lg:flex w-full flex-col gap-4 text-3xl text-blue-500 font-century-gothic font-semibold mb-4">
           <h2 className="w-full">{name}</h2>
+          {motto && (
+            <h3 className="w-full font-century-gothic font-light text-2xl">
+              {motto}
+            </h3>
+          )}
+
           <div className="flex items-center gap-2">
             <FontAwesomeIcon icon={faLocationDot} />
             <span>{offices?.[0]?.address?.state?.name}</span>

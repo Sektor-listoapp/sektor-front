@@ -353,6 +353,7 @@ export type InsuranceCompanyInputType = {
   coverageStates: Array<Scalars['Float']['input']>;
   foundationYear: Scalars['Float']['input'];
   id?: InputMaybe<Scalars['String']['input']>;
+  license: Scalars['String']['input'];
   lineOfBusiness: Array<OrganizationLineOfBusiness>;
   logoUrl?: InputMaybe<Scalars['String']['input']>;
   modality: OrganizationModality;
@@ -377,6 +378,7 @@ export type InsuranceCompanyType = {
   foundationYear?: Maybe<Scalars['Float']['output']>;
   id: Scalars['String']['output'];
   isActive: Scalars['Boolean']['output'];
+  license?: Maybe<Scalars['String']['output']>;
   lineOfBusiness: Array<OrganizationLineOfBusiness>;
   logoUrl?: Maybe<Scalars['String']['output']>;
   modality: OrganizationModality;
@@ -591,18 +593,20 @@ export type OrganizationOfficeInputType = {
 };
 
 export type OrganizationOfficeScheduleInputType = {
-  day: DayOfWeek;
-  from: Scalars['String']['input'];
+  fromDay: DayOfWeek;
+  fromTime: Scalars['String']['input'];
   id?: InputMaybe<Scalars['String']['input']>;
-  to: Scalars['String']['input'];
+  toDay: DayOfWeek;
+  toTime: Scalars['String']['input'];
 };
 
 export type OrganizationOfficeScheduleType = {
   __typename?: 'OrganizationOfficeScheduleType';
-  day: DayOfWeek;
-  from: Scalars['String']['output'];
+  fromDay: DayOfWeek;
+  fromTime: Scalars['String']['output'];
   id: Scalars['String']['output'];
-  to: Scalars['String']['output'];
+  toDay: DayOfWeek;
+  toTime: Scalars['String']['output'];
 };
 
 export type OrganizationOfficeType = {

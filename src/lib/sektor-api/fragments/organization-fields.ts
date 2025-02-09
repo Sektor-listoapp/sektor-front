@@ -20,9 +20,10 @@ export const ORGANIZATION_CLIENT_FIELDS_FRAGMENT = gql`
 
 export const ORGANIZATION_OFFICE_SCHEDULE_FIELDS_FRAGMENT = gql`
   fragment OrganizationOfficeScheduleFields on OrganizationOfficeScheduleType {
-    day
-    from
-    to
+    fromDay
+    toDay
+    fromTime
+    toTime
   }
 `;
 
