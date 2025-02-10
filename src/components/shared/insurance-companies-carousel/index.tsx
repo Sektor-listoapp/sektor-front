@@ -5,7 +5,7 @@ import { useQuery } from "@apollo/client";
 import { Carousel } from "antd";
 import Image from "next/image";
 import { cn } from "@/utils/class-name";
-import { PublicInsuranceCompany } from "@/types/public";
+import { InsuranceCompanyType } from "@/lib/sektor-api/__generated__/types";
 
 interface InsuranceCompaniesCarouselProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -25,7 +25,7 @@ const InsuranceCompaniesCarousel = ({
   }
 
   const insuranceCompanies = (data?.publicInsuranceCompanies?.items ||
-    []) as PublicInsuranceCompany[];
+    []) as InsuranceCompanyType[];
 
   return (
     <div className={cn("w-11/12 max-w-sm md:max-w-full", className)}>
@@ -49,7 +49,7 @@ const InsuranceCompaniesCarousel = ({
                 "w-11/12 h-32 m-auto max-w-full object-contain md:h-60 xl:h-36",
                 imageClassName
               )}
-              src={logoUrl}
+              src={logoUrl || "/images/placeholder.png"}
               width={700}
               height={700}
               alt={name}
