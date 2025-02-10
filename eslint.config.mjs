@@ -11,6 +11,13 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    ignores: [
+      ".src/lib/sektor-api/__generated__/",
+      "src/lib/sektor-api/__generated__/",
+      "src/lib/sektor-api/__generated__/*",
+    ],
+  },
 ];
 
 export default eslintConfig;
