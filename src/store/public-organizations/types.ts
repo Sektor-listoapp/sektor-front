@@ -1,11 +1,11 @@
 import {
-  PublicOrganizations,
-  PublicSupplier,
-  PublicBrokerageSociety,
-  PublicExclusiveAgent,
-  PublicInsuranceBroker,
-  PublicInsuranceCompany,
-} from "@/types/public";
+  BrokerageSocietyType,
+  ExclusiveAgentType,
+  InsuranceBrokerType,
+  InsuranceCompanyType,
+  SupplierType,
+} from "@/lib/sektor-api/__generated__/types";
+import { PublicOrganizations } from "@/types/public";
 
 export interface PublicOrganizationsStoreState {
   publicOrganizations: PublicOrganizations | null;
@@ -15,17 +15,15 @@ export interface PublicOrganizationsStoreState {
 export interface PublicOrganizationsStoreActions {
   setIsLoadingPublicOrganizations: (isLoading: boolean) => void;
   setPublicOrganizations: (organizations: PublicOrganizations | null) => void;
-  setPublicSuppliers: (suppliers: PublicSupplier[]) => void;
-  setPublicExclusiveAgents: (exclusiveAgents: PublicExclusiveAgent[]) => void;
+  setPublicSuppliers: (suppliers: SupplierType[]) => void;
+  setPublicExclusiveAgents: (exclusiveAgents: ExclusiveAgentType[]) => void;
   setPublicInsuranceCompanies: (
-    insuranceCompanies: PublicInsuranceCompany[]
+    insuranceCompanies: InsuranceCompanyType[]
   ) => void;
   setPublicBrokerageSocieties: (
-    brokerageSocieties: PublicBrokerageSociety[]
+    brokerageSocieties: BrokerageSocietyType[]
   ) => void;
-  setPublicInsuranceBrokers: (
-    insuranceBrokers: PublicInsuranceBroker[]
-  ) => void;
+  setPublicInsuranceBrokers: (insuranceBrokers: InsuranceBrokerType[]) => void;
   resetPublicOrganizations: () => void;
 }
 
