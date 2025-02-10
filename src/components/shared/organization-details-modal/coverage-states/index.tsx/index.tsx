@@ -40,7 +40,7 @@ const OrganizationCoverageStates = ({
               <div
                 key={`office-${index}`}
                 className={cn(
-                  "w-full min-h-64 rounded-2xl mx-auto font-century-gothic flex flex-col max-w-sm justify-between relative md:max-w-80 2xl:max-w-96 2xl:h-96 md:hover:shadow-xl md:hover:cursor-pointer transition-shadow duration-300 md:active:shadow-sm"
+                  "w-full rounded-2xl mx-auto font-century-gothic flex flex-col max-w-sm justify-between relative md:max-w-80 2xl:max-w-96 2xl:h-80 md:hover:shadow-xl md:hover:cursor-pointer transition-shadow duration-300 md:active:shadow-sm"
                 )}
                 onClick={() => {
                   setShowOfficesList(true);
@@ -54,7 +54,7 @@ const OrganizationCoverageStates = ({
                   width={500}
                   height={400}
                 />
-                <div className="w-full shadow-lg p-2 text-base rounded-b-2xl border border-blue-500 border-opacity-20 h-full flex justify-start items-center gap-1 md:gap-2 2xl:text-base">
+                <div className="w-full shadow-lg p-2 py-4 text-base rounded-b-2xl border border-blue-500 border-opacity-20 h-full flex justify-start items-center gap-1 md:gap-2">
                   <h3 className="w-full">{location}</h3>
                 </div>
               </div>
