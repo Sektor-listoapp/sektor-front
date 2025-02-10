@@ -15,7 +15,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 interface OrganizationsSliderProps extends SwiperOptions {
-  organizations: PublicOrganizationType[] | OrganizationClientType[];
+  organizations: Array<PublicOrganizationType | OrganizationClientType>;
 }
 
 const OrganizationsSlider = ({
@@ -41,18 +41,21 @@ const OrganizationsSlider = ({
         className="w-full"
         {...swiperOptions}
       >
-        {organizations.map(({ id, name, logoUrl }, index) => (
-          <SwiperSlide key={`${id}-${index}`}>
-            <Image
-              title={name}
-              className="w-full"
-              src={logoUrl || "/images/placeholder.png"}
-              alt={name}
-              width={200}
-              height={200}
-            />
-          </SwiperSlide>
-        ))}
+        {organizations.map((organization, index) => {
+          const { id, name, logoUrl } = organization;
+          return (
+            <SwiperSlide key={`${id}-${index}`}>
+              <Image
+                title={name}
+                className="w-full"
+                src={logoUrl || "/images/placeholder.png"}
+                alt={name}
+                width={200}
+                height={200}
+              />
+            </SwiperSlide>
+          );
+        })}
       </Swiper>
       <FontAwesomeIcon
         className="cursor-pointer"
