@@ -63,14 +63,14 @@ const ExclusiveAgentDetails = () => {
       <OrganizationRecognitions recognitions={recognitions} />
     ),
   };
-
   const tabItems = getTabItems({
     lineOfBusiness,
     clients,
     allies,
     recognitions,
   }).map((item) => {
-    if (!item) return null;
+    if (!item || !tabComponents[item?.component as keyof typeof tabComponents])
+      return null;
 
     return {
       ...item,

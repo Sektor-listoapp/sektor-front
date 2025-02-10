@@ -17,7 +17,7 @@ const OrganizationCoverageLists = ({
   return (
     <section
       className={cn(
-        "w-full border-2 border-red-500 grid grid-cols-2 text-blue-500 gap-10 mt-5 md:grid-cols-3",
+        "w-full grid grid-cols-2 text-blue-500 gap-10 mt-5 md:grid-cols-3",
         className
       )}
       {...props}

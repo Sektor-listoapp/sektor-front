@@ -64,7 +64,7 @@ const BrokerageSocietyDetails = () => {
     workTeam,
     offices,
   }).map((item) => {
-    if (!item) return null;
+    if (!item || !tabComponents[item?.component as keyof typeof tabComponents]) return null;
 
     return {
       ...item,
