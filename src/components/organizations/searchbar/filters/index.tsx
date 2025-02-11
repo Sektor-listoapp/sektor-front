@@ -21,7 +21,14 @@ import {
 import { useQuery } from "@apollo/client";
 import { COUNTRY_BY_CODE_QUERY } from "@/lib/sektor-api/queries/public/country-by-code";
 import { Query } from "@/lib/sektor-api/__generated__/graphql";
-import { getLocationOptions } from "@/utils/organizations";
+import {
+  getCurrentFiltersFromQuery,
+  getLocationOptions,
+} from "@/utils/organizations";
+import { pickBy } from "lodash";
+import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
+import { toast } from "react-toastify";
+import { usePublicOrganizationsStore } from "@/store/public-organizations";
 
 const { AGE_RANGE, EXPERIENCE_RANGE, GENRE, SEGMENT, SERVICE_TYPE } =
   ORGANIZATION_FILTER_FIELD_NAMES;
@@ -37,12 +44,20 @@ const OrganizationFilters = () => {
     { variables: { code: "VE" } }
   );
   const locationOptions = getLocationOptions(countryData?.getCountryByCode);
+  const setIsLoadingPublicOrganizations = usePublicOrganizationsStore(
+    (state) => state.setIsLoadingPublicOrganizations
+  );
 
-  const { handleGetPublicOrganizations, isLoadingPublicOrganizations } =
-    usePublicOrganizations({});
+  const {
+    handleGetPublicOrganizations,
+    isLoadingPublicOrganizations,
+    getPublicOrganizations,
+    setPublicOrganizations,
+  } = usePublicOrganizations({});
 
   const {
     type,
+    search = "",
     genre = "",
     segment = "",
     location = "",
@@ -78,6 +93,33 @@ const OrganizationFilters = () => {
     replace({ query: { ...query, ...rangeQueries } }, undefined, {
       scroll: false,
     });
+  };
+
+  const handleResetFilters = () => {
+    const defaultFilters = pickBy({ search, type }, (value) => {
+      return Boolean(value);
+    });
+    replace({ query: { ...defaultFilters } }, undefined, { scroll: false });
+
+    const currentFilters = getCurrentFiltersFromQuery(defaultFilters);
+    setIsLoadingPublicOrganizations(true);
+
+    getPublicOrganizations({
+      pagination: { offset: 0, limit: 6 },
+      ...currentFilters,
+    })
+      .then((response) => setPublicOrganizations(response?.data))
+      .catch((error) => {
+        toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
+      })
+      .finally(() => setIsLoadingPublicOrganizations(false));
+  };
+
+  const disableResetFiltersButton = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { search: __, type: _, ...filters } = query;
+    const hasFilters = Object.values(filters).some((value) => Boolean(value));
+    return !hasFilters;
   };
 
   return (
@@ -194,6 +236,14 @@ const OrganizationFilters = () => {
               onClick={handleGetPublicOrganizations}
             >
               Aplicar filtros
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full"
+              disabled={isLoadingPublicOrganizations || disableResetFiltersButton()}
+              onClick={handleResetFilters}
+            >
+              Eliminar filtros
             </Button>
           </section>
         </section>

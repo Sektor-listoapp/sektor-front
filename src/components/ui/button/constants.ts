@@ -5,7 +5,7 @@ export const BUTTON_VARIANTS = {
   "solid-blue":
     "bg-blue-500 text-white hover:bg-blue-600 focus:outline-none focus:bg-blue-500 disabled:opacity-50 disabled:pointer-events-none",
   outline:
-    "border-gray-200 text-gray-500 hover:border-blue-600 hover:text-blue-600 focus:outline-none focus:border-blue-600 focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none",
+    "border-gray-200 text-blue-500 hover:border-blue-600 hover:text-blue-600 focus:outline-none focus:border-blue-600 focus:text-blue-600 disabled:opacity-50 disabled:pointer-events-none",
   ghost:
     "text-blue-600 hover:bg-blue-100 hover:text-blue-800 focus:outline-none focus:bg-blue-100 focus:text-blue-800 disabled:opacity-50 disabled:pointer-events-none",
   soft: "bg-blue-100 text-blue-800 hover:bg-blue-200 focus:outline-none focus:bg-blue-200 disabled:opacity-50 disabled:pointer-events-none",

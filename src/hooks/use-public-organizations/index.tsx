@@ -5,6 +5,7 @@ import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import { OperationVariables, QueryHookOptions, useQuery } from "@apollo/client";
 import { ALL_ORGANIZATION_TYPES_QUERY } from "@/lib/sektor-api/queries/public/all-organization-types";
 import { usePublicOrganizationsStore } from "@/store/public-organizations";
+import { Query } from "@/lib/sektor-api/__generated__/types";
 
 interface UsePublicOrganizationsProps {
   variables?: OperationVariables;
@@ -18,7 +19,7 @@ const usePublicOrganizations = ({
   const { query } = useRouter();
   const currentFilters = getCurrentFiltersFromQuery(query);
 
-  const { refetch: getPublicOrganizations } = useQuery(
+  const { refetch: getPublicOrganizations } = useQuery<Query>(
     ALL_ORGANIZATION_TYPES_QUERY,
     {
       skip: true,
@@ -57,25 +58,19 @@ const usePublicOrganizations = ({
     (state) => state.publicOrganizations
   );
 
-  /**
-   * Fetches public organizations and sets them in the public organizations store.
-   */
+  const setPublicOrganizations = (data: Query) => {
+    setPublicSuppliers(data?.publicSuppliers?.items || []);
+    setPublicExclusiveAgents(data?.publicExclusiveAgents?.items || []);
+    setPublicInsuranceBrokers(data?.publicInsuranceBrokers?.items || []);
+    setPublicBrokerageSocieties(data?.publicBrokerageSocieties?.items || []);
+    setPublicInsuranceCompanies(data?.publicInsuranceCompanies?.items || []);
+  };
+
   const handleGetPublicOrganizations = async () => {
     setIsLoadingPublicOrganizations(true);
     try {
-      const organizationsData = await getPublicOrganizations();
-      const {
-        publicSuppliers = {},
-        publicExclusiveAgents = {},
-        publicInsuranceBrokers = {},
-        publicBrokerageSocieties = {},
-        publicInsuranceCompanies = {},
-      } = organizationsData?.data;
-      setPublicSuppliers(publicSuppliers?.items);
-      setPublicExclusiveAgents(publicExclusiveAgents?.items);
-      setPublicInsuranceBrokers(publicInsuranceBrokers?.items);
-      setPublicBrokerageSocieties(publicBrokerageSocieties?.items);
-      setPublicInsuranceCompanies(publicInsuranceCompanies?.items);
+      const { data } = await getPublicOrganizations();
+      setPublicOrganizations(data);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
@@ -87,6 +82,7 @@ const usePublicOrganizations = ({
   return {
     publicOrganizations,
     getPublicOrganizations,
+    setPublicOrganizations,
     handleGetPublicOrganizations,
     isLoadingPublicOrganizations,
   };
