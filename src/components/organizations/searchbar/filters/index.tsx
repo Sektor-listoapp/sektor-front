@@ -21,14 +21,8 @@ import {
 import { useQuery } from "@apollo/client";
 import { COUNTRY_BY_CODE_QUERY } from "@/lib/sektor-api/queries/public/country-by-code";
 import { Query } from "@/lib/sektor-api/__generated__/graphql";
-import {
-  getCurrentFiltersFromQuery,
-  getLocationOptions,
-} from "@/utils/organizations";
+import { getLocationOptions } from "@/utils/organizations";
 import { pickBy } from "lodash";
-import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
-import { toast } from "react-toastify";
-import { usePublicOrganizationsStore } from "@/store/public-organizations";
 
 const { AGE_RANGE, EXPERIENCE_RANGE, GENRE, SEGMENT, SERVICE_TYPE } =
   ORGANIZATION_FILTER_FIELD_NAMES;
@@ -44,15 +38,11 @@ const OrganizationFilters = () => {
     { variables: { code: "VE" } }
   );
   const locationOptions = getLocationOptions(countryData?.getCountryByCode);
-  const setIsLoadingPublicOrganizations = usePublicOrganizationsStore(
-    (state) => state.setIsLoadingPublicOrganizations
-  );
 
   const {
     handleGetPublicOrganizations,
     isLoadingPublicOrganizations,
-    getPublicOrganizations,
-    setPublicOrganizations,
+    handleGetPublicOrganizationsWithNewFilters,
   } = usePublicOrganizations({});
 
   const {
@@ -100,19 +90,7 @@ const OrganizationFilters = () => {
       return Boolean(value);
     });
     replace({ query: { ...defaultFilters } }, undefined, { scroll: false });
-
-    const currentFilters = getCurrentFiltersFromQuery(defaultFilters);
-    setIsLoadingPublicOrganizations(true);
-
-    getPublicOrganizations({
-      pagination: { offset: 0, limit: 6 },
-      ...currentFilters,
-    })
-      .then((response) => setPublicOrganizations(response?.data))
-      .catch((error) => {
-        toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
-      })
-      .finally(() => setIsLoadingPublicOrganizations(false));
+    handleGetPublicOrganizationsWithNewFilters({ ...defaultFilters });
   };
 
   const disableResetFiltersButton = () => {
@@ -240,7 +218,9 @@ const OrganizationFilters = () => {
             <Button
               variant="outline"
               className="w-full"
-              disabled={isLoadingPublicOrganizations || disableResetFiltersButton()}
+              disabled={
+                isLoadingPublicOrganizations || disableResetFiltersButton()
+              }
               onClick={handleResetFilters}
             >
               Eliminar filtros

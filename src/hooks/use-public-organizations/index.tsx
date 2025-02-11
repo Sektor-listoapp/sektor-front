@@ -6,6 +6,7 @@ import { OperationVariables, QueryHookOptions, useQuery } from "@apollo/client";
 import { ALL_ORGANIZATION_TYPES_QUERY } from "@/lib/sektor-api/queries/public/all-organization-types";
 import { usePublicOrganizationsStore } from "@/store/public-organizations";
 import { Query } from "@/lib/sektor-api/__generated__/types";
+import { ParsedUrlQuery } from "querystring";
 
 interface UsePublicOrganizationsProps {
   variables?: OperationVariables;
@@ -79,12 +80,30 @@ const usePublicOrganizations = ({
     }
   };
 
+  const handleGetPublicOrganizationsWithNewFilters = async (
+    query: ParsedUrlQuery
+  ) => {
+    const currentFilters = getCurrentFiltersFromQuery(query);
+    setIsLoadingPublicOrganizations(true);
+    try {
+      const { data } = await getPublicOrganizations({
+        pagination: { offset: 0, limit: 6 },
+        ...currentFilters,
+      });
+      setPublicOrganizations(data);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: unknown | any) {
+      toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
+    } finally {
+      setIsLoadingPublicOrganizations(false);
+    }
+  };
+
   return {
     publicOrganizations,
-    getPublicOrganizations,
-    setPublicOrganizations,
     handleGetPublicOrganizations,
     isLoadingPublicOrganizations,
+    handleGetPublicOrganizationsWithNewFilters,
   };
 };
 
