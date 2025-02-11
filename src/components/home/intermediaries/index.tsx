@@ -8,7 +8,6 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
 import { INTERMEDIARIES_LIST } from "./constants";
-import { OrganizationTypes } from "@/lib/sektor-api/__generated__/types";
 
 const Intermediaries = ({
   className,
