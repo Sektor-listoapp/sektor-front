@@ -4,6 +4,7 @@ import Button from "@/components/ui/button";
 import { ROUTES } from "@/constants/router";
 import { cn } from "@/utils/class-name";
 import { useRouter } from "next/router";
+import { OrganizationTypes } from "@/lib/sektor-api/__generated__/types";
 
 const InsuranceCompanies = ({
   className,
@@ -47,7 +48,12 @@ const InsuranceCompanies = ({
         <Button
           variant="solid-blue"
           className="w-full md:max-w-sm"
-          onClick={() => push(ROUTES.ORGANIZATIONS)}
+          onClick={() =>
+            push({
+              pathname: ROUTES.ORGANIZATIONS,
+              query: { type: OrganizationTypes.InsuranceCompany },
+            })
+          }
         >
           Ver más
         </Button>

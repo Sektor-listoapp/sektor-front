@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
 import { INTERMEDIARIES_LIST } from "./constants";
+import { OrganizationTypes } from "@/lib/sektor-api/__generated__/types";
 
 const Intermediaries = ({
   className,
@@ -97,7 +98,11 @@ const Intermediaries = ({
 
         <Button
           className="w-full max-w-xs mt-6"
-          onClick={() => push(ROUTES.ORGANIZATIONS)}
+          onClick={() =>
+            push({
+              pathname: ROUTES.ORGANIZATIONS,
+            })
+          }
         >
           Conocer intermediarios
         </Button>
@@ -136,7 +141,14 @@ const Intermediaries = ({
               </span>
             </div>
           </div>
-          <Button className="mt-6" onClick={() => push(ROUTES.ORGANIZATIONS)}>
+          <Button
+            className="mt-6"
+            onClick={() =>
+              push({
+                pathname: ROUTES.ORGANIZATIONS,
+              })
+            }
+          >
             Conocer intermediarios
           </Button>
         </div>

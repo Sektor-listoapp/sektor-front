@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import React from "react";
 import { SUPPLIER_SERVICES } from "./constants";
 import { ROUTES } from "@/constants/router";
+import { OrganizationTypes } from "@/lib/sektor-api/__generated__/types";
 
 const Suppliers = ({
   className,
@@ -57,7 +58,12 @@ const Suppliers = ({
             </ul>
             <Button
               className="px-10 transition-all absolute bottom-4 opacity-0 group-hover:opacity-100"
-              onClick={() => push(url)}
+              onClick={() =>
+                push({
+                  pathname: url,
+                  query: { type: OrganizationTypes.Supplier },
+                })
+              }
             >
               Ver más
             </Button>
@@ -69,7 +75,12 @@ const Suppliers = ({
         <Button
           variant="solid-blue"
           className="w-full sm:max-w-fit px-10"
-          onClick={() => push(ROUTES.ORGANIZATIONS)}
+          onClick={() =>
+            push({
+              pathname: ROUTES.ORGANIZATIONS,
+              query: { type: OrganizationTypes.Supplier },
+            })
+          }
         >
           Ver todos los servicios
         </Button>
