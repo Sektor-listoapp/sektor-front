@@ -45,7 +45,7 @@ const Intermediaries = ({
 
         <div className="grid grid-cols-2 gap-x-4 gap-y-6">
           <div className="w-full bg-blue-200 text-blue-500 text-center flex flex-col justify-center items-center gap-1 min-h-32 rounded-3xl">
-            <b className="text-4xl">30k</b>
+            <b className="text-4xl">1k</b>
             <span className="font-century-gothic text-sm">
               corredores a elegir
             </span>

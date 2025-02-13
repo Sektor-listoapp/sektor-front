@@ -22,13 +22,8 @@ const InsuranceCompanies = ({
     >
       <div className="text-pretty text-center flex flex-col items-center justify-center gap-3 md:text-start md:gap-4">
         <h2 className="text-3xl lg:text-6xl">
-          <span className="md:hidden">
-            Trabajamos con las mejores Compañias de Seguros
-          </span>
-          <span>
             Con nosotros, accede a información detallada sobre las principales
             aseguradoras
-          </span>
         </h2>
         <p className="font-century-gothic text-base lg:text-xl">
           <span className="md:hidden">
