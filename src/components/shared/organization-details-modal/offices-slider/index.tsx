@@ -33,8 +33,15 @@ const OrganizationOfficesSlider = ({
       />
       <Swiper
         onSwiper={(it) => (sliderRef.current = it)}
-        slidesPerView={2}
         spaceBetween={30}
+        breakpoints={{
+          740: {
+            slidesPerView: 2,
+          },
+          300: {
+            slidesPerView: 1,
+          },
+        }}
         autoplay={{ delay: 1500 }}
         rewind={true}
         className="w-full"
@@ -67,7 +74,7 @@ const OrganizationOfficesSlider = ({
                   width={500}
                   height={400}
                 />
-                <div className="w-full shadow-lg p-2 text-xs rounded-b-2xl border border-blue-500 border-opacity-20 h-full grid grid-cols-3 gap-1 md:text-sm md:gap-2 md:p-4 2xl:text-base">
+                <div className="w-full shadow-lg p-2 text-xs rounded-b-2xl border border-blue-500 border-opacity-20 h-full grid grid-cols-3 gap-1 md:text-sm md:gap-2 md:p-4">
                   <div className="col-span-2">
                     <h3 className="w-full">{formattedAddress}</h3>
                     {office?.phone && (
