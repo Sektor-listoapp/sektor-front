@@ -77,8 +77,10 @@ const PropertyQuoteForm = () => {
       <div className="w-11/12 grid grid-cols-1 gap-4 md:grid-cols-2">
         <SwitchInput
           label="Industrial y comercio"
+          disabled={loading}
           icon={faPeopleRoof}
           switchProps={{
+            disabled: loading,
             checked: input.industryAndCommerce,
             onChange: (checked) =>
               setInput((prev) => ({ ...prev, industryAndCommerce: checked })),
@@ -86,8 +88,10 @@ const PropertyQuoteForm = () => {
         />
         <SwitchInput
           label="Combinando residencial"
+          disabled={loading}
           icon={faPeopleRoof}
           switchProps={{
+            disabled: loading,
             checked: input.residentialComplex,
             onChange: (checked) =>
               setInput((prev) => ({ ...prev, residentialComplex: checked })),
@@ -99,6 +103,7 @@ const PropertyQuoteForm = () => {
         className="w-full max-w-xl rounded-3xl"
         placeholder="Comentanos otros servicios que deseas cotizar..."
         allowClear
+        required
         disabled={loading}
         onChange={(e) =>
           setInput((prev) => ({ ...prev, comments: e.target.value }))
