@@ -6,6 +6,8 @@ import {
   OrganizationTeamMemberType,
   PublicOrganizationType,
 } from "@/lib/sektor-api/__generated__/types";
+import { useRouter } from "next/router";
+import { ROUTES } from "@/constants/router";
 
 interface OrganizationPartnersProps
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -19,13 +21,24 @@ const OrganizationPartners = ({
   className,
   ...props
 }: OrganizationPartnersProps) => {
+  const { push, query } = useRouter();
   return (
-    <section className={cn("flex flex-col gap-6 mt-5", className)} {...props}>
-      {partners.map(({ id, name = "", ...props }, index) => {
+    <section
+      className={cn("flex flex-col gap-6 mt-5", className)}
+      {...props}
+    >
+      {partners.map(({ id, name = "", type = "", ...props }, index) => {
+        const organizationQuery = `${type}-${id}`;
         return (
           <article
             key={`${id}-${index}`}
-            className="w-full flex items-center justify-start gap-4"
+            onClick={() =>
+              push({
+                pathname: ROUTES.ORGANIZATIONS,
+                query: { ...query, details: organizationQuery },
+              })
+            }
+            className="w-full flex items-center justify-start gap-4 cursor-pointer"
           >
             {"logoUrl" in props && (
               <Image

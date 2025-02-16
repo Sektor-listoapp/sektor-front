@@ -7,6 +7,7 @@ export const ORGANIZATION_TEAM_MEMBER_FIELDS_FRAGMENT = gql`
     name
     photoUrl
     position
+    type
   }
 `;
 
@@ -14,6 +15,7 @@ export const ORGANIZATION_CLIENT_FIELDS_FRAGMENT = gql`
   fragment OrganizationClientFields on OrganizationClientType {
     id
     name
+    type
     logoUrl
   }
 `;

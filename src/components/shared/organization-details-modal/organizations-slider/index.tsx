@@ -13,6 +13,8 @@ import {
   faChevronLeft,
   faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/router";
+import { ROUTES } from "@/constants/router";
 
 interface OrganizationsSliderProps extends SwiperOptions {
   organizations: Array<PublicOrganizationType | OrganizationClientType>;
@@ -22,6 +24,7 @@ const OrganizationsSlider = ({
   organizations,
   ...swiperOptions
 }: OrganizationsSliderProps) => {
+  const { push, query } = useRouter();
   const sliderRef = useRef<SwiperType | null>(null);
 
   return (
@@ -42,16 +45,24 @@ const OrganizationsSlider = ({
         {...swiperOptions}
       >
         {organizations.map((organization, index) => {
-          const { id, name, logoUrl } = organization;
+          const { id, name, logoUrl, type = "" } = organization;
+          const organizationQuery = `${type}-${id}`;
+
           return (
             <SwiperSlide key={`${id}-${index}`}>
               <Image
                 title={name}
-                className="w-full"
+                className="w-full cursor-pointer"
                 src={logoUrl || "/images/placeholder.png"}
                 alt={name}
                 width={200}
                 height={200}
+                onClick={() =>
+                  push({
+                    pathname: ROUTES.ORGANIZATIONS,
+                    query: { ...query, details: organizationQuery },
+                  })
+                }
               />
             </SwiperSlide>
           );

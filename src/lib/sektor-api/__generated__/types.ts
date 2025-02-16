@@ -575,6 +575,7 @@ export type OrganizationClientType = {
   id: Scalars['String']['output'];
   logoUrl?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
+  type: OrganizationTypes;
 };
 
 export enum OrganizationLineOfBusiness {
