@@ -190,7 +190,9 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
             <>
               <Button
                 variant="link"
-                className="text-white no-underline text-base"
+                className={cn("text-white no-underline text-base", {
+                  "text-blue-500": pathname === ROUTES.ORGANIZATIONS,
+                })}
               >
                 Mi cuenta
               </Button>

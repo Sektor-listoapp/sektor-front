@@ -19,6 +19,7 @@ import { getFormattedYearsOfExperience } from "@/utils/formatters";
 import OrganizationFlipCard from "../flip-card";
 import { getTabItems } from "../utils";
 import OrganizationsSlider from "../organizations-slider";
+import { ROUTES } from "@/constants/router";
 
 const InsuranceBrokerDetails = () => {
   const router = useRouter();
@@ -69,7 +70,8 @@ const InsuranceBrokerDetails = () => {
     allies,
     recognitions,
   }).map((item) => {
-    if (!item || !tabComponents[item?.component as keyof typeof tabComponents]) return null;
+    if (!item || !tabComponents[item?.component as keyof typeof tabComponents])
+      return null;
 
     return {
       ...item,
@@ -129,7 +131,11 @@ const InsuranceBrokerDetails = () => {
       </div>
 
       <footer className="w-full flex justify-center items-center col-span-6 my-8">
-        <Button variant="solid-blue" className="w-full max-w-xs">
+        <Button
+          variant="solid-blue"
+          className="w-full max-w-xs"
+          onClick={() => router.push(`${ROUTES.QUOTES}/${detailsQuery}`)}
+        >
           Solicitar Cotización
         </Button>
       </footer>

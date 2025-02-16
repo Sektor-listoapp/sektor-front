@@ -19,6 +19,7 @@ import {
   Query,
 } from "@/lib/sektor-api/__generated__/types";
 import BasicOrganizationOffices from "../basic-organization-offices";
+import { ROUTES } from "@/constants/router";
 
 const BrokerageSocietyDetails = () => {
   const router = useRouter();
@@ -64,7 +65,8 @@ const BrokerageSocietyDetails = () => {
     workTeam,
     offices,
   }).map((item) => {
-    if (!item || !tabComponents[item?.component as keyof typeof tabComponents]) return null;
+    if (!item || !tabComponents[item?.component as keyof typeof tabComponents])
+      return null;
 
     return {
       ...item,
@@ -124,7 +126,11 @@ const BrokerageSocietyDetails = () => {
       </div>
 
       <footer className="w-full flex justify-center items-center col-span-6 my-8">
-        <Button variant="solid-blue" className="w-full max-w-xs">
+        <Button
+          variant="solid-blue"
+          className="w-full max-w-xs"
+          onClick={() => router.push(`${ROUTES.QUOTES}/${detailsQuery}`)}
+        >
           Solicitar Cotización
         </Button>
       </footer>

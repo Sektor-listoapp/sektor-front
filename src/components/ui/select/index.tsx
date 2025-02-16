@@ -43,7 +43,7 @@ const Select = ({
       <div className={"relative w-full"}>
         {icon && (
           <FontAwesomeIcon
-            size="xl"
+            size="lg"
             icon={icon}
             className={cn(
               "absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 peer-disabled:opacity-50 peer-disabled:pointer-events-none my-auto",

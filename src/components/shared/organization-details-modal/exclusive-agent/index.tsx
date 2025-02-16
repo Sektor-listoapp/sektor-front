@@ -19,6 +19,7 @@ import { PUBLIC_EXCLUSIVE_AGENT_BY_ID_QUERY } from "@/lib/sektor-api/queries";
 import { useQuery } from "@apollo/client";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { ROUTES } from "@/constants/router";
 
 const ExclusiveAgentDetails = () => {
   const router = useRouter();
@@ -137,7 +138,11 @@ const ExclusiveAgentDetails = () => {
       </div>
 
       <footer className="w-full flex justify-center items-center col-span-6 my-8">
-        <Button variant="solid-blue" className="w-full max-w-xs">
+        <Button
+          variant="solid-blue"
+          className="w-full max-w-xs"
+          onClick={() => router.push(`${ROUTES.QUOTES}/${detailsQuery}`)}
+        >
           Solicitar Cotización
         </Button>
       </footer>

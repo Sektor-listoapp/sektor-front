@@ -14,8 +14,9 @@ import { toast } from "react-toastify";
 const { EMAIL, PASSWORD, GENERAL } = INPUT_ERROR_MESSAGES;
 
 const LoginForm = () => {
-  const { push } = useRouter();
+  const { push, replace, query } = useRouter();
   const [login, { loading }] = useMutation(LOGIN);
+  const redirectTo = (query?.redirectTo || "") as string;
 
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
   const setUser = useAuthStore((state) => state.setUser);
@@ -70,7 +71,7 @@ const LoginForm = () => {
         const { user, token } = response.data.login;
         setAccessToken(token);
         setUser(user);
-        push(ROUTES.HOME);
+        replace(Boolean(redirectTo.length) ? redirectTo : ROUTES.HOME);
       })
       .catch((error) => {
         toast.error(

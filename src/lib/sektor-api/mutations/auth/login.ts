@@ -7,12 +7,11 @@ export const LOGIN = gql`
       __typename
       user {
         id
-        email
-        verifiedAt
         name
-        companies
+        email
+        deletedAt
+        verifiedAt
         group
-        __typename
       }
     }
   }

@@ -42,6 +42,13 @@ export default function App({ Component, pageProps, router }: AppProps) {
             colorText: "#182F48",
             colorPrimaryActive: "#182F48",
           },
+          components: {
+            Switch: {
+              handleBg: "#182F48",
+              colorPrimaryBg: "#182F48",
+              colorPrimary: "#182F48",
+            }
+          }
         }}
       >
         <ToastContainer

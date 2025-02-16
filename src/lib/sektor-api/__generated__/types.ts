@@ -47,6 +47,7 @@ export type AutoQuoteInputType = {
   make: Scalars['String']['input'];
   model: Scalars['String']['input'];
   organizationId: Scalars['String']['input'];
+  usageType: AutoUsageTypes;
   version: Scalars['String']['input'];
   year: Scalars['Int']['input'];
 };
@@ -61,9 +62,19 @@ export type AutoQuoteType = {
   lineOfBusiness: QuoteLineOfBusiness;
   make: Scalars['String']['output'];
   model: Scalars['String']['output'];
+  usageType: AutoUsageTypes;
   version: Scalars['String']['output'];
   year: Scalars['Int']['output'];
 };
+
+/** Auto usage types */
+export enum AutoUsageTypes {
+  Cargo = 'Cargo',
+  Motorcycle = 'Motorcycle',
+  Personal = 'Personal',
+  Pickup = 'Pickup',
+  Rustic = 'Rustic'
+}
 
 export type BrokerageSocietyContactInputType = {
   name: Scalars['String']['input'];
@@ -102,7 +113,7 @@ export type BrokerageSocietyInputType = {
   recognitions: Array<Scalars['String']['input']>;
   rif: Scalars['String']['input'];
   type: OrganizationTypes;
-  workTeam: Array<OrganizationTeamMemberInputType>;
+  workTeam: Array<Scalars['String']['input']>;
 };
 
 export type BrokerageSocietyPaginatedType = {
@@ -621,12 +632,10 @@ export enum OrganizationPlans {
   Standard = 'Standard'
 }
 
-export type OrganizationTeamMemberInputType = {
-  id?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  photoUrl?: InputMaybe<Scalars['String']['input']>;
-  position: Scalars['String']['input'];
-};
+export enum OrganizationTeamMemberOrganizationType {
+  ExclusiveAgent = 'ExclusiveAgent',
+  InsuranceBroker = 'InsuranceBroker'
+}
 
 export type OrganizationTeamMemberType = {
   __typename?: 'OrganizationTeamMemberType';
@@ -634,6 +643,7 @@ export type OrganizationTeamMemberType = {
   name: Scalars['String']['output'];
   photoUrl?: Maybe<Scalars['String']['output']>;
   position: Scalars['String']['output'];
+  type: OrganizationTeamMemberOrganizationType;
 };
 
 export enum OrganizationTypes {
