@@ -98,7 +98,7 @@ export type BrokerageSocietyFilterType = {
 
 export type BrokerageSocietyInputType = {
   allies: Array<Scalars['String']['input']>;
-  clients: Array<OrganizationClientInputType>;
+  clients: Array<Scalars['String']['input']>;
   contact: BrokerageSocietyContactInputType;
   coverageStates: Array<Scalars['Float']['input']>;
   foundationYear: Scalars['Float']['input'];
@@ -146,6 +146,11 @@ export type BrokerageSocietyType = {
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
   workTeam: Array<OrganizationTeamMemberType>;
+};
+
+export type ChangeOrganizationFeatureInputType = {
+  featureKey: OrganizationFeatures;
+  id: Scalars['String']['input'];
 };
 
 export type ChangeOrganizationPlanInputType = {
@@ -198,7 +203,7 @@ export type ExclusiveAgentInputType = {
   address?: InputMaybe<AddressInputType>;
   allies: Array<Scalars['String']['input']>;
   birthDate?: InputMaybe<Scalars['DateTime']['input']>;
-  clients: Array<OrganizationClientInputType>;
+  clients: Array<Scalars['String']['input']>;
   coverageStates: Array<Scalars['Float']['input']>;
   foundationYear: Scalars['Float']['input'];
   id?: InputMaybe<Scalars['String']['input']>;
@@ -291,7 +296,7 @@ export type InsuranceBrokerInputType = {
   address?: InputMaybe<AddressInputType>;
   allies: Array<Scalars['String']['input']>;
   birthDate?: InputMaybe<Scalars['DateTime']['input']>;
-  clients: Array<OrganizationClientInputType>;
+  clients: Array<Scalars['String']['input']>;
   coverageStates: Array<Scalars['Float']['input']>;
   foundationYear: Scalars['Float']['input'];
   id?: InputMaybe<Scalars['String']['input']>;
@@ -406,15 +411,18 @@ export type LoginInputType = {
 
 export type LoginResponseType = {
   __typename?: 'LoginResponseType';
+  refreshToken: Scalars['String']['output'];
   token: Scalars['String']['output'];
   user: UserType;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
-  changeOrganizationPlan: PublicOrganizationType;
-  changeOrganizationVisibility: PublicOrganizationType;
+  changeOrganizationFeature: PublicOrganizationType;
+  changeOrganizationPlan: OrganizationType;
+  changeOrganizationVisibility: OrganizationType;
   login: LoginResponseType;
+  refreshToken: Scalars['String']['output'];
   registerAsBrokerageSociety: RegisterAsOrganizationResponseType;
   registerAsCustomer: RegisterAsCustomerResponseType;
   registerAsExclusiveAgent: RegisterAsOrganizationResponseType;
@@ -440,6 +448,11 @@ export type Mutation = {
 };
 
 
+export type MutationChangeOrganizationFeatureArgs = {
+  input: ChangeOrganizationFeatureInputType;
+};
+
+
 export type MutationChangeOrganizationPlanArgs = {
   input: ChangeOrganizationPlanInputType;
 };
@@ -452,6 +465,11 @@ export type MutationChangeOrganizationVisibilityArgs = {
 
 export type MutationLoginArgs = {
   input: LoginInputType;
+};
+
+
+export type MutationRefreshTokenArgs = {
+  refreshToken: Scalars['String']['input'];
 };
 
 
@@ -564,18 +582,22 @@ export type MutationUpdateSupplierArgs = {
   input: SupplierInputType;
 };
 
-export type OrganizationClientInputType = {
-  id: Scalars['String']['input'];
-  logoUrl?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-};
-
 export type OrganizationClientType = {
   __typename?: 'OrganizationClientType';
   id: Scalars['String']['output'];
   logoUrl?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   type: OrganizationTypes;
+};
+
+export enum OrganizationFeatures {
+  AllowQuoting = 'AllowQuoting'
+}
+
+export type OrganizationFeaturesType = {
+  __typename?: 'OrganizationFeaturesType';
+  featureKey: OrganizationFeatures;
+  value: Scalars['Boolean']['output'];
 };
 
 export enum OrganizationLineOfBusiness {
@@ -628,6 +650,13 @@ export type OrganizationOfficeType = {
   schedule: Array<OrganizationOfficeScheduleType>;
 };
 
+export type OrganizationPaginatedType = {
+  __typename?: 'OrganizationPaginatedType';
+  count: Scalars['Int']['output'];
+  items?: Maybe<Array<OrganizationType>>;
+  pages: Scalars['Int']['output'];
+};
+
 export enum OrganizationPlans {
   Premium = 'Premium',
   Standard = 'Standard'
@@ -645,6 +674,23 @@ export type OrganizationTeamMemberType = {
   photoUrl?: Maybe<Scalars['String']['output']>;
   position: Scalars['String']['output'];
   type: OrganizationTeamMemberOrganizationType;
+};
+
+export type OrganizationType = {
+  __typename?: 'OrganizationType';
+  coverageStates: Array<Scalars['Float']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  features: Array<OrganizationFeaturesType>;
+  foundationYear?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['String']['output'];
+  isActive: Scalars['Boolean']['output'];
+  lineOfBusiness: Array<OrganizationLineOfBusiness>;
+  logoUrl?: Maybe<Scalars['String']['output']>;
+  modality: OrganizationModality;
+  name: Scalars['String']['output'];
+  plan: OrganizationPlans;
+  type: OrganizationTypes;
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 export enum OrganizationTypes {
@@ -755,6 +801,7 @@ export type Query = {
   publicOrganizations: PublicOrganizationPaginatedType;
   publicSupplierById: SupplierType;
   publicSuppliers: SupplierPaginatedType;
+  searchOrganizations: OrganizationPaginatedType;
 };
 
 
@@ -843,6 +890,12 @@ export type QueryPublicSuppliersArgs = {
   pagination?: InputMaybe<PaginationType>;
 };
 
+
+export type QuerySearchOrganizationsArgs = {
+  filter?: InputMaybe<SearchOrganizationFilterType>;
+  pagination: PaginationType;
+};
+
 export type QuoteCustomerInputType = {
   id?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
@@ -921,6 +974,13 @@ export type RegisterRequestInsuranceCompanyInputType = {
   email: Scalars['String']['input'];
   instagramUrl?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type SearchOrganizationFilterType = {
+  createdAfter?: InputMaybe<Scalars['String']['input']>;
+  createdBefore?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<OrganizationTypes>;
 };
 
 export enum ServiceSupplierTypes {

@@ -1,4 +1,5 @@
 export * from "./auth/login";
+export * from "./auth/refresh-token";
 export * from "./auth/update-password";
 export * from "./auth/send-password-request";
 export * from "./auth/send-verification-email";

@@ -3,6 +3,7 @@ export const ROUTES = {
   LOGIN: "/login",
   QUOTES: "/quotes",
   REGISTER: "/register",
+  MY_ACCOUNT: "/my-account",
   FORGOT_PASSWORD: "/forgot-password",
   RESET_PASSWORD: "/reset-password",
   ORGANIZATIONS: "/organizations",

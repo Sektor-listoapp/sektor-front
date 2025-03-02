@@ -42,7 +42,12 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
           <div className="flex flex-col gap-6 pb-8">
             {isAuthenticated ? (
               <>
-                <Button variant="solid-blue">Mi cuenta</Button>
+                <Button
+                  variant="solid-blue"
+                  onClick={() => push(ROUTES.MY_ACCOUNT)}
+                >
+                  Mi cuenta
+                </Button>
                 <Button variant="solid-blue" onClick={handleLogout}>
                   Cerrar sesión
                 </Button>
@@ -190,6 +195,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
             <>
               <Button
                 variant="link"
+                onClick={() => push(ROUTES.MY_ACCOUNT)}
                 className={cn("text-white no-underline text-base", {
                   "text-blue-500": pathname === ROUTES.ORGANIZATIONS,
                 })}

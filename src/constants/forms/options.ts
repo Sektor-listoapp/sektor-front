@@ -1,8 +1,10 @@
+import { OrganizationModality } from "@/lib/sektor-api/__generated__/types";
 import {
   GENRES,
   ORGANIZATION_LINE_OF_BUSINESS,
   SERVICE_SUPPLIER_TYPES,
 } from "../shared";
+const { Hybrid, Online, Physical } = OrganizationModality;
 
 const { MALE, FEMALE } = GENRES;
 const { CLINIC, MEDICAL_HOUSE, PRIMARY_CARE, WORKSHOP } =
@@ -13,6 +15,11 @@ const { AUTO, AVIATION, FINANCIAL, HEALTH, LIFE, PROPERTY, TRAVEL } =
 export const LICENSE_TYPE_OPTIONS = [
   { label: "CAA -", value: "CAA-" },
   { label: "AAA -", value: "AAA-" },
+];
+
+export const IDENTIFICATION_TYPE_OPTIONS = [
+  { label: "V-", value: "V-" },
+  { label: "J-", value: "J-" },
 ];
 
 export const PHONE_CODE_OPTIONS = [
@@ -63,4 +70,16 @@ export const SELECT_SUPPLIER_SERVICE_OPTIONS = [
   { label: "Talleres", value: WORKSHOP },
   { label: "Casa medica", value: MEDICAL_HOUSE },
   { label: "Atención medica primaria", value: PRIMARY_CARE },
+];
+
+export const MODALITY_OPTIONS = [
+  {
+    label: "Tipo de oficina",
+    value: "",
+    disabled: true,
+    hidden: true,
+  },
+  { label: "Híbrida", value: Hybrid },
+  { label: "Online", value: Online },
+  { label: "Física", value: Physical },
 ];

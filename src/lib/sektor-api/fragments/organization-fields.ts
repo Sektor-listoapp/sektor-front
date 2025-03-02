@@ -29,6 +29,28 @@ export const ORGANIZATION_OFFICE_SCHEDULE_FIELDS_FRAGMENT = gql`
   }
 `;
 
+export const ORGANIZATION_FIELDS_FRAGMENT = gql`
+  fragment OrganizationFields on OrganizationType {
+    id
+    name
+    logoUrl
+    type
+    isActive
+    plan
+    lineOfBusiness
+    coverageStates
+    modality
+    foundationYear
+    identification
+    createdAt
+    updatedAt
+    features {
+      featureKey
+      value
+    }
+  }
+`;
+
 export const ORGANIZATION_OFFICE_FIELDS_FRAGMENT = gql`
   fragment OrganizationOfficeFields on OrganizationOfficeType {
     id
