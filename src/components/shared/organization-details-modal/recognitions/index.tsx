@@ -1,9 +1,10 @@
+import { RecognitionType } from "@/lib/sektor-api/__generated__/types";
 import { cn } from "@/utils/class-name";
 import React from "react";
 
 interface OrganizationRecognitionsProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  recognitions: string[];
+  recognitions: string[] | RecognitionType[];
   label?: string;
 }
 
@@ -21,7 +22,7 @@ const OrganizationRecognitions = ({
       <h3 className="text-xl font-semibold font-century-gothic text-blue-500 lg:text-2xl">
         {label || "Estudios realizados"}
       </h3>
-      
+
       <ul className="list-disc list-inside w-full my-4 lg:text-base">
         {recognitions.map((title, index) => (
           <li key={`${title}-${index}`}>{title}</li>

@@ -19,8 +19,6 @@ import weekday from "dayjs/plugin/weekday";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import weekYear from "dayjs/plugin/weekYear";
 import { IStaticMethods } from "preline/preline";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
 
 dayjs.locale("es");
 dayjs.extend(customParseFormat);
