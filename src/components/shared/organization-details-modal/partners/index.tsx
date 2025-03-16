@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import { cn } from "@/utils/class-name";
 import Image from "next/image";
 import {
   OrganizationClientType,
-  OrganizationTeamMemberType,
   PublicOrganizationType,
+  TeamMemberType,
 } from "@/lib/sektor-api/__generated__/types";
 import { useRouter } from "next/router";
 import { ROUTES } from "@/constants/router";
@@ -12,7 +13,7 @@ import { ROUTES } from "@/constants/router";
 interface OrganizationPartnersProps
   extends React.HTMLAttributes<HTMLDivElement> {
   partners: Array<
-    OrganizationClientType | PublicOrganizationType | OrganizationTeamMemberType
+    OrganizationClientType | PublicOrganizationType | TeamMemberType
   >;
 }
 
@@ -23,11 +24,8 @@ const OrganizationPartners = ({
 }: OrganizationPartnersProps) => {
   const { push, query } = useRouter();
   return (
-    <section
-      className={cn("flex flex-col gap-6 mt-5", className)}
-      {...props}
-    >
-      {partners.map(({ id, name = "", type = "", ...props }, index) => {
+    <section className={cn("flex flex-col gap-6 mt-5", className)} {...props}>
+      {partners.map(({ id, name = "", type = "", ...props }: any, index) => {
         const organizationQuery = `${type}-${id}`;
         return (
           <article

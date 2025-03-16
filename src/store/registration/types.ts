@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { RegisterStep } from "@/types/register";
-import { UserType } from "@/types/shared";
 import { REGISTER_STEPS } from "../../constants/register/steps";
 
 type NewUser = {
@@ -8,14 +8,14 @@ type NewUser = {
 };
 
 export interface RegistrationStoreState {
-  userType: UserType;
+  userType: string | any;
   currentStep: (typeof REGISTER_STEPS)[keyof typeof REGISTER_STEPS];
   nextStep: RegisterStep | null;
   newUser: NewUser;
 }
 
 export interface RegistrationStoreActions {
-  setUserType: (userType: UserType) => void;
+  setUserType: (userType: string | any) => void;
   setCurrentRegistrationStep: (currentStep: RegisterStep) => void;
   setNewUser: (newUser: NewUser) => void;
   resetRegistrationStore: () => void;

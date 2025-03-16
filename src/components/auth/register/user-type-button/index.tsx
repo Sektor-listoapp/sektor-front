@@ -1,6 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { HTMLAttributes } from "react";
 import { useRegistrationStore } from "@/store/registration";
-import type { UserType } from "@/types/shared";
 import type { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -10,7 +10,7 @@ import {
 import clsx from "clsx";
 
 interface UserTypeButtonProps extends HTMLAttributes<HTMLButtonElement> {
-  selectedUserType: UserType;
+  selectedUserType: any;
   icon: IconDefinition;
   iconProps?: FontAwesomeIconProps;
   text: string;
@@ -29,7 +29,7 @@ const UserTypeButton = ({
   const userType = useRegistrationStore((state) => state.userType);
   const setUserType = useRegistrationStore((state) => state.setUserType);
 
-  const handleUserType = (selectedUserType: UserType) => {
+  const handleUserType = (selectedUserType: any) => {
     const newUserType = userType === selectedUserType ? null : selectedUserType;
     setUserType(newUserType);
   };

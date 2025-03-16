@@ -1,8 +1,8 @@
-import { User } from "@/types/shared";
+import { UserType } from "@/lib/sektor-api/__generated__/types";
 
 export interface AuthStoreState {
   accessToken: string | null;
-  user: User | null;
+  user: UserType | null;
   resetPasswordToken: string | null;
 }
 
@@ -10,7 +10,7 @@ export interface AuthStoreActions {
   getIsAuthenticated: () => boolean;
   setAccessToken: (accessToken: string | null) => void;
   setResetPasswordToken: (resetPasswordToken: string | null) => void;
-  setUser: (user: User | null) => void;
+  setUser: (user: UserType | null) => void;
   resetAuthStore: () => void;
 }
 

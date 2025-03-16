@@ -9,6 +9,8 @@ import { cn } from "@/utils/class-name";
 import { useRouter } from "next/router";
 import { useAuthStore } from "@/store/auth";
 import { ROUTES } from "@/constants/router";
+import { useShallow } from "zustand/shallow";
+import { UserGroups } from "@/lib/sektor-api/__generated__/types";
 
 interface NavbarProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "light" | "dark";
@@ -20,12 +22,15 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
 
   const isAuthenticated = useAuthStore((state) => state.getIsAuthenticated)();
   const resetAuthStore = useAuthStore((state) => state.resetAuthStore);
+  const userGroup = useAuthStore(useShallow((state) => state.user?.group));
+  const isAdmin = userGroup === UserGroups.Admin;
 
   const showDrawer = () => setOpen(true);
   const onClose = () => setOpen(false);
 
   const handleLogout = () => {
     resetAuthStore();
+    window?.localStorage?.clear();
     push(ROUTES.HOME);
   };
 
@@ -42,7 +47,12 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
           <div className="flex flex-col gap-6 pb-8">
             {isAuthenticated ? (
               <>
-                <Button variant="solid-blue">Mi cuenta</Button>
+                <Button
+                  variant="solid-blue"
+                  onClick={() => push(ROUTES.MY_ACCOUNT)}
+                >
+                  Mi cuenta
+                </Button>
                 <Button variant="solid-blue" onClick={handleLogout}>
                   Cerrar sesión
                 </Button>
@@ -93,6 +103,17 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
             >
               Nosotros
             </Link>
+            {isAdmin && (
+              <Link
+                className={cn(
+                  " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
+                  { "font-bold": pathname === ROUTES.COMPANIES }
+                )}
+                href={ROUTES.COMPANIES}
+              >
+                Empresa
+              </Link>
+            )}
           </nav>
         </div>
       </Drawer>
@@ -183,6 +204,22 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
           >
             Nosotros
           </Link>
+          {isAdmin && (
+            <Link
+              className={cn(
+                "focus:outline-none",
+                variant === "light"
+                  ? "hover:text-blue-400"
+                  : "hover:text-gray-200",
+                {
+                  "font-bold": pathname === ROUTES.COMPANIES,
+                }
+              )}
+              href={ROUTES.COMPANIES}
+            >
+              Empresa
+            </Link>
+          )}
         </div>
 
         <div className="flex items-center gap-6">
@@ -190,6 +227,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
             <>
               <Button
                 variant="link"
+                onClick={() => push(ROUTES.MY_ACCOUNT)}
                 className={cn("text-white no-underline text-base", {
                   "text-blue-500": pathname === ROUTES.ORGANIZATIONS,
                 })}

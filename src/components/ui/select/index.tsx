@@ -1,4 +1,4 @@
-import { UserType } from "@/types/shared";
+import { OrganizationTypes } from "@/lib/sektor-api/__generated__/types";
 import { cn } from "@/utils/class-name";
 import {
   faChevronDown,
@@ -10,7 +10,7 @@ import { useState } from "react";
 
 type SelectOption = {
   label: string;
-  value: string | number | UserType;
+  value: string | number | OrganizationTypes;
   disabled?: boolean;
   hidden?: boolean;
 };

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 
@@ -45,7 +46,7 @@ const OrganizationsSlider = ({
         {...swiperOptions}
       >
         {organizations.map((organization, index) => {
-          const { id, name, logoUrl, type = "" } = organization;
+          const { id, name, logoUrl, type = "" } = (organization || {}) as any;
           const organizationQuery = `${type}-${id}`;
 
           return (

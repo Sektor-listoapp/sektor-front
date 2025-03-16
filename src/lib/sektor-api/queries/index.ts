@@ -1,4 +1,5 @@
 export * from "./auth/profile";
+export * from "./auth/organization-by-id";
 export * from "./public/public-organizations";
 export * from "./public/public-brokerage-societies";
 export * from "./public/public-insurance-companies";

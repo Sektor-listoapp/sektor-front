@@ -1,11 +1,11 @@
-import { UserType } from "@/types/shared";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { TooltipPlacement } from "antd/es/tooltip";
 import { CSSProperties, ReactNode } from "react";
 
 type SelectOption = {
   label: string;
-  value: string | number | UserType;
+  value: string | number | any;
   disabled?: boolean;
   hidden?: boolean;
 };

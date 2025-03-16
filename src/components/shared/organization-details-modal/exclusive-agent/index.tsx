@@ -61,7 +61,9 @@ const ExclusiveAgentDetails = () => {
     OrganizationClients: <OrganizationPartners partners={clients} />,
     OrganizationAllies: <OrganizationPartners partners={allies} />,
     OrganizationRecognitions: (
-      <OrganizationRecognitions recognitions={recognitions} />
+      <OrganizationRecognitions
+        recognitions={recognitions as unknown as string[]}
+      />
     ),
   };
   const tabItems = getTabItems({
