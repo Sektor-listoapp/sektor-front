@@ -4,15 +4,10 @@ const nextConfig: NextConfig = {
   /* config options here */
   images: {
     remotePatterns: [
-      {
-        hostname: "s3-alpha-sig.figma.com",
-      },
-      {
-        hostname: "web-api.s3.us-east-1.amazonaws.com",
-      },
-      {
-        hostname: "avatars.githubusercontent.com",
-      },
+      { hostname: "s3-alpha-sig.figma.com" },
+      { hostname: "web-api.s3.amazonaws.com" },
+      { hostname: "avatars.githubusercontent.com" },
+      { hostname: "web-api.s3.us-east-1.amazonaws.com" },
     ],
   },
   reactStrictMode: true,

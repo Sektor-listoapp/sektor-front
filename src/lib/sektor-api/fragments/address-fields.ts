@@ -34,6 +34,7 @@ export const COUNTRY_FIELDS_FRAGMENT = gql`
 
 export const ADDRESS_FIELDS_FRAGMENT = gql`
   fragment AddressFields on AddressType {
+    street
     country {
       ...CountryFields
     }

@@ -51,6 +51,8 @@ const SelectMultiple = ({
             "ps-12": icon,
             "border-red-500 placeholder:text-red-500 text-red-500": error,
           })}
+          showSearch={true}
+          optionFilterProp="label"
           {...restSelectProps}
         />
       </div>

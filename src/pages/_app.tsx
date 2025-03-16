@@ -18,6 +18,9 @@ import localeData from "dayjs/plugin/localeData";
 import weekday from "dayjs/plugin/weekday";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import weekYear from "dayjs/plugin/weekYear";
+import { IStaticMethods } from "preline/preline";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 dayjs.locale("es");
 dayjs.extend(customParseFormat);
@@ -28,6 +31,11 @@ dayjs.extend(weekOfYear);
 dayjs.extend(weekYear);
 
 const sektorApiClient = createSektorApiClient();
+declare global {
+  interface Window {
+    HSStaticMethods: IStaticMethods;
+  }
+}
 
 export default function App({ Component, pageProps, router }: AppProps) {
   return (
@@ -47,8 +55,8 @@ export default function App({ Component, pageProps, router }: AppProps) {
               handleBg: "#182F48",
               colorPrimaryBg: "#182F48",
               colorPrimary: "#182F48",
-            }
-          }
+            },
+          },
         }}
       >
         <ToastContainer

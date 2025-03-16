@@ -1,0 +1,108 @@
+import React, { useState } from "react";
+import { faPen, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Select } from "antd";
+import { SocialMediaLinkType } from "@/lib/sektor-api/__generated__/types";
+import { useLocalStorage } from "@uidotdev/usehooks";
+import LocalContactModal from "./contact-modal";
+import { PLATFORM_LABELS_MAP } from "@/constants/forms";
+
+interface LocalContactInputProps {
+  links: SocialMediaLinkType[];
+  disabled?: boolean;
+}
+
+const LocalContactInput = ({ links, disabled }: LocalContactInputProps) => {
+  const [localContact, setLocalContact] = useLocalStorage(
+    "sektor-local-contact",
+    {}
+  );
+
+  React.useEffect(() => {
+    if (links && Array.isArray(links) && links.length > 0) {
+      const linksMap = {};
+      links.forEach(({ url, platform }) => {
+        linksMap[platform] = url;
+      });
+      setLocalContact({ ...linksMap });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [links]);
+
+  const localContactOptions = Object.entries(localContact)?.map(
+    ([key, value]) => {
+      return {
+        value,
+        label: `${PLATFORM_LABELS_MAP[key]}: ${value}`,
+        data: {
+          label: `${PLATFORM_LABELS_MAP[key]}`,
+          value: key,
+          platform: key,
+          url: value as string,
+        },
+      };
+    }
+  );
+
+  const [openContactModal, setOpenContactModal] = useState(false);
+
+  return (
+    <>
+      <div className="w-full border rounded-xl h-[46px] overflow-hidden border-blue-500 relative flex justify-between items-center cursor-pointer px-4">
+        <span className="text-sm">Contacto</span>
+        <Select
+          className="w-full absolute inset-0 h-full opacity-0"
+          suffixIcon={null}
+          size="large"
+          disabled={disabled}
+          value={null}
+          options={localContactOptions}
+          notFoundContent="No hay formas de contacto"
+          optionRender={(option) => {
+            return (
+              <div className="flex items-center gap-3 justify-between p-2 bg-transparent">
+                <div>
+                  <b>{option?.data?.data?.label}: </b>
+                  {option?.data?.data?.url || ""}
+                </div>
+                <FontAwesomeIcon
+                  className="ml-auto cursor-pointer"
+                  icon={faPen}
+                  size="lg"
+                  title="Editar"
+                  onClick={() => setOpenContactModal(true)}
+                />
+                <FontAwesomeIcon
+                  className="ml-2 cursor-pointer text-red-500"
+                  icon={faTrashCan}
+                  size="lg"
+                  title="Eliminar"
+                  onClick={() => {
+                    const newLocalContact = { ...localContact };
+                    delete newLocalContact[option?.data?.data?.value];
+                    setLocalContact(newLocalContact);
+                  }}
+                />
+              </div>
+            );
+          }}
+        />
+        <div className="flex items-center justify-center gap-3 h-full w-fit bg-white z-10">
+          <FontAwesomeIcon
+            size="xl"
+            icon={faPlus}
+            onClick={() => setOpenContactModal(true)}
+          />
+        </div>
+      </div>
+      <LocalContactModal
+        open={openContactModal}
+        localContact={localContact}
+        setLocalContact={setLocalContact}
+        setOpenContactModal={setOpenContactModal}
+      />
+    </>
+  );
+};
+
+export default LocalContactInput;

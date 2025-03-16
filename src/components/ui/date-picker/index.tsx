@@ -11,6 +11,7 @@ interface DatePickerProps extends AntDatePickerProps {
   wrapperClassName?: string;
   error?: boolean;
   errors?: string[];
+  showIcon?: boolean;
 }
 
 const DatePicker = ({
@@ -18,6 +19,7 @@ const DatePicker = ({
   wrapperClassName,
   error = false,
   errors = [],
+  showIcon = true,
   ...props
 }: DatePickerProps) => {
   return (
@@ -29,20 +31,25 @@ const DatePicker = ({
             "w-full text-blue-500",
             styles.datePicker,
             className,
-            error && styles.datePickerError
+            error && styles.datePickerError,
+            {
+              "!ps-5": !showIcon,
+            }
           )}
           {...props}
         />
-        <FontAwesomeIcon
-          size="lg"
-          icon={faCalendarDays}
-          className={cn(
-            "absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 peer-disabled:opacity-50 peer-disabled:pointer-events-none my-auto transition-all bg-transparent",
-            {
-              "text-red-500": error,
-            }
-          )}
-        />
+        {showIcon && (
+          <FontAwesomeIcon
+            size="lg"
+            icon={faCalendarDays}
+            className={cn(
+              "absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 peer-disabled:opacity-50 peer-disabled:pointer-events-none my-auto transition-all bg-transparent",
+              {
+                "text-red-500": error,
+              }
+            )}
+          />
+        )}
       </div>
       {error && errors?.length && (
         <ul className="text-red-500 text-xs font-century-gothic mt-2">

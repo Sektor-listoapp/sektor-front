@@ -1,4 +1,7 @@
-import { OrganizationModality } from "@/lib/sektor-api/__generated__/types";
+import {
+  OrganizationModality,
+  SocialMediaPlatform,
+} from "@/lib/sektor-api/__generated__/types";
 import {
   GENRES,
   ORGANIZATION_LINE_OF_BUSINESS,
@@ -6,11 +9,25 @@ import {
 } from "../shared";
 const { Hybrid, Online, Physical } = OrganizationModality;
 
+const {
+  Facebook,
+  EmergencyPhone,
+  Instagram,
+  Phone,
+  Twitter,
+  Website,
+  Whatsapp,
+} = SocialMediaPlatform;
+
 const { MALE, FEMALE } = GENRES;
 const { CLINIC, MEDICAL_HOUSE, PRIMARY_CARE, WORKSHOP } =
   SERVICE_SUPPLIER_TYPES;
 const { AUTO, AVIATION, FINANCIAL, HEALTH, LIFE, PROPERTY, TRAVEL } =
   ORGANIZATION_LINE_OF_BUSINESS;
+
+export const BROKERAGE_SOCIETY_LICENSE_TYPE_OPTIONS = [
+  { label: "SCSMP -", value: "SCSMP-" },
+];
 
 export const LICENSE_TYPE_OPTIONS = [
   { label: "CAA -", value: "CAA-" },
@@ -83,3 +100,13 @@ export const MODALITY_OPTIONS = [
   { label: "Online", value: Online },
   { label: "Física", value: Physical },
 ];
+
+export const PLATFORM_LABELS_MAP = {
+  [Facebook]: "Facebook",
+  [EmergencyPhone]: "Teléfono de emergencia",
+  [Instagram]: "Instagram",
+  [Phone]: "Teléfono",
+  [Twitter]: "Twitter",
+  [Website]: "Sitio web",
+  [Whatsapp]: "Whatsapp",
+} as const;

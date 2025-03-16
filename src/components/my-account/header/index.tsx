@@ -7,23 +7,22 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Popover } from "antd";
-import { OrganizationTypes } from "@/lib/sektor-api/__generated__/types";
+import { OrganizationType } from "@/lib/sektor-api/__generated__/types";
+import { ORGANIZATION_TYPE_LABEL } from "@/constants/content";
 
-const {
-  Supplier,
-  ExclusiveAgent,
-  InsuranceBroker,
-  InsuranceCompany,
-  BrokerageSociety,
-} = OrganizationTypes;
+interface HeaderProps {
+  data: OrganizationType;
+}
 
-const Header = () => {
-  const isAccountVerified = true;
+const Header = ({ data }: HeaderProps) => {
+  const isAccountVerified = data?.isActive;
+  const userTypeLabel =
+    ORGANIZATION_TYPE_LABEL.SINGULAR[data?.type] || "Sektor";
 
   return (
     <header className="w-11/12 max-w-screen-xl border-b-2 border-b-gray-300 flex justify-between items-end text-blue-500 pb-3 gap-2 md:gap-5 md:pb-5 md:items-center">
       <h1 className="text-lg text-balance md:text-2xl lg:text-3xl">
-        ¡Hola Miguel! Bienvenido a tu cuenta de Sektor
+        ¡Hola Miguel! Bienvenido a tu cuenta de {userTypeLabel}
       </h1>
 
       <div className="text-blue-500 flex justify-center items-center gap-3 w-fit">

@@ -2,6 +2,7 @@ import { gql } from "@apollo/client";
 import {
   ORGANIZATION_CLIENT_FIELDS_FRAGMENT,
   ORGANIZATION_OFFICE_FIELDS_FRAGMENT,
+  ORGANIZATION_RECOGNITION_FIELDS_FRAGMENT,
   ORGANIZATION_TEAM_MEMBER_FIELDS_FRAGMENT,
 } from "./organization-fields";
 import { INSURANCE_COMPANY_FIELDS_FRAGMENT } from "./insurance-company-fields";
@@ -11,6 +12,7 @@ export const BROKERAGE_SOCIETY_CONTACT_FIELDS_FRAGMENT = gql`
   fragment BrokerageSocietyContactFields on BrokerageSocietyContactType {
     name
     position
+    phone
   }
 `;
 
@@ -24,9 +26,11 @@ export const BROKERAGE_SOCIETY_FIELDS_FRAGMENT = gql`
     lineOfBusiness
     coverageStates
     modality
-    rif
     license
-    recognitions
+    identification
+    recognitions {
+      ...OrganizationRecognitionFields
+    }
     foundationYear
     allies {
       ...PublicOrganizationFields
@@ -48,6 +52,7 @@ export const BROKERAGE_SOCIETY_FIELDS_FRAGMENT = gql`
     }
   }
 
+  ${ORGANIZATION_RECOGNITION_FIELDS_FRAGMENT}
   ${PUBLIC_ORGANIZATION_FIELDS_FRAGMENT}
   ${ORGANIZATION_OFFICE_FIELDS_FRAGMENT}
   ${BROKERAGE_SOCIETY_CONTACT_FIELDS_FRAGMENT}

@@ -1,13 +1,33 @@
 import { gql } from "@apollo/client";
 import { ADDRESS_FIELDS_FRAGMENT } from "./address-fields";
 
+export const ORGANIZATION_RECOGNITION_FIELDS_FRAGMENT = gql`
+  fragment OrganizationRecognitionFields on RecognitionType {
+    id
+    title
+    description
+    date
+    giver
+  }
+`;
+
+export const ORGANIZATION_STUDY_FIELDS_FRAGMENT = gql`
+  fragment studiesFields on StudyType {
+    id
+    title
+    description
+    startDate
+    endDate
+    institution
+  }
+`;
+
 export const ORGANIZATION_TEAM_MEMBER_FIELDS_FRAGMENT = gql`
-  fragment OrganizationTeamMemberFields on OrganizationTeamMemberType {
+  fragment OrganizationTeamMemberFields on TeamMemberType {
     id
     name
     photoUrl
     position
-    type
   }
 `;
 
@@ -15,7 +35,6 @@ export const ORGANIZATION_CLIENT_FIELDS_FRAGMENT = gql`
   fragment OrganizationClientFields on OrganizationClientType {
     id
     name
-    type
     logoUrl
   }
 `;
@@ -33,7 +52,6 @@ export const ORGANIZATION_FIELDS_FRAGMENT = gql`
   fragment OrganizationFields on OrganizationType {
     id
     name
-    logoUrl
     type
     isActive
     plan
@@ -41,7 +59,6 @@ export const ORGANIZATION_FIELDS_FRAGMENT = gql`
     coverageStates
     modality
     foundationYear
-    identification
     createdAt
     updatedAt
     features {

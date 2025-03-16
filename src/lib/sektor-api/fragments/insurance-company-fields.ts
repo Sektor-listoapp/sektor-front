@@ -25,7 +25,13 @@ export const INSURANCE_COMPANY_FIELDS_FRAGMENT = gql`
     isActive
     coverageStates
     motto
+    identification
     foundationYear
+    suppliers {
+      id
+      name
+      logoUrl
+    }
     offices {
       ...OrganizationOfficeFields
     }
