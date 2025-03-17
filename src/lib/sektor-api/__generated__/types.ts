@@ -31,6 +31,16 @@ export type AddressType = {
   street: Scalars['String']['output'];
 };
 
+export type AdminType = {
+  __typename?: 'AdminType';
+  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  email: Scalars['String']['output'];
+  group?: Maybe<UserGroups>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  verifiedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
 /** Auto coverages options */
 export enum AutoCoverages {
   BasicThirdPartyLiability = 'BasicThirdPartyLiability',
@@ -63,6 +73,7 @@ export type AutoQuoteType = {
   lineOfBusiness: QuoteLineOfBusiness;
   make: Scalars['String']['output'];
   model: Scalars['String']['output'];
+  read: Scalars['Boolean']['output'];
   usageType: AutoUsageTypes;
   version: Scalars['String']['output'];
   year: Scalars['Int']['output'];
@@ -291,6 +302,7 @@ export type HealthQuoteType = {
   maternity: Scalars['Boolean']['output'];
   organization: PublicOrganizationType;
   primaryCare: Scalars['Boolean']['output'];
+  read: Scalars['Boolean']['output'];
   upToInsuranceAmount: Scalars['Int']['output'];
   vision: Scalars['Boolean']['output'];
 };
@@ -724,6 +736,8 @@ export type OrganizationType = {
   identification?: Maybe<Scalars['String']['output']>;
   isActive: Scalars['Boolean']['output'];
   lineOfBusiness: Array<OrganizationLineOfBusiness>;
+  clicks: Scalars['Int']['output'];
+  email?: Maybe<Scalars['String']['output']>;
   modality: OrganizationModality;
   name: Scalars['String']['output'];
   plan: OrganizationPlans;
@@ -755,6 +769,7 @@ export type OtherQuoteType = {
   customer: QuoteCustomerType;
   id: Scalars['String']['output'];
   lineOfBusiness: QuoteLineOfBusiness;
+  read: Scalars['Boolean']['output'];
 };
 
 export type PaginationType = {
@@ -782,6 +797,7 @@ export type PropertyQuoteType = {
   id: Scalars['String']['output'];
   industryAndCommerce: Scalars['Boolean']['output'];
   lineOfBusiness: QuoteLineOfBusiness;
+  read: Scalars['Boolean']['output'];
   residentialComplex: Scalars['Boolean']['output'];
 };
 
@@ -823,6 +839,8 @@ export type PublicOrganizationType = {
 
 export type Query = {
   __typename?: 'Query';
+  adminUserById?: Maybe<AdminType>;
+  adminUsers: Array<AdminType>;
   autoQuoteById: AutoQuoteType;
   getCountryByCode?: Maybe<CountryType>;
   healthQuoteById: HealthQuoteType;
@@ -842,6 +860,11 @@ export type Query = {
   publicSupplierById: SupplierType;
   publicSuppliers: SupplierPaginatedType;
   searchOrganizations: OrganizationPaginatedType;
+};
+
+
+export type QueryAdminUserByIdArgs = {
+  id: Scalars['String']['input'];
 };
 
 
@@ -960,6 +983,16 @@ export enum QuoteLineOfBusiness {
   Other = 'Other',
   Property = 'Property'
 }
+
+export type QuoteType = {
+  __typename?: 'QuoteType';
+  city: CityType;
+  comments?: Maybe<Scalars['String']['output']>;
+  customer: QuoteCustomerType;
+  id: Scalars['String']['output'];
+  lineOfBusiness: QuoteLineOfBusiness;
+  read: Scalars['Boolean']['output'];
+};
 
 export type RecognitionInputType = {
   date: Scalars['DateTime']['input'];

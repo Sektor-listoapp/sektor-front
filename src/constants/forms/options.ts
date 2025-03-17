@@ -1,5 +1,6 @@
 import {
   OrganizationModality,
+  OrganizationTypes,
   SocialMediaPlatform,
 } from "@/lib/sektor-api/__generated__/types";
 import {
@@ -18,6 +19,14 @@ const {
   Website,
   Whatsapp,
 } = SocialMediaPlatform;
+
+const {
+  InsuranceBroker,
+  BrokerageSociety,
+  ExclusiveAgent,
+  InsuranceCompany,
+  Supplier,
+} = OrganizationTypes;
 
 const { MALE, FEMALE } = GENRES;
 const { CLINIC, MEDICAL_HOUSE, PRIMARY_CARE, WORKSHOP } =
@@ -87,6 +96,14 @@ export const SELECT_SUPPLIER_SERVICE_OPTIONS = [
   { label: "Talleres", value: WORKSHOP },
   { label: "Casa medica", value: MEDICAL_HOUSE },
   { label: "Atención medica primaria", value: PRIMARY_CARE },
+];
+
+export const ORGANIZATION_TYPE_SELECT_OPTIONS = [
+  { label: "Sociedad de corretaje", value: BrokerageSociety },
+  { label: "Agente exclusivo", value: ExclusiveAgent },
+  { label: "Compañía de seguros", value: InsuranceCompany },
+  { label: "Proveedores", value: Supplier },
+  { label: "Corredor de seguros", value: InsuranceBroker },
 ];
 
 export const MODALITY_OPTIONS = [

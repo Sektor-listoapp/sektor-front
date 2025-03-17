@@ -19,6 +19,7 @@ const LoginForm = () => {
   const redirectTo = (query?.redirectTo || "") as string;
 
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
+  const setRefreshToken = useAuthStore((state) => state.setRefreshToken);
   const setUser = useAuthStore((state) => state.setUser);
 
   const [input, setInput] = useState({ email: "", password: "" });
@@ -68,8 +69,9 @@ const LoginForm = () => {
 
     login({ variables: { input } })
       .then((response) => {
-        const { user, token } = response.data.login;
+        const { user, token, refreshToken } = response.data?.login;
         setAccessToken(token);
+        setRefreshToken(refreshToken);
         setUser(user);
         replace(Boolean(redirectTo.length) ? redirectTo : ROUTES.HOME);
       })

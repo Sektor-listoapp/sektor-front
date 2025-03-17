@@ -13,6 +13,9 @@ export const authStoreActions = (
   setAccessToken: (accessToken) => {
     return set({ accessToken }, false, "setAccessToken");
   },
+  setRefreshToken: (refreshToken) => {
+    return set({ refreshToken }, false, "setRefreshToken");
+  },
   setResetPasswordToken: (resetPasswordToken) => {
     return set({ resetPasswordToken }, false, "setResetPasswordToken");
   },
