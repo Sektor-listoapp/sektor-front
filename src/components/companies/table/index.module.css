@@ -1,0 +1,13 @@
+.table * {
+  font-family: "Century Gothic", sans-serif !important;
+  color: #182f48 !important;
+}
+
+.table div div ul li[class*="ant-pagination-item-active"] {
+  border: 1px solid #182f48 !important;
+  color: #fff !important;
+  background: #182f48 !important;
+}
+.table div div ul li[class*="ant-pagination-item-active"] a {
+  color: #fff !important;
+}

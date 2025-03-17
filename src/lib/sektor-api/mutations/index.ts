@@ -18,3 +18,5 @@ export * from "./register/register-as-exclusive-agent";
 export * from "./register/register-as-insurance-broker";
 export * from "./register/register-as-brokerage-society";
 export * from "./register/register-as-insurance-company";
+export * from "./companies/change-organization-plan";
+export * from "./companies/change-organization-visibility";

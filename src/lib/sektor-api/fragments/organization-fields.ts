@@ -61,6 +61,7 @@ export const ORGANIZATION_FIELDS_FRAGMENT = gql`
     foundationYear
     createdAt
     updatedAt
+    identification
     features {
       featureKey
       value
