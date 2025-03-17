@@ -14,17 +14,18 @@ import {
   UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
 
-const { Member, Admin } = UserGroups;
+const { Admin, Customer } = UserGroups;
 
 const MyAccount = () => {
   const userId = useAuthStore(useShallow((state) => state.user?.id));
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
   const isAdmin = userGroup === Admin;
+  const isCustomer = userGroup === Customer;
 
   const { data: organizationDataResponse, loading: isLoadingOrganizationData } =
     useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
       variables: { id: userId },
-      skip: userGroup !== Member,
+      skip: userGroup === Customer,
     });
 
   const organizationData = organizationDataResponse?.organizationById;
@@ -42,7 +43,7 @@ const MyAccount = () => {
         </div>
       ) : (
         <main className="text-blue-500 w-11/12 max-w-screen-xl flex flex-col items-center justify-center gap-4 pb-20 md:pb-40">
-          {!isAdmin && (
+          {!isAdmin && !isCustomer && (
             <header className="w-full flex flex-col items-center justify-center gap-2">
               <h2 className="text-lg md:text-xl lg:text-3xl">
                 Llena el siguiente formulario
