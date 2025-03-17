@@ -107,15 +107,17 @@ const CompanyList = () => {
         </div>
       )}
 
-      {!companies?.length && !isLoadingCompanies && <NoCompanies />}
-
-      <CompaniesTable
-        data={companies}
-        disabled={disableActions}
-        countryStates={countryStates}
-        changeOrgPlan={handleChangeOrgPlan}
-        changeOrgVisibility={handleChangeOrgVisibility}
-      />
+      {!companies?.length && !isLoadingCompanies ? (
+        <NoCompanies />
+      ) : (
+        <CompaniesTable
+          data={companies}
+          disabled={disableActions}
+          countryStates={countryStates}
+          changeOrgPlan={handleChangeOrgPlan}
+          changeOrgVisibility={handleChangeOrgVisibility}
+        />
+      )}
 
       <CompaniesAccordion
         data={companies}
