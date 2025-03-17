@@ -11,6 +11,7 @@ import { faChevronDown, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Switch from "@/components/ui/switch";
 import { ORGANIZATION_TYPE_SELECT_OPTIONS } from "@/constants/forms";
+import dayjs from "dayjs";
 
 const { Panel } = Collapse;
 
@@ -76,8 +77,9 @@ const CompaniesAccordion = ({
             { title: "Tipo de usuario:", value: label ?? "No disponible" },
             {
               title: "Fecha de creación:",
-              value:
-                new Date(createdAt).toLocaleDateString() ?? "No disponible",
+              value: createdAt
+                ? dayjs(createdAt)?.format("DD/MM/YYYY")
+                : "No disponible",
             },
             { title: "Email:", value: email ?? "No disponible" },
             { title: "Ubicaciòn:", value: state ?? "No disponible" },

@@ -13,6 +13,7 @@ import Switch from "@/components/ui/switch";
 import styles from "./index.module.css";
 import { cn } from "@/utils/class-name";
 import { ColumnProps } from "antd/es/table";
+import dayjs from "dayjs";
 
 interface CompaniesTableProps {
   data: OrganizationType[];
@@ -64,7 +65,9 @@ const CompaniesTable = ({
       key: "createdAt",
       className: "text-center",
       render: (createdAt: string) => (
-        <span>{new Date(createdAt).toLocaleDateString()}</span>
+        <span>
+          {createdAt ? dayjs(createdAt)?.format("DD/MM/YYYY") : "No disponible"}
+        </span>
       ),
     },
     {
