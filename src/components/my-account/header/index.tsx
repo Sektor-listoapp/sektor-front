@@ -16,13 +16,10 @@ interface HeaderProps {
 }
 
 const Header = ({ data }: HeaderProps) => {
+  const userName = useAuthStore((state) => state.user?.name);
   const isAccountVerified = data?.isActive;
   const userTypeLabel =
     ORGANIZATION_TYPE_LABEL.SINGULAR[data?.type] || "Sektor";
-
-  const userName = useAuthStore((state) => state.user?.name);
-
-  console.log("Header -> data", data);
 
   return (
     <header className="w-11/12 max-w-screen-xl border-b-2 border-b-gray-300 flex justify-between items-end text-blue-500 pb-3 gap-2 md:gap-5 md:pb-5 md:items-center">
