@@ -110,22 +110,23 @@ const CompanyList = () => {
       {!companies?.length && !isLoadingCompanies ? (
         <NoCompanies />
       ) : (
-        <CompaniesTable
-          data={companies}
-          disabled={disableActions}
-          countryStates={countryStates}
-          changeOrgPlan={handleChangeOrgPlan}
-          changeOrgVisibility={handleChangeOrgVisibility}
-        />
+        <>
+          <CompaniesTable
+            data={companies}
+            disabled={disableActions}
+            countryStates={countryStates}
+            changeOrgPlan={handleChangeOrgPlan}
+            changeOrgVisibility={handleChangeOrgVisibility}
+          />
+          <CompaniesAccordion
+            data={companies}
+            disabled={disableActions}
+            countryStates={countryStates}
+            changeOrgPlan={handleChangeOrgPlan}
+            changeOrgVisibility={handleChangeOrgVisibility}
+          />
+        </>
       )}
-
-      <CompaniesAccordion
-        data={companies}
-        disabled={disableActions}
-        countryStates={countryStates}
-        changeOrgPlan={handleChangeOrgPlan}
-        changeOrgVisibility={handleChangeOrgVisibility}
-      />
     </section>
   );
 };
