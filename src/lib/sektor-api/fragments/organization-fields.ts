@@ -59,6 +59,8 @@ export const ORGANIZATION_FIELDS_FRAGMENT = gql`
     coverageStates
     modality
     foundationYear
+    email
+    clicks
     createdAt
     updatedAt
     identification

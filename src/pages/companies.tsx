@@ -7,17 +7,18 @@ import { UserGroups } from "@/lib/sektor-api/__generated__/types";
 import { useRouter } from "next/router";
 import { ROUTES } from "@/constants/router";
 import CompanyList from "@/components/companies";
+import OrganizationDetailsModal from "@/components/shared/organization-details-modal";
 
 const { Admin } = UserGroups;
 
 const Companies = () => {
-  const router = useRouter();
+  const { query, isReady, push } = useRouter();
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
   const isAdmin = userGroup === Admin;
 
   useEffect(() => {
     if (!isAdmin) {
-      router.push(ROUTES.HOME);
+      push(ROUTES.HOME);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAdmin]);
@@ -29,6 +30,7 @@ const Companies = () => {
       <main className="text-blue-500 w-11/12 max-w-screen-xl flex flex-col items-center justify-center gap-10 py-5 !font-century-gothic">
         <CompanyList />
       </main>
+      {isReady && query?.details && <OrganizationDetailsModal />}
     </div>
   );
 };

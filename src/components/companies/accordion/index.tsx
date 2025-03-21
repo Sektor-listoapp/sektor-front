@@ -7,11 +7,17 @@ import {
 import { Collapse } from "antd";
 import styles from "./index.module.css";
 import { cn } from "@/utils/class-name";
-import { faChevronDown, faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import {
+  faChevronDown,
+  faEye,
+  faTrashCan,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Switch from "@/components/ui/switch";
 import { ORGANIZATION_TYPE_SELECT_OPTIONS } from "@/constants/forms";
 import dayjs from "dayjs";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 
 const { Panel } = Collapse;
 
@@ -32,6 +38,8 @@ const CompaniesAccordion = ({
   changeOrgPlan,
   changeOrgVisibility,
 }: CompaniesAccordionProps) => {
+  const { replace } = useRouter();
+
   return (
     <Collapse
       expandIconPosition="right"
@@ -72,6 +80,8 @@ const CompaniesAccordion = ({
           const state = countryStates?.find(
             (state) => state?.id === coverageStates?.[0]
           )?.name;
+          const organizationQuery = `${type || ""}-${id || ""}`;
+          const hasValidQuery = organizationQuery?.length > 5;
 
           const listItems = [
             { title: "Tipo de usuario:", value: label ?? "No disponible" },
@@ -107,7 +117,7 @@ const CompaniesAccordion = ({
                     onClick={() => changeOrgVisibility(id, !isActive)}
                     disabled={disabled}
                   >
-                    <span>Activo</span>
+                    <span className="text-xs">Activo</span>
                     <Switch checked={isActive} />
                   </button>
 
@@ -116,15 +126,35 @@ const CompaniesAccordion = ({
                     onClick={() => changeOrgPlan(id, newPlan)}
                     disabled={disabled}
                   >
-                    <span>Premiun</span>
+                    <span className="text-xs">Premiun</span>
                     <Switch checked={isPremium} />
+                  </button>
+
+                  <button
+                    className="w-fit flex flex-col items-center justify-center gap-3"
+                    onClick={() => {
+                      if (!hasValidQuery) {
+                        toast.error(
+                          "No se pudo obtener la información de la organización, por favor intenta de nuevo más tarde."
+                        );
+                        return;
+                      }
+                      replace({ query: { details: organizationQuery } });
+                    }}
+                  >
+                    <span className="text-xs">Detalles</span>
+                    <FontAwesomeIcon
+                      icon={faEye}
+                      size="xl"
+                      className="text-blue-500"
+                    />
                   </button>
 
                   <button
                     className="w-fit flex flex-col items-center justify-center gap-3"
                     onClick={() => console.log("Delete company", { id, name })}
                   >
-                    <span>Eliminar</span>
+                    <span className="text-xs">Eliminar</span>
                     <FontAwesomeIcon
                       icon={faTrashCan}
                       size="xl"

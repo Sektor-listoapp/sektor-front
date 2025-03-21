@@ -14,6 +14,8 @@ import styles from "./index.module.css";
 import { cn } from "@/utils/class-name";
 import { ColumnProps } from "antd/es/table";
 import dayjs from "dayjs";
+import { useRouter } from "next/router";
+import { toast } from "react-toastify";
 
 interface CompaniesTableProps {
   data: OrganizationType[];
@@ -32,12 +34,35 @@ const CompaniesTable = ({
   changeOrgVisibility,
   countryStates,
 }: CompaniesTableProps) => {
+  const { replace } = useRouter();
+
   const columns: ColumnProps<OrganizationType>[] = [
     {
       title: "Nombre",
       dataIndex: "name",
       key: "name",
-      render: (name: string) => <p>{name}</p>,
+      render: (name: string, record: OrganizationType) => {
+        const { id, type } = record;
+        const organizationQuery = `${type || ""}-${id || ""}`;
+        const hasValidQuery = organizationQuery?.length > 5;
+
+        return (
+          <p
+            onClick={() => {
+              if (!hasValidQuery) {
+                toast.error(
+                  "No se pudo obtener la información de la organización, por favor intenta de nuevo más tarde."
+                );
+                return;
+              }
+              replace({ query: { details: organizationQuery } });
+            }}
+            className="cursor-pointer hover:text-blue-700 transition-all hover:scale-105"
+          >
+            {name}
+          </p>
+        );
+      },
     },
     {
       title: "Tipo de usuario",
