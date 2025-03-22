@@ -152,6 +152,7 @@ const StudiesModal = ({
               showIcon={false}
               value={input?.startDate ? dayjs(input?.startDate) : undefined}
               defaultValue={undefined}
+              maxDate={input?.endDate ? dayjs(input?.endDate) : undefined}
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-expect-error
               onChange={(date) => handleInputChange("startDate", date)}
@@ -162,8 +163,14 @@ const StudiesModal = ({
               wrapperClassName="col-span-4 md:col-span-1 w-full"
               placeholder="Fecha de finalización"
               format="DD/MM/YYYY"
+              disabled={!input?.startDate}
               showIcon={false}
               value={input?.endDate ? dayjs(input?.endDate) : undefined}
+              minDate={
+                input?.startDate
+                  ? dayjs(input?.startDate).add(1, "day")
+                  : undefined
+              }
               defaultValue={undefined}
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-expect-error
