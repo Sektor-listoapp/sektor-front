@@ -45,10 +45,11 @@ const ExclusiveAgentDetails = () => {
     logoUrl = "",
     foundationYear = 0,
     address,
-    allies = [],
     clients = [],
     recognitions = [],
     lineOfBusiness = [],
+    insuranceCompanies = [],
+    allies = [],
     plan,
   } = exclusiveAgentData || {};
 
@@ -56,7 +57,7 @@ const ExclusiveAgentDetails = () => {
   const stateName = address?.state?.name || "";
   const heading = `${name}${stateName ? `, ${stateName}` : ""}`;
   const yearsOfExperience = getFormattedYearsOfExperience(foundationYear || 0);
-  const organizationLogoUrl = allies?.[0]?.logoUrl;
+  const organizationLogoUrl = insuranceCompanies?.[0]?.logoUrl;
 
   const tabComponents = {
     OrganizationLineOfBusiness: (

@@ -48,6 +48,7 @@ const BrokerageSocietyDetails = () => {
     offices = [],
     lineOfBusiness = [],
     workTeam = [],
+    insuranceCompanies = [],
     plan,
   } = brokerageSocietyData || {};
 
@@ -109,7 +110,7 @@ const BrokerageSocietyDetails = () => {
           yearsOfExperience={yearsOfExperience || ""}
         />
 
-        <OrganizationsSlider organizations={clients} />
+        <OrganizationsSlider organizations={insuranceCompanies} />
       </section>
 
       <div className="col-span-6 w-full lg:col-span-4">

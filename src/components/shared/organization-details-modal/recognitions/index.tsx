@@ -4,7 +4,7 @@ import React from "react";
 
 interface OrganizationRecognitionsProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  recognitions: string[] | RecognitionType[];
+  recognitions: RecognitionType[];
   label?: string;
 }
 
@@ -24,8 +24,10 @@ const OrganizationRecognitions = ({
       </h3>
 
       <ul className="list-disc list-inside w-full my-4 lg:text-base">
-        {recognitions.map((title, index) => (
-          <li key={`${title}-${index}`}>{title}</li>
+        {recognitions.map(({ id, title = "", giver = "" }, index) => (
+          <li key={`${id}-${index}`}>
+            {giver ? `${title} - ${giver}` : title}
+          </li>
         ))}
       </ul>
     </section>

@@ -42,7 +42,7 @@ const SupplierCard = ({ data, className, ...props }: SupplierCardProps) => {
         {supplierServiceType}
       </div>
       <Image
-        className="w-full h-full object-cover object-center rounded-l-2xl"
+        className="w-full h-full object-cover object-center rounded-l-2xl min-h-48"
         src={data?.logoUrl || "/images/placeholder.png"}
         alt={name}
         width={500}

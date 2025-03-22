@@ -38,12 +38,12 @@ const SupplierDetails = () => {
     name = "",
     motto = "",
     logoUrl = "",
-    allies = [],
     offices = [],
     serviceType = "",
     lineOfBusiness = [],
     services = [],
     socialMediaLinks = [],
+    insuranceCompanies = [],
   } = supplierData || {};
 
   const serviceTypeLabel =
@@ -115,7 +115,7 @@ const SupplierDetails = () => {
           serviceType={serviceTypeLabel || ""}
         />
 
-        <OrganizationsSlider organizations={allies} />
+        <OrganizationsSlider organizations={insuranceCompanies} />
       </section>
 
       <div className="col-span-6 w-full lg:col-span-4">

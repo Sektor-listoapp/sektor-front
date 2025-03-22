@@ -49,8 +49,11 @@ const InsuranceBrokerDetails = () => {
     clients = [],
     recognitions = [],
     lineOfBusiness = [],
+    insuranceCompanies = [],
     plan,
   } = insuranceBrokerData || {};
+
+  console.log("Recog", recognitions);
 
   const isPremium = plan === OrganizationPlans.Premium;
   const stateName = address?.state?.name || "";
@@ -114,7 +117,7 @@ const InsuranceBrokerDetails = () => {
           yearsOfExperience={yearsOfExperience || ""}
         />
 
-        <OrganizationsSlider organizations={allies} />
+        <OrganizationsSlider organizations={insuranceCompanies} />
       </section>
 
       <div className="col-span-6 w-full lg:col-span-4">

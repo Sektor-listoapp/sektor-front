@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 
 import "swiper/css";
 import {
+  InsuranceCompanyType,
   OrganizationClientType,
   PublicOrganizationType,
 } from "@/lib/sektor-api/__generated__/types";
@@ -16,9 +17,12 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import { ROUTES } from "@/constants/router";
+import { cn } from "@/utils/class-name";
 
 interface OrganizationsSliderProps extends SwiperOptions {
-  organizations: Array<PublicOrganizationType | OrganizationClientType>;
+  organizations: Array<
+    PublicOrganizationType | OrganizationClientType | InsuranceCompanyType
+  >;
 }
 
 const OrganizationsSlider = ({
@@ -47,23 +51,28 @@ const OrganizationsSlider = ({
       >
         {organizations.map((organization, index) => {
           const { id, name, logoUrl, type = "" } = (organization || {}) as any;
-          const organizationQuery = `${type}-${id}`;
+          const organizationQuery = `${type || ""}-${id || ""}`;
+          const hasOrganizationQuery = Boolean(type) && Boolean(id);
 
           return (
             <SwiperSlide key={`${id}-${index}`}>
               <Image
                 title={name}
-                className="w-full cursor-pointer"
+                className={cn(
+                  "w-full",
+                  hasOrganizationQuery && "cursor-pointer"
+                )}
                 src={logoUrl || "/images/placeholder.png"}
                 alt={name}
-                width={200}
-                height={200}
-                onClick={() =>
+                width={300}
+                height={300}
+                onClick={() => {
+                  if (!hasOrganizationQuery) return;
                   push({
                     pathname: ROUTES.ORGANIZATIONS,
                     query: { ...query, details: organizationQuery },
-                  })
-                }
+                  });
+                }}
               />
             </SwiperSlide>
           );

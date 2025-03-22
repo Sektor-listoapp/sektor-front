@@ -26,17 +26,23 @@ const OrganizationPartners = ({
   return (
     <section className={cn("flex flex-col gap-6 mt-5", className)} {...props}>
       {partners.map(({ id, name = "", type = "", ...props }: any, index) => {
-        const organizationQuery = `${type}-${id}`;
+        const organizationQuery = `${type || ""}-${id || ""}`;
+        const hasOrganizationQuery = Boolean(type) && Boolean(id);
+
         return (
           <article
             key={`${id}-${index}`}
-            onClick={() =>
+            onClick={() => {
+              if (!hasOrganizationQuery) return;
               push({
                 pathname: ROUTES.ORGANIZATIONS,
                 query: { ...query, details: organizationQuery },
-              })
-            }
-            className="w-full flex items-center justify-start gap-4 cursor-pointer"
+              });
+            }}
+            className={cn(
+              "w-full flex items-center justify-start gap-4",
+              hasOrganizationQuery && "cursor-pointer"
+            )}
           >
             {"logoUrl" in props && (
               <Image

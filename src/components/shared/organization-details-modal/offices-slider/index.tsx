@@ -56,7 +56,7 @@ const OrganizationOfficesSlider = ({
           const formattedAddress = `${
             street ? `${street}, ` : ""
           }${cityName}, ${stateName}`;
-          const googleMapsUrl = `https://www.google.com/maps/search/${cityName},${stateName},${countryName}`;
+          const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${formattedAddress}`;
 
           return (
             <SwiperSlide key={`${office.id}-${index}`}>
@@ -76,7 +76,7 @@ const OrganizationOfficesSlider = ({
                 />
                 <div className="w-full shadow-lg p-2 text-xs rounded-b-2xl border border-blue-500 border-opacity-20 h-full grid grid-cols-3 gap-1 md:text-sm md:gap-2 md:p-4">
                   <div className="col-span-2">
-                    <h3 className="w-full">{formattedAddress}</h3>
+                    <h3 className="w-full">{`${stateName}, ${countryName}`}</h3>
                     {office?.phone && (
                       <h3 className="w-full">{office.phone}</h3>
                     )}

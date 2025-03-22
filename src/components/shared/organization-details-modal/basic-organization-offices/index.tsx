@@ -23,11 +23,14 @@ const BasicOrganizationOffices = ({
       {...props}
     >
       {offices.map((office, index) => {
+        const street = office?.address?.street || "";
         const stateName = office?.address?.state?.name || "";
         const cityName = office?.address?.city?.name || "";
         const countryName = office?.address?.country?.name || "";
-        const formattedAddress = `${cityName}, ${stateName}`;
-        const googleMapsUrl = `https://www.google.com/maps/search/${cityName},${stateName},${countryName}`;
+        const formattedAddress = `${
+          street ? `${street}, ` : ""
+        }${cityName}, ${stateName}`;
+        const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${formattedAddress}`;
 
         return (
           <article
@@ -45,7 +48,7 @@ const BasicOrganizationOffices = ({
               height={400}
             />
             <div className="w-full shadow-lg p-2 text-xs rounded-b-2xl border border-blue-500 border-opacity-20 h-full flex flex-col justify-between gap-1 md:text-sm md:gap-2 md:p-4 2xl:text-base">
-              <h3 className="w-full">{formattedAddress}</h3>
+              <h3 className="w-full">{`${stateName}, ${countryName}`}</h3>
               <Link
                 href={googleMapsUrl}
                 passHref
