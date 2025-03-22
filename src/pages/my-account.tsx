@@ -2,12 +2,12 @@ import React from "react";
 import withAuth from "@/components/shared/with-auth";
 import Header from "@/components/my-account/header";
 import Navbar from "@/components/my-account/navbar";
-import Spinner from "@/components/ui/spinner";
 import { useAuthStore } from "@/store/auth";
 import { useShallow } from "zustand/shallow";
 import { ORGANIZATION_BY_ID_QUERY } from "@/lib/sektor-api/queries";
 import { useQuery } from "@apollo/client";
 import { USER_FORM } from "@/components/my-account/constants";
+import { Empty } from "antd";
 import {
   OrganizationType,
   Query,
@@ -22,11 +22,14 @@ const MyAccount = () => {
   const isAdmin = userGroup === Admin;
   const isCustomer = userGroup === Customer;
 
-  const { data: organizationDataResponse, loading: isLoadingOrganizationData } =
-    useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
-      variables: { id: userId },
-      skip: userGroup === Customer,
-    });
+  const {
+    data: organizationDataResponse,
+    error,
+    loading,
+  } = useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
+    variables: { id: userId },
+    skip: userGroup === Customer,
+  });
 
   const organizationData = organizationDataResponse?.organizationById;
   const UserForm = USER_FORM[organizationData?.type || ""];
@@ -37,10 +40,19 @@ const MyAccount = () => {
 
       <Header data={organizationData as OrganizationType} />
 
-      {isLoadingOrganizationData ? (
-        <div className="w-full flex items-center justify-center text-blue-500 py-20">
-          <Spinner className="size-10 animate-spin" />
-        </div>
+      {error && !loading ? (
+        <section className="w-full flex flex-col items-center justify-center gap-4 font-century-gothic py-20">
+          <Empty
+            description="No se pudo cargar la información de la cuenta, por favor intenta de nuevo más tarde."
+            style={{
+              maxWidth: "450px",
+              color: "#aaa",
+              fontWeight: "500",
+              fontFamily: "Century Gothic",
+              textWrap: "balance",
+            }}
+          />
+        </section>
       ) : (
         <main className="text-blue-500 w-11/12 max-w-screen-xl flex flex-col items-center justify-center gap-4 pb-20 md:pb-40">
           {!isAdmin && !isCustomer && (

@@ -32,6 +32,7 @@ import {
 } from "@/lib/sektor-api/queries";
 import UploadInput from "@/components/ui/upload-input";
 import LocalContactInput from "../local-contact-input";
+import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
 
 const InsuranceCompanyForm = () => {
   const userId = useAuthStore(useShallow((state) => state.user?.id));
@@ -247,11 +248,18 @@ const InsuranceCompanyForm = () => {
       .finally(() => setIsUpdatingCompany(false));
   };
 
+  const showLoading = loadingCompany || loadingSuppliers;
+
   return (
     <form
-      className="py-5 w-full flex flex-col items-center justify-center gap-10 font-century-gothic"
+      className="py-5 w-full flex flex-col items-center justify-center gap-10 font-century-gothic relative"
       onSubmit={handleSubmit}
     >
+      {showLoading && (
+        <div className="w-full absolute left-0 top-0 z-50 bg-white bg-opacity-90 h-full flex justify-center">
+          <SektorFullVerticalLogo className="w-20 animate-pulse md:w-24" />
+        </div>
+      )}
       <div className="w-full flex flex-col gap-7 md:gap-10 md:grid md:grid-cols-2">
         <h3 className="col-span-2 font-bold">Datos obligatorios</h3>
 

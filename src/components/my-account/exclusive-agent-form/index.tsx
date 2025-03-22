@@ -37,6 +37,7 @@ import {
   PUBLIC_INSURANCE_BROKERS_QUERY,
   PUBLIC_INSURANCE_COMPANIES_QUERY,
 } from "@/lib/sektor-api/queries";
+import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
 
 const ExclusiveAgentForm = () => {
   const userId = useAuthStore(useShallow((state) => state.user?.id));
@@ -162,7 +163,8 @@ const ExclusiveAgentForm = () => {
   useEffect(() => {
     const currentYear = new Date().getFullYear();
     const foundationYear = Number(exclusiveAgent?.foundationYear || 0);
-    const yearsOfExperience = foundationYear > 0 ? currentYear - foundationYear : 0;
+    const yearsOfExperience =
+      foundationYear > 0 ? currentYear - foundationYear : 0;
     const studies = exclusiveAgent?.studies
       ? exclusiveAgent?.studies.map(
           ({ id, title, institution, startDate, endDate, description }) => {
@@ -288,11 +290,22 @@ const ExclusiveAgentForm = () => {
       .finally(() => setIsUpdatingExclusiveAgent(false));
   };
 
+  const showLoading =
+    loadingExclusiveAgent ||
+    loadingInsuranceCompanies ||
+    loadingBrokerageSocieties ||
+    isLoadingCountryData;
+
   return (
     <form
-      className="py-5 w-full flex flex-col items-center justify-center gap-10 font-century-gothic"
+      className="py-5 w-full flex flex-col items-center justify-center gap-10 font-century-gothic relative"
       onSubmit={handleSubmit}
     >
+      {showLoading && (
+        <div className="w-full absolute left-0 top-0 z-50 bg-white bg-opacity-90 h-full flex justify-center">
+          <SektorFullVerticalLogo className="w-20 animate-pulse md:w-24" />
+        </div>
+      )}
       <div className="w-full flex flex-col gap-7 md:gap-10 md:grid md:grid-cols-2">
         <h3 className="col-span-2 font-bold">Datos obligatorios</h3>
 
