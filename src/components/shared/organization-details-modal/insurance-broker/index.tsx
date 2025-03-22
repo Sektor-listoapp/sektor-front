@@ -53,8 +53,6 @@ const InsuranceBrokerDetails = () => {
     plan,
   } = insuranceBrokerData || {};
 
-  console.log("Recog", recognitions);
-
   const isPremium = plan === OrganizationPlans.Premium;
   const stateName = address?.state?.name || "";
   const heading = `${name}${stateName ? `, ${stateName}` : ""}`;
