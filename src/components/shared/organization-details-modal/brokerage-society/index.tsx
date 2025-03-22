@@ -110,7 +110,9 @@ const BrokerageSocietyDetails = () => {
           yearsOfExperience={yearsOfExperience || ""}
         />
 
-        <OrganizationsSlider organizations={insuranceCompanies} />
+        {Boolean(insuranceCompanies?.length > 0) && (
+          <OrganizationsSlider organizations={insuranceCompanies} />
+        )}
       </section>
 
       <div className="col-span-6 w-full lg:col-span-4">
