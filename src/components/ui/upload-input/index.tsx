@@ -27,16 +27,18 @@ const UploadInput: React.FC<UploadInputProps> = ({
 
   const handleChange = (info: UploadChangeParam<UploadFile<unknown>>) => {
     const { type, status, size } = info?.file;
-    const allowedFileTypes = ["image/jpeg", "image/png", "image/svg+xml"];
+    const allowedFileTypes = ["image/jpeg", "image/png", "image/jpg"];
 
     if (!allowedFileTypes.includes(type || "")) {
       toast.error(
-        "Solo puedes agregar archivos que terminen en .png, .jpeg y .svg"
+        "Debe subir una imagen tipo JPG, PNG o JPEG con un maximo de 2 MB de peso"
       );
       return;
     }
-    if ((size || 0) > 5000000) {
-      toast.error("Solo puedes cargar archivos que pesen menos de 5MB");
+    if ((size || 0) > 2000000) {
+      toast.error(
+        "Debe subir una imagen tipo JPG, PNG o JPEG con un maximo de 2 MB de peso"
+      );
       return;
     }
     if (status === "uploading") {
