@@ -80,6 +80,9 @@ const InsuranceBrokerForm = () => {
   const { data: countryDataResponse, loading: isLoadingCountryData } =
     useQuery<Query>(COUNTRY_BY_CODE_QUERY, { variables: { code: "VE" } });
 
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [logoHasError, setLogoHasError] = useState(false);
+
   const countryStates = countryDataResponse?.getCountryByCode?.states || [];
   const countryStateOptions = [
     ...countryStates?.map(({ id, name }) => ({
@@ -222,7 +225,10 @@ const InsuranceBrokerForm = () => {
     identification: Boolean(input.identification.trim().length),
     modality: Boolean(input.modality.trim().length),
     coverageState: Boolean(input.coverageState.length),
-    yearsOfExperience: Boolean(input.yearsOfExperience.trim().length),
+    yearsOfExperience: Boolean(
+      input.yearsOfExperience.trim().length &&
+        Number(input.yearsOfExperience) > 0
+    ),
     phone: Boolean(input.phone.trim().length),
     logoUrl: Boolean(input.logoUrl.trim().length),
   };
@@ -315,6 +321,7 @@ const InsuranceBrokerForm = () => {
         <TextInput
           name="name"
           className="col-span-1"
+          error={!requiredFields.name}
           placeholder="Nombre completo"
           disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
           onChange={(e) => handleInputChange("name", e.target.value)}
@@ -323,6 +330,7 @@ const InsuranceBrokerForm = () => {
 
         <SelectMultiple
           wrapperClassName="w-full"
+          error={!requiredFields.insuranceCompanies}
           selectProps={{
             disabled: loadingInsuranceCompanies || isUpdatingInsuranceBroker,
             placeholder: "Compañias con las que trabajas",
@@ -358,6 +366,7 @@ const InsuranceBrokerForm = () => {
           textInputProps={{
             name: "license",
             placeholder: "123456",
+            error: !requiredFields.license,
             onChange: (e) => handleInputChange("license", e?.target?.value),
             disabled: loadingInsuranceBroker || isUpdatingInsuranceBroker,
             minLength: 6,
@@ -376,6 +385,7 @@ const InsuranceBrokerForm = () => {
 
         <SelectMultiple
           wrapperClassName="w-full"
+          error={!requiredFields.segment}
           selectProps={{
             placeholder: "Ramos con los que trabajas",
             options: SELECT_LINE_OF_BUSINESS_OPTIONS,
@@ -401,6 +411,7 @@ const InsuranceBrokerForm = () => {
           textInputProps={{
             name: "identification",
             placeholder: "1234567890",
+            error: !requiredFields.identification,
             minLength: 6,
             maxLength: 10,
             disabled: loadingInsuranceBroker || isUpdatingInsuranceBroker,
@@ -421,6 +432,7 @@ const InsuranceBrokerForm = () => {
         <Select
           name="modality"
           value={input?.modality}
+          error={!requiredFields.modality}
           options={MODALITY_OPTIONS}
           disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
           onChange={(e) => handleInputChange("modality", e?.target?.value)}
@@ -428,6 +440,7 @@ const InsuranceBrokerForm = () => {
 
         <SelectMultiple
           wrapperClassName="w-full"
+          error={!requiredFields.coverageState}
           selectProps={{
             placeholder: "Zona de alcance (estado)",
             options: countryStateOptions,
@@ -444,6 +457,7 @@ const InsuranceBrokerForm = () => {
         <TextInput
           name="yearsOfExperience"
           placeholder="Años de experiencia"
+          error={!requiredFields.yearsOfExperience}
           type="number"
           min={0}
           disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
@@ -468,6 +482,7 @@ const InsuranceBrokerForm = () => {
             name: "phone",
             placeholder: "Teléfono",
             type: "tel",
+            error: !requiredFields.phone,
             disabled: loadingInsuranceBroker || isUpdatingInsuranceBroker,
             onChange: (e) => handleInputChange("phone", e.target.value),
             maxLength: 10,
@@ -477,7 +492,14 @@ const InsuranceBrokerForm = () => {
 
         <UploadInput
           imageUrl={input?.logoUrl || ""}
-          disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
+          error={!requiredFields.logoUrl || logoHasError}
+          setError={setLogoHasError}
+          setIsUploadingLogo={setIsUploadingLogo}
+          disabled={
+            loadingInsuranceBroker ||
+            isUpdatingInsuranceBroker ||
+            isUploadingLogo
+          }
           onImageChange={(url: string) => handleInputChange("logoUrl", url)}
         />
       </div>
@@ -544,7 +566,11 @@ const InsuranceBrokerForm = () => {
         className="w-fit px-7"
         type="submit"
         disabled={
-          hasErrors || isUpdatingInsuranceBroker || loadingInsuranceBroker
+          hasErrors ||
+          isUpdatingInsuranceBroker ||
+          loadingInsuranceBroker ||
+          isUploadingLogo ||
+          logoHasError
         }
         loading={isUpdatingInsuranceBroker}
       >

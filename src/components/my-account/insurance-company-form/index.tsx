@@ -52,6 +52,10 @@ const InsuranceCompanyForm = () => {
     variables: { id: userId },
   });
 
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [logoHasError, setLogoHasError] = useState(false);
+  const [hasLocalContact, setHasLocalContact] = useState(false);
+
   const company = companyResponse?.publicInsuranceCompanyById;
 
   const suppliers = suppliersResponse?.publicSuppliers?.items || [];
@@ -142,7 +146,10 @@ const InsuranceCompanyForm = () => {
     license: Boolean(input.license?.trim()?.length),
     segment: Boolean(input.segment?.length),
     identification: Boolean(input.identification?.trim()?.length),
-    yearsOfExperience: Boolean(input.yearsOfExperience?.trim()?.length),
+    yearsOfExperience: Boolean(
+      input.yearsOfExperience?.trim()?.length &&
+        Number(input.yearsOfExperience) > 0
+    ),
     logoUrl: Boolean(input.logoUrl?.trim()?.length),
   };
 
@@ -266,6 +273,7 @@ const InsuranceCompanyForm = () => {
         <TextInput
           name="name"
           className="col-span-1"
+          error={!requiredFields.name}
           placeholder="Nombre completo"
           disabled={loadingCompany || isUpdatingCompany}
           onChange={(e) => handleInputChange("name", e.target.value)}
@@ -274,6 +282,7 @@ const InsuranceCompanyForm = () => {
 
         <SelectMultiple
           wrapperClassName="w-full"
+          error={!requiredFields.segment}
           selectProps={{
             placeholder: "Ramos con los que trabajas",
             options: SELECT_LINE_OF_BUSINESS_OPTIONS,
@@ -298,6 +307,7 @@ const InsuranceCompanyForm = () => {
           textInputProps={{
             name: "license",
             placeholder: "123456",
+            error: !requiredFields.license,
             onChange: (e) => handleInputChange("license", e?.target?.value),
             disabled: loadingCompany || isUpdatingCompany,
             minLength: 6,
@@ -309,6 +319,7 @@ const InsuranceCompanyForm = () => {
         <TextInput
           name="yearsOfExperience"
           placeholder="Años de experiencia"
+          error={!requiredFields.yearsOfExperience}
           type="number"
           min={0}
           disabled={loadingCompany || isUpdatingCompany}
@@ -333,6 +344,7 @@ const InsuranceCompanyForm = () => {
           textInputProps={{
             name: "identification",
             placeholder: "Documento de identidad",
+            error: !requiredFields.identification,
             onChange: (e) =>
               handleInputChange("identification", e?.target?.value),
             disabled: loadingCompany || isUpdatingCompany,
@@ -343,12 +355,16 @@ const InsuranceCompanyForm = () => {
 
         <UploadInput
           imageUrl={input?.logoUrl || ""}
-          disabled={loadingCompany || isUpdatingCompany}
+          error={!requiredFields.logoUrl || logoHasError}
+          setError={setLogoHasError}
+          setIsUploadingLogo={setIsUploadingLogo}
+          disabled={loadingCompany || isUpdatingCompany || isUploadingLogo}
           onImageChange={(url: string) => handleInputChange("logoUrl", url)}
         />
 
         <LocalContactInput
           links={company?.contact?.links || []}
+          setHasLocalContact={setHasLocalContact}
           disabled={loadingCompany || isUpdatingCompany}
         />
       </div>
@@ -398,7 +414,14 @@ const InsuranceCompanyForm = () => {
         variant="solid-blue"
         className="w-fit px-7"
         type="submit"
-        disabled={hasErrors || isUpdatingCompany || loadingCompany}
+        disabled={
+          hasErrors ||
+          isUpdatingCompany ||
+          loadingCompany ||
+          isUploadingLogo ||
+          logoHasError ||
+          !hasLocalContact
+        }
         loading={isUpdatingCompany}
       >
         Guardar Información

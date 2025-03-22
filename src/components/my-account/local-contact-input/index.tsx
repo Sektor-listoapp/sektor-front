@@ -6,13 +6,19 @@ import { SocialMediaLinkType } from "@/lib/sektor-api/__generated__/types";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import LocalContactModal from "./contact-modal";
 import { PLATFORM_LABELS_MAP } from "@/constants/forms";
+import { cn } from "@/utils/class-name";
 
 interface LocalContactInputProps {
   links: SocialMediaLinkType[];
+  setHasLocalContact: React.Dispatch<React.SetStateAction<boolean>>;
   disabled?: boolean;
 }
 
-const LocalContactInput = ({ links, disabled }: LocalContactInputProps) => {
+const LocalContactInput = ({
+  links,
+  disabled,
+  setHasLocalContact,
+}: LocalContactInputProps) => {
   const [localContact, setLocalContact] = useLocalStorage(
     "sektor-local-contact",
     {}
@@ -44,11 +50,24 @@ const LocalContactInput = ({ links, disabled }: LocalContactInputProps) => {
     }
   );
 
+  React.useEffect(() => {
+    console.log("localContact", localContact);
+    setHasLocalContact(Object?.keys(localContact)?.length > 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [localContact]);
+
   const [openContactModal, setOpenContactModal] = useState(false);
 
   return (
     <>
-      <div className="w-full border rounded-xl h-[46px] overflow-hidden border-blue-500 relative flex justify-between items-center cursor-pointer px-4">
+      <div
+        className={cn(
+          "w-full border rounded-xl h-[46px] overflow-hidden border-blue-500 relative flex justify-between items-center cursor-pointer px-4",
+          {
+            "border-red-500": Object?.keys(localContact)?.length === 0,
+          }
+        )}
+      >
         <span className="text-sm">Contacto</span>
         <Select
           className="w-full absolute inset-0 h-full opacity-0"

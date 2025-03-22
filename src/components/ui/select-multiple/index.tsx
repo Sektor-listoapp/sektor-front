@@ -27,7 +27,7 @@ const SelectMultiple = ({
     options: selectOptions,
     ...restSelectProps
   } = selectProps;
-
+  console.log("error", error);
   return (
     <div className={cn("relative w-full", wrapperClassName)}>
       <div className={"relative w-full"}>
@@ -47,10 +47,15 @@ const SelectMultiple = ({
           suffixIcon={
             <FontAwesomeIcon size="xl" icon={faChevronDown} color="#182f48" />
           }
-          className={cn(styles.selectMultiple, selectClassName, {
-            "ps-12": icon,
-            "border-red-500 placeholder:text-red-500 text-red-500": error,
-          })}
+          className={cn(
+            styles.selectMultiple,
+            selectClassName,
+            error && styles.selectWithErrors,
+            {
+              "ps-12": icon,
+              "border-red-500 placeholder:text-red-500 text-red-500": error,
+            }
+          )}
           showSearch={true}
           optionFilterProp="label"
           {...restSelectProps}

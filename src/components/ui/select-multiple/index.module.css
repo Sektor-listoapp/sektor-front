@@ -15,3 +15,8 @@
   border: 1px solid #182f48 !important;
   border-radius: 0.75rem !important;
 }
+
+.selectWithErrors > div {
+  color: #ff0000 !important;
+  border: 1px solid #ff0000 !important;
+}

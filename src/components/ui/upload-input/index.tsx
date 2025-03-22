@@ -11,14 +11,18 @@ interface UploadInputProps {
   className?: string;
   imageUrl: string;
   onImageChange: (imageUrl: string) => void;
+  setIsUploadingLogo: React.Dispatch<React.SetStateAction<boolean>>;
   disabled?: boolean;
   error?: boolean;
+  setError?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const UploadInput: React.FC<UploadInputProps> = ({
   className,
   imageUrl,
+  setError,
   onImageChange,
+  setIsUploadingLogo,
   disabled = false,
   error = false,
 }) => {
@@ -34,19 +38,23 @@ const UploadInput: React.FC<UploadInputProps> = ({
 
     if (!allowedFileTypes.includes(type || "") || (size || 0) > 2000000) {
       setShowError(true);
+      if (setError) setError(true);
       return;
     }
 
     setShowError(false);
+    if (setError) setError(false);
 
     if (status === "uploading") {
       setLoadingLocalImage(true);
+      setIsUploadingLogo(true);
       return;
     }
     if (status === "done") {
       setLocalImageFile(info.file);
       getBase64(info.file.originFileObj, (imageUrl) => {
         setLoadingLocalImage(false);
+        setIsUploadingLogo(false);
         onImageChange(imageUrl);
       });
     }

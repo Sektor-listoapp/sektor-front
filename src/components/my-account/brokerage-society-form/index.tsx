@@ -125,6 +125,9 @@ const BrokerageSocietyForm = () => {
     })),
   ];
 
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [logoHasError, setLogoHasError] = useState(false);
+
   const allies = [...(brokerageSociety?.allies?.map(({ id }) => id) || [])];
   const phoneCodes = PHONE_CODE_OPTIONS.map(({ value }) => value);
   const userPhone = brokerageSociety?.contact?.phone || "";
@@ -218,7 +221,10 @@ const BrokerageSocietyForm = () => {
     identification: Boolean(input.identification.trim().length),
     modality: Boolean(input.modality.trim().length),
     coverageState: Boolean(input.coverageState.length),
-    yearsOfExperience: Boolean(input.yearsOfExperience.trim().length),
+    yearsOfExperience: Boolean(
+      input.yearsOfExperience?.trim()?.length &&
+        Number(input.yearsOfExperience) > 0
+    ),
     phone: Boolean(input.phone.trim().length),
     logoUrl: Boolean(input.logoUrl.trim().length),
   };
@@ -341,6 +347,7 @@ const BrokerageSocietyForm = () => {
           name="name"
           className="col-span-1"
           placeholder="Nombre completo"
+          error={!requiredFields.name}
           disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
           onChange={(e) => handleInputChange("name", e.target.value)}
           value={input?.name}
@@ -348,6 +355,7 @@ const BrokerageSocietyForm = () => {
 
         <SelectMultiple
           wrapperClassName="w-full"
+          error={!requiredFields.insuranceCompanies}
           selectProps={{
             disabled: loadingInsuranceCompanies || isUpdatingBrokerageSociety,
             placeholder: "Compañias con las que trabajas",
@@ -383,6 +391,7 @@ const BrokerageSocietyForm = () => {
           textInputProps={{
             name: "license",
             placeholder: "123456",
+            error: !requiredFields.license,
             onChange: (e) => handleInputChange("license", e?.target?.value),
             disabled: loadingBrokerageSociety || isUpdatingBrokerageSociety,
             minLength: 6,
@@ -393,6 +402,7 @@ const BrokerageSocietyForm = () => {
 
         <SelectMultiple
           wrapperClassName="w-full"
+          error={!requiredFields.segment}
           selectProps={{
             placeholder: "Ramos con los que trabajas",
             options: SELECT_LINE_OF_BUSINESS_OPTIONS,
@@ -406,6 +416,7 @@ const BrokerageSocietyForm = () => {
         <TextInput
           name="identification"
           className="col-span-1"
+          error={!requiredFields.identification}
           placeholder="Documento de identidad"
           disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
           onChange={(e) => handleInputChange("identification", e.target?.value)}
@@ -416,6 +427,7 @@ const BrokerageSocietyForm = () => {
 
         <Select
           name="modality"
+          error={!requiredFields.modality}
           value={input?.modality}
           options={MODALITY_OPTIONS}
           disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
@@ -424,6 +436,7 @@ const BrokerageSocietyForm = () => {
 
         <SelectMultiple
           wrapperClassName="w-full"
+          error={!requiredFields.coverageState}
           selectProps={{
             placeholder: "Zona de alcance (estado)",
             options: countryStateOptions,
@@ -440,6 +453,7 @@ const BrokerageSocietyForm = () => {
         <TextInput
           name="yearsOfExperience"
           placeholder="Años de experiencia"
+          error={!requiredFields.yearsOfExperience}
           type="number"
           min={0}
           disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
@@ -463,6 +477,7 @@ const BrokerageSocietyForm = () => {
           textInputProps={{
             name: "phone",
             placeholder: "Teléfono",
+            error: !requiredFields.phone,
             type: "tel",
             disabled: loadingBrokerageSociety || isUpdatingBrokerageSociety,
             onChange: (e) => handleInputChange("phone", e.target.value),
@@ -473,7 +488,15 @@ const BrokerageSocietyForm = () => {
 
         <UploadInput
           imageUrl={input?.logoUrl || ""}
-          disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
+          error={!requiredFields.logoUrl || logoHasError}
+          setError={setLogoHasError}
+          setIsUploadingLogo={setIsUploadingLogo}
+          disabled={
+            loadingBrokerageSociety ||
+            loadingBrokerageSocieties ||
+            isUpdatingBrokerageSociety ||
+            isUploadingLogo
+          }
           onImageChange={(url: string) => handleInputChange("logoUrl", url)}
         />
       </div>
@@ -593,7 +616,11 @@ const BrokerageSocietyForm = () => {
         className="w-fit px-7"
         type="submit"
         disabled={
-          hasErrors || isUpdatingBrokerageSociety || loadingBrokerageSociety
+          hasErrors ||
+          isUpdatingBrokerageSociety ||
+          loadingBrokerageSociety ||
+          isUploadingLogo ||
+          logoHasError
         }
         loading={isUpdatingBrokerageSociety}
       >

@@ -137,6 +137,8 @@ const ExclusiveAgentForm = () => {
   const [identificationType, identification] =
     exclusiveAgent?.identification?.split("-") || [];
 
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+
   const [input, setInput] = useState({
     // required
     name: exclusiveAgent?.name || "",
@@ -221,7 +223,10 @@ const ExclusiveAgentForm = () => {
     identification: Boolean(input.identification.trim().length),
     modality: Boolean(input.modality.trim().length),
     coverageState: Boolean(input.coverageState.length),
-    yearsOfExperience: Boolean(input.yearsOfExperience.trim().length),
+    yearsOfExperience: Boolean(
+      input.yearsOfExperience.trim().length &&
+        Number(input.yearsOfExperience) > 0
+    ),
     phone: Boolean(input.phone.trim().length),
     logoUrl: Boolean(input.logoUrl.trim().length),
   };
@@ -313,6 +318,7 @@ const ExclusiveAgentForm = () => {
           name="name"
           className="col-span-1"
           placeholder="Nombre completo"
+          error={!requiredFields.name}
           disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
           onChange={(e) => handleInputChange("name", e.target.value)}
           value={input?.name}
@@ -320,6 +326,7 @@ const ExclusiveAgentForm = () => {
 
         <SelectMultiple
           wrapperClassName="w-full"
+          error={!requiredFields.insuranceCompanies}
           selectProps={{
             disabled: loadingInsuranceCompanies || isUpdatingExclusiveAgent,
             placeholder: "Compañias con las que trabajas",
@@ -355,6 +362,7 @@ const ExclusiveAgentForm = () => {
           textInputProps={{
             name: "license",
             placeholder: "123456",
+            error: !requiredFields.license,
             onChange: (e) => handleInputChange("license", e?.target?.value),
             disabled: loadingExclusiveAgent || isUpdatingExclusiveAgent,
             minLength: 6,
@@ -373,6 +381,7 @@ const ExclusiveAgentForm = () => {
 
         <SelectMultiple
           wrapperClassName="w-full"
+          error={!requiredFields.segment}
           selectProps={{
             placeholder: "Ramos con los que trabajas",
             options: SELECT_LINE_OF_BUSINESS_OPTIONS,
@@ -398,6 +407,7 @@ const ExclusiveAgentForm = () => {
           textInputProps={{
             name: "identification",
             placeholder: "1234567890",
+            error: !requiredFields.identification,
             minLength: 6,
             maxLength: 10,
             disabled: loadingExclusiveAgent || isUpdatingExclusiveAgent,
@@ -418,6 +428,7 @@ const ExclusiveAgentForm = () => {
         <Select
           name="modality"
           value={input?.modality}
+          error={!requiredFields.modality}
           options={MODALITY_OPTIONS}
           disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
           onChange={(e) => handleInputChange("modality", e?.target?.value)}
@@ -425,6 +436,7 @@ const ExclusiveAgentForm = () => {
 
         <SelectMultiple
           wrapperClassName="w-full"
+          error={!requiredFields.coverageState}
           selectProps={{
             placeholder: "Zona de alcance (estado)",
             options: countryStateOptions,
@@ -439,6 +451,7 @@ const ExclusiveAgentForm = () => {
         />
 
         <TextInput
+          error={!requiredFields.yearsOfExperience}
           name="yearsOfExperience"
           placeholder="Años de experiencia"
           type="number"
@@ -463,6 +476,7 @@ const ExclusiveAgentForm = () => {
           }}
           textInputProps={{
             name: "phone",
+            error: !requiredFields.phone,
             placeholder: "Teléfono",
             type: "tel",
             disabled: loadingExclusiveAgent || isUpdatingExclusiveAgent,
@@ -474,7 +488,11 @@ const ExclusiveAgentForm = () => {
 
         <UploadInput
           imageUrl={input?.logoUrl || ""}
-          disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
+          error={!requiredFields.logoUrl}
+          setIsUploadingLogo={setIsUploadingLogo}
+          disabled={
+            loadingExclusiveAgent || isUpdatingExclusiveAgent || isUploadingLogo
+          }
           onImageChange={(url: string) => handleInputChange("logoUrl", url)}
         />
       </div>
@@ -541,7 +559,10 @@ const ExclusiveAgentForm = () => {
         className="w-fit px-7"
         type="submit"
         disabled={
-          hasErrors || isUpdatingExclusiveAgent || loadingExclusiveAgent
+          hasErrors ||
+          isUpdatingExclusiveAgent ||
+          loadingExclusiveAgent ||
+          isUploadingLogo
         }
         loading={isUpdatingExclusiveAgent}
       >

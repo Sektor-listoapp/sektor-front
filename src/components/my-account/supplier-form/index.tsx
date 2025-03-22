@@ -125,9 +125,10 @@ const SupplierForm = () => {
   const requiredFields = {
     name: Boolean(input.name?.trim()?.length),
     license: Boolean(input.license?.trim()?.length),
-    segment: Boolean(input.segment.length),
+    segment: Boolean(input?.segment?.length),
     identification: Boolean(input.identification?.trim()?.length),
   };
+  console.log("Required fields", requiredFields);
 
   const hasErrors = Object.values(requiredFields).some((field) => !field);
 
@@ -224,10 +225,12 @@ const SupplierForm = () => {
           disabled={loadingSupplier || isUpdatingSupplier}
           onChange={(e) => handleInputChange("name", e.target.value)}
           value={input?.name}
+          error={!requiredFields.name}
         />
 
         <SelectMultiple
           wrapperClassName="w-full"
+          error={!requiredFields.segment}
           selectProps={{
             placeholder: "Ramos con los que trabajas",
             options: SELECT_LINE_OF_BUSINESS_OPTIONS,
@@ -250,6 +253,7 @@ const SupplierForm = () => {
             onChange: (e) => handleInputChange("licenseType", e?.target?.value),
           }}
           textInputProps={{
+            error: !requiredFields.license,
             name: "license",
             placeholder: "123456",
             onChange: (e) => handleInputChange("license", e?.target?.value),
@@ -274,6 +278,7 @@ const SupplierForm = () => {
           }}
           textInputProps={{
             name: "identification",
+            error: !requiredFields.identification,
             placeholder: "Documento de identidad",
             onChange: (e) =>
               handleInputChange("identification", e?.target?.value),
