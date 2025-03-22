@@ -78,11 +78,11 @@ const OrganizationCoverageStates = ({
               const street = address?.street || "";
               const cityName = address?.city?.name || "";
               const stateName = address?.state?.name || "";
-              const countryName = address?.country?.name || "";
               const formattedAddress = `${
                 street ? `${street}, ` : ""
               }${cityName}, ${stateName}`;
-              const googleMapsUrl = `https://www.google.com/maps/search/${cityName},${stateName},${countryName}`;
+              console.log("Address", formattedAddress);
+              const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${formattedAddress}`;
 
               return (
                 <div
