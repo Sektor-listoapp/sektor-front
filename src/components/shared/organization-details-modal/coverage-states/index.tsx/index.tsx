@@ -81,7 +81,6 @@ const OrganizationCoverageStates = ({
               const formattedAddress = `${
                 street ? `${street}, ` : ""
               }${cityName}, ${stateName}`;
-              console.log("Address", formattedAddress);
               const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${formattedAddress}`;
 
               return (
