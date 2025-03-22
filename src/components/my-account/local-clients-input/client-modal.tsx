@@ -30,6 +30,9 @@ const LocalClientModal = ({
     logoUrl: clientToEdit?.logoUrl || " ",
   });
 
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [logoError, setLogoError] = useState(false);
+
   useEffect(() => {
     if (clientToEdit?.id) {
       setInput({
@@ -115,6 +118,10 @@ const LocalClientModal = ({
           />
 
           <UploadInput
+            setIsUploadingLogo={setIsUploadingLogo}
+            disabled={isUploadingLogo}
+            error={logoError}
+            setError={setLogoError}
             imageUrl={input?.logoUrl || " "}
             onImageChange={(url: string) => handleInputChange("logoUrl", url)}
           />
@@ -123,7 +130,12 @@ const LocalClientModal = ({
             variant="solid-blue"
             onClick={handleSubmit}
             className="w-fit px-10"
-            disabled={!input?.name?.trim() || !input?.logoUrl}
+            disabled={
+              !input?.name?.trim() ||
+              !input?.logoUrl ||
+              isUploadingLogo ||
+              logoError
+            }
           >
             Guardar
           </Button>
