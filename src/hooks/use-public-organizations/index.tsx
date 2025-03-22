@@ -81,13 +81,14 @@ const usePublicOrganizations = ({
   };
 
   const handleGetPublicOrganizationsWithNewFilters = async (
-    query: ParsedUrlQuery
+    query: ParsedUrlQuery,
+    limit = 6
   ) => {
     const currentFilters = getCurrentFiltersFromQuery(query);
     setIsLoadingPublicOrganizations(true);
     try {
       const { data } = await getPublicOrganizations({
-        pagination: { offset: 0, limit: 6 },
+        pagination: { offset: 0, limit },
         ...currentFilters,
       });
       setPublicOrganizations(data);

@@ -15,11 +15,18 @@ const Searchbar = ({
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const isClient = useIsClient();
   const { replace, query } = useRouter();
-  const { handleGetPublicOrganizations, isLoadingPublicOrganizations } =
-    usePublicOrganizations({});
+  const {
+    handleGetPublicOrganizations,
+    isLoadingPublicOrganizations,
+    handleGetPublicOrganizationsWithNewFilters,
+  } = usePublicOrganizations({});
 
   useEffect(() => {
-    handleGetPublicOrganizations();
+    if (query?.type) {
+      handleGetPublicOrganizationsWithNewFilters(query, 10000);
+    } else {
+      handleGetPublicOrganizations();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query?.type]);
 
