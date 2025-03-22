@@ -76,6 +76,7 @@ export type AutoQuoteType = {
   lineOfBusiness: QuoteLineOfBusiness;
   make: Scalars['String']['output'];
   model: Scalars['String']['output'];
+  organization: PublicOrganizationType;
   read: Scalars['Boolean']['output'];
   usageType: AutoUsageTypes;
   version: Scalars['String']['output'];
@@ -461,6 +462,7 @@ export type Mutation = {
   changeOrganizationPlan: OrganizationType;
   changeOrganizationVisibility: OrganizationType;
   login: LoginResponseType;
+  markAsRead?: Maybe<QuoteType>;
   refreshToken: Scalars['String']['output'];
   registerAsBrokerageSociety: RegisterAsOrganizationResponseType;
   registerAsCustomer: RegisterAsCustomerResponseType;
@@ -507,6 +509,11 @@ export type MutationChangeOrganizationVisibilityArgs = {
 
 export type MutationLoginArgs = {
   input: LoginInputType;
+};
+
+
+export type MutationMarkAsReadArgs = {
+  id: Scalars['String']['input'];
 };
 
 
@@ -731,8 +738,10 @@ export enum OrganizationPlans {
 
 export type OrganizationType = {
   __typename?: 'OrganizationType';
+  clicks: Scalars['Int']['output'];
   coverageStates: Array<Scalars['Float']['output']>;
   createdAt: Scalars['DateTime']['output'];
+  email: Scalars['String']['output'];
   features: Array<OrganizationFeaturesType>;
   foundationYear?: Maybe<Scalars['Float']['output']>;
   id: Scalars['String']['output'];
@@ -770,6 +779,7 @@ export type OtherQuoteType = {
   customer: QuoteCustomerType;
   id: Scalars['String']['output'];
   lineOfBusiness: QuoteLineOfBusiness;
+  organization: PublicOrganizationType;
   read: Scalars['Boolean']['output'];
 };
 
@@ -798,6 +808,7 @@ export type PropertyQuoteType = {
   id: Scalars['String']['output'];
   industryAndCommerce: Scalars['Boolean']['output'];
   lineOfBusiness: QuoteLineOfBusiness;
+  organization: PublicOrganizationType;
   read: Scalars['Boolean']['output'];
   residentialComplex: Scalars['Boolean']['output'];
 };
@@ -860,6 +871,8 @@ export type Query = {
   publicOrganizations: PublicOrganizationPaginatedType;
   publicSupplierById: SupplierType;
   publicSuppliers: SupplierPaginatedType;
+  quoteById?: Maybe<QuoteType>;
+  quotes: QuotePaginatedType;
   searchOrganizations: OrganizationPaginatedType;
 };
 
@@ -960,6 +973,18 @@ export type QueryPublicSuppliersArgs = {
 };
 
 
+export type QueryQuoteByIdArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryQuotesArgs = {
+  filter?: InputMaybe<QuoteFilterType>;
+  organizationId?: InputMaybe<Scalars['String']['input']>;
+  pagination?: InputMaybe<PaginationType>;
+};
+
+
 export type QuerySearchOrganizationsArgs = {
   filter?: InputMaybe<SearchOrganizationFilterType>;
   pagination: PaginationType;
@@ -978,12 +1003,26 @@ export type QuoteCustomerType = {
   phone: Scalars['String']['output'];
 };
 
+export type QuoteFilterType = {
+  dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
+  dateTo?: InputMaybe<Scalars['DateTime']['input']>;
+  lineOfBusinesses?: InputMaybe<Array<Scalars['String']['input']>>;
+  read?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export enum QuoteLineOfBusiness {
   Auto = 'Auto',
   Health = 'Health',
   Other = 'Other',
   Property = 'Property'
 }
+
+export type QuotePaginatedType = {
+  __typename?: 'QuotePaginatedType';
+  count: Scalars['Int']['output'];
+  items?: Maybe<Array<QuoteType>>;
+  pages: Scalars['Int']['output'];
+};
 
 export type QuoteType = {
   __typename?: 'QuoteType';
@@ -992,6 +1031,7 @@ export type QuoteType = {
   customer: QuoteCustomerType;
   id: Scalars['String']['output'];
   lineOfBusiness: QuoteLineOfBusiness;
+  organization: PublicOrganizationType;
   read: Scalars['Boolean']['output'];
 };
 
@@ -1089,7 +1129,7 @@ export enum ServiceSupplierTypes {
 export enum Sexes {
   Female = 'Female',
   Male = 'Male',
-  PreferNotToSay = 'PreferNotToSay'
+  PreferNotSay = 'PreferNotSay'
 }
 
 export type SocialMediaLinkInputType = {

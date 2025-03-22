@@ -29,6 +29,7 @@ const SupplierDetails = () => {
     loading: isLoading,
   } = useQuery<Query>(PUBLIC_SUPPLIER_BY_ID_QUERY, {
     variables: { id: orgId },
+    fetchPolicy: "no-cache",
   });
 
   const supplierData = data?.publicSupplierById as SupplierType;

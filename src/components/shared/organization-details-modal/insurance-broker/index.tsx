@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import {
   InsuranceBrokerType,
+  OrganizationPlans,
   Query,
 } from "@/lib/sektor-api/__generated__/types";
 import { Tabs, TabsProps } from "antd";
@@ -32,6 +33,7 @@ const InsuranceBrokerDetails = () => {
     loading: isLoading,
   } = useQuery<Query>(PUBLIC_INSURANCE_BROKER_BY_ID_QUERY, {
     variables: { id: orgId },
+    fetchPolicy: "no-cache",
   });
 
   const insuranceBrokerData =
@@ -47,8 +49,10 @@ const InsuranceBrokerDetails = () => {
     clients = [],
     recognitions = [],
     lineOfBusiness = [],
+    plan,
   } = insuranceBrokerData || {};
 
+  const isPremium = plan === OrganizationPlans.Premium;
   const stateName = address?.state?.name || "";
   const heading = `${name}${stateName ? `, ${stateName}` : ""}`;
   const yearsOfExperience = getFormattedYearsOfExperience(foundationYear || 0);
@@ -130,15 +134,17 @@ const InsuranceBrokerDetails = () => {
         />
       </div>
 
-      <footer className="w-full flex justify-center items-center col-span-6 my-8">
-        <Button
-          variant="solid-blue"
-          className="w-full max-w-xs"
-          onClick={() => router.push(`${ROUTES.QUOTES}/${detailsQuery}`)}
-        >
-          Solicitar Cotización
-        </Button>
-      </footer>
+      {isPremium && (
+        <footer className="w-full flex justify-center items-center col-span-6 my-8">
+          <Button
+            variant="solid-blue"
+            className="w-full max-w-xs"
+            onClick={() => router.push(`${ROUTES.QUOTES}/${detailsQuery}`)}
+          >
+            Solicitar Cotización
+          </Button>
+        </footer>
+      )}
     </section>
   );
 };

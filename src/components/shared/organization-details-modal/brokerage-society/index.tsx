@@ -16,6 +16,7 @@ import OrganizationLineOfBusiness from "../line-of-business";
 import { getFormattedYearsOfExperience } from "@/utils/formatters";
 import {
   BrokerageSocietyType,
+  OrganizationPlans,
   Query,
 } from "@/lib/sektor-api/__generated__/types";
 import BasicOrganizationOffices from "../basic-organization-offices";
@@ -32,6 +33,7 @@ const BrokerageSocietyDetails = () => {
     loading: isLoading,
   } = useQuery<Query>(PUBLIC_BROKERAGE_SOCIETY_BY_ID_QUERY, {
     variables: { id: orgId },
+    fetchPolicy: "no-cache",
   });
 
   const brokerageSocietyData =
@@ -46,8 +48,10 @@ const BrokerageSocietyDetails = () => {
     offices = [],
     lineOfBusiness = [],
     workTeam = [],
+    plan,
   } = brokerageSocietyData || {};
 
+  const isPremium = plan === OrganizationPlans.Premium;
   const yearsOfExperience = getFormattedYearsOfExperience(foundationYear || 0);
 
   const tabComponents = {
@@ -125,15 +129,17 @@ const BrokerageSocietyDetails = () => {
         />
       </div>
 
-      <footer className="w-full flex justify-center items-center col-span-6 my-8">
-        <Button
-          variant="solid-blue"
-          className="w-full max-w-xs"
-          onClick={() => router.push(`${ROUTES.QUOTES}/${detailsQuery}`)}
-        >
-          Solicitar Cotización
-        </Button>
-      </footer>
+      {isPremium && (
+        <footer className="w-full flex justify-center items-center col-span-6 my-8">
+          <Button
+            variant="solid-blue"
+            className="w-full max-w-xs"
+            onClick={() => router.push(`${ROUTES.QUOTES}/${detailsQuery}`)}
+          >
+            Solicitar Cotización
+          </Button>
+        </footer>
+      )}
     </section>
   );
 };

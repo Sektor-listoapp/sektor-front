@@ -25,6 +25,7 @@ export const BROKERAGE_SOCIETY_FIELDS_FRAGMENT = gql`
     isActive
     lineOfBusiness
     coverageStates
+    plan
     modality
     license
     identification

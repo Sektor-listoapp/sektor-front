@@ -19,6 +19,7 @@ export const INSURANCE_BROKER_FIELDS_FRAGMENT = gql`
     coverageStates
     modality
     license
+    plan
     birthDate
     sex
     identification

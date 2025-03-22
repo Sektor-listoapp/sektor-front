@@ -22,6 +22,7 @@ export const INSURANCE_COMPANY_FIELDS_FRAGMENT = gql`
     lineOfBusiness
     modality
     license
+    plan
     isActive
     coverageStates
     motto

@@ -23,6 +23,7 @@ export const SUPPLIER_FIELDS_FRAGMENT = gql`
     coverageStates
     modality
     serviceType
+    plan
     motto
     identification
     license

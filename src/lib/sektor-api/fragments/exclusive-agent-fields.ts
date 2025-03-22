@@ -20,6 +20,7 @@ export const EXCLUSIVE_AGENT_FIELDS_FRAGMENT = gql`
     modality
     license
     birthDate
+    plan
     sex
     foundationYear
     identification

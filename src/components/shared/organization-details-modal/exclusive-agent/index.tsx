@@ -13,6 +13,7 @@ import OrganizationLineOfBusiness from "../line-of-business";
 import { getFormattedYearsOfExperience } from "@/utils/formatters";
 import {
   ExclusiveAgentType,
+  OrganizationPlans,
   Query,
 } from "@/lib/sektor-api/__generated__/types";
 import { PUBLIC_EXCLUSIVE_AGENT_BY_ID_QUERY } from "@/lib/sektor-api/queries";
@@ -32,6 +33,7 @@ const ExclusiveAgentDetails = () => {
     loading: isLoading,
   } = useQuery<Query>(PUBLIC_EXCLUSIVE_AGENT_BY_ID_QUERY, {
     variables: { id: orgId },
+    fetchPolicy: "no-cache",
   });
 
   const exclusiveAgentData =
@@ -47,8 +49,10 @@ const ExclusiveAgentDetails = () => {
     clients = [],
     recognitions = [],
     lineOfBusiness = [],
+    plan,
   } = exclusiveAgentData || {};
 
+  const isPremium = plan === OrganizationPlans.Premium;
   const stateName = address?.state?.name || "";
   const heading = `${name}${stateName ? `, ${stateName}` : ""}`;
   const yearsOfExperience = getFormattedYearsOfExperience(foundationYear || 0);
@@ -139,15 +143,17 @@ const ExclusiveAgentDetails = () => {
         />
       </div>
 
-      <footer className="w-full flex justify-center items-center col-span-6 my-8">
-        <Button
-          variant="solid-blue"
-          className="w-full max-w-xs"
-          onClick={() => router.push(`${ROUTES.QUOTES}/${detailsQuery}`)}
-        >
-          Solicitar Cotización
-        </Button>
-      </footer>
+      {isPremium && (
+        <footer className="w-full flex justify-center items-center col-span-6 my-8">
+          <Button
+            variant="solid-blue"
+            className="w-full max-w-xs"
+            onClick={() => router.push(`${ROUTES.QUOTES}/${detailsQuery}`)}
+          >
+            Solicitar Cotización
+          </Button>
+        </footer>
+      )}
     </section>
   );
 };

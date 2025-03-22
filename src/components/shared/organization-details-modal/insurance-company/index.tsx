@@ -28,6 +28,7 @@ const InsuranceCompanyDetails = () => {
     loading: isLoading,
   } = useQuery<Query>(PUBLIC_INSURANCE_COMPANY_BY_ID_QUERY, {
     variables: { id: orgId },
+    fetchPolicy: "no-cache",
   });
 
   const insuranceCompanyData =
