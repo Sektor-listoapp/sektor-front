@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import Image from "next/image";
 import { Upload } from "antd";
 import { UploadChangeParam, UploadFile } from "antd/lib/upload";
-import { toast } from "react-toastify";
 import { getBase64 } from "./utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpFromBracket } from "@fortawesome/free-solid-svg-icons";
@@ -39,7 +38,7 @@ const UploadInput: React.FC<UploadInputProps> = ({
     }
 
     setShowError(false);
-    
+
     if (status === "uploading") {
       setLoadingLocalImage(true);
       return;
