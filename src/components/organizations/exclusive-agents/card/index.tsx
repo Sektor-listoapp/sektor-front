@@ -41,7 +41,7 @@ const ExclusiveAgentCard = ({
         </div>
       )}
       <Image
-        className="w-full h-full object-cover object-center rounded-t-2xl"
+        className="w-full min-h-72 h-72 object-cover object-center rounded-t-2x"
         src={data?.logoUrl || "/images/placeholder.png"}
         alt={name}
         width={500}

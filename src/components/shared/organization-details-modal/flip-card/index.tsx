@@ -38,11 +38,11 @@ const OrganizationFlipCard = ({
               </div>
             )}
             <Image
-              className="w-full h-full"
+              className="w-full h-full object-cover object-center"
               alt={heading}
               src={logoUrl || "/images/placeholder.png"}
-              height={400}
-              width={400}
+              height={500}
+              width={500}
             />
           </div>
         ),
