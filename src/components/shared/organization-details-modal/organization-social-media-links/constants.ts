@@ -5,9 +5,17 @@ import {
   faWhatsapp,
   faXTwitter,
 } from "@fortawesome/free-brands-svg-icons";
-import { faGlobe } from "@fortawesome/free-solid-svg-icons";
+import { faGlobe, faPhone } from "@fortawesome/free-solid-svg-icons";
 
-const { Facebook, Instagram, Twitter, Website, Whatsapp } = SocialMediaPlatform;
+const {
+  Facebook,
+  Instagram,
+  Twitter,
+  Website,
+  Whatsapp,
+  EmergencyPhone,
+  Phone,
+} = SocialMediaPlatform;
 
 export const SOCIAL_MEDIA_LINK_ICONS = {
   [Facebook]: faFacebook,
@@ -15,4 +23,6 @@ export const SOCIAL_MEDIA_LINK_ICONS = {
   [Twitter]: faXTwitter,
   [Website]: faGlobe,
   [Whatsapp]: faWhatsapp,
+  [EmergencyPhone]: faPhone,
+  [Phone]: faPhone,
 } as const;

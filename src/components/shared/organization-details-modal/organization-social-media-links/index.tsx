@@ -45,7 +45,7 @@ const OrganizationSocialMediaLinks = ({
             rel="noreferrer noopener"
           >
             <FontAwesomeIcon icon={icon} />
-            <span className="underline">{platform}</span>
+            <span className="underline">{isPhoneNumber ? url : platform}</span>
           </a>
         );
       })}
