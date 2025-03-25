@@ -31,10 +31,12 @@ import {
 import LocalOfficesInput from "../local-offices-input";
 import Select from "@/components/ui/select";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
+import UploadInput from "@/components/ui/upload-input";
 
 const SupplierForm = () => {
   const userId = useAuthStore(useShallow((state) => state.user?.id));
   const [isUpdatingSupplier, setIsUpdatingSupplier] = useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
   const [updateSupplier] = useMutation<Mutation>(UPDATE_SUPPLIER);
 
@@ -87,6 +89,7 @@ const SupplierForm = () => {
     identification: "",
     identificationType: "",
     serviceType: "",
+    logoUrl: "",
     // additional
     motto: "",
     insuranceCompanies: [],
@@ -119,6 +122,7 @@ const SupplierForm = () => {
         `${identificationType}-` || IDENTIFICATION_TYPE_OPTIONS[0].value,
       serviceType: supplier?.serviceType || "",
       motto: supplier?.motto || "",
+      logoUrl: supplier?.logoUrl || "",
     });
   }, [supplier]);
 
@@ -127,6 +131,7 @@ const SupplierForm = () => {
     license: Boolean(input.license?.trim()?.length),
     segment: Boolean(input?.segment?.length),
     identification: Boolean(input.identification?.trim()?.length),
+    logoUrl: Boolean(input.logoUrl?.trim()?.length),
   };
 
   const hasErrors = Object.values(requiredFields).some((field) => !field);
@@ -285,6 +290,14 @@ const SupplierForm = () => {
             maxLength: 12,
             value: input?.identification,
           }}
+        />
+
+        <UploadInput
+          imageUrl={input?.logoUrl || ""}
+          error={!requiredFields.logoUrl}
+          setIsUploadingLogo={setIsUploadingLogo}
+          disabled={loadingSupplier || isUpdatingSupplier || isUploadingLogo}
+          onImageChange={(url: string) => handleInputChange("logoUrl", url)}
         />
       </div>
 
