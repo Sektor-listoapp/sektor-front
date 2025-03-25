@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useQuery } from "@apollo/client";
 import { QUOTES_QUERY } from "@/lib/sektor-api/queries";
 import QuotesTable from "./table";
-import CompaniesAccordion from "./accordion";
+import QuotesAccordion from "./accordion";
 import QuotesHeader from "./header";
 import SektorFullVerticalLogo from "../icons/sektor-full-vertical-logo";
 import { useAuthStore } from "@/store/auth";
@@ -60,7 +60,7 @@ const QuoteList = () => {
       ) : (
         <>
           <QuotesTable data={quotes} disabled={disableActions} />
-          <CompaniesAccordion data={quotes} disabled={disableActions} />
+          <QuotesAccordion data={quotes} disabled={disableActions} />
         </>
       )}
     </section>

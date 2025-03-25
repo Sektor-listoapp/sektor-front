@@ -3,13 +3,9 @@ import { QuoteType } from "@/lib/sektor-api/__generated__/types";
 import { Collapse } from "antd";
 import styles from "./index.module.css";
 import { cn } from "@/utils/class-name";
-import {
-  faChevronDown,
-  faEye,
-} from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faEye } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import dayjs from "dayjs";
-import { useRouter } from "next/router";
 
 const { Panel } = Collapse;
 
@@ -18,9 +14,7 @@ interface QuotesAccordionProps {
   disabled: boolean;
 }
 
-const CompaniesAccordion = ({ data, disabled }: QuotesAccordionProps) => {
-  const { replace } = useRouter();
-
+const QuotesAccordion = ({ data }: QuotesAccordionProps) => {
   return (
     <Collapse
       expandIconPosition="right"
@@ -98,4 +92,4 @@ const CompaniesAccordion = ({ data, disabled }: QuotesAccordionProps) => {
   );
 };
 
-export default CompaniesAccordion;
+export default QuotesAccordion;

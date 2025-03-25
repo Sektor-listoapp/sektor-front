@@ -18,7 +18,7 @@ const QuotesTable = ({ data, disabled }: QuotesTableProps) => {
       title: "Nombre",
       dataIndex: "name",
       key: "name",
-      render: (name: string, record: QuoteType) => {
+      render: (name: string) => {
         return (
           <p className="cursor-pointer hover:text-blue-700 transition-all hover:scale-105">
             {name}
@@ -59,7 +59,7 @@ const QuotesTable = ({ data, disabled }: QuotesTableProps) => {
       title: "Activo",
       dataIndex: "isActive",
       key: "isActive",
-      render: (isActive: boolean, record: QuoteType) => (
+      render: (isActive: boolean) => (
         <div className="w-full flex justify-center items-center">
           <Switch disabled={disabled} checked={isActive} />
         </div>
