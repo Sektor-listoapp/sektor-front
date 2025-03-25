@@ -5,9 +5,12 @@ import { Select } from "antd";
 import {
   OrganizationOfficeInputType,
   OrganizationOfficeType,
+  Query,
 } from "@/lib/sektor-api/__generated__/types";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import LocalOfficeModal from "./office-modal";
+import { useQuery } from "@apollo/client";
+import { COUNTRY_BY_CODE_QUERY } from "@/lib/sektor-api/queries";
 
 interface LocalOfficesInputProps {
   offices: OrganizationOfficeInputType[];
@@ -19,6 +22,10 @@ const LocalOfficesInput = ({ offices, disabled }: LocalOfficesInputProps) => {
     "sektor-local-offices",
     offices ?? []
   );
+  const { data: countryDataResponse, loading: isLoadingCountryData } =
+    useQuery<Query>(COUNTRY_BY_CODE_QUERY, { variables: { code: "VE" } });
+
+  const countryStates = countryDataResponse?.getCountryByCode?.states || [];
 
   React.useEffect(() => {
     if (offices) {
@@ -27,15 +34,23 @@ const LocalOfficesInput = ({ offices, disabled }: LocalOfficesInputProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offices]);
 
+  console.log("localOffices", { localOffices, offices });
+
   const localOfficeOptions = useMemo(
     () =>
       localOffices.map((office) => {
+        const { stateId = "", street = "" } = office?.address || {};
+        const state =
+          countryStates?.find((state) => state?.id === stateId)?.name || "";
+        const label = `${street}, ${state}`;
+
         return {
-          label: office?.address?.street || "",
+          label,
           value: office?.id || "",
           data: office,
         };
       }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [localOffices]
   );
 
@@ -51,7 +66,7 @@ const LocalOfficesInput = ({ offices, disabled }: LocalOfficesInputProps) => {
           className="w-full absolute inset-0 h-full opacity-0"
           suffixIcon={null}
           size="large"
-          disabled={disabled}
+          disabled={disabled || isLoadingCountryData}
           value={null}
           options={localOfficeOptions}
           notFoundContent="No hay oficinas"

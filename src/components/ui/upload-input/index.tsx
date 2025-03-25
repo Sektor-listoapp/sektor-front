@@ -15,6 +15,7 @@ interface UploadInputProps {
   disabled?: boolean;
   error?: boolean;
   setError?: React.Dispatch<React.SetStateAction<boolean>>;
+  placeholder?: string;
 }
 
 const UploadInput: React.FC<UploadInputProps> = ({
@@ -25,6 +26,7 @@ const UploadInput: React.FC<UploadInputProps> = ({
   setIsUploadingLogo,
   disabled = false,
   error = false,
+  placeholder = "Subir foto de perfil",
 }) => {
   const [loadingLocalImage, setLoadingLocalImage] = useState(false);
   const [localImageFile, setLocalImageFile] =
@@ -76,7 +78,7 @@ const UploadInput: React.FC<UploadInputProps> = ({
       >
         <div
           className="flex items-center justify-between gap-2 absolute w-full h-full top-0 left-0 p-4 text-base"
-          title={localImageFile?.name || "Subir foto de perfil"}
+          title={localImageFile?.name || placeholder}
         >
           {Boolean(imageUrl.trim()) && (
             <Image
@@ -94,7 +96,7 @@ const UploadInput: React.FC<UploadInputProps> = ({
             <span className="block w-full truncate">
               {(!localImageFile?.name && !imageUrl?.trim()) ||
               (localImageFile?.name && !imageUrl?.trim())
-                ? "Subir foto de perfil"
+                ? placeholder
                 : ""}
               {localImageFile?.name && imageUrl.trim() && localImageFile?.name}
               {!localImageFile?.name && imageUrl.trim() && "Imagen cargada"}

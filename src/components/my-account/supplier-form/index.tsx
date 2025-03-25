@@ -68,7 +68,7 @@ const SupplierForm = () => {
 
   const formattedOffices = supplier?.offices?.map((office: any) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { __typename: _, address, photoUrl, ...restOfficeProps } = office;
+    const { __typename: _, address, ...restOfficeProps } = office;
     return {
       ...restOfficeProps,
       address: {
@@ -163,7 +163,7 @@ const SupplierForm = () => {
     const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
     const formattedOffices = JSON.parse(offices).map((office: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { __typename: _, address, photoUrl, ...restOfficeProps } = office;
+      const { __typename: _, address, ...restOfficeProps } = office;
       return {
         ...restOfficeProps,
         address: {

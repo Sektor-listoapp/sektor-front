@@ -7,13 +7,16 @@ import {
   OrganizationOfficeType,
   Query,
 } from "@/lib/sektor-api/__generated__/types";
-import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { faCircleXmark, faPhone } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Modal, ModalProps } from "antd";
 import { ObjectId } from "bson";
 import Select from "@/components/ui/select";
 import { useQuery } from "@apollo/client";
 import { COUNTRY_BY_CODE_QUERY } from "@/lib/sektor-api/queries";
+import UploadInput from "@/components/ui/upload-input";
+import { DEFAULT_PHONE_CODE, PHONE_CODE_OPTIONS } from "@/constants/forms";
+import SelectWithTextInput from "@/components/ui/select-with-text-input";
 
 interface OfficeModalProps extends ModalProps {
   officeToEdit?: any;
@@ -31,47 +34,62 @@ const LocalOfficeModal = ({
   officeToEdit,
   ...modalProps
 }: OfficeModalProps) => {
+  const phoneCodes = PHONE_CODE_OPTIONS.map(({ value }) => value);
+  const userPhone = officeToEdit?.phone || "";
+  const userPhoneCode =
+    phoneCodes.find((code) => userPhone.startsWith(code)) || "";
+  const userPhoneWithoutCode = userPhone.replace(userPhoneCode, "") || "";
+
   const isEditing = Boolean(officeToEdit?.id);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [input, setInput] = useState<OrganizationOfficeInputType>({
     id: "",
-    phone: "+584120000000",
+    phone: userPhoneWithoutCode || "",
+    phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
     schedule: [],
+    photoUrl: "",
     address: {
       cityId: 0,
       countryId: 1,
       stateId: 0,
-      street: " ",
+      street: "",
     },
-  });
+  } as OrganizationOfficeInputType);
 
   useEffect(() => {
+    console.log("officeToEdit", officeToEdit);
     if (officeToEdit?.id) {
       setInput({
         id: officeToEdit?.id,
-        phone: officeToEdit?.phone || "+584120000000",
         schedule: officeToEdit?.schedule || [],
+        photoUrl: officeToEdit?.photoUrl || "",
+        phone: userPhoneWithoutCode || "",
+        phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
         address: {
           cityId: officeToEdit?.address?.cityId || 1,
           countryId: officeToEdit?.address?.countryId || 1,
           stateId: officeToEdit?.address?.stateId || 1,
-          street: officeToEdit?.address?.street || " ",
+          street: officeToEdit?.address?.street || "",
         },
-      });
+      } as OrganizationOfficeInputType);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [officeToEdit]);
 
   const handleClose = () => {
     setInput({
       id: "",
-      phone: "+584120000000",
+      phone: "",
+      phoneCode: DEFAULT_PHONE_CODE,
       schedule: [],
+      photoUrl: "",
       address: {
         cityId: 0,
         countryId: 1,
         stateId: 0,
         street: "",
       },
-    });
+    } as OrganizationOfficeInputType);
     setOpenOfficeModal(false);
   };
 
@@ -80,7 +98,13 @@ const LocalOfficeModal = ({
       const updatedOffices = localOffices.map((office) =>
         office?.id === officeToEdit?.id ? { ...office, ...input } : office
       );
-      setLocalOffices(updatedOffices as OrganizationOfficeInputType[]);
+      const formattedOffices = updatedOffices.map(
+        ({ phone: basePhone, phoneCode, ...restOfficeProps }: any) => ({
+          phone: `${phoneCode}${basePhone}`,
+          ...restOfficeProps,
+        })
+      );
+      setLocalOffices(formattedOffices as OrganizationOfficeInputType[]);
     }
     handleClose();
   };
@@ -91,17 +115,25 @@ const LocalOfficeModal = ({
       return;
     }
 
+    const { phone, phoneCode, ...restInputProps } = input as any;
+
     setLocalOffices([
       ...(localOffices as unknown as OrganizationOfficeInputType[]),
-      { ...input, id: new ObjectId().toHexString() },
+      {
+        ...restInputProps,
+        id: new ObjectId().toHexString(),
+        phone: `${phoneCode}${phone}`,
+      },
     ]);
     handleClose();
   };
 
   const hasEmptyFields =
-    !input?.address?.street?.trim() ||
     !input?.address?.cityId ||
-    !input?.address?.stateId;
+    !input?.address?.stateId ||
+    !input?.phone?.trim()?.length ||
+    !input?.photoUrl?.trim()?.length ||
+    !input?.address?.street?.trim()?.length;
 
   const { data: countryDataResponse, loading: isLoadingCountryData } =
     useQuery<Query>(COUNTRY_BY_CODE_QUERY, { variables: { code: "VE" } });
@@ -201,7 +233,7 @@ const LocalOfficeModal = ({
           />
 
           <TextInput
-            placeholder="Calle"
+            placeholder="Dirección completa"
             value={input?.address?.street}
             disabled={isLoadingCountryData}
             required
@@ -216,11 +248,54 @@ const LocalOfficeModal = ({
             }}
           />
 
+          <SelectWithTextInput
+            selectProps={{
+              name: "phoneCode",
+              icon: faPhone,
+              // @ts-expect-error - Bypassing typescript error
+              value: input?.phoneCode,
+              wrapperClassName: "w-60",
+              className: "border-r-0",
+              disabled: isLoadingCountryData || isUploadingLogo,
+              options: PHONE_CODE_OPTIONS,
+              onChange: (e) => {
+                setInput((prev) => ({
+                  ...prev,
+                  phoneCode: e.target.value,
+                }));
+              },
+            }}
+            textInputProps={{
+              name: "phone",
+              placeholder: "Teléfono",
+              type: "tel",
+              disabled: isLoadingCountryData || isUploadingLogo,
+              onChange: (e) => {
+                setInput((prev) => ({ ...prev, phone: e.target.value }));
+              },
+              maxLength: 10,
+              value: input?.phone as string,
+            }}
+          />
+
+          <UploadInput
+            placeholder="Foto de la oficina"
+            imageUrl={input?.photoUrl || ""}
+            setIsUploadingLogo={setIsUploadingLogo}
+            disabled={isLoadingCountryData}
+            onImageChange={(url: string) => {
+              setInput((prev) => ({
+                ...prev,
+                photoUrl: url,
+              }));
+            }}
+          />
+
           <Button
             variant="solid-blue"
             onClick={handleSubmit}
             className="w-fit px-10"
-            disabled={hasEmptyFields}
+            disabled={hasEmptyFields || isLoadingCountryData || isUploadingLogo}
           >
             Guardar
           </Button>

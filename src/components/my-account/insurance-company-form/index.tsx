@@ -74,7 +74,6 @@ const InsuranceCompanyForm = () => {
   const formattedOffices = company?.offices?.map((office: any) => {
     const {
       __typename: _,
-      photoUrl: _photoUrl,
       address,
       schedule = [],
       ...restOfficeProps
@@ -199,7 +198,6 @@ const InsuranceCompanyForm = () => {
     const formattedOffices = JSON.parse(offices).map((office: any) => {
       const {
         __typename: _,
-        photoUrl: _photoUrl,
         address,
         schedule = [],
         ...restOfficeProps
