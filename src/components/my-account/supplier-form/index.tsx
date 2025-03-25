@@ -194,6 +194,7 @@ const SupplierForm = () => {
           offices: formattedOffices,
           modality: supplier?.modality,
           serviceType: input?.serviceType,
+          logoUrl: input?.logoUrl,
         },
       },
     })
