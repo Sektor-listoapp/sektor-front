@@ -2,6 +2,7 @@ import { FormEvent } from "react";
 
 export interface UserInfoFormInput {
   name: string;
+  email: string;
   location: string;
   phone: string;
   phoneCode: string;
@@ -10,6 +11,7 @@ export interface UserInfoFormInput {
 
 export interface UserInfoFormInputErrors {
   name: string[];
+  email: string[];
   location: string[];
   phone: string[];
   phoneCode: string[];

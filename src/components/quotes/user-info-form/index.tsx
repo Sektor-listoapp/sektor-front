@@ -16,10 +16,14 @@ import {
   faPerson,
   faSliders,
   faLocationDot,
+  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { handleUserInfoFormInputChange, validateFormFields } from "./helpers";
 import { useQuoteStore } from "@/store/quotes";
 import { ROUTES } from "@/constants/router";
+import { INPUT_ERROR_MESSAGES, REGEX } from "@/constants/validations";
+
+const { EMAIL } = INPUT_ERROR_MESSAGES;
 
 const UserInfoForm = () => {
   const router = useRouter();
@@ -31,10 +35,14 @@ const UserInfoForm = () => {
     COUNTRY_BY_CODE_QUERY,
     { variables: { code: "VE" } }
   );
-  const locationOptions = getLocationOptions(countryData?.getCountryByCode, true);
+  const locationOptions = getLocationOptions(
+    countryData?.getCountryByCode,
+    true
+  );
 
   const [input, setInput] = useState<UserInfoFormInput>({
     name: "",
+    email: "",
     location: locationOptions[0].value,
     phone: "",
     phoneCode: DEFAULT_PHONE_CODE,
@@ -43,6 +51,7 @@ const UserInfoForm = () => {
 
   const [errors, setErrors] = useState<UserInfoFormInputErrors>({
     name: [],
+    email: [],
     location: [],
     phone: [],
     phoneCode: [],
@@ -65,12 +74,13 @@ const UserInfoForm = () => {
     const isValidForm = validateFormFields({ input, errors, setErrors });
     if (!isValidForm) return;
 
-    const { name, location, phone, phoneCode, segment } = input;
+    const { name, location, phone, phoneCode, segment, email } = input;
     const phoneWithCode = `${phoneCode}${phone}`;
 
     setQuoteRequestCustomer({
       name,
       location,
+      email,
       segment,
       phone: phoneWithCode,
     });
@@ -96,6 +106,22 @@ const UserInfoForm = () => {
         errors={errors.name}
         onChange={handleInputChange}
         value={input.name}
+      />
+
+      <TextInput
+        name="email"
+        icon={faUser}
+        error={Boolean(errors?.email?.length)}
+        errors={errors?.email}
+        onChange={(e: FormEvent<HTMLInputElement>) => {
+          const { value } = e.currentTarget;
+          const trimmedValue = value.trim();
+          setInput((prev) => ({ ...prev, email: trimmedValue }));
+          const errors = REGEX.EMAIL.test(trimmedValue) ? [] : [EMAIL.EXAMPLE];
+          setErrors((prev) => ({ ...prev, email: errors }));
+        }}
+        value={input.email}
+        placeholder="Correo electrónico"
       />
 
       <Select

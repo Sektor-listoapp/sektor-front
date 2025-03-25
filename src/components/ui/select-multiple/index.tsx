@@ -27,7 +27,7 @@ const SelectMultiple = ({
     options: selectOptions,
     ...restSelectProps
   } = selectProps;
-  console.log("error", error);
+
   return (
     <div className={cn("relative w-full", wrapperClassName)}>
       <div className={"relative w-full"}>

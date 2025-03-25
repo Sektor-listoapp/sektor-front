@@ -27,7 +27,12 @@ const OtherQuoteForm = () => {
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { name = "", phone = "", location = 0 } = quoteRequestCustomer || {};
+    const {
+      name = "",
+      phone = "",
+      location = 0,
+      email = "",
+    } = quoteRequestCustomer || {};
 
     requestOtherQuote({
       variables: {
@@ -35,7 +40,7 @@ const OtherQuoteForm = () => {
           organizationId,
           comments,
           cityId: Number(location),
-          customer: { name, phone },
+          customer: { name, phone, email },
         },
       },
     })

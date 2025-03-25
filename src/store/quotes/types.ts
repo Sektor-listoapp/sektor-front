@@ -7,6 +7,7 @@ import {
 
 type QuoteRequestCustomer = {
   name: string | null;
+  email: string | null;
   location: string | null;
   phone: string | null;
   segment: string | null;

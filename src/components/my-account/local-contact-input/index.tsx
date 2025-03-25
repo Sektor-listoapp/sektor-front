@@ -51,7 +51,6 @@ const LocalContactInput = ({
   );
 
   React.useEffect(() => {
-    console.log("localContact", localContact);
     setHasLocalContact(Object?.keys(localContact)?.length > 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [localContact]);

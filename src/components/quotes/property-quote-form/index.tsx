@@ -35,7 +35,12 @@ const PropertyQuoteForm = () => {
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { name = "", phone = "", location = 0 } = quoteRequestCustomer || {};
+    const {
+      name = "",
+      phone = "",
+      location = 0,
+      email = "",
+    } = quoteRequestCustomer || {};
     const { comments, industryAndCommerce, residentialComplex } = input;
 
     requestQuote({
@@ -46,7 +51,7 @@ const PropertyQuoteForm = () => {
           residentialComplex,
           industryAndCommerce,
           cityId: Number(location),
-          customer: { name, phone },
+          customer: { name, phone, email },
         },
       },
     })

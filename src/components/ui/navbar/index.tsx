@@ -23,7 +23,8 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
   const isAuthenticated = useAuthStore((state) => state.getIsAuthenticated)();
   const resetAuthStore = useAuthStore((state) => state.resetAuthStore);
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
-  const isAdmin = userGroup === UserGroups.Admin;
+  const isAdmin = isAuthenticated && userGroup === UserGroups.Admin;
+  const isCustomer = isAuthenticated && userGroup === UserGroups.Customer;
 
   const showDrawer = () => setOpen(true);
   const onClose = () => setOpen(false);
@@ -81,16 +82,16 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                 " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
                 { "font-bold": pathname === "/" }
               )}
-              href="#"
+              href={ROUTES.HOME}
             >
               Inicio
             </Link>
             <Link
               className={cn(
                 " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
-                { "font-bold": pathname === "/insurance" }
+                { "font-bold": pathname === ROUTES.ORGANIZATIONS }
               )}
-              href="#"
+              href={ROUTES.ORGANIZATIONS}
             >
               Seguros
             </Link>
@@ -99,7 +100,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                 " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
                 { "font-bold": pathname === "/about-us" }
               )}
-              href="#"
+              href={ROUTES.HOME}
             >
               Nosotros
             </Link>
@@ -112,6 +113,28 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                 href={ROUTES.COMPANIES}
               >
                 Empresa
+              </Link>
+            )}
+            {isAdmin && (
+              <Link
+                className={cn(
+                  " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
+                  { "font-bold": pathname === ROUTES.COMPANIES }
+                )}
+                href={ROUTES.COMPANIES}
+              >
+                Empresa
+              </Link>
+            )}
+            {isAuthenticated && !isCustomer && (
+              <Link
+                className={cn(
+                  " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
+                  { "font-bold": pathname === ROUTES.MY_QUOTES }
+                )}
+                href={ROUTES.MY_QUOTES}
+              >
+                Mis cotizaciones
               </Link>
             )}
           </nav>
@@ -172,7 +195,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                 "font-bold": pathname === "/",
               }
             )}
-            href="#"
+            href={ROUTES.HOME}
           >
             Inicio
           </Link>
@@ -183,10 +206,10 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                 ? "hover:text-blue-400"
                 : "hover:text-gray-200",
               {
-                "font-bold": pathname === "/insurance",
+                "font-bold": pathname === ROUTES.ORGANIZATIONS,
               }
             )}
-            href="#"
+            href={ROUTES.ORGANIZATIONS}
           >
             Seguros
           </Link>
@@ -200,7 +223,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                 "font-bold": pathname === "/about-us",
               }
             )}
-            href="#"
+            href={ROUTES.HOME}
           >
             Nosotros
           </Link>
@@ -218,6 +241,22 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
               href={ROUTES.COMPANIES}
             >
               Empresa
+            </Link>
+          )}
+          {isAuthenticated && !isCustomer && (
+            <Link
+              className={cn(
+                "focus:outline-none",
+                variant === "light"
+                  ? "hover:text-blue-400"
+                  : "hover:text-gray-200",
+                {
+                  "font-bold": pathname === ROUTES.MY_QUOTES,
+                }
+              )}
+              href={ROUTES.MY_QUOTES}
+            >
+              Mis cotizaciones
             </Link>
           )}
         </div>

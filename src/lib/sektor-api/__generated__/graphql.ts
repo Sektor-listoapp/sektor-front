@@ -71,6 +71,7 @@ export type AutoQuoteType = {
   city: CityType;
   comments?: Maybe<Scalars['String']['output']>;
   coverage: AutoCoverages;
+  createdAt: Scalars['DateTime']['output'];
   customer: QuoteCustomerType;
   id: Scalars['String']['output'];
   lineOfBusiness: QuoteLineOfBusiness;
@@ -297,6 +298,7 @@ export type HealthQuoteType = {
   __typename?: 'HealthQuoteType';
   city: CityType;
   comments?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
   customer: QuoteCustomerType;
   dateOfBirth: Scalars['String']['output'];
   dental: Scalars['Boolean']['output'];
@@ -461,6 +463,7 @@ export type Mutation = {
   changeOrganizationFeature: PublicOrganizationType;
   changeOrganizationPlan: OrganizationType;
   changeOrganizationVisibility: OrganizationType;
+  deleteOrganization: Scalars['Boolean']['output'];
   login: LoginResponseType;
   markAsRead?: Maybe<QuoteType>;
   refreshToken: Scalars['String']['output'];
@@ -504,6 +507,11 @@ export type MutationChangeOrganizationPlanArgs = {
 
 export type MutationChangeOrganizationVisibilityArgs = {
   input: ChangeOrganizationVisibilityInputType;
+};
+
+
+export type MutationDeleteOrganizationArgs = {
+  id: Scalars['String']['input'];
 };
 
 
@@ -776,6 +784,7 @@ export type OtherQuoteType = {
   __typename?: 'OtherQuoteType';
   city: CityType;
   comments: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
   customer: QuoteCustomerType;
   id: Scalars['String']['output'];
   lineOfBusiness: QuoteLineOfBusiness;
@@ -804,6 +813,7 @@ export type PropertyQuoteType = {
   __typename?: 'PropertyQuoteType';
   city: CityType;
   comments?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
   customer: QuoteCustomerType;
   id: Scalars['String']['output'];
   industryAndCommerce: Scalars['Boolean']['output'];
@@ -991,6 +1001,7 @@ export type QuerySearchOrganizationsArgs = {
 };
 
 export type QuoteCustomerInputType = {
+  email: Scalars['String']['input'];
   id?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   phone: Scalars['String']['input'];
@@ -998,12 +1009,14 @@ export type QuoteCustomerInputType = {
 
 export type QuoteCustomerType = {
   __typename?: 'QuoteCustomerType';
+  email: Scalars['String']['output'];
   id?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
   phone: Scalars['String']['output'];
 };
 
 export type QuoteFilterType = {
+  customerName?: InputMaybe<Scalars['String']['input']>;
   dateFrom?: InputMaybe<Scalars['DateTime']['input']>;
   dateTo?: InputMaybe<Scalars['DateTime']['input']>;
   lineOfBusinesses?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -1028,6 +1041,7 @@ export type QuoteType = {
   __typename?: 'QuoteType';
   city: CityType;
   comments?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
   customer: QuoteCustomerType;
   id: Scalars['String']['output'];
   lineOfBusiness: QuoteLineOfBusiness;
@@ -1036,7 +1050,7 @@ export type QuoteType = {
 };
 
 export type RecognitionInputType = {
-  date: Scalars['DateTime']['input'];
+  date: Scalars['String']['input'];
   description?: InputMaybe<Scalars['String']['input']>;
   giver: Scalars['String']['input'];
   id?: InputMaybe<Scalars['ID']['input']>;
@@ -1045,7 +1059,7 @@ export type RecognitionInputType = {
 
 export type RecognitionType = {
   __typename?: 'RecognitionType';
-  date: Scalars['DateTime']['output'];
+  date: Scalars['String']['output'];
   description?: Maybe<Scalars['String']['output']>;
   giver: Scalars['String']['output'];
   id: Scalars['ID']['output'];
@@ -1163,10 +1177,10 @@ export type StateType = {
 
 export type StudyInputType = {
   description?: InputMaybe<Scalars['String']['input']>;
-  endDate?: InputMaybe<Scalars['DateTime']['input']>;
+  endDate?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['String']['input']>;
   institution: Scalars['String']['input'];
-  startDate: Scalars['DateTime']['input'];
+  startDate: Scalars['String']['input'];
   title: Scalars['String']['input'];
 };
 

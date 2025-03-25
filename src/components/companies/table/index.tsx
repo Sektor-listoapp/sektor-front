@@ -23,6 +23,7 @@ interface CompaniesTableProps {
   changeOrgVisibility: (id: string, isACtive: boolean) => void;
   changeOrgPlan: (id: string, plan: OrganizationPlans) => void;
   countryStates: StateType[];
+  setOpenDeleteModal: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const { Premium, Standard } = OrganizationPlans;
@@ -33,6 +34,7 @@ const CompaniesTable = ({
   changeOrgPlan,
   changeOrgVisibility,
   countryStates,
+  setOpenDeleteModal,
 }: CompaniesTableProps) => {
   const { replace } = useRouter();
 
@@ -151,12 +153,9 @@ const CompaniesTable = ({
     {
       title: "",
       key: "action",
-      render: (_, record: OrganizationType) => (
+      render: (_, { id }: OrganizationType) => (
         <div className="text-blue-500">
-          <button
-            onClick={() => console.log("Record", record)}
-            disabled={disabled}
-          >
+          <button onClick={() => setOpenDeleteModal(id)} disabled={disabled}>
             <FontAwesomeIcon icon={faTrashCan} size="xl" />
           </button>
         </div>
@@ -170,7 +169,7 @@ const CompaniesTable = ({
       className={cn("hidden xl:block w-full !text-blue-500", styles.table)}
       columns={columns}
       pagination={{
-        pageSize: 8,
+        pageSize: 6,
         position: ["bottomCenter"],
         showLessItems: true,
       }}

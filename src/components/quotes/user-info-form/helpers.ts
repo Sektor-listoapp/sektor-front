@@ -50,10 +50,13 @@ export const validateFormFields = ({
   if (hasEmptyFields) {
     setErrors((prev) => ({
       ...prev,
-      name: !input.name.trim().length ? [GENERAL.REQUIRED] : prev.name,
-      phone: !input.phone.trim().length ? [GENERAL.REQUIRED] : prev.phone,
-      segment: !input.segment.trim().length ? [GENERAL.REQUIRED] : prev.segment,
-      location: !input.location.trim().length
+      name: !input.name?.trim()?.length ? [GENERAL.REQUIRED] : prev.name,
+      phone: !input.phone?.trim()?.length ? [GENERAL.REQUIRED] : prev.phone,
+      segment: !input.segment?.trim()?.length
+        ? [GENERAL.REQUIRED]
+        : prev.segment,
+      email: !input.email?.trim()?.length ? [GENERAL.REQUIRED] : prev.segment,
+      location: !input.location?.trim()?.length
         ? [GENERAL.REQUIRED]
         : prev.location,
     }));

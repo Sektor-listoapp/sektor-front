@@ -6,33 +6,31 @@ import { useShallow } from "zustand/shallow";
 import { UserGroups } from "@/lib/sektor-api/__generated__/types";
 import { useRouter } from "next/router";
 import { ROUTES } from "@/constants/router";
-import CompanyList from "@/components/companies";
-import OrganizationDetailsModal from "@/components/shared/organization-details-modal";
+import QuoteList from "@/components/my-quotes";
 
-const { Admin } = UserGroups;
+const { Customer } = UserGroups;
 
-const Companies = () => {
-  const { query, isReady, push } = useRouter();
+const MyQuotes = () => {
+  const { push } = useRouter();
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
-  const isAdmin = userGroup === Admin;
+  const isCustomer = userGroup === Customer;
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (isCustomer) {
       push(ROUTES.HOME);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isAdmin]);
+  }, [isCustomer]);
 
   return (
     <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start gap-8  overflow-hidden">
       <Navbar />
 
       <main className="text-blue-500 w-11/12 max-w-screen-xl flex flex-col items-center justify-center gap-10 py-5 !font-century-gothic pb-32">
-        <CompanyList />
+        <QuoteList />
       </main>
-      {isReady && query?.details && <OrganizationDetailsModal />}
     </div>
   );
 };
 
-export default withAuth(Companies);
+export default withAuth(MyQuotes);

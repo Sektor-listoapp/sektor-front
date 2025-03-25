@@ -50,7 +50,12 @@ const HealthQuoteForm = () => {
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { name = "", phone = "", location = 0 } = quoteRequestCustomer || {};
+    const {
+      name = "",
+      phone = "",
+      location = 0,
+      email = "",
+    } = quoteRequestCustomer || {};
     const {
       comments,
       dateOfBirth,
@@ -74,7 +79,7 @@ const HealthQuoteForm = () => {
           dateOfBirth,
           organizationId,
           cityId: Number(location),
-          customer: { name, phone },
+          customer: { name, phone, email },
           upToInsuranceAmount: Number(upToInsuranceAmount),
         },
       },

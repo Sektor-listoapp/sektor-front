@@ -15,31 +15,33 @@ import CompaniesTable from "./table";
 import {
   CHANGE_ORGANIZATION_PLAN,
   CHANGE_ORGANIZATION_VISIBILITY,
+  DELETE_ORGANIZATION,
 } from "@/lib/sektor-api/mutations";
 import { toast } from "react-toastify";
 import CompaniesAccordion from "./accordion";
 import CompaniesHeader from "./header";
 import NoCompanies from "./no-companies";
 import SektorFullVerticalLogo from "../icons/sektor-full-vertical-logo";
+import DeleteOrgModal from "./delete-org-modal";
 
 const CompanyList = () => {
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
   const [companies, setCompanies] = useState<OrganizationType[]>([]);
   const [isChangingVisibility, setIsChangingVisibility] = useState(false);
   const [isChangingPlan, setIsChangingPlan] = useState(false);
+  const [isDeletingOrganization, setIsDeletingOrganization] = useState(false);
+  const [openDeleteModal, setOpenDeleteModal] = useState<string | null>(null);
 
   const [changeOrgVisibility] = useMutation<Mutation>(
     CHANGE_ORGANIZATION_VISIBILITY
   );
   const [changeOrgPlan] = useMutation<Mutation>(CHANGE_ORGANIZATION_PLAN);
+  const [deleteOrganization] = useMutation<Mutation>(DELETE_ORGANIZATION);
 
   const defaultVariables = { pagination: { offset: 0, limit: 10000 } };
   const { error: companiesError, refetch: getCompanies } = useQuery<Query>(
     SEARCH_ORGANIZATIONS,
-    {
-      variables: defaultVariables,
-      fetchPolicy: "no-cache",
-    }
+    { variables: defaultVariables, fetchPolicy: "no-cache" }
   );
 
   const { data: countryDataResponse, loading: isLoadingCountryData } =
@@ -74,6 +76,22 @@ const CompanyList = () => {
       .finally(() => setIsChangingPlan(false));
   };
 
+  const handleDeleteCompany = (id: string) => {
+    setIsDeletingOrganization(true);
+    deleteOrganization({ variables: { id } })
+      .then(() => {
+        setOpenDeleteModal(null);
+        toast.success("Empresa eliminada correctamente.");
+        handleGetCompanies();
+      })
+      .catch(() => {
+        toast.error(
+          "No se pudo eliminar la empresa, por favor intenta de nuevo más tarde."
+        );
+      })
+      .finally(() => setIsDeletingOrganization(false));
+  };
+
   const handleChangeOrgVisibility = (id: string, isActive: boolean) => {
     setIsChangingVisibility(true);
     changeOrgVisibility({ variables: { input: { id, isActive } } })
@@ -95,39 +113,52 @@ const CompanyList = () => {
   }
 
   return (
-    <section className="bg-white w-full py-5 md:py-10 flex flex-col items-center justify-center gap-10 xl:shadow-2xl rounded-xl xl:px-10">
-      <CompaniesHeader
-        handleGetCompanies={handleGetCompanies}
-        disabled={isLoadingCompanies || isChangingVisibility || isChangingPlan}
+    <>
+      <section className="bg-white w-full py-5 md:py-10 flex flex-col items-center justify-center gap-10 xl:shadow-2xl rounded-xl xl:px-10">
+        <CompaniesHeader
+          handleGetCompanies={handleGetCompanies}
+          disabled={
+            isLoadingCompanies || isChangingVisibility || isChangingPlan
+          }
+        />
+
+        {isLoadingCompanies && (
+          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-white bg-opacity-40 z-50">
+            <SektorFullVerticalLogo className="w-32 animate-pulse" />
+          </div>
+        )}
+
+        {!companies?.length && !isLoadingCompanies ? (
+          <NoCompanies />
+        ) : (
+          <>
+            <CompaniesTable
+              data={companies}
+              disabled={disableActions}
+              countryStates={countryStates}
+              changeOrgPlan={handleChangeOrgPlan}
+              changeOrgVisibility={handleChangeOrgVisibility}
+              setOpenDeleteModal={setOpenDeleteModal}
+            />
+            <CompaniesAccordion
+              data={companies}
+              disabled={disableActions}
+              countryStates={countryStates}
+              changeOrgPlan={handleChangeOrgPlan}
+              changeOrgVisibility={handleChangeOrgVisibility}
+              setOpenDeleteModal={setOpenDeleteModal}
+            />
+          </>
+        )}
+      </section>
+      <DeleteOrgModal
+        id={openDeleteModal}
+        setOpen={setOpenDeleteModal}
+        open={Boolean(openDeleteModal)}
+        handleDeleteCompany={handleDeleteCompany}
+        isDeletingOrganization={isDeletingOrganization}
       />
-
-      {isLoadingCompanies && (
-        <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-white bg-opacity-40 z-50">
-          <SektorFullVerticalLogo className="w-32 animate-pulse" />
-        </div>
-      )}
-
-      {!companies?.length && !isLoadingCompanies ? (
-        <NoCompanies />
-      ) : (
-        <>
-          <CompaniesTable
-            data={companies}
-            disabled={disableActions}
-            countryStates={countryStates}
-            changeOrgPlan={handleChangeOrgPlan}
-            changeOrgVisibility={handleChangeOrgVisibility}
-          />
-          <CompaniesAccordion
-            data={companies}
-            disabled={disableActions}
-            countryStates={countryStates}
-            changeOrgPlan={handleChangeOrgPlan}
-            changeOrgVisibility={handleChangeOrgVisibility}
-          />
-        </>
-      )}
-    </section>
+    </>
   );
 };
 

@@ -128,7 +128,6 @@ const SupplierForm = () => {
     segment: Boolean(input?.segment?.length),
     identification: Boolean(input.identification?.trim()?.length),
   };
-  console.log("Required fields", requiredFields);
 
   const hasErrors = Object.values(requiredFields).some((field) => !field);
 

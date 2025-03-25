@@ -27,6 +27,7 @@ interface CompaniesAccordionProps {
   countryStates: StateType[];
   changeOrgVisibility: (id: string, isACtive: boolean) => void;
   changeOrgPlan: (id: string, plan: OrganizationPlans) => void;
+  setOpenDeleteModal: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 const { Premium, Standard } = OrganizationPlans;
@@ -37,6 +38,7 @@ const CompaniesAccordion = ({
   countryStates,
   changeOrgPlan,
   changeOrgVisibility,
+  setOpenDeleteModal,
 }: CompaniesAccordionProps) => {
   const { replace } = useRouter();
 
@@ -152,7 +154,7 @@ const CompaniesAccordion = ({
 
                   <button
                     className="w-fit flex flex-col items-center justify-center gap-3"
-                    onClick={() => console.log("Delete company", { id, name })}
+                    onClick={() => setOpenDeleteModal(id)}
                   >
                     <span className="text-xs">Eliminar</span>
                     <FontAwesomeIcon

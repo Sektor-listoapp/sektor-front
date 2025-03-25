@@ -39,7 +39,7 @@ const AutoQuoteForm = () => {
 
   const handleFormSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const { name = "", phone = "", location = 0 } = quoteRequestCustomer || {};
+    const { name = "", phone = "", location = 0,email="" } = quoteRequestCustomer || {};
     const { comments, usageType, coverage, make, model, version, year } = input;
 
     requestQuote({
@@ -54,7 +54,7 @@ const AutoQuoteForm = () => {
           organizationId,
           year: Number(year),
           cityId: Number(location),
-          customer: { name, phone },
+          customer: { name, phone, email },
         },
       },
     })
