@@ -34,7 +34,6 @@ const LocalOfficesInput = ({ offices, disabled }: LocalOfficesInputProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offices]);
 
-  console.log("localOffices", { localOffices, offices });
 
   const localOfficeOptions = useMemo(
     () =>

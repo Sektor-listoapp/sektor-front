@@ -57,7 +57,6 @@ const LocalOfficeModal = ({
   } as OrganizationOfficeInputType);
 
   useEffect(() => {
-    console.log("officeToEdit", officeToEdit);
     if (officeToEdit?.id) {
       setInput({
         id: officeToEdit?.id,
