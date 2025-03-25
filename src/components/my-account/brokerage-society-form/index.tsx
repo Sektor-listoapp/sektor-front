@@ -33,6 +33,7 @@ import {
 import LocalRecognitionsInput from "../local-recognitions-input";
 import LocalWorkTeamInput from "../local-work-team-input";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
+import LocalClientsInput from "../local-clients-input";
 
 const BrokerageSocietyForm = () => {
   const userId = useAuthStore(useShallow((state) => state.user?.id));
@@ -72,7 +73,7 @@ const BrokerageSocietyForm = () => {
     useQuery<Query>(COUNTRY_BY_CODE_QUERY, { variables: { code: "VE" } });
 
   const brokerageSociety = brokerageSocietyResponse?.publicBrokerageSocietyById;
-  const exclusiveAgentClients = [...(brokerageSociety?.clients || [])];
+  const brokerageClients = [...(brokerageSociety?.clients || [])];
   const exclusiveAgentRecognitions = [
     ...(brokerageSociety?.recognitions || []),
   ];
@@ -155,7 +156,6 @@ const BrokerageSocietyForm = () => {
     phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
     logoUrl: "",
     // additional
-    clients: exclusiveAgentClients || [],
     allies: allies || [],
   });
 
@@ -172,7 +172,11 @@ const BrokerageSocietyForm = () => {
         }
       ) || [];
 
-    const clients = brokerageSociety?.clients?.map(({ id }) => id) || [];
+    const clients = brokerageSociety?.clients
+      ? brokerageSociety?.clients.map(({ id, name, logoUrl }) => {
+          return { id, name, logoUrl };
+        })
+      : [];
 
     const workTeam =
       brokerageSociety?.workTeam.map(({ id, name, position, photoUrl }) => {
@@ -191,6 +195,10 @@ const BrokerageSocietyForm = () => {
       "sektor-local-work-team",
       JSON.stringify(workTeam)
     );
+    window?.localStorage?.setItem(
+      "sektor-local-clients",
+      JSON.stringify(clients)
+    );
 
     setInput({
       name: brokerageSociety?.name || "",
@@ -208,7 +216,6 @@ const BrokerageSocietyForm = () => {
       phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
       logoUrl: brokerageSociety?.logoUrl || "",
       allies: [...(brokerageSociety?.allies?.map(({ id }) => id) || [])],
-      clients: (clients || []) as never[],
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [brokerageSociety]);
@@ -257,6 +264,7 @@ const BrokerageSocietyForm = () => {
 
     const currentYear = new Date().getFullYear();
     const foundationYear = currentYear - Number(input?.yearsOfExperience || 0);
+    const clients = window.localStorage.getItem("sektor-local-clients") ?? "[]";
     const recognitions =
       window.localStorage.getItem("sektor-local-recognitions") ?? "[]";
     const workTeam =
@@ -268,28 +276,11 @@ const BrokerageSocietyForm = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { __typename, ...contactData } = brokerageSociety?.contact || {};
 
-    const clients =
-      input?.clients?.map((id) => {
-        const data = [
-          ...insuranceCompanies,
-          ...insuranceBrokers,
-          ...exclusiveAgents,
-        ];
-        const clientData = data.find(
-          (client) => client?.id === (id as unknown as string)
-        );
-        return {
-          id: clientData?.id || "",
-          name: clientData?.name || "",
-          logoUrl: clientData?.logoUrl || "",
-        };
-      }) || [];
-
     updateBrokerageSociety({
       variables: {
         input: {
           id: userId,
-          clients,
+          clients: JSON.parse(clients),
           foundationYear,
           name: input?.name,
           allies: input?.allies,
@@ -504,47 +495,14 @@ const BrokerageSocietyForm = () => {
       <div className="w-full flex flex-col gap-7 md:gap-10 md:grid md:grid-cols-2">
         <h3 className="w-full font-bold col-span-2">Datos adicionales</h3>
 
-        <SelectMultiple
-          wrapperClassName="w-full col-span-1"
-          selectProps={{
-            disabled:
-              loadingBrokerageSociety ||
-              loadingInsuranceBrokers ||
-              loadingExclusiveAgents ||
-              loadingInsuranceCompanies ||
-              isUpdatingBrokerageSociety,
-            placeholder: "Clientes con los que has trabajado",
-            options: [
-              {
-                label: "Compañias de seguros",
-                options: insuranceCompanyOptions,
-              },
-              {
-                label: "Corredores de seguros",
-                options: insuranceBrokerOptions,
-              },
-              {
-                label: "Agentes exclusivos",
-                options: exclusiveAgentOptions,
-              },
-            ],
-            value: input?.clients,
-            notFoundContent: "No hay opciones disponibles",
-            showSearch: true,
-            optionFilterProp: "label",
-            onChange: (value) => handleInputChange("clients", value),
-            optionRender: (option) => (
-              <Space>
-                <Image
-                  src={option.data.image || "/images/placeholder.png"}
-                  alt={"Aliado"}
-                  width={40}
-                  height={40}
-                />
-                {option.data.label}
-              </Space>
-            ),
-          }}
+        <LocalClientsInput
+          clients={brokerageClients}
+          disabled={
+            loadingBrokerageSociety ||
+            loadingInsuranceBrokers ||
+            loadingExclusiveAgents ||
+            loadingBrokerageSocieties
+          }
         />
 
         <SelectMultiple
