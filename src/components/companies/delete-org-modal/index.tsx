@@ -28,7 +28,7 @@ const DeleteOrgModal = ({
     >
       <section className="flex flex-col items-center justify-center gap-12 text-blue-500 px-5 py-10">
         <h2 className="text-2xl font-bold font-arial-rounded text-center">
-          ¿Estás seguro de que deseas eliminar esta organización? {id}
+          ¿Estás seguro de que deseas eliminar esta organización?
         </h2>
 
         <footer className="flex flex-col gap-5 w-full md:flex-row md:gap-10">
