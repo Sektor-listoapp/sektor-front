@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Drawer } from "antd";
 import { useRouter } from "next/router";
 import Range from "@/components/ui/range";
@@ -21,7 +21,6 @@ import {
 import { useQuery } from "@apollo/client";
 import { COUNTRY_BY_CODE_QUERY } from "@/lib/sektor-api/queries/public/country-by-code";
 import { Query } from "@/lib/sektor-api/__generated__/graphql";
-import { getLocationOptions } from "@/utils/organizations";
 import { pickBy } from "lodash";
 
 const { AGE_RANGE, EXPERIENCE_RANGE, GENRE, SEGMENT, SERVICE_TYPE } =
@@ -32,17 +31,40 @@ const OrganizationFilters = () => {
   const { query, replace } = useRouter();
   const [openDrawer, setOpenDrawer] = useState(false);
   const handleCloseDrawer = () => setOpenDrawer(false);
+  const [refetchCleaned, setRefetchCleaned] = useState(false);
 
   const { data: countryData, loading: isLoadingCountryData } = useQuery<Query>(
     COUNTRY_BY_CODE_QUERY,
     { variables: { code: "VE" } }
   );
-  const locationOptions = getLocationOptions(countryData?.getCountryByCode);
+
+  const countryStates = countryData?.getCountryByCode?.states || [];
+  const stateCities = countryStates
+    .map((state) => {
+      return state.cities.map((city) => {
+        return {
+          label: `${city?.name}, ${state?.name}`,
+          value: city?.id,
+          stateId: state?.id,
+        };
+      });
+    })
+    .flat();
+  const formattedLocationOptions = [
+    {
+      label: "Ubicación",
+      value: "",
+      disabled: true,
+      hidden: true,
+    },
+    ...stateCities,
+  ];
 
   const {
     handleGetPublicOrganizations,
     isLoadingPublicOrganizations,
     handleGetPublicOrganizationsWithNewFilters,
+    handleGetPublicOrganizationsWithoutFilters,
   } = usePublicOrganizations({});
 
   const {
@@ -90,6 +112,11 @@ const OrganizationFilters = () => {
       return Boolean(value);
     });
     replace({ query: { ...defaultFilters } }, undefined, { scroll: false });
+
+    if (!Object?.keys(defaultFilters)?.length) {
+      setRefetchCleaned(true);
+    }
+
     handleGetPublicOrganizationsWithNewFilters({ ...defaultFilters });
   };
 
@@ -99,6 +126,16 @@ const OrganizationFilters = () => {
     const hasFilters = Object.values(filters).some((value) => Boolean(value));
     return !hasFilters;
   };
+
+  useEffect(() => {
+    if (refetchCleaned) {
+      setTimeout(() => {
+        handleGetPublicOrganizationsWithoutFilters();
+        setRefetchCleaned(false);
+      }, 500);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refetchCleaned]);
 
   return (
     <>
@@ -131,9 +168,9 @@ const OrganizationFilters = () => {
               wrapperClassName="w-full"
               value={location || ""}
               disabled={isLoadingCountryData}
-              options={locationOptions}
+              options={formattedLocationOptions}
               onChange={(e) => handleFilterChange("location", e?.target?.value)}
-              defaultValue={locationOptions[0].value}
+              defaultValue={formattedLocationOptions[0].value}
             />
 
             {checkAllowedFilter(organizationType, SEGMENT) && (

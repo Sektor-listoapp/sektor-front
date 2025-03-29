@@ -81,10 +81,10 @@ const usePublicOrganizations = ({
   };
 
   const handleGetPublicOrganizationsWithNewFilters = async (
-    query: ParsedUrlQuery,
+    query?: ParsedUrlQuery,
     limit = 6
   ) => {
-    const currentFilters = getCurrentFiltersFromQuery(query);
+    const currentFilters = getCurrentFiltersFromQuery(query ?? {});
     setIsLoadingPublicOrganizations(true);
     try {
       const { data } = await getPublicOrganizations({
@@ -100,11 +100,29 @@ const usePublicOrganizations = ({
     }
   };
 
+  const handleGetPublicOrganizationsWithoutFilters = async () => {
+    setIsLoadingPublicOrganizations(true);
+    try {
+      const { data } = await getPublicOrganizations({
+        pagination: { offset: 0, limit: 6 },
+        ...{},
+      });
+      setPublicOrganizations(data);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: unknown | any) {
+      toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
+    } finally {
+      setIsLoadingPublicOrganizations(false);
+    }
+  };
+
   return {
     publicOrganizations,
+    getPublicOrganizations,
     handleGetPublicOrganizations,
     isLoadingPublicOrganizations,
     handleGetPublicOrganizationsWithNewFilters,
+    handleGetPublicOrganizationsWithoutFilters,
   };
 };
 
