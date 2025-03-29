@@ -48,6 +48,7 @@ const InsuranceBrokerDetails = () => {
     allies = [],
     clients = [],
     recognitions = [],
+    studies = [],
     lineOfBusiness = [],
     insuranceCompanies = [],
     plan,
@@ -67,6 +68,9 @@ const InsuranceBrokerDetails = () => {
     OrganizationRecognitions: (
       <OrganizationRecognitions recognitions={recognitions} />
     ),
+    OrganizationStudies: (
+      <OrganizationRecognitions recognitions={studies} />
+    ),
   };
 
   const tabItems = getTabItems({
@@ -74,6 +78,7 @@ const InsuranceBrokerDetails = () => {
     clients,
     allies,
     recognitions,
+    studies,
   }).map((item) => {
     if (!item || !tabComponents[item?.component as keyof typeof tabComponents])
       return null;

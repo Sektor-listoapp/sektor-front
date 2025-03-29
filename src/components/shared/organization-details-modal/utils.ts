@@ -4,6 +4,7 @@ import {
   PublicOrganizationType,
   RecognitionType,
   SocialMediaLinkType,
+  StudyType,
   SupplierServiceType,
   TeamMemberType,
 } from "@/lib/sektor-api/__generated__/types";
@@ -19,6 +20,7 @@ export const getTabItems = ({
   socialMediaLinks,
   contactLinks,
   coverageStates,
+  studies,
 }: {
   lineOfBusiness?: string[];
   clients?: OrganizationClientType[];
@@ -30,6 +32,7 @@ export const getTabItems = ({
   socialMediaLinks?: SocialMediaLinkType[];
   contactLinks?: SocialMediaLinkType[];
   coverageStates?: number[];
+  studies?: StudyType[];
 }) => {
   const tabItems = [
     Boolean(lineOfBusiness?.length) && {
@@ -102,6 +105,12 @@ export const getTabItems = ({
       key: "12",
       label: "Coberturas",
       component: "OrganizationCoverageLists",
+      children: undefined,
+    },
+    Boolean(studies?.length) && {
+      key: "13",
+      label: "Licencias y Certificaciones",
+      component: "OrganizationStudies",
       children: undefined,
     },
   ];

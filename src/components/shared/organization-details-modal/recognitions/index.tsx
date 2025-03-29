@@ -1,10 +1,13 @@
-import { RecognitionType } from "@/lib/sektor-api/__generated__/types";
+import {
+  RecognitionType,
+  StudyType,
+} from "@/lib/sektor-api/__generated__/types";
 import { cn } from "@/utils/class-name";
 import React from "react";
 
 interface OrganizationRecognitionsProps
   extends React.HTMLAttributes<HTMLDivElement> {
-  recognitions: RecognitionType[];
+  recognitions: RecognitionType[] | StudyType[];
   label?: string;
 }
 
@@ -24,11 +27,16 @@ const OrganizationRecognitions = ({
       </h3>
 
       <ul className="list-disc list-inside w-full my-4 lg:text-base">
-        {recognitions.map(({ id, title = "", giver = "" }, index) => (
-          <li key={`${id}-${index}`}>
-            {giver ? `${title} - ${giver}` : title}
-          </li>
-        ))}
+        {recognitions?.map(
+          ({ id, title = "", giver = "", institution = "" }, index) => {
+            const aux = giver || institution || "";
+            return (
+              <li key={`${id}-${index}`}>
+                {aux ? `${title} - ${aux}` : title}
+              </li>
+            );
+          }
+        )}
       </ul>
     </section>
   );

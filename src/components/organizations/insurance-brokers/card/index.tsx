@@ -46,8 +46,8 @@ const InsuranceBrokerCard = ({
         width={500}
         height={400}
       />
-      <div className="w-full p-2 text-xs rounded-b-2xl border border-blue-500 border-opacity-20 h-full flex flex-col justify-between gap-1 md:text-sm md:gap-2 md:p-4 2xl:text-base">
-        <h3 className="w-full">{name}</h3>
+      <div className="w-full p-2 text-xs rounded-b-2xl border border-blue-500 border-opacity-20 flex flex-col justify-between gap-1 md:text-sm md:gap-2 md:p-4 2xl:text-base">
+        <h3 className="w-full truncate">{name}</h3>
         <div className="w-full flex justify-between items-center">
           <OrganizationModality modality={data?.modality} />
           <LineOfBusiness lineOfBusiness={data?.lineOfBusiness} />
