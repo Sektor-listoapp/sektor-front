@@ -223,6 +223,11 @@ const InsuranceCompanyForm = () => {
       };
     });
 
+    const coverageStates =
+      formattedOffices?.map(
+        (office: OrganizationOfficeInputType) => office?.address?.stateId
+      ) || [];
+
     updateCompany({
       variables: {
         input: {
@@ -236,7 +241,7 @@ const InsuranceCompanyForm = () => {
           identification: `${input?.identificationType}${input?.identification}`,
           motto: input?.motto,
           offices: formattedOffices,
-          coverageStates: company?.coverageStates || [],
+          coverageStates: coverageStates || [],
           modality: company?.modality,
           logoUrl: input?.logoUrl,
           contact: formattedContact,

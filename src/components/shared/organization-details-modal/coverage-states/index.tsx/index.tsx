@@ -33,14 +33,14 @@ const OrganizationCoverageStates = ({
   return (
     <section className="w-full mt-5">
       {!showOfficesList && (
-        <div className="w-full text-blue-500 grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-10 h-96 overflow-y-auto px-5">
-          {Object.entries(coverageStates)?.map(([location, offices], index) => {
+        <div className="w-full text-blue-500 grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-10 overflow-y-auto px-5">
+          {Object?.entries(coverageStates)?.map(([location, offices], index) => {
             const imageSrc = offices[0]?.photoUrl || "/images/placeholder.png";
             return (
               <div
                 key={`office-${index}`}
                 className={cn(
-                  "w-full rounded-2xl mx-auto font-century-gothic flex flex-col max-w-sm justify-between relative md:max-w-80 2xl:max-w-96 2xl:h-80 md:hover:shadow-xl md:hover:cursor-pointer transition-shadow duration-300 md:active:shadow-sm"
+                  "w-full rounded-2xl mx-auto font-century-gothic flex flex-col max-w-sm justify-between relative md:max-w-80 2xl:max-w-96 md:hover:shadow-xl md:hover:cursor-pointer transition-shadow duration-300 md:active:shadow-sm"
                 )}
                 onClick={() => {
                   setShowOfficesList(true);
@@ -48,14 +48,14 @@ const OrganizationCoverageStates = ({
                 }}
               >
                 <Image
-                  className="w-full h-full object-cover object-center 2xl:h-72 rounded-t-2xl"
+                  className="w-full object-cover object-center h-72 rounded-t-2xl relative"
                   src={imageSrc}
                   alt={location}
                   width={500}
                   height={400}
                 />
-                <div className="w-full shadow-lg p-2 py-4 text-base rounded-b-2xl border border-blue-500 border-opacity-20 h-full flex justify-start items-center gap-1 md:gap-2">
-                  <h3 className="w-full">{location}</h3>
+                <div className="w-full shadow-lg p-2 py-4 text-base rounded-b-2xl border border-blue-500 border-opacity-20 flex justify-start items-center gap-1 md:gap-2">
+                  <h3 className="w-full truncate text-sm">{location}</h3>
                 </div>
               </div>
             );
