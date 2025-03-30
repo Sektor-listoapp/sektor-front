@@ -14,8 +14,10 @@ export const QUOTES_QUERY = gql`
       items {
         id
         lineOfBusiness
-        comments
         read
+        rating
+        createdAt
+        updatedAt
         customer {
           id
           name
