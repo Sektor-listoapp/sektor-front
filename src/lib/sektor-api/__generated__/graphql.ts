@@ -44,6 +44,56 @@ export type AdminType = {
   verifiedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
+/** Auto coverages options */
+export enum AutoCoverages {
+  BasicThirdPartyLiability = 'BasicThirdPartyLiability',
+  BasicThirdPartyLiabilityPlusTowingService = 'BasicThirdPartyLiabilityPlusTowingService',
+  ComprehensiveCoverage = 'ComprehensiveCoverage',
+  TotalLossCoverage = 'TotalLossCoverage'
+}
+
+export type AutoQuoteInputType = {
+  cityId: Scalars['Int']['input'];
+  comments?: InputMaybe<Scalars['String']['input']>;
+  coverage: AutoCoverages;
+  customer: QuoteCustomerInputType;
+  id?: InputMaybe<Scalars['String']['input']>;
+  make: Scalars['String']['input'];
+  model: Scalars['String']['input'];
+  organizationId: Scalars['String']['input'];
+  usageType: AutoUsageTypes;
+  version: Scalars['String']['input'];
+  year: Scalars['Int']['input'];
+};
+
+export type AutoQuoteType = {
+  __typename?: 'AutoQuoteType';
+  city: QuoteCityType;
+  coverage: AutoCoverages;
+  createdAt: Scalars['DateTime']['output'];
+  customer: QuoteCustomerType;
+  id: Scalars['String']['output'];
+  lineOfBusiness: QuoteLineOfBusiness;
+  make: Scalars['String']['output'];
+  model: Scalars['String']['output'];
+  organization: PublicOrganizationType;
+  rating?: Maybe<Scalars['Float']['output']>;
+  read: Scalars['Boolean']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  usageType: AutoUsageTypes;
+  version: Scalars['String']['output'];
+  year: Scalars['Int']['output'];
+};
+
+/** Auto usage types */
+export enum AutoUsageTypes {
+  Cargo = 'Cargo',
+  Motorcycle = 'Motorcycle',
+  Personal = 'Personal',
+  Pickup = 'Pickup',
+  Rustic = 'Rustic'
+}
+
 export type BrokerageSocietyContactInputType = {
   name: Scalars['String']['input'];
   phone: Scalars['String']['input'];
@@ -251,6 +301,41 @@ export type ExclusiveAgentType = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type HealthQuoteInputType = {
+  cityId: Scalars['Int']['input'];
+  comments?: InputMaybe<Scalars['String']['input']>;
+  customer: QuoteCustomerInputType;
+  dateOfBirth: Scalars['String']['input'];
+  dental: Scalars['Boolean']['input'];
+  funeral: Scalars['Boolean']['input'];
+  id?: InputMaybe<Scalars['String']['input']>;
+  maternity: Scalars['Boolean']['input'];
+  organizationId: Scalars['String']['input'];
+  primaryCare: Scalars['Boolean']['input'];
+  upToInsuranceAmount: Scalars['Int']['input'];
+  vision: Scalars['Boolean']['input'];
+};
+
+export type HealthQuoteType = {
+  __typename?: 'HealthQuoteType';
+  city: QuoteCityType;
+  createdAt: Scalars['DateTime']['output'];
+  customer: QuoteCustomerType;
+  dateOfBirth: Scalars['String']['output'];
+  dental: Scalars['Boolean']['output'];
+  funeral: Scalars['Boolean']['output'];
+  id: Scalars['String']['output'];
+  lineOfBusiness: QuoteLineOfBusiness;
+  maternity: Scalars['Boolean']['output'];
+  organization: PublicOrganizationType;
+  primaryCare: Scalars['Boolean']['output'];
+  rating?: Maybe<Scalars['Float']['output']>;
+  read: Scalars['Boolean']['output'];
+  upToInsuranceAmount: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  vision: Scalars['Boolean']['output'];
+};
+
 export type InsuranceBrokerFilterType = {
   address?: InputMaybe<PublicOrganizationFilterAddressType>;
   ageRange?: InputMaybe<Array<Scalars['Float']['input']>>;
@@ -413,6 +498,14 @@ export type Mutation = {
   registerAsInsuranceBroker: RegisterAsOrganizationResponseType;
   registerAsInsuranceCompany: RegisterAsOrganizationResponseType;
   registerAsSupplier: RegisterAsOrganizationResponseType;
+  requestAutoQuote: AutoQuoteType;
+  requestHealthQuote: HealthQuoteType;
+  requestOtherQuote: OtherQuoteType;
+  requestPropertyQuote: PropertyQuoteType;
+  saveAutoQuote: AutoQuoteType;
+  saveHealthQuote: HealthQuoteType;
+  saveOtherQuote: OtherQuoteType;
+  savePropertyQuote: PropertyQuoteType;
   sendPasswordResetRequest: Scalars['Boolean']['output'];
   sendVerificationEmail: Scalars['Boolean']['output'];
   updateBrokerageSociety: BrokerageSocietyType;
@@ -501,6 +594,46 @@ export type MutationRegisterAsInsuranceCompanyArgs = {
 
 export type MutationRegisterAsSupplierArgs = {
   input: RegisterAsSupplierInputType;
+};
+
+
+export type MutationRequestAutoQuoteArgs = {
+  input: AutoQuoteInputType;
+};
+
+
+export type MutationRequestHealthQuoteArgs = {
+  input: HealthQuoteInputType;
+};
+
+
+export type MutationRequestOtherQuoteArgs = {
+  input: OtherQuoteInputType;
+};
+
+
+export type MutationRequestPropertyQuoteArgs = {
+  input: PropertyQuoteInputType;
+};
+
+
+export type MutationSaveAutoQuoteArgs = {
+  input: AutoQuoteInputType;
+};
+
+
+export type MutationSaveHealthQuoteArgs = {
+  input: HealthQuoteInputType;
+};
+
+
+export type MutationSaveOtherQuoteArgs = {
+  input: OtherQuoteInputType;
+};
+
+
+export type MutationSavePropertyQuoteArgs = {
+  input: PropertyQuoteInputType;
 };
 
 
@@ -687,11 +820,58 @@ export enum OrganizationTypes {
   Supplier = 'Supplier'
 }
 
+export type OtherQuoteInputType = {
+  cityId: Scalars['Int']['input'];
+  comments: Scalars['String']['input'];
+  customer: QuoteCustomerInputType;
+  id?: InputMaybe<Scalars['String']['input']>;
+  organizationId: Scalars['String']['input'];
+};
+
+export type OtherQuoteType = {
+  __typename?: 'OtherQuoteType';
+  city: QuoteCityType;
+  comments: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  customer: QuoteCustomerType;
+  id: Scalars['String']['output'];
+  lineOfBusiness: QuoteLineOfBusiness;
+  organization: PublicOrganizationType;
+  rating?: Maybe<Scalars['Float']['output']>;
+  read: Scalars['Boolean']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type PaginationType = {
   limit: Scalars['Int']['input'];
   offset: Scalars['Int']['input'];
   sortField?: InputMaybe<Scalars['String']['input']>;
   sortOrder?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PropertyQuoteInputType = {
+  cityId: Scalars['Int']['input'];
+  comments?: InputMaybe<Scalars['String']['input']>;
+  customer: QuoteCustomerInputType;
+  id?: InputMaybe<Scalars['String']['input']>;
+  industryAndCommerce: Scalars['Boolean']['input'];
+  organizationId: Scalars['String']['input'];
+  residentialComplex: Scalars['Boolean']['input'];
+};
+
+export type PropertyQuoteType = {
+  __typename?: 'PropertyQuoteType';
+  city: QuoteCityType;
+  createdAt: Scalars['DateTime']['output'];
+  customer: QuoteCustomerType;
+  id: Scalars['String']['output'];
+  industryAndCommerce: Scalars['Boolean']['output'];
+  lineOfBusiness: QuoteLineOfBusiness;
+  organization: PublicOrganizationType;
+  rating?: Maybe<Scalars['Float']['output']>;
+  read: Scalars['Boolean']['output'];
+  residentialComplex: Scalars['Boolean']['output'];
+  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type PublicOrganizationFilterAddressType = {
@@ -734,10 +914,14 @@ export type Query = {
   __typename?: 'Query';
   adminUserById?: Maybe<AdminType>;
   adminUsers: Array<AdminType>;
+  autoQuoteById: AutoQuoteType;
   customerById: CustomerType;
   getCountryByCode?: Maybe<CountryType>;
+  healthQuoteById: HealthQuoteType;
   organizationById: OrganizationType;
+  otherQuoteById: OtherQuoteType;
   profile: UserType;
+  propertyQuoteById: PropertyQuoteType;
   publicBrokerageSocieties: BrokerageSocietyPaginatedType;
   publicBrokerageSocietyById: BrokerageSocietyType;
   publicExclusiveAgentById: ExclusiveAgentType;
@@ -763,6 +947,11 @@ export type QueryAdminUserByIdArgs = {
 };
 
 
+export type QueryAutoQuoteByIdArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type QueryCustomerByIdArgs = {
   id: Scalars['String']['input'];
 };
@@ -773,7 +962,22 @@ export type QueryGetCountryByCodeArgs = {
 };
 
 
+export type QueryHealthQuoteByIdArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type QueryOrganizationByIdArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryOtherQuoteByIdArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryPropertyQuoteByIdArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -875,6 +1079,13 @@ export type QuoteCityType = {
   __typename?: 'QuoteCityType';
   id: Scalars['String']['output'];
   name: Scalars['String']['output'];
+};
+
+export type QuoteCustomerInputType = {
+  email: Scalars['String']['input'];
+  id?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  phone: Scalars['String']['input'];
 };
 
 export type QuoteCustomerType = {
