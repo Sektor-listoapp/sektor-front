@@ -62,16 +62,8 @@ const CompaniesHeader = ({
         />
         <Select
           options={[
-            {
-              label: "Buscar por",
-              value: "",
-              disabled: true,
-              hidden: true,
-            },
-            {
-              label: "Todos",
-              value: "",
-            },
+            { label: "Buscar por", value: "", disabled: true, hidden: true },
+            { label: "Todos", value: "" },
             ...ORGANIZATION_TYPE_SELECT_OPTIONS,
           ]}
           value={input.type}

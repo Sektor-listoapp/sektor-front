@@ -1,6 +1,7 @@
 import {
   OrganizationModality,
   OrganizationTypes,
+  QuoteLineOfBusiness,
   SocialMediaPlatform,
 } from "@/lib/sektor-api/__generated__/types";
 import {
@@ -19,6 +20,8 @@ const {
   Website,
   Whatsapp,
 } = SocialMediaPlatform;
+
+const { Auto, Health, Other, Property } = QuoteLineOfBusiness;
 
 const {
   InsuranceBroker,
@@ -83,6 +86,13 @@ export const SELECT_LINE_OF_BUSINESS_OPTIONS = [
   { label: "Aviación", value: AVIATION },
   { label: "Finanzas", value: FINANCIAL },
   { label: "Patrimoniales", value: PROPERTY },
+];
+
+export const QUOTE_LINE_OF_BUSINESS_OPTIONS = [
+  { label: "Salud", value: Health },
+  { label: "Patrimoniales", value: Property },
+  { label: "Automóvil", value: Auto },
+  { label: "Otros", value: Other },
 ];
 
 export const SELECT_SUPPLIER_SERVICE_OPTIONS = [

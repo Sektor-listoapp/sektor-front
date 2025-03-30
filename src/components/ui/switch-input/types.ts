@@ -8,6 +8,7 @@ export interface SwitchInputProps
   icon: IconDefinition;
   iconProps?: Omit<FontAwesomeIconProps, "icon">;
   error?: boolean;
+  readOnly?: boolean;
   label: string;
   errors?: string[];
   switchProps?: SwitchProps & React.RefAttributes<HTMLButtonElement>;

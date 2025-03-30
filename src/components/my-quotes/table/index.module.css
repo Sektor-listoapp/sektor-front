@@ -11,3 +11,11 @@
 .table div div ul li[class*="ant-pagination-item-active"] a {
   color: #fff !important;
 }
+
+.green {
+  color: #4caf50 !important;
+}
+
+.red {
+  color: #ff0000 !important;
+}

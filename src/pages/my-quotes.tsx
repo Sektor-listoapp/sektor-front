@@ -7,11 +7,12 @@ import { UserGroups } from "@/lib/sektor-api/__generated__/types";
 import { useRouter } from "next/router";
 import { ROUTES } from "@/constants/router";
 import QuoteList from "@/components/my-quotes";
+import QuoteDetailsModal from "@/components/shared/quote-details-modal";
 
 const { Customer } = UserGroups;
 
 const MyQuotes = () => {
-  const { push } = useRouter();
+  const { push, isReady, query } = useRouter();
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
   const isCustomer = userGroup === Customer;
 
@@ -29,6 +30,7 @@ const MyQuotes = () => {
       <main className="text-blue-500 w-11/12 max-w-screen-xl flex flex-col items-center justify-center gap-10 py-5 !font-century-gothic pb-32">
         <QuoteList />
       </main>
+      {isReady && query?.quote && <QuoteDetailsModal />}
     </div>
   );
 };

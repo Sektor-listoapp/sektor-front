@@ -9,6 +9,7 @@ import styles from "./index.module.css";
 
 interface SelectMultipleProps {
   wrapperClassName?: string;
+  subWrapperClassName?: string;
   selectProps: SelectProps;
   icon?: IconDefinition;
   error?: boolean;
@@ -21,6 +22,7 @@ const SelectMultiple = ({
   error = false,
   errors = [],
   wrapperClassName,
+  subWrapperClassName,
 }: SelectMultipleProps) => {
   const {
     className: selectClassName,
@@ -30,7 +32,7 @@ const SelectMultiple = ({
 
   return (
     <div className={cn("relative w-full", wrapperClassName)}>
-      <div className={"relative w-full"}>
+      <div className={cn("relative w-full", subWrapperClassName)}>
         {icon && (
           <FontAwesomeIcon
             size="lg"

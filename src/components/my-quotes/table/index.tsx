@@ -1,11 +1,15 @@
 import React from "react";
 import { Table } from "antd";
-import Switch from "@/components/ui/switch";
 import styles from "./index.module.css";
 import { cn } from "@/utils/class-name";
 import { ColumnProps } from "antd/es/table";
 import dayjs from "dayjs";
-import { QuoteType } from "@/lib/sektor-api/__generated__/types";
+import {
+  QuoteCustomerType,
+  QuoteType,
+} from "@/lib/sektor-api/__generated__/types";
+import { toast } from "react-toastify";
+import { useRouter } from "next/router";
 
 interface QuotesTableProps {
   data: QuoteType[];
@@ -13,33 +17,41 @@ interface QuotesTableProps {
 }
 
 const QuotesTable = ({ data, disabled }: QuotesTableProps) => {
+  const { replace } = useRouter();
+
   const columns: ColumnProps<QuoteType>[] = [
     {
       title: "Nombre",
-      dataIndex: "name",
+      dataIndex: "customer",
       key: "name",
-      render: (name: string) => {
+      render: ({ name }: QuoteCustomerType) => {
         return (
           <p className="cursor-pointer hover:text-blue-700 transition-all hover:scale-105">
-            {name}
+            {name ? name : "No disponible"}
           </p>
         );
       },
     },
     {
-      title: "Clicks",
-      dataIndex: "clicks",
-      key: "clicks",
-      className: "text-center",
-      render: (clicks: number | undefined) => {
-        return <p>{clicks ? clicks : 0}</p>;
-      },
+      title: "Telefono",
+      dataIndex: "customer",
+      key: "phone",
+      render: ({ phone }: QuoteCustomerType) => (
+        <span>{phone ? phone : "No disponible"}</span>
+      ),
     },
     {
-      title: "Fecha de creación",
+      title: "Correo electrónico",
+      dataIndex: "customer",
+      key: "email",
+      render: ({ email }: QuoteCustomerType) => (
+        <span>{email ? email : "No disponible"}</span>
+      ),
+    },
+    {
+      title: "Fecha de solicitud",
       dataIndex: "createdAt",
       key: "createdAt",
-      className: "text-center",
       render: (createdAt: string) => (
         <span>
           {createdAt ? dayjs(createdAt)?.format("DD/MM/YYYY") : "No disponible"}
@@ -47,22 +59,41 @@ const QuotesTable = ({ data, disabled }: QuotesTableProps) => {
       ),
     },
     {
-      title: "Correo electrónico",
-      dataIndex: "email",
-      key: "email",
-      className: "text-center",
-      render: (email: string | undefined) => (
-        <span>{email ? email : "No disponible"}</span>
-      ),
+      title: "Acciòn",
+      dataIndex: "id",
+      key: "action",
+      render: (id: string, record: QuoteType) => {
+        const { lineOfBusiness } = record;
+        const quoteQuery = `${lineOfBusiness || ""}-${id || ""}`;
+        const hasValidQuery = quoteQuery?.length > 5;
+
+        return (
+          <span
+            className="underline cursor-pointer"
+            onClick={() => {
+              if (disabled) return;
+              if (!hasValidQuery) {
+                toast.error(
+                  "No se pudo obtener la información de la cotización, por favor intenta de nuevo más tarde."
+                );
+                return;
+              }
+              replace({ query: { quote: quoteQuery } });
+            }}
+          >
+            Ver
+          </span>
+        );
+      },
     },
     {
-      title: "Activo",
-      dataIndex: "isActive",
-      key: "isActive",
-      render: (isActive: boolean) => (
-        <div className="w-full flex justify-center items-center">
-          <Switch disabled={disabled} checked={isActive} />
-        </div>
+      title: "Abierto",
+      dataIndex: "read",
+      key: "read",
+      render: (read: boolean) => (
+        <span className={cn(read ? styles.green : styles.red)}>
+          {read ? "Si" : "No"}
+        </span>
       ),
     },
   ];

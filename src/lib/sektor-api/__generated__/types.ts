@@ -66,6 +66,7 @@ export type AutoQuoteInputType = {
 export type AutoQuoteType = {
   __typename?: 'AutoQuoteType';
   city: QuoteCityType;
+  comments?: Maybe<Scalars['String']['output']>;
   coverage: AutoCoverages;
   createdAt: Scalars['DateTime']['output'];
   customer: QuoteCustomerType;
@@ -316,6 +317,7 @@ export type HealthQuoteInputType = {
 export type HealthQuoteType = {
   __typename?: 'HealthQuoteType';
   city: QuoteCityType;
+  comments?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   customer: QuoteCustomerType;
   dateOfBirth: Scalars['String']['output'];
@@ -859,6 +861,7 @@ export type PropertyQuoteInputType = {
 export type PropertyQuoteType = {
   __typename?: 'PropertyQuoteType';
   city: QuoteCityType;
+  comments?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   customer: QuoteCustomerType;
   id: Scalars['String']['output'];
@@ -1119,6 +1122,7 @@ export type QuotePaginatedType = {
 export type QuoteType = {
   __typename?: 'QuoteType';
   city: QuoteCityType;
+  comments?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   customer: QuoteCustomerType;
   id: Scalars['String']['output'];
