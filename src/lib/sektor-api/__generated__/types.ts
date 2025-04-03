@@ -222,10 +222,8 @@ export type CountryType = {
 
 export type CustomerInputType = {
   birthdate?: InputMaybe<Scalars['DateTime']['input']>;
-  email: Scalars['String']['input'];
   id?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
-  password: Scalars['String']['input'];
   sex: Sexes;
 };
 
