@@ -14,11 +14,7 @@ import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo
 import { CUSTOMER_BY_ID_QUERY } from "@/lib/sektor-api/queries/auth/customer-by-id";
 import DatePicker from "@/components/ui/date-picker";
 import dayjs from "dayjs";
-import {
-  faPerson,
-  faPersonHalfDress,
-  faUser,
-} from "@fortawesome/free-solid-svg-icons";
+import { faPerson, faPersonHalfDress } from "@fortawesome/free-solid-svg-icons";
 
 const CustomerForm = () => {
   const userId = useAuthStore(useShallow((state) => state.user?.id));
@@ -37,24 +33,21 @@ const CustomerForm = () => {
 
   const [input, setInput] = useState({
     name: "",
-    email: "",
     birthDate: "",
     sex: "",
   });
 
   useEffect(() => {
-    const { name, email, sex, birthdate } = customerData || {};
+    const { name, sex, birthdate } = customerData || {};
     setInput({
       sex: sex || "",
       name: name || "",
-      email: email || "",
       birthDate: birthdate || "",
     });
   }, [customerData]);
 
   const requiredFields = {
     name: Boolean(input?.name?.trim()?.length),
-    email: Boolean(input?.email?.trim()?.length),
     birthDate: Boolean(input?.birthDate?.trim()?.length),
     sex: Boolean(input?.sex?.trim()?.length),
   };
@@ -91,7 +84,6 @@ const CustomerForm = () => {
           id: userId,
           sex: input?.sex,
           name: input?.name,
-          email: input?.email,
           birthdate: input?.birthDate,
         },
       },
@@ -130,17 +122,6 @@ const CustomerForm = () => {
           disabled={customerLoading || isUpdatingCustomer}
           onChange={(e) => handleInputChange("name", e.target.value)}
           value={input?.name}
-        />
-        <TextInput
-          name="email"
-          className="col-span-1"
-          icon={faUser}
-          type="email"
-          placeholder="Correo electrónico"
-          error={!requiredFields.email}
-          disabled={customerLoading || isUpdatingCustomer}
-          onChange={(e) => handleInputChange("email", e.target.value)}
-          value={input?.email}
         />
         <DatePicker
           name="birthdate"
