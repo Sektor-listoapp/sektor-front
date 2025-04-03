@@ -8,3 +8,4 @@ export * from "./social-media-link-fields";
 export * from "./brokerage-society-fields";
 export * from "./public-organization-fields";
 export * from "./quotes";
+export * from "./customer-fields";

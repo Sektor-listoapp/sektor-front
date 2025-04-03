@@ -1,3 +1,4 @@
+export * from "./my-account/update-customer";
 export * from "./my-account/update-brokerage-society";
 export * from "./my-account/update-exclusive-agent";
 export * from "./my-account/update-insurance-broker";

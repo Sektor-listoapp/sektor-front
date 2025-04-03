@@ -21,14 +21,14 @@ const QuoteList = () => {
   };
   const { error: quotesError, refetch: getQuotes } = useQuery<Query>(
     QUOTES_QUERY,
-    { variables: defaultVariables, fetchPolicy: "no-cache" }
+    { fetchPolicy: "no-cache", nextFetchPolicy: "no-cache" }
   );
 
   const disableActions = isLoadingQuotes;
 
-  const handleGetQuotes = (variables = {}) => {
+  const handleGetQuotes = (variables?) => {
     setIsLoadingQuotes(true);
-    const hasVariables = Object.keys(variables).length > 0;
+    const hasVariables = Boolean(variables?.filter);
     const queryVariables = hasVariables ? variables : defaultVariables;
     getQuotes(queryVariables)
       .then((res) => setQuotes(res?.data?.quotes?.items || []))

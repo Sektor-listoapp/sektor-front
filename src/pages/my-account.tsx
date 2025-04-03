@@ -13,6 +13,7 @@ import {
   Query,
   UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
+import CustomerForm from "@/components/my-account/customer-form";
 
 const { Admin, Customer } = UserGroups;
 
@@ -28,11 +29,11 @@ const MyAccount = () => {
     loading,
   } = useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
     variables: { id: userId },
-    skip: userGroup === Customer,
+    skip: isCustomer,
   });
 
   const organizationData = organizationDataResponse?.organizationById;
-  const UserForm = USER_FORM[organizationData?.type || ""];
+  const OrganizationForm = USER_FORM[organizationData?.type || ""];
 
   return (
     <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start gap-8  overflow-hidden">
@@ -67,7 +68,8 @@ const MyAccount = () => {
             </header>
           )}
 
-          {Boolean(UserForm) && <UserForm />}
+          {isCustomer && <CustomerForm />}
+          {Boolean(OrganizationForm) && <OrganizationForm />}
         </main>
       )}
     </div>

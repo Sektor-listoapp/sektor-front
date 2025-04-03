@@ -1,14 +1,13 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Select from "@/components/ui/select";
 import TextInput from "@/components/ui/text-input";
 import { QUOTE_LINE_OF_BUSINESS_OPTIONS } from "@/constants/forms";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import { faClose, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { pickBy } from "lodash";
 import DatePicker from "@/components/ui/date-picker";
 import dayjs from "dayjs";
-import { useDebounce } from "@uidotdev/usehooks";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 interface QuotesHeaderProps {
   handleGetQuotes: (variables?) => void;
@@ -17,24 +16,24 @@ interface QuotesHeaderProps {
 
 interface InputState {
   lineOfBusiness?: string;
+  customerName?: string;
   dateFrom?: string;
   read?: string;
 }
 
 const QuotesHeader = ({
-  handleGetQuotes: handleGetQuotes,
+  handleGetQuotes,
   disabled = false,
 }: QuotesHeaderProps) => {
   const [input, setInput] = useState<InputState>({
     lineOfBusiness: "",
+    customerName: "",
     dateFrom: "",
     read: "",
   });
-  const { dateFrom, lineOfBusiness, read } = input;
-  const [customerName, setCustomerName] = useState<string>("");
-  const debouncedCustomerName = useDebounce(customerName, 1000);
 
-  const handleSearchQuotes = () => {
+  const getCleanedVariables = () => {
+    const { dateFrom, lineOfBusiness, read, customerName } = input || {};
     const formattedInput = {
       customerName: customerName ? customerName?.trim() : null,
       dateFrom: dateFrom ? dateFrom : null,
@@ -42,14 +41,16 @@ const QuotesHeader = ({
       lineOfBusinesses: lineOfBusiness ? [lineOfBusiness] : null,
     };
     const cleanedInput = pickBy(formattedInput, (value) => value !== null);
-    const hasValidInput = Object.keys(cleanedInput).length > 0;
-    const variables = hasValidInput ? { filter: { ...cleanedInput } } : {};
-    handleGetQuotes(variables);
+    const isValidInput = Object?.keys(cleanedInput)?.length > 0;
+    return { filter: isValidInput ? cleanedInput : {} };
   };
 
-  useEffect(() => {
-    handleSearchQuotes();
-  }, [dateFrom, lineOfBusiness, read, debouncedCustomerName]);
+  const cleanedVariables = useMemo(
+    () => getCleanedVariables(),
+    [input.dateFrom, input.lineOfBusiness, input.read]
+  );
+
+  useEffect(() => handleGetQuotes(cleanedVariables), [cleanedVariables]);
 
   return (
     <header className="w-full flex flex-col items-center justify-center gap-4 max-w-xl text-blue-500 xl:flex-row xl:justify-between xl:max-w-full">
@@ -58,28 +59,38 @@ const QuotesHeader = ({
           Mis cotizaciones
         </h1>
       </div>
-      <form
-        className="xl:flex gap-4 w-full md:mx-auto justify-stretch items-center grid grid-cols-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSearchQuotes();
-        }}
-      >
+      <div className="xl:flex gap-4 w-full md:mx-auto justify-stretch items-center grid grid-cols-4">
         <TextInput
           placeholder="Buscar por nombre"
           wrapperClassName="w-full xl:w-72 col-span-4 sm:col-span-2"
           className="w-full xl:w-72"
           icon={faSearch}
           iconPosition="end"
-          value={customerName}
+          value={input?.customerName}
           disabled={disabled}
-          onChange={(e) => setCustomerName(e.target.value)}
+          onChange={(e) =>
+            setInput({ ...input, customerName: e.target?.value })
+          }
+          onKeyDown={(e) => {
+            if (e?.key === "Enter") {
+              const cleanedVariables = getCleanedVariables();
+              handleGetQuotes(cleanedVariables);
+            }
+          }}
         />
         <DatePicker
-          wrapperClassName="w-full xl:w-44 col-span-4 sm:col-span-2"
-          className="w-full xl:w-44"
+          wrapperClassName="w-full xl:w-48 col-span-4 sm:col-span-2"
+          className="w-full xl:w-48"
           placeholder="Fecha"
-          allowClear={true}
+          allowClear={{
+            clearIcon: (
+              <FontAwesomeIcon
+                icon={faClose}
+                size="2x"
+                className="text-blue-500"
+              />
+            ),
+          }}
           disabled={disabled}
           onChange={(_, dateString) => {
             setInput((prev) => ({ ...prev, dateFrom: dateString as string }));
@@ -134,7 +145,7 @@ const QuotesHeader = ({
             })
           }
         />
-      </form>
+      </div>
     </header>
   );
 };

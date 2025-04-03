@@ -32,9 +32,8 @@ const DatePicker = ({
             styles.datePicker,
             className,
             error && styles.datePickerError,
-            {
-              "!ps-5": !showIcon,
-            }
+            props?.allowClear && styles.showSuffix,
+            { "!ps-5": !showIcon }
           )}
           {...props}
         />
