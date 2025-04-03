@@ -125,16 +125,20 @@ const CustomerForm = () => {
         />
         <DatePicker
           name="birthdate"
-          placeholder="Fecha de nacimiento"
+          placeholder={
+            input?.birthDate
+              ? dayjs(input?.birthDate).format("MM/DD/YYYY")
+              : "Fecha de nacimiento"
+          }
           disabled={customerLoading || isUpdatingCustomer}
           error={!requiredFields.birthDate}
-          value={input?.birthDate ? dayjs(input?.birthDate) : undefined}
-          maxDate={dayjs()}
+          maxDate={dayjs().subtract(18, "year")}
           format="DD/MM/YYYY"
           onChange={(_, dateString) => {
             handleInputChange("birthDate", dateString);
           }}
         />
+
         <Select
           name="sex"
           value={input?.sex}
