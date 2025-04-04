@@ -23,7 +23,7 @@ const Organizations = () => {
   return (
     <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start overflow-hidden">
       <HeroBanner />
-      <main className="text-blue-500 w-full max-w-screen-xl flex flex-col items-center justify-center gap-8 py-10 px-7 2xl:px-0">
+      <main className="text-blue-500 w-full max-w-screen-xl flex flex-col items-center justify-center gap-8 py-10 px-7 pb-36 2xl:px-0">
         <Searchbar />
         {isLoadingPublicOrganizations ? (
           <div className="w-full transition-all py-20 lg:py-10">
