@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Button from "@/components/ui/button";
 import { Tabs, TabsProps } from "antd";
 import { PUBLIC_BROKERAGE_SOCIETY_BY_ID_QUERY } from "@/lib/sektor-api/queries";
@@ -21,11 +21,13 @@ import {
 } from "@/lib/sektor-api/__generated__/types";
 import BasicOrganizationOffices from "../basic-organization-offices";
 import { ROUTES } from "@/constants/router";
+import ContactDetailsModal from "../contact-details-modal";
 
 const BrokerageSocietyDetails = () => {
   const router = useRouter();
   const detailsQuery = router?.query?.details as string;
   const orgId = detailsQuery?.split("-")?.[1] || "";
+  const [openContactDetailsModal, setOpenContactDetailsModal] = useState(false);
 
   const {
     data,
@@ -92,7 +94,7 @@ const BrokerageSocietyDetails = () => {
   }
 
   return (
-    <section className="w-full grid grid-cols-6 gap-6 overflow-x-hidden lg:gap-12 lg:p-5 lg:pb-0">
+    <section className="w-full grid grid-cols-6 gap-6 overflow-x-hidden lg:gap-12 lg:p-5 lg:pb-10">
       <section className="col-span-6 w-full flex flex-col gap-6 lg:col-span-2">
         <header className="w-full flex flex-col gap-2 text-xl text-blue-500 font-century-gothic font-semibold md:text-center lg:hidden">
           <h2 className="w-full">{name}</h2>
@@ -113,6 +115,19 @@ const BrokerageSocietyDetails = () => {
         {Boolean(insuranceCompanies?.length > 0) && (
           <OrganizationsSlider organizations={insuranceCompanies} />
         )}
+
+        <Button
+          variant="link-blue"
+          className="w-fit"
+          onClick={() => setOpenContactDetailsModal(true)}
+        >
+          Ver contacto
+        </Button>
+        <ContactDetailsModal
+          contact={brokerageSocietyData}
+          open={openContactDetailsModal}
+          setOpen={setOpenContactDetailsModal}
+        />
       </section>
 
       <div className="col-span-6 w-full lg:col-span-4">

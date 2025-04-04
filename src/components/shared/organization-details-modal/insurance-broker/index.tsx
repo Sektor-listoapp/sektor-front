@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
 import { PUBLIC_INSURANCE_BROKER_BY_ID_QUERY } from "@/lib/sektor-api/queries";
 import { useQuery } from "@apollo/client";
@@ -21,11 +21,13 @@ import OrganizationFlipCard from "../flip-card";
 import { getTabItems } from "../utils";
 import OrganizationsSlider from "../organizations-slider";
 import { ROUTES } from "@/constants/router";
+import ContactDetailsModal from "../contact-details-modal";
 
 const InsuranceBrokerDetails = () => {
   const router = useRouter();
   const detailsQuery = router?.query?.details as string;
   const orgId = detailsQuery?.split("-")?.[1] || "";
+  const [openContactDetailsModal, setOpenContactDetailsModal] = useState(false);
 
   const {
     data,
@@ -68,9 +70,7 @@ const InsuranceBrokerDetails = () => {
     OrganizationRecognitions: (
       <OrganizationRecognitions recognitions={recognitions} />
     ),
-    OrganizationStudies: (
-      <OrganizationRecognitions recognitions={studies} />
-    ),
+    OrganizationStudies: <OrganizationRecognitions recognitions={studies} />,
   };
 
   const tabItems = getTabItems({
@@ -102,7 +102,7 @@ const InsuranceBrokerDetails = () => {
   }
 
   return (
-    <section className="w-full grid grid-cols-6 gap-6 overflow-x-hidden lg:gap-12 lg:p-5 lg:pb-0">
+    <section className="w-full grid grid-cols-6 gap-6 overflow-x-hidden lg:gap-12 lg:p-5 lg:pb-10">
       <section className="col-span-6 w-full flex flex-col gap-6 lg:col-span-2">
         <header className="w-full flex flex-col gap-2 text-xl text-blue-500 font-century-gothic font-semibold md:text-center lg:hidden">
           <h2 className="w-full">{heading}</h2>
@@ -123,6 +123,19 @@ const InsuranceBrokerDetails = () => {
         {Boolean(insuranceCompanies?.length > 0) && (
           <OrganizationsSlider organizations={insuranceCompanies} />
         )}
+
+        <Button
+          variant="link-blue"
+          className="w-fit"
+          onClick={() => setOpenContactDetailsModal(true)}
+        >
+          Ver contacto
+        </Button>
+        <ContactDetailsModal
+          contact={insuranceBrokerData}
+          open={openContactDetailsModal}
+          setOpen={setOpenContactDetailsModal}
+        />
       </section>
 
       <div className="col-span-6 w-full lg:col-span-4">
