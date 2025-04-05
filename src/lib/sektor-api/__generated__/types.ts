@@ -250,6 +250,15 @@ export enum DayOfWeek {
   Wednesday = 'Wednesday'
 }
 
+export enum EntityType {
+  Organization = 'Organization'
+}
+
+export enum EventType {
+  Click = 'Click',
+  View = 'View'
+}
+
 export type ExclusiveAgentFilterType = {
   address?: InputMaybe<PublicOrganizationFilterAddressType>;
   ageRange?: InputMaybe<Array<Scalars['Float']['input']>>;
@@ -276,7 +285,7 @@ export type ExclusiveAgentInputType = {
   logoUrl?: InputMaybe<Scalars['String']['input']>;
   modality: OrganizationModality;
   name: Scalars['String']['input'];
-  phone: Scalars['String']['input'];
+  phone?: InputMaybe<Scalars['String']['input']>;
   recognitions: Array<RecognitionInputType>;
   sex: Sexes;
   studies: Array<StudyInputType>;
@@ -299,6 +308,7 @@ export type ExclusiveAgentType = BasePublicOrganizationType & {
   coverageStates: Array<Scalars['Float']['output']>;
   createdAt: Scalars['DateTime']['output'];
   deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  email: Scalars['String']['output'];
   foundationYear?: Maybe<Scalars['Float']['output']>;
   id: Scalars['String']['output'];
   identification?: Maybe<Scalars['String']['output']>;
@@ -381,7 +391,7 @@ export type InsuranceBrokerInputType = {
   logoUrl?: InputMaybe<Scalars['String']['input']>;
   modality: OrganizationModality;
   name: Scalars['String']['input'];
-  phone: Scalars['String']['input'];
+  phone?: InputMaybe<Scalars['String']['input']>;
   recognitions: Array<RecognitionInputType>;
   sex: Sexes;
   studies: Array<StudyInputType>;
@@ -404,6 +414,7 @@ export type InsuranceBrokerType = BasePublicOrganizationType & {
   coverageStates: Array<Scalars['Float']['output']>;
   createdAt: Scalars['DateTime']['output'];
   deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  email: Scalars['String']['output'];
   foundationYear?: Maybe<Scalars['Float']['output']>;
   id: Scalars['String']['output'];
   identification?: Maybe<Scalars['String']['output']>;
@@ -962,7 +973,7 @@ export type Query = {
   quoteById?: Maybe<QuoteType>;
   quotes: QuotePaginatedType;
   searchOrganizations: OrganizationPaginatedType;
-  trackingByElementId: Array<TrackingType>;
+  trackingByEntityId: Array<TrackingType>;
   trackingByEventType: Array<TrackingType>;
   trackingById?: Maybe<TrackingType>;
 };
@@ -1087,13 +1098,13 @@ export type QuerySearchOrganizationsArgs = {
 };
 
 
-export type QueryTrackingByElementIdArgs = {
-  elementId: Scalars['String']['input'];
+export type QueryTrackingByEntityIdArgs = {
+  entityId: Scalars['String']['input'];
 };
 
 
 export type QueryTrackingByEventTypeArgs = {
-  eventType: Scalars['String']['input'];
+  eventType: EventType;
 };
 
 
@@ -1389,19 +1400,38 @@ export type TeamMemberType = {
 };
 
 export type TrackingInputType = {
-  elementId: Scalars['String']['input'];
-  eventType: Scalars['String']['input'];
-  user?: InputMaybe<Scalars['String']['input']>;
+  entityId: Scalars['String']['input'];
+  entityType: EntityType;
+  eventType: EventType;
+  user?: InputMaybe<TrackingUserInputType>;
 };
 
 export type TrackingType = {
   __typename?: 'TrackingType';
   _id: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
-  elementId: Scalars['String']['output'];
-  eventType: Scalars['String']['output'];
+  entityId: Scalars['String']['output'];
+  entityType: EntityType;
+  eventType: EventType;
   updatedAt: Scalars['DateTime']['output'];
-  user?: Maybe<Scalars['String']['output']>;
+  user?: Maybe<TrackingUserType>;
+};
+
+export type TrackingUserInputType = {
+  _id?: InputMaybe<Scalars['String']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  group: UserGroups;
+  name?: InputMaybe<Scalars['String']['input']>;
+  phone?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type TrackingUserType = {
+  __typename?: 'TrackingUserType';
+  _id?: Maybe<Scalars['String']['output']>;
+  email?: Maybe<Scalars['String']['output']>;
+  group: UserGroups;
+  name?: Maybe<Scalars['String']['output']>;
+  phone?: Maybe<Scalars['String']['output']>;
 };
 
 export type UpdatePasswordInputType = {
