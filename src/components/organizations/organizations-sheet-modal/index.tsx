@@ -35,7 +35,7 @@ const OrganizationsSheetModal = ({
     >
       <section className="flex flex-col items-center justify-center gap-5 text-blue-500 p-5 font-century-gothic w-full">
         <iframe
-          className="w-full h-[600px] md:h-[800px] border-0"
+          className="w-full h-[600px] border-0"
           src={organizationsSheetUrl}
           title="Organizations Sheet"
           allowFullScreen
