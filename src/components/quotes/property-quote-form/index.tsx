@@ -73,13 +73,10 @@ const PropertyQuoteForm = () => {
       spellCheck="false"
       autoComplete="off"
       onSubmit={handleFormSubmit}
-      className="w-full flex flex-col items-center gap-8 bg-blue-200 rounded-3xl px-2 p-8 max-w-4xl md:px-8"
+      className="w-full flex flex-col items-center gap-5"
     >
-      <header className="w-11/12 border-b border-b-blue-500 pb-4">
-        <h2 className="text-xl">Patrimoniales</h2>
-      </header>
-
-      <div className="w-11/12 grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="w-11/12 flex flex-col md:grid grid-cols-1 gap-5 md:grid-cols-2">
+        <h2 className="text-xl col-span-2">Patrimoniales</h2>
         <SwitchInput
           label="Industrial y comercio"
           disabled={loading}
@@ -105,7 +102,7 @@ const PropertyQuoteForm = () => {
       </div>
 
       <TextArea
-        className="w-full max-w-xl rounded-3xl"
+        className="w-11/12 max-w-xl rounded-3xl bg-gray-200"
         placeholder="Comentanos otros servicios que deseas cotizar..."
         allowClear
         required
@@ -115,7 +112,7 @@ const PropertyQuoteForm = () => {
         }
         styles={{
           textarea: {
-            minHeight: "250px",
+            minHeight: "100px",
             padding: "1rem",
             fontFamily: "Century Gothic",
           },

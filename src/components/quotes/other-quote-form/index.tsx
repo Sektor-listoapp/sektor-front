@@ -62,14 +62,11 @@ const OtherQuoteForm = () => {
       spellCheck="false"
       autoComplete="off"
       onSubmit={handleFormSubmit}
-      className="w-full flex flex-col items-center gap-8 bg-blue-200 rounded-3xl px-2 p-8 max-w-4xl md:px-8"
+      className="w-11/12 flex flex-col items-center gap-5"
     >
-      <header className="w-11/12 border-b border-b-blue-500 pb-4">
-        <h2 className="text-xl">Otros</h2>
-      </header>
-
+      <h2 className="text-xl w-full max-w-xl text-left">Otros</h2>
       <TextArea
-        className="w-full max-w-xl rounded-3xl"
+        className="w-full max-w-xl rounded-3xl bg-gray-200"
         placeholder="Comentanos los servicios que necesitas cotizar..."
         allowClear
         required
@@ -77,7 +74,7 @@ const OtherQuoteForm = () => {
         onChange={(e) => setComments(e.target.value)}
         styles={{
           textarea: {
-            minHeight: "250px",
+            minHeight: "200px",
             padding: "1rem",
             fontFamily: "Century Gothic",
           },

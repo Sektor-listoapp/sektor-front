@@ -96,7 +96,7 @@ const UserInfoForm = () => {
       spellCheck="false"
       autoComplete="off"
       onSubmit={handleFormSubmit}
-      className="w-full flex flex-col items-center gap-8 bg-blue-200 rounded-3xl px-2 p-8 max-w-md md:px-8"
+      className="w-11/12 flex flex-col items-center gap-4 max-w-lg mt-5"
     >
       <TextInput
         name="name"
@@ -170,8 +170,8 @@ const UserInfoForm = () => {
         icon={faSliders}
       />
 
-      <Button variant="solid-blue" className="w-full max-w-xs" type="submit">
-        Continuar
+      <Button variant="solid-blue" className="w-fit px-10 mt-5" type="submit">
+        Siguiente
       </Button>
     </form>
   );
