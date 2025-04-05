@@ -25,6 +25,7 @@ export const INSURANCE_BROKER_FIELDS_FRAGMENT = gql`
     identification
     license
     phone
+    email
     insuranceCompanies {
       ...InsuranceCompanyFields
     }

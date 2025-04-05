@@ -121,6 +121,7 @@ export type BrokerageSocietyContactInputType = {
 
 export type BrokerageSocietyContactType = {
   __typename?: 'BrokerageSocietyContactType';
+  email: Scalars['String']['output'];
   name: Scalars['String']['output'];
   phone: Scalars['String']['output'];
   position: Scalars['String']['output'];

@@ -13,6 +13,7 @@ export const BROKERAGE_SOCIETY_CONTACT_FIELDS_FRAGMENT = gql`
     name
     position
     phone
+    email
   }
 `;
 
