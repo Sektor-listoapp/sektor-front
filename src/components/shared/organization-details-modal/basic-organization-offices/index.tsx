@@ -41,7 +41,7 @@ const BasicOrganizationOffices = ({
             onClick={() => window.open(googleMapsUrl, "_blank")}
           >
             <Image
-              className="w-full h-full object-cover object-center 2xl:h-72 rounded-t-2xl"
+              className="w-full h-full object-cover object-center 2xl:h-72 2xl:min-h-72 rounded-t-2xl"
               src={office?.photoUrl || "/images/placeholder.png"}
               alt={office?.address?.state?.name}
               width={500}
