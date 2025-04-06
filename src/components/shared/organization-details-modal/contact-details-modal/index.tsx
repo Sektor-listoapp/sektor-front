@@ -86,7 +86,7 @@ const ContactDetailsModal = ({
         />
       }
     >
-      <section className="flex flex-col items-center justify-center gap-5 text-blue-500 p-5 px-16 font-century-gothic w-full">
+      <section className="flex flex-col items-center justify-center gap-5 text-blue-500 p-5 font-century-gothic w-full">
         <h3 className="text-center font-bold">Datos de contacto</h3>
 
         <div className="flex flex-col gap-4 w-full items-start text-lg">
@@ -96,7 +96,7 @@ const ContactDetailsModal = ({
           </div>
           <div className="flex gap-2 w-full items-center justify-start">
             <span>Correo:</span>
-            <b className="font-bold">
+            <b className="font-bold truncate">
               {email ? (email as string) : "No disponible"}
             </b>
           </div>
