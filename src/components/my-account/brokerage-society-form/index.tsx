@@ -1,7 +1,12 @@
-import React, { useEffect, useState } from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useEffect, useMemo, useState } from "react";
 import SelectMultiple from "@/components/ui/select-multiple";
 import TextInput from "@/components/ui/text-input";
-import { Mutation, Query } from "@/lib/sektor-api/__generated__/types";
+import {
+  Mutation,
+  OrganizationOfficeInputType,
+  Query,
+} from "@/lib/sektor-api/__generated__/types";
 import { useMutation, useQuery } from "@apollo/client";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
 import Select from "@/components/ui/select";
@@ -34,6 +39,7 @@ import LocalRecognitionsInput from "../local-recognitions-input";
 import LocalWorkTeamInput from "../local-work-team-input";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
 import LocalClientsInput from "../local-clients-input";
+import LocalOfficesInput from "../local-offices-input";
 
 const BrokerageSocietyForm = () => {
   const userId = useAuthStore(useShallow((state) => state.user?.id));
@@ -139,6 +145,20 @@ const BrokerageSocietyForm = () => {
   const [licenseType, license] = brokerageSociety?.license?.split("-") || [];
   const identification = brokerageSociety?.identification || "";
 
+  const formattedOffices = brokerageSociety?.offices?.map((office: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { __typename: _, address, ...restOfficeProps } = office;
+    return {
+      ...restOfficeProps,
+      address: {
+        cityId: address?.cityId || address?.city?.id,
+        countryId: address?.countryId || address?.country?.id,
+        stateId: address?.stateId || address?.state?.id,
+        street: address?.street,
+      },
+    };
+  });
+
   const [input, setInput] = useState({
     // required
     name: brokerageSociety?.name || "",
@@ -200,6 +220,11 @@ const BrokerageSocietyForm = () => {
       JSON.stringify(clients)
     );
 
+    window?.localStorage?.setItem(
+      "sektor-local-offices",
+      JSON.stringify(formattedOffices || [])
+    );
+
     setInput({
       name: brokerageSociety?.name || "",
       insuranceCompanies: insuranceCompaniesIds || [],
@@ -220,21 +245,23 @@ const BrokerageSocietyForm = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [brokerageSociety]);
 
-  const requiredFields = {
-    name: Boolean(input.name.trim().length),
-    insuranceCompanies: Boolean(input.insuranceCompanies.length),
-    license: Boolean(input.license.trim().length),
-    segment: Boolean(input.segment.length),
-    identification: Boolean(input.identification.trim().length),
-    modality: Boolean(input.modality.trim().length),
-    coverageState: Boolean(input.coverageState.length),
-    yearsOfExperience: Boolean(
-      input.yearsOfExperience?.trim()?.length &&
-        Number(input.yearsOfExperience) > 0
-    ),
-    phone: Boolean(input.phone.trim().length),
-    logoUrl: Boolean(input.logoUrl.trim().length),
-  };
+  const requiredFields = useMemo(() => {
+    return {
+      name: Boolean(input.name.trim().length),
+      insuranceCompanies: Boolean(input.insuranceCompanies.length),
+      license: Boolean(input.license.trim().length),
+      segment: Boolean(input.segment.length),
+      identification: Boolean(input.identification.trim().length),
+      modality: Boolean(input.modality.trim().length),
+      coverageState: Boolean(input.coverageState.length),
+      yearsOfExperience: Boolean(
+        input.yearsOfExperience?.trim()?.length &&
+          Number(input.yearsOfExperience) > 0
+      ),
+      phone: Boolean(input.phone.trim().length),
+      logoUrl: Boolean(input.logoUrl.trim().length),
+    };
+  }, [input]);
 
   const hasErrors = Object.values(requiredFields).some((field) => !field);
 
@@ -276,6 +303,21 @@ const BrokerageSocietyForm = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { __typename, ...contactData } = brokerageSociety?.contact || {};
 
+    const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
+    const formattedOffices = JSON.parse(offices).map((office: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { __typename: _, address, ...restOfficeProps } = office;
+      return {
+        ...restOfficeProps,
+        address: {
+          cityId: address?.cityId || address?.city?.id,
+          countryId: address?.countryId || address?.country?.id,
+          stateId: address?.stateId || address?.state?.id,
+          street: address?.street,
+        },
+      };
+    });
+
     updateBrokerageSociety({
       variables: {
         input: {
@@ -294,7 +336,7 @@ const BrokerageSocietyForm = () => {
           insuranceCompanies: input?.insuranceCompanies,
           license: `${input?.licenseType}${input?.license}`,
           identification: input?.identification,
-          offices: brokerageSociety?.offices,
+          offices: formattedOffices,
           contact: {
             ...contactData,
             phone: `${input?.phoneCode}${input?.phone}`,
@@ -494,6 +536,11 @@ const BrokerageSocietyForm = () => {
 
       <div className="w-full flex flex-col gap-7 md:gap-10 md:grid md:grid-cols-2">
         <h3 className="w-full font-bold col-span-2">Datos adicionales</h3>
+
+        <LocalOfficesInput
+          disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
+          offices={formattedOffices as unknown as OrganizationOfficeInputType[]}
+        />
 
         <LocalClientsInput
           clients={brokerageClients}

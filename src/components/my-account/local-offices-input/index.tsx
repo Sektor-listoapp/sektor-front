@@ -11,17 +11,24 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import LocalOfficeModal from "./office-modal";
 import { useQuery } from "@apollo/client";
 import { COUNTRY_BY_CODE_QUERY } from "@/lib/sektor-api/queries";
+import clsx from "clsx";
 
 interface LocalOfficesInputProps {
   offices: OrganizationOfficeInputType[];
+  error?: boolean;
   disabled?: boolean;
 }
 
-const LocalOfficesInput = ({ offices, disabled }: LocalOfficesInputProps) => {
+const LocalOfficesInput = ({
+  offices,
+  disabled,
+  error = false,
+}: LocalOfficesInputProps) => {
   const [localOffices, setLocalOffices] = useLocalStorage(
     "sektor-local-offices",
     offices ?? []
   );
+
   const { data: countryDataResponse, loading: isLoadingCountryData } =
     useQuery<Query>(COUNTRY_BY_CODE_QUERY, { variables: { code: "VE" } });
 
@@ -33,7 +40,6 @@ const LocalOfficesInput = ({ offices, disabled }: LocalOfficesInputProps) => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [offices]);
-
 
   const localOfficeOptions = useMemo(
     () =>
@@ -59,7 +65,12 @@ const LocalOfficesInput = ({ offices, disabled }: LocalOfficesInputProps) => {
 
   return (
     <>
-      <div className="w-full border rounded-xl h-[46px] overflow-hidden border-blue-500 relative flex justify-between items-center cursor-pointer px-4">
+      <div
+        className={clsx(
+          "w-full border rounded-xl h-[46px] overflow-hidden border-blue-500 relative flex justify-between items-center cursor-pointer px-4",
+          error && "border-red-500"
+        )}
+      >
         <span className="text-sm">Oficinas</span>
         <Select
           className="w-full absolute inset-0 h-full opacity-0"
@@ -72,7 +83,7 @@ const LocalOfficesInput = ({ offices, disabled }: LocalOfficesInputProps) => {
           optionRender={(option) => {
             return (
               <div className="flex items-center gap-3 justify-between p-2 bg-transparent">
-                {option?.data?.label}
+                <span className="truncate">{option?.data?.label}</span>
                 <FontAwesomeIcon
                   className="ml-auto cursor-pointer"
                   icon={faPen}
