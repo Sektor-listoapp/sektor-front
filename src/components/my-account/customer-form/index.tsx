@@ -12,8 +12,6 @@ import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import { SELECT_GENRE_OPTIONS } from "@/constants/forms";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
 import { CUSTOMER_BY_ID_QUERY } from "@/lib/sektor-api/queries/auth/customer-by-id";
-import DatePicker from "@/components/ui/date-picker";
-import dayjs from "dayjs";
 import { faPerson, faPersonHalfDress } from "@fortawesome/free-solid-svg-icons";
 
 const CustomerForm = () => {
@@ -33,22 +31,19 @@ const CustomerForm = () => {
 
   const [input, setInput] = useState({
     name: "",
-    birthDate: "",
     sex: "",
   });
 
   useEffect(() => {
-    const { name, sex, birthdate } = customerData || {};
+    const { name, sex } = customerData || {};
     setInput({
       sex: sex || "",
       name: name || "",
-      birthDate: birthdate || "",
     });
   }, [customerData]);
 
   const requiredFields = {
     name: Boolean(input?.name?.trim()?.length),
-    birthDate: Boolean(input?.birthDate?.trim()?.length),
     sex: Boolean(input?.sex?.trim()?.length),
   };
 
@@ -84,7 +79,6 @@ const CustomerForm = () => {
           id: userId,
           sex: input?.sex,
           name: input?.name,
-          birthdate: input?.birthDate,
         },
       },
     })
@@ -123,22 +117,6 @@ const CustomerForm = () => {
           onChange={(e) => handleInputChange("name", e.target.value)}
           value={input?.name}
         />
-        <DatePicker
-          name="birthdate"
-          placeholder={
-            input?.birthDate
-              ? dayjs(input?.birthDate).format("MM/DD/YYYY")
-              : "Fecha de nacimiento"
-          }
-          disabled={customerLoading || isUpdatingCustomer}
-          error={!requiredFields.birthDate}
-          maxDate={dayjs().subtract(18, "year")}
-          format="DD/MM/YYYY"
-          onChange={(_, dateString) => {
-            handleInputChange("birthDate", dateString);
-          }}
-        />
-
         <Select
           name="sex"
           value={input?.sex}

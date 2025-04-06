@@ -111,6 +111,7 @@ export type BasePublicOrganizationType = {
 };
 
 export type BrokerageSocietyContactInputType = {
+  email?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   phone: Scalars['String']['input'];
   position: Scalars['String']['input'];
