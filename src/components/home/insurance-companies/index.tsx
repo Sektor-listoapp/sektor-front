@@ -1,27 +1,16 @@
-import Button from "@/components/ui/button";
-import Spinner from "@/components/ui/spinner";
-import { PUBLIC_ORGANIZATIONS_QUERY } from "@/lib/sektor-api/queries";
-import { PublicOrganizationType } from "@/types/public";
-import { cn } from "@/utils/class-name";
-import { useQuery } from "@apollo/client";
-import { Carousel } from "antd";
-import Image from "next/image";
 import React from "react";
+import InsuranceCompaniesCarousel from "@/components/shared/insurance-companies-carousel";
+import Button from "@/components/ui/button";
+import { ROUTES } from "@/constants/router";
+import { cn } from "@/utils/class-name";
+import { useRouter } from "next/router";
+import { OrganizationTypes } from "@/lib/sektor-api/__generated__/types";
 
-const InsuranceCompaniesInfo = ({
+const InsuranceCompanies = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
-  const { data, loading, error } = useQuery(PUBLIC_ORGANIZATIONS_QUERY, {
-    variables: { type: "InsuranceCompany" },
-  });
-
-  if (error) {
-    console.error("Error fetching insurance companies", error);
-  }
-
-  const insuranceCompanies = (data?.getPublicOrganizations?.items ||
-    []) as PublicOrganizationType[];
+  const { push } = useRouter();
 
   return (
     <section
@@ -33,13 +22,8 @@ const InsuranceCompaniesInfo = ({
     >
       <div className="text-pretty text-center flex flex-col items-center justify-center gap-3 md:text-start md:gap-4">
         <h2 className="text-3xl lg:text-6xl">
-          <span className="md:hidden">
-            Trabajamos con las mejores Compañias de Seguros
-          </span>
-          <span>
             Con nosotros, accede a información detallada sobre las principales
             aseguradoras
-          </span>
         </h2>
         <p className="font-century-gothic text-base lg:text-xl">
           <span className="md:hidden">
@@ -54,32 +38,18 @@ const InsuranceCompaniesInfo = ({
           </span>
         </p>
       </div>
-      <div className="w-11/12 max-w-sm md:max-w-full">
-        {loading ? (
-          <Spinner className="m-auto w-10 h-10 text-blue-500 transition-all my-24 md:my-auto text-opacity-70" />
-        ) : (
-          <Carousel
-            autoplay
-            dots={false}
-            draggable
-            speed={1000}
-            className="flex items-center justify-center w-full relative h-36 md:h-60 xl:h-36"
-          >
-            {insuranceCompanies?.map(({ id, logoUrl, name }, index) => (
-              <Image
-                key={`insurance-company-${id}-${index}`}
-                className="w-11/12 h-32 m-auto max-w-full object-contain md:h-60 xl:h-36"
-                src={logoUrl}
-                width={700}
-                height={700}
-                alt={name}
-              />
-            ))}
-          </Carousel>
-        )}
-      </div>
+      <InsuranceCompaniesCarousel />
       <footer className="w-full max-w-sm md:col-span-2 md:max-w-full flex items-center justify-center">
-        <Button variant="solid-blue" className="w-full md:max-w-sm">
+        <Button
+          variant="solid-blue"
+          className="w-full md:max-w-sm"
+          onClick={() =>
+            push({
+              pathname: ROUTES.ORGANIZATIONS,
+              query: { type: OrganizationTypes.InsuranceCompany },
+            })
+          }
+        >
           Ver más
         </Button>
       </footer>
@@ -87,4 +57,4 @@ const InsuranceCompaniesInfo = ({
   );
 };
 
-export default InsuranceCompaniesInfo;
+export default InsuranceCompanies;

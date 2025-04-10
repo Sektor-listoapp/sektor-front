@@ -1,8 +1,24 @@
 import Navbar from "@/components/ui/navbar";
 import TextInput from "@/components/ui/text-input";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { useRouter } from "next/router";
 
 const HeroBanner = () => {
+  const router = useRouter();
+
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
+    const search = formData.get("search") as string;
+
+    if (Boolean(search)) {
+      router.push({
+        pathname: "/organizations",
+        query: { search },
+      });
+    }
+  };
+
   return (
     <header className="bg-blue-500 primary-gradient min-h-fit rounded-b-3xl px-7 w-full py-8 border-white sm:gap-8 sm:pb-12 xl:pb-28">
       <div className="max-w-screen-xl w-full flex flex-col items-start justify-start gap-5 xl:items-center md:gap-20 xl:gap-28 mx-auto">
@@ -16,14 +32,18 @@ const HeroBanner = () => {
             elige entre los mejores de nuestra red
           </h2>
         </div>
-        <TextInput
-          iconPosition="end"
-          icon={faMagnifyingGlass}
-          iconProps={{ className: "opacity-40" }}
-          wrapperClassName="md:max-w-lg xl:max-w-5xl relative"
-          className="rounded-3xl border-opacity-50 md:max-w-lg xl:max-w-5xl md:text-lg"
-          placeholder="Busca aquí el seguro de tu preferencia"
-        />
+        <form onSubmit={handleSearch} className="w-full">
+          <TextInput
+            iconPosition="end"
+            icon={faMagnifyingGlass}
+            iconProps={{ className: "opacity-40" }}
+            wrapperClassName="md:max-w-2xl xl:max-w-5xl relative mx-auto"
+            className="rounded-3xl border-opacity-50 w-full md:text-lg"
+            placeholder="Busca aquí el seguro de tu preferencia"
+            name="search"
+            defaultValue=""
+          />
+        </form>
       </div>
     </header>
   );

@@ -1,4 +1,4 @@
-import { UserType } from "@/types/shared";
+import { OrganizationTypes } from "@/lib/sektor-api/__generated__/types";
 import { cn } from "@/utils/class-name";
 import {
   faChevronDown,
@@ -10,7 +10,7 @@ import { useState } from "react";
 
 type SelectOption = {
   label: string;
-  value: string | number | UserType;
+  value: string | number | OrganizationTypes;
   disabled?: boolean;
   hidden?: boolean;
 };
@@ -43,7 +43,7 @@ const Select = ({
       <div className={"relative w-full"}>
         {icon && (
           <FontAwesomeIcon
-            size="xl"
+            size="lg"
             icon={icon}
             className={cn(
               "absolute inset-y-0 start-0 flex items-center pointer-events-none ps-4 peer-disabled:opacity-50 peer-disabled:pointer-events-none my-auto",

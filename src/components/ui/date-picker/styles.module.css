@@ -24,6 +24,10 @@
   display: none;
 }
 
+.showSuffix div span {
+  display: block !important;
+}
+
 .datePickerError {
   border-color: #ff0000 !important;
   color: #ff0000 !important;

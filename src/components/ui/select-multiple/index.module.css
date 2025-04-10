@@ -1,0 +1,22 @@
+.selectMultiple {
+  width: 100% !important;
+  color: #182f48 !important;
+  font-family: Century Gothic, sans-serif !important;
+}
+
+.selectMultiple * {
+  color: #182f48 !important;
+  font-family: Century Gothic, sans-serif !important;
+}
+
+.selectMultiple > div {
+  padding: 0.5rem 20px !important;
+  width: 100% !important;
+  border: 1px solid #182f48 !important;
+  border-radius: 0.75rem !important;
+}
+
+.selectWithErrors > div {
+  color: #ff0000 !important;
+  border: 1px solid #ff0000 !important;
+}

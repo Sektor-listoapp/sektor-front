@@ -14,10 +14,12 @@ import { toast } from "react-toastify";
 const { EMAIL, PASSWORD, GENERAL } = INPUT_ERROR_MESSAGES;
 
 const LoginForm = () => {
-  const { push } = useRouter();
+  const { push, replace, query } = useRouter();
   const [login, { loading }] = useMutation(LOGIN);
+  const redirectTo = (query?.redirectTo || "") as string;
 
   const setAccessToken = useAuthStore((state) => state.setAccessToken);
+  const setRefreshToken = useAuthStore((state) => state.setRefreshToken);
   const setUser = useAuthStore((state) => state.setUser);
 
   const [input, setInput] = useState({ email: "", password: "" });
@@ -67,10 +69,11 @@ const LoginForm = () => {
 
     login({ variables: { input } })
       .then((response) => {
-        const { user, token } = response.data.login;
+        const { user, token, refreshToken } = response.data?.login;
         setAccessToken(token);
+        setRefreshToken(refreshToken);
         setUser(user);
-        push(ROUTES.HOME);
+        replace(Boolean(redirectTo.length) ? redirectTo : ROUTES.HOME);
       })
       .catch((error) => {
         toast.error(

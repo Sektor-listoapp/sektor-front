@@ -5,9 +5,9 @@ export const PROFILE_QUERY = gql`
     profile {
       id
       name
-      verifiedAt
       email
-      companies
+      deletedAt
+      verifiedAt
       group
     }
   }

@@ -1,7 +1,7 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Select from "@/components/ui/select";
-import { USER_TYPES } from "@/constants/auth";
+import { USER_TYPES } from "@/constants/shared";
 import { useRegistrationStore } from "@/store/registration";
-import { UserType } from "@/types/shared";
 
 const { INSURANCE_BROKER, EXCLUSIVE_AGENT, BROKERAGE_SOCIETY, INTERMEDIARY } =
   USER_TYPES;
@@ -31,7 +31,7 @@ const CompanySegments = () => {
   const userType = useRegistrationStore((state) => state.userType);
   const setUserType = useRegistrationStore((state) => state.setUserType);
 
-  const handleSelectChange = (selectedUserType: UserType) => {
+  const handleSelectChange = (selectedUserType: any) => {
     if (userType === selectedUserType) {
       return;
     }
@@ -54,7 +54,7 @@ const CompanySegments = () => {
         className="font-bold"
         options={companySegments}
         value={userType || ""}
-        onChange={(e) => handleSelectChange(e.target.value as UserType)}
+        onChange={(e) => handleSelectChange(e.target.value)}
       />
     </div>
   );

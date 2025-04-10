@@ -18,6 +18,7 @@ import localeData from "dayjs/plugin/localeData";
 import weekday from "dayjs/plugin/weekday";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import weekYear from "dayjs/plugin/weekYear";
+import { IStaticMethods } from "preline/preline";
 
 dayjs.locale("es");
 dayjs.extend(customParseFormat);
@@ -28,11 +29,34 @@ dayjs.extend(weekOfYear);
 dayjs.extend(weekYear);
 
 const sektorApiClient = createSektorApiClient();
+declare global {
+  interface Window {
+    HSStaticMethods: IStaticMethods;
+  }
+}
 
 export default function App({ Component, pageProps, router }: AppProps) {
   return (
     <ApolloProvider client={sektorApiClient}>
-      <ConfigProvider locale={es}>
+      <ConfigProvider
+        locale={es}
+        theme={{
+          token: {
+            fontFamily: "Century Gothic",
+            colorPrimaryBorder: "#182F48",
+            colorPrimary: "#182F48",
+            colorText: "#182F48",
+            colorPrimaryActive: "#182F48",
+          },
+          components: {
+            Switch: {
+              handleBg: "#182F48",
+              colorPrimaryBg: "#182F48",
+              colorPrimary: "#182F48",
+            },
+          },
+        }}
+      >
         <ToastContainer
           position="bottom-center"
           autoClose={6000}

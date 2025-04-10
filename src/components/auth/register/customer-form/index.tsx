@@ -14,10 +14,11 @@ import { useMutation } from "@apollo/client";
 import { toast } from "react-toastify";
 import dayjs from "dayjs";
 import { CustomerFormInput, CustomerFormInputErrors } from "./types";
-import { GENERIC_ERROR_MESSAGE, SELECT_GENRE_OPTIONS } from "./constants";
+import { GENERIC_ERROR_MESSAGE } from "./constants";
 import { handleCustomerFormInputChange, validateFormFields } from "./helpers";
 import { useRegistrationStore } from "@/store/registration";
 import { REGISTER_STEPS } from "@/constants/register";
+import { SELECT_GENRE_OPTIONS } from "@/constants/forms";
 
 interface CustomerFormProps {
   formRef: React.RefObject<HTMLFormElement | null>;

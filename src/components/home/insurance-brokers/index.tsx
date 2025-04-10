@@ -1,12 +1,17 @@
 import Button from "@/components/ui/button";
+import { ROUTES } from "@/constants/router";
+import { OrganizationTypes } from "@/lib/sektor-api/__generated__/types";
 import { cn } from "@/utils/class-name";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import React from "react";
 
 const InsuranceBrokers = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
+  const { push } = useRouter();
+
   return (
     <section
       className={cn(
@@ -38,6 +43,12 @@ const InsuranceBrokers = ({
         <Button
           variant="solid-blue"
           className="hidden lg:block w-full max-w-fit px-20"
+          onClick={() =>
+            push({
+              pathname: ROUTES.ORGANIZATIONS,
+              query: { type: OrganizationTypes.InsuranceBroker },
+            })
+          }
         >
           Conecta
         </Button>
@@ -85,7 +96,16 @@ const InsuranceBrokers = ({
       </div>
 
       <footer className="w-full flex justify-center items-center z-10 lg:hidden lg:col-span-0s">
-        <Button variant="solid-blue" className="w-full max-w-fit px-20 ">
+        <Button
+          variant="solid-blue"
+          className="w-full max-w-fit px-20 "
+          onClick={() =>
+            push({
+              pathname: ROUTES.ORGANIZATIONS,
+              query: { type: OrganizationTypes.InsuranceBroker },
+            })
+          }
+        >
           Descubre
         </Button>
       </footer>
