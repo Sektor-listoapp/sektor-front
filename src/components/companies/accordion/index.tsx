@@ -16,8 +16,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Switch from "@/components/ui/switch";
 import { ORGANIZATION_TYPE_SELECT_OPTIONS } from "@/constants/forms";
 import dayjs from "dayjs";
-import { useRouter } from "next/router";
-import { toast } from "react-toastify";
+import Link from "next/link";
 
 const { Panel } = Collapse;
 
@@ -40,7 +39,7 @@ const CompaniesAccordion = ({
   changeOrgVisibility,
   setOpenDeleteModal,
 }: CompaniesAccordionProps) => {
-  const { replace } = useRouter();
+
 
   return (
     <Collapse
@@ -83,7 +82,7 @@ const CompaniesAccordion = ({
             (state) => state?.id === coverageStates?.[0]
           )?.name;
           const organizationSlug = `${id || ""}`;
-          const hasValidSlug = organizationSlug?.length > 5;
+       
 
           const listItems = [
             { title: "Tipo de usuario:", value: label ?? "No disponible" },
@@ -131,27 +130,18 @@ const CompaniesAccordion = ({
                     <span className="text-xs">Premiun</span>
                     <Switch checked={isPremium} />
                   </button>
-
-                  <button
-                    className="w-fit flex flex-col items-center justify-center gap-3"
-                    onClick={() => {
-                      if (!hasValidSlug) {
-                        toast.error(
-                          "No se pudo obtener la información de la organización, por favor intenta de nuevo más tarde."
-                        );
-                        return;
-                      }
-                      replace(`/account/${organizationSlug}`);
-                    }}
-                  >
+              
+                  <Link href={`/account/${organizationSlug}`}
+                    className="cursor-pointer hover:text-blue-700 transition-all hover:scale-105">
                     <span className="text-xs">Detalles</span>
                     <FontAwesomeIcon
                       icon={faEye}
                       size="xl"
                       className="text-blue-500"
                     />
-                  </button>
+                  </Link>
 
+              
                   <button
                     className="w-fit flex flex-col items-center justify-center gap-3"
                     onClick={() => setOpenDeleteModal(id)}
