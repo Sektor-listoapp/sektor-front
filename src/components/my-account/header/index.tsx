@@ -23,7 +23,7 @@ const Header = ({ data, accountEdit = false }: HeaderProps) => {
     ORGANIZATION_TYPE_LABEL.SINGULAR[data?.type] || "Sektor";
 
 
-  const editUserName = data?.name;
+  const editUserName = data?.name || ''
   const message = accountEdit
     ? `Editando la cuenta de ${editUserName}`
     : `¡Hola ${userName ?? ""}! Bienvenido a tu cuenta de ${userTypeLabel}`
