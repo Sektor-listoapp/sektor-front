@@ -33,9 +33,13 @@ import {
 import UploadInput from "@/components/ui/upload-input";
 import LocalContactInput from "../local-contact-input";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
+import { FormProps } from "@/types/forms";
 
-const InsuranceCompanyForm = () => {
-  const userId = useAuthStore(useShallow((state) => state.user?.id));
+type InsuranceCompanyIdProps = FormProps;
+
+const InsuranceCompanyForm = ({userId}: InsuranceCompanyIdProps) => {
+  const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
+  const targetUserId = userId || loggedUserId;;
   const [isUpdatingCompany, setIsUpdatingCompany] = useState(false);
 
   const [updateCompany] = useMutation<Mutation>(UPDATE_INSURANCE_COMPANY);
@@ -49,7 +53,7 @@ const InsuranceCompanyForm = () => {
     loading: loadingCompany,
     refetch: refetchCompany,
   } = useQuery<Query>(PUBLIC_INSURANCE_COMPANY_BY_ID_QUERY, {
-    variables: { id: userId },
+    variables: { id: targetUserId },
   });
 
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
@@ -231,7 +235,7 @@ const InsuranceCompanyForm = () => {
     updateCompany({
       variables: {
         input: {
-          id: userId,
+          id: targetUserId,
           type: company?.type,
           name: input?.name,
           suppliers: input?.suppliers || [],

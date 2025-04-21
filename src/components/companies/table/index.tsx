@@ -44,20 +44,22 @@ const CompaniesTable = ({
       dataIndex: "name",
       key: "name",
       render: (name: string, record: OrganizationType) => {
-        const { id, type } = record;
-        const organizationQuery = `${type || ""}-${id || ""}`;
-        const hasValidQuery = organizationQuery?.length > 5;
+        const { id } = record;
+        // const organizationSlug = `${type || ""}-${id || ""}`;
+        const organizationSlug = `${id || ""}`;
+
+        const hasValidSlug = organizationSlug?.length > 5;
 
         return (
           <p
             onClick={() => {
-              if (!hasValidQuery) {
+              if (!hasValidSlug) {
                 toast.error(
                   "No se pudo obtener la información de la organización, por favor intenta de nuevo más tarde."
                 );
                 return;
               }
-              replace({ query: { details: organizationQuery } });
+              replace(`/account/${organizationSlug}`);
             }}
             className="cursor-pointer hover:text-blue-700 transition-all hover:scale-105"
           >

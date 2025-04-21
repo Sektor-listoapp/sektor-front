@@ -40,9 +40,13 @@ import LocalWorkTeamInput from "../local-work-team-input";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
 import LocalClientsInput from "../local-clients-input";
 import LocalOfficesInput from "../local-offices-input";
+import { FormProps } from "@/types/forms";
 
-const BrokerageSocietyForm = () => {
-  const userId = useAuthStore(useShallow((state) => state.user?.id));
+type BrokerageSocietyIdProps = FormProps;
+
+const BrokerageSocietyForm = ({userId}: BrokerageSocietyIdProps) => {
+  const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
+  const targetUserId = userId || loggedUserId;
   const [isUpdatingBrokerageSociety, setIsUpdatingBrokerageSociety] =
     useState(false);
 
@@ -52,7 +56,7 @@ const BrokerageSocietyForm = () => {
     loading: loadingBrokerageSociety,
     refetch: refetchBrokerageSociety,
   } = useQuery<Query>(PUBLIC_BROKERAGE_SOCIETY_BY_ID_QUERY, {
-    variables: { id: userId },
+    variables: { id: targetUserId },
   });
 
   const [updateBrokerageSociety] = useMutation<Mutation>(
@@ -321,7 +325,7 @@ const BrokerageSocietyForm = () => {
     updateBrokerageSociety({
       variables: {
         input: {
-          id: userId,
+          id: targetUserId,
           clients: JSON.parse(clients),
           foundationYear,
           name: input?.name,

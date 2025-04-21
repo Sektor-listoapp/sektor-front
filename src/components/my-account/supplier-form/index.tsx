@@ -32,9 +32,14 @@ import LocalOfficesInput from "../local-offices-input";
 import Select from "@/components/ui/select";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
 import UploadInput from "@/components/ui/upload-input";
+import { FormProps } from "@/types/forms";
 
-const SupplierForm = () => {
-  const userId = useAuthStore(useShallow((state) => state.user?.id));
+
+type supplierIdProps = FormProps;
+
+const SupplierForm = ({userId}: supplierIdProps) => {
+  const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
+  const targetUserId = userId || loggedUserId;
   const [isUpdatingSupplier, setIsUpdatingSupplier] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
@@ -51,7 +56,7 @@ const SupplierForm = () => {
     loading: loadingSupplier,
     refetch: refetchSupplier,
   } = useQuery<Query>(PUBLIC_SUPPLIER_BY_ID_QUERY, {
-    variables: { id: userId },
+    variables: { id: targetUserId },
   });
 
   const supplier = supplierResponse?.publicSupplierById;
@@ -139,7 +144,7 @@ const SupplierForm = () => {
   if (supplierError) {
     toast.error(
       supplierError?.message ||
-        "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
+      "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
     );
   }
 
@@ -178,7 +183,7 @@ const SupplierForm = () => {
     updateSupplier({
       variables: {
         input: {
-          id: userId,
+          id: targetUserId,
           name: input?.name,
           type: supplier?.type,
           lineOfBusiness: input?.segment,

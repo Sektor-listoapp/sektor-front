@@ -38,9 +38,13 @@ import {
   PUBLIC_INSURANCE_COMPANIES_QUERY,
 } from "@/lib/sektor-api/queries";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
+import { FormProps } from "@/types/forms";
 
-const ExclusiveAgentForm = () => {
-  const userId = useAuthStore(useShallow((state) => state.user?.id));
+type ExclusiveAgentIdProps = FormProps;
+
+const ExclusiveAgentForm = ({userId}: ExclusiveAgentIdProps) => {
+  const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
+  const targetUserId = userId || loggedUserId;
   const [isUpdatingExclusiveAgent, setIsUpdatingExclusiveAgent] =
     useState(false);
 
@@ -50,7 +54,7 @@ const ExclusiveAgentForm = () => {
     loading: loadingExclusiveAgent,
     refetch: refetchExclusiveAgent,
   } = useQuery<Query>(PUBLIC_EXCLUSIVE_AGENT_BY_ID_QUERY, {
-    variables: { id: userId },
+    variables: { id: targetUserId },
   });
 
   const [updateExclusiveAgent] = useMutation<Mutation>(UPDATE_EXCLUSIVE_AGENT);
@@ -265,7 +269,7 @@ const ExclusiveAgentForm = () => {
     updateExclusiveAgent({
       variables: {
         input: {
-          id: userId,
+          id: targetUserId,
           foundationYear,
           name: input?.name,
           allies: input?.allies,

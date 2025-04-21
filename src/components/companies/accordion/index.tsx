@@ -82,8 +82,8 @@ const CompaniesAccordion = ({
           const state = countryStates?.find(
             (state) => state?.id === coverageStates?.[0]
           )?.name;
-          const organizationQuery = `${type || ""}-${id || ""}`;
-          const hasValidQuery = organizationQuery?.length > 5;
+          const organizationSlug = `${id || ""}`;
+          const hasValidSlug = organizationSlug?.length > 5;
 
           const listItems = [
             { title: "Tipo de usuario:", value: label ?? "No disponible" },
@@ -135,13 +135,13 @@ const CompaniesAccordion = ({
                   <button
                     className="w-fit flex flex-col items-center justify-center gap-3"
                     onClick={() => {
-                      if (!hasValidQuery) {
+                      if (!hasValidSlug) {
                         toast.error(
                           "No se pudo obtener la información de la organización, por favor intenta de nuevo más tarde."
                         );
                         return;
                       }
-                      replace({ query: { details: organizationQuery } });
+                      replace(`/account/${organizationSlug}`);
                     }}
                   >
                     <span className="text-xs">Detalles</span>

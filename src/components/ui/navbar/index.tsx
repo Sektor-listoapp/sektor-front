@@ -106,17 +106,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                 Empresa
               </Link>
             )}
-            {isAdmin && (
-              <Link
-                className={cn(
-                  " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
-                  { "font-bold": pathname === ROUTES.COMPANIES }
-                )}
-                href={ROUTES.COMPANIES}
-              >
-                Empresa
-              </Link>
-            )}
+
             {isAuthenticated && !isCustomer && (
               <Link
                 className={cn(

@@ -38,9 +38,13 @@ import {
   PUBLIC_INSURANCE_COMPANIES_QUERY,
 } from "@/lib/sektor-api/queries";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
+import { FormProps } from "@/types/forms";
 
-const InsuranceBrokerForm = () => {
-  const userId = useAuthStore(useShallow((state) => state.user?.id));
+type InsuranceBrokerIdProps = FormProps;
+
+const InsuranceBrokerForm = ({userId}: InsuranceBrokerIdProps) => {
+  const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
+  const targetUserId = userId || loggedUserId;
   const [isUpdatingInsuranceBroker, setIsUpdatingInsuranceBroker] =
     useState(false);
 
@@ -50,7 +54,7 @@ const InsuranceBrokerForm = () => {
     loading: loadingInsuranceBroker,
     refetch: refetchInsuranceBroker,
   } = useQuery<Query>(PUBLIC_INSURANCE_BROKER_BY_ID_QUERY, {
-    variables: { id: userId },
+    variables: { id: targetUserId },
   });
 
   const insuranceBroker = insuranceBrokerResponse?.publicInsuranceBrokerById;
@@ -267,7 +271,7 @@ const InsuranceBrokerForm = () => {
     updateInsuranceBroker({
       variables: {
         input: {
-          id: userId,
+          id: targetUserId,
           foundationYear,
           name: input?.name,
           allies: input?.allies,
