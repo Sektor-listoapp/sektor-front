@@ -856,6 +856,7 @@ export enum OrganizationTypes {
   Supplier = 'Supplier'
 }
 
+
 export type OtherQuoteInputType = {
   cityId: Scalars['Int']['input'];
   comments: Scalars['String']['input'];

@@ -7,7 +7,7 @@ import { UserGroups } from "@/lib/sektor-api/__generated__/types";
 import { useRouter } from "next/router";
 import { ROUTES } from "@/constants/router";
 import CompanyList from "@/components/companies";
-// import OrganizationDetailsModal from "@/components/shared/organization-details-modal";
+
 
 const { Admin } = UserGroups;
 
@@ -39,7 +39,7 @@ const Companies = () => {
       <main className="text-blue-500 w-11/12 max-w-screen-xl flex flex-col items-center justify-center gap-10 py-5 !font-century-gothic pb-32">
         <CompanyList />
       </main>
-      {/* {isReady && query?.details && <OrganizationDetailsModal />} */}
+    
     </div>
   );
 };
