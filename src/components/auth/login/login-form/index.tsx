@@ -3,6 +3,7 @@ import PasswordInput from "@/components/ui/password-input";
 import TextInput from "@/components/ui/text-input";
 import { ROUTES } from "@/constants/router";
 import { INPUT_ERROR_MESSAGES, REGEX } from "@/constants/validations";
+import { useRedirectBasedOnOrganization } from "@/hooks/use-redirect-based-on-organization";
 import { LOGIN } from "@/lib/sektor-api/mutations";
 import { useAuthStore } from "@/store/auth";
 import { useMutation } from "@apollo/client";
@@ -13,8 +14,14 @@ import { toast } from "react-toastify";
 
 const { EMAIL, PASSWORD, GENERAL } = INPUT_ERROR_MESSAGES;
 
+export type UserInfo = {
+  id: string;
+  group: string;
+};
+
+
 const LoginForm = () => {
-  const { push, replace, query } = useRouter();
+  const { push, query } = useRouter();
   const [login, { loading }] = useMutation(LOGIN);
   const redirectTo = (query?.redirectTo || "") as string;
 
@@ -22,11 +29,21 @@ const LoginForm = () => {
   const setRefreshToken = useAuthStore((state) => state.setRefreshToken);
   const setUser = useAuthStore((state) => state.setUser);
 
+
+  const [userInfo, setUserInfo] = useState<UserInfo>({
+    id: '',
+    group: ''
+  });
+
+
   const [input, setInput] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<Record<string, string[]>>({
     email: [],
     password: [],
   });
+
+  useRedirectBasedOnOrganization(userInfo, redirectTo);
+
 
   const handleChange = (e: FormEvent<HTMLInputElement>) => {
     const { name, value } = e.currentTarget;
@@ -73,15 +90,20 @@ const LoginForm = () => {
         setAccessToken(token);
         setRefreshToken(refreshToken);
         setUser(user);
-        replace(Boolean(redirectTo.length) ? redirectTo : ROUTES.HOME);
+        setUserInfo({
+          id: user.id,
+          group: user.group
+        });
       })
       .catch((error) => {
         toast.error(
           error?.message ||
-            "Ocurrió un error al iniciar sesión, por favor intenta de nuevo más tarde."
+          "Ocurrió un error al iniciar sesión, por favor intenta de nuevo más tarde."
         );
       });
   };
+
+
 
   return (
     <form
