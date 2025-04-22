@@ -22,9 +22,9 @@ export const useRedirectBasedOnOrganization = (
   
   useEffect(() => {
     if (group === "Admin") {
-      replace(ROUTES.HOME);
+      replace(redirectTo || ROUTES.HOME);
     }
-  }, [group, replace]);
+  }, [group, replace, redirectTo]);
 
   const { data: organizationDataResponse, error, loading } = useQuery<Query>(
     ORGANIZATION_BY_ID_QUERY,
@@ -50,7 +50,7 @@ export const useRedirectBasedOnOrganization = (
     const redirectToQuotes = COMPANY_TYPES_REDIRECT.includes(companyType);
 
     const targetRoute = redirectToQuotes
-      ? ROUTES.MY_QUOTES
+      ? redirectTo || ROUTES.MY_QUOTES
       : redirectTo || ROUTES.HOME;
 
     replace(targetRoute);
