@@ -32,33 +32,38 @@ const OrganizationFilters = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const handleCloseDrawer = () => setOpenDrawer(false);
   const [refetchCleaned, setRefetchCleaned] = useState(false);
+  const [selectedStateId, setSelectedStateId] = useState("");
+  const [selectedCityId, setSelectedCityId] = useState("");
 
   const { data: countryData, loading: isLoadingCountryData } = useQuery<Query>(
     COUNTRY_BY_CODE_QUERY,
     { variables: { code: "VE" } }
   );
 
+
   const countryStates = countryData?.getCountryByCode?.states || [];
-  const stateCities = countryStates
-    .map((state) => {
-      return state.cities.map((city) => {
-        return {
-          label: `${city?.name}, ${state?.name}`,
-          value: city?.id,
-          stateId: state?.id,
-        };
-      });
-    })
-    .flat();
-  const formattedLocationOptions = [
-    {
-      label: "Ubicación",
-      value: "",
-      disabled: true,
-      hidden: true,
-    },
-    ...stateCities,
+
+  const stateOptions = [
+    { label: "Estado", value: "", disabled: true },
+    ...countryStates.map((state) => ({
+      label: state?.name || "",
+      value: state?.id || "",
+    })),
   ];
+
+
+  const selectedState = countryStates.find((s) => s.id === Number(selectedStateId));
+  const cityOptions = selectedState?.cities
+    ? [
+      { label: "Ciudad", value: "", disabled: true },
+      ...selectedState.cities.map((city) => ({
+        label: city?.name || "",
+        value: city?.id || "",
+      })),
+    ]
+    : [];
+
+
 
   const {
     handleGetPublicOrganizations,
@@ -72,7 +77,6 @@ const OrganizationFilters = () => {
     search = "",
     genre = "",
     segment = "",
-    location = "",
     serviceType = "",
     minAge = 0,
     maxAge = 50,
@@ -118,6 +122,9 @@ const OrganizationFilters = () => {
     }
 
     handleGetPublicOrganizationsWithNewFilters({ ...defaultFilters });
+    setSelectedStateId('');
+    setSelectedCityId('');
+
   };
 
   const disableResetFiltersButton = () => {
@@ -166,13 +173,30 @@ const OrganizationFilters = () => {
           <section className="w-full flex flex-col gap-6 items-center justify-center">
             <Select
               wrapperClassName="w-full"
-              value={location || ""}
+              value={selectedStateId}
               disabled={isLoadingCountryData}
-              options={formattedLocationOptions}
-              onChange={(e) => handleFilterChange("location", e?.target?.value)}
-              defaultValue={formattedLocationOptions[0].value}
+              options={stateOptions}
+              onChange={(e) => {
+                const stateId = e.target.value;
+                setSelectedStateId(stateId);
+                setSelectedCityId("");
+                handleFilterChange("state", stateId);
+              }}
             />
 
+            {selectedStateId && (
+              <Select
+                wrapperClassName="w-full"
+                value={selectedCityId}
+                disabled={isLoadingCountryData || !selectedState}
+                options={cityOptions}
+                onChange={(e) => {
+                  const cityId = e.target.value;
+                  setSelectedCityId(cityId);
+                  handleFilterChange("city", cityId);
+                }}
+              />
+            )}
             {checkAllowedFilter(organizationType, SEGMENT) && (
               <Select
                 wrapperClassName="w-full"
