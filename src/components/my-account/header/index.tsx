@@ -29,7 +29,7 @@ const Header = ({ data, accountEdit = false }: HeaderProps) => {
     : `¡Hola ${userName ?? ""}! Bienvenido a tu cuenta de ${userTypeLabel}`
 
   return (
-    <header className="w-11/12 max-w-screen-xl border-b-2 border-b-gray-300 flex justify-between items-end text-blue-500 pb-3 gap-2 md:gap-5 md:pb-5 md:items-center">
+    <header className="w-11/12 max-w-screen-xl border-b border-b-[#B7D9E2] flex justify-between items-end text-blue-500 pb-3 gap-2 md:gap-5 md:pb-5 md:items-center">
       <h1 className="text-lg text-balance md:text-2xl lg:text-3xl">
         {message}
       </h1>

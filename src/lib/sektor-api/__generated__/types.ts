@@ -1457,3 +1457,5 @@ export type UserType = {
   name: Scalars['String']['output'];
   verifiedAt?: Maybe<Scalars['DateTime']['output']>;
 };
+
+
