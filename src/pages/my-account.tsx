@@ -4,36 +4,24 @@ import Header from "@/components/my-account/header";
 import Navbar from "@/components/my-account/navbar";
 import { useAuthStore } from "@/store/auth";
 import { useShallow } from "zustand/shallow";
-import { ORGANIZATION_BY_ID_QUERY } from "@/lib/sektor-api/queries";
-import { useQuery } from "@apollo/client";
 import { Empty } from "antd";
 import {
   OrganizationType,
   OrganizationTypes,
-  Query,
   UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
 import { getUserForm } from "@/utils/form/get-user-form";
+import { useOrganizationData } from "@/hooks/use-organization-data";
 
 const { Admin, Customer } = UserGroups;
 
 const MyAccount = () => {
-  const userId = useAuthStore(useShallow((state) => state.user?.id));
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
   const isAdmin = userGroup === Admin;
   const isCustomer = userGroup === Customer;
 
-  const {
-    data: organizationDataResponse,
-    error,
-    loading,
-  } = useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
-    variables: { id: userId },
-    skip: isCustomer,
-  });
+  const { organizationData, loading, error } = useOrganizationData();
 
-  const organizationData = organizationDataResponse?.organizationById;
-  console.log(organizationData?.type)
   const FormComponent = getUserForm(organizationData);
 
   const showMessage =
