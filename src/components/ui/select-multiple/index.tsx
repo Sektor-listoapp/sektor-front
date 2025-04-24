@@ -6,6 +6,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Select, SelectProps } from "antd";
 import styles from "./index.module.css";
+import { useState } from "react";
 
 interface SelectMultipleProps {
   wrapperClassName?: string;
@@ -14,6 +15,8 @@ interface SelectMultipleProps {
   icon?: IconDefinition;
   error?: boolean;
   errors?: string[];
+  label?: string;
+  showFloatingLabel?: boolean;
 }
 
 const SelectMultiple = ({
@@ -23,15 +26,36 @@ const SelectMultiple = ({
   errors = [],
   wrapperClassName,
   subWrapperClassName,
+  label,
+  showFloatingLabel = false,
 }: SelectMultipleProps) => {
+  const [focused, setFocused] = useState(false);
   const {
     className: selectClassName,
     options: selectOptions,
+    value,
+    onFocus,
+    onBlur,
     ...restSelectProps
   } = selectProps;
 
+  const hasValue =
+    Array.isArray(value) ? value.length > 0 : Boolean(value);
+  const showLabel = focused || hasValue;
+
   return (
     <div className={cn("relative w-full", wrapperClassName)}>
+      {showFloatingLabel && label && (
+        <label
+          className={cn(
+            "absolute left-0 text-sm font-century-gothic text-blue-500 transition-all duration-200 bg-white px-1 z-10",
+            showLabel ? "-top-2 -translate-y-3 opacity-100" : "top-1/2 -translate-y-1/2 opacity-0"
+          )}
+        >
+          {label}
+        </label>
+      )}
+
       <div className={cn("relative w-full", subWrapperClassName)}>
         {icon && (
           <FontAwesomeIcon
@@ -43,12 +67,22 @@ const SelectMultiple = ({
             )}
           />
         )}
+
         <Select
           mode="multiple"
           options={selectOptions || []}
           suffixIcon={
             <FontAwesomeIcon size="xl" icon={faChevronDown} color="#182f48" />
           }
+          onFocus={(e) => {
+            setFocused(true);
+            onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setFocused(false);
+            onBlur?.(e);
+          }}
+          value={value}
           className={cn(
             styles.selectMultiple,
             selectClassName,

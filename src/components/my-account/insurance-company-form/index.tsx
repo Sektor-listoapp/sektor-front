@@ -37,7 +37,7 @@ import { FormProps } from "@/types/forms";
 
 type InsuranceCompanyIdProps = FormProps;
 
-const InsuranceCompanyForm = ({userId}: InsuranceCompanyIdProps) => {
+const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
   const targetUserId = userId || loggedUserId;;
   const [isUpdatingCompany, setIsUpdatingCompany] = useState(false);
@@ -151,7 +151,7 @@ const InsuranceCompanyForm = ({userId}: InsuranceCompanyIdProps) => {
     identification: Boolean(input.identification?.trim()?.length),
     yearsOfExperience: Boolean(
       input.yearsOfExperience?.trim()?.length &&
-        Number(input.yearsOfExperience) > 0
+      Number(input.yearsOfExperience) > 0
     ),
     logoUrl: Boolean(input.logoUrl?.trim()?.length),
   };
@@ -163,7 +163,7 @@ const InsuranceCompanyForm = ({userId}: InsuranceCompanyIdProps) => {
   if (companyError) {
     toast.error(
       companyError?.message ||
-        "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
+      "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
     );
   }
 
@@ -282,12 +282,15 @@ const InsuranceCompanyForm = ({userId}: InsuranceCompanyIdProps) => {
           className="col-span-1"
           error={!requiredFields.name}
           placeholder="Nombre completo"
+          showFloatingLabel
           disabled={loadingCompany || isUpdatingCompany}
           onChange={(e) => handleInputChange("name", e.target.value)}
           value={input?.name}
         />
 
         <SelectMultiple
+          label="Ramos con los que trabajas"
+          showFloatingLabel
           wrapperClassName="w-full"
           error={!requiredFields.segment}
           selectProps={{
@@ -326,6 +329,7 @@ const InsuranceCompanyForm = ({userId}: InsuranceCompanyIdProps) => {
         <TextInput
           name="yearsOfExperience"
           placeholder="Años de experiencia"
+          showFloatingLabel
           error={!requiredFields.yearsOfExperience}
           type="number"
           min={0}
@@ -383,6 +387,7 @@ const InsuranceCompanyForm = ({userId}: InsuranceCompanyIdProps) => {
           name="motto"
           className="col-span-1"
           placeholder="Lema"
+          showFloatingLabel
           disabled={loadingCompany || isUpdatingCompany}
           onChange={(e) => handleInputChange("motto", e.target.value)}
           value={input?.motto}
@@ -394,6 +399,8 @@ const InsuranceCompanyForm = ({userId}: InsuranceCompanyIdProps) => {
         />
 
         <SelectMultiple
+          label="Proveedores"
+          showFloatingLabel
           wrapperClassName="w-full"
           selectProps={{
             disabled: loadingSuppliers || isUpdatingCompany,

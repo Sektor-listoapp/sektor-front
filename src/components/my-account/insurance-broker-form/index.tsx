@@ -42,7 +42,7 @@ import { FormProps } from "@/types/forms";
 
 type InsuranceBrokerIdProps = FormProps;
 
-const InsuranceBrokerForm = ({userId}: InsuranceBrokerIdProps) => {
+const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
   const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
   const targetUserId = userId || loggedUserId;
   const [isUpdatingInsuranceBroker, setIsUpdatingInsuranceBroker] =
@@ -175,15 +175,15 @@ const InsuranceBrokerForm = ({userId}: InsuranceBrokerIdProps) => {
     const yearsOfExperience = currentYear - foundationYear;
     const studies = insuranceBroker?.studies
       ? insuranceBroker?.studies.map(
-          ({ id, title, institution, startDate, endDate, description }) => {
-            return { id, title, institution, startDate, endDate, description };
-          }
-        )
+        ({ id, title, institution, startDate, endDate, description }) => {
+          return { id, title, institution, startDate, endDate, description };
+        }
+      )
       : [];
     const clients = insuranceBroker?.clients
       ? insuranceBroker?.clients.map(({ id, name, logoUrl }) => {
-          return { id, name, logoUrl };
-        })
+        return { id, name, logoUrl };
+      })
       : [];
     const insuranceCompanies = (insuranceBroker?.insuranceCompanies?.map(
       ({ id }) => id
@@ -231,7 +231,7 @@ const InsuranceBrokerForm = ({userId}: InsuranceBrokerIdProps) => {
     coverageState: Boolean(input.coverageState.length),
     yearsOfExperience: Boolean(
       input.yearsOfExperience.trim().length &&
-        Number(input.yearsOfExperience) > 0
+      Number(input.yearsOfExperience) > 0
     ),
     phone: Boolean(input.phone.trim().length),
     logoUrl: Boolean(input.logoUrl.trim().length),
@@ -242,7 +242,7 @@ const InsuranceBrokerForm = ({userId}: InsuranceBrokerIdProps) => {
   if (insuranceBrokerError) {
     toast.error(
       insuranceBrokerError?.message ||
-        "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
+      "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
     );
   }
 
@@ -323,16 +323,20 @@ const InsuranceBrokerForm = ({userId}: InsuranceBrokerIdProps) => {
         <h3 className="col-span-2 font-bold">Datos obligatorios</h3>
 
         <TextInput
+
           name="name"
           className="col-span-1"
           error={!requiredFields.name}
           placeholder="Nombre completo"
+          showFloatingLabel
           disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
           onChange={(e) => handleInputChange("name", e.target.value)}
           value={input?.name}
         />
 
         <SelectMultiple
+          label="Compañias con las que trabajas"
+          showFloatingLabel
           wrapperClassName="w-full"
           error={!requiredFields.insuranceCompanies}
           selectProps={{
@@ -388,6 +392,8 @@ const InsuranceBrokerForm = ({userId}: InsuranceBrokerIdProps) => {
         />
 
         <SelectMultiple
+          label="Ramos con los que trabajas"
+          showFloatingLabel
           wrapperClassName="w-full"
           error={!requiredFields.segment}
           selectProps={{
@@ -443,6 +449,8 @@ const InsuranceBrokerForm = ({userId}: InsuranceBrokerIdProps) => {
         />
 
         <SelectMultiple
+          label="Zona de alcance (estado)"
+          showFloatingLabel
           wrapperClassName="w-full"
           error={!requiredFields.coverageState}
           selectProps={{
@@ -461,6 +469,7 @@ const InsuranceBrokerForm = ({userId}: InsuranceBrokerIdProps) => {
         <TextInput
           name="yearsOfExperience"
           placeholder="Años de experiencia"
+          showFloatingLabel
           error={!requiredFields.yearsOfExperience}
           type="number"
           min={0}
@@ -517,6 +526,8 @@ const InsuranceBrokerForm = ({userId}: InsuranceBrokerIdProps) => {
         />
 
         <SelectMultiple
+          label="Aliados"
+          showFloatingLabel
           wrapperClassName="w-full col-span-1"
           selectProps={{
             disabled:

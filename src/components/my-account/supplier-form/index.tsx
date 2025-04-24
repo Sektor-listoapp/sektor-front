@@ -37,7 +37,7 @@ import { FormProps } from "@/types/forms";
 
 type supplierIdProps = FormProps;
 
-const SupplierForm = ({userId}: supplierIdProps) => {
+const SupplierForm = ({ userId }: supplierIdProps) => {
   const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
   const targetUserId = userId || loggedUserId;
   const [isUpdatingSupplier, setIsUpdatingSupplier] = useState(false);
@@ -232,11 +232,13 @@ const SupplierForm = ({userId}: supplierIdProps) => {
           name="name"
           className="col-span-1"
           placeholder="Nombre completo"
+          showFloatingLabel
           disabled={loadingSupplier || isUpdatingSupplier}
           onChange={(e) => handleInputChange("name", e.target.value)}
           value={input?.name}
           error={!requiredFields.name}
         />
+
 
         <SelectMultiple
           wrapperClassName="w-full"
@@ -314,6 +316,7 @@ const SupplierForm = ({userId}: supplierIdProps) => {
           name="motto"
           className="col-span-1"
           placeholder="Lema"
+          showFloatingLabel
           disabled={loadingSupplier || isUpdatingSupplier}
           onChange={(e) => handleInputChange("motto", e.target.value)}
           value={input?.motto}

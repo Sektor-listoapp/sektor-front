@@ -44,7 +44,7 @@ import { FormProps } from "@/types/forms";
 
 type BrokerageSocietyIdProps = FormProps;
 
-const BrokerageSocietyForm = ({userId}: BrokerageSocietyIdProps) => {
+const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
   const targetUserId = userId || loggedUserId;
   const [isUpdatingBrokerageSociety, setIsUpdatingBrokerageSociety] =
@@ -198,8 +198,8 @@ const BrokerageSocietyForm = ({userId}: BrokerageSocietyIdProps) => {
 
     const clients = brokerageSociety?.clients
       ? brokerageSociety?.clients.map(({ id, name, logoUrl }) => {
-          return { id, name, logoUrl };
-        })
+        return { id, name, logoUrl };
+      })
       : [];
 
     const workTeam =
@@ -260,7 +260,7 @@ const BrokerageSocietyForm = ({userId}: BrokerageSocietyIdProps) => {
       coverageState: Boolean(input.coverageState.length),
       yearsOfExperience: Boolean(
         input.yearsOfExperience?.trim()?.length &&
-          Number(input.yearsOfExperience) > 0
+        Number(input.yearsOfExperience) > 0
       ),
       phone: Boolean(input.phone.trim().length),
       logoUrl: Boolean(input.logoUrl.trim().length),
@@ -272,7 +272,7 @@ const BrokerageSocietyForm = ({userId}: BrokerageSocietyIdProps) => {
   if (brokerageSocietyError) {
     toast.error(
       brokerageSocietyError?.message ||
-        "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
+      "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
     );
   }
 
@@ -384,6 +384,7 @@ const BrokerageSocietyForm = ({userId}: BrokerageSocietyIdProps) => {
           name="name"
           className="col-span-1"
           placeholder="Nombre completo"
+          showFloatingLabel
           error={!requiredFields.name}
           disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
           onChange={(e) => handleInputChange("name", e.target.value)}
@@ -391,6 +392,8 @@ const BrokerageSocietyForm = ({userId}: BrokerageSocietyIdProps) => {
         />
 
         <SelectMultiple
+          label="Compañias con las que trabajas"
+          showFloatingLabel
           wrapperClassName="w-full"
           error={!requiredFields.insuranceCompanies}
           selectProps={{
@@ -438,6 +441,8 @@ const BrokerageSocietyForm = ({userId}: BrokerageSocietyIdProps) => {
         />
 
         <SelectMultiple
+          label="Ramos con los que trabajas"
+          showFloatingLabel
           wrapperClassName="w-full"
           error={!requiredFields.segment}
           selectProps={{
@@ -455,6 +460,7 @@ const BrokerageSocietyForm = ({userId}: BrokerageSocietyIdProps) => {
           className="col-span-1"
           error={!requiredFields.identification}
           placeholder="Documento de identidad"
+          showFloatingLabel
           disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
           onChange={(e) => handleInputChange("identification", e.target?.value)}
           value={input?.identification}
@@ -472,6 +478,8 @@ const BrokerageSocietyForm = ({userId}: BrokerageSocietyIdProps) => {
         />
 
         <SelectMultiple
+          label="Zona de alcance (estado)"
+          showFloatingLabel
           wrapperClassName="w-full"
           error={!requiredFields.coverageState}
           selectProps={{
@@ -490,6 +498,7 @@ const BrokerageSocietyForm = ({userId}: BrokerageSocietyIdProps) => {
         <TextInput
           name="yearsOfExperience"
           placeholder="Años de experiencia"
+          showFloatingLabel
           error={!requiredFields.yearsOfExperience}
           type="number"
           min={0}
@@ -557,6 +566,8 @@ const BrokerageSocietyForm = ({userId}: BrokerageSocietyIdProps) => {
         />
 
         <SelectMultiple
+          label="Aliados"
+          showFloatingLabel
           wrapperClassName="w-full col-span-1"
           selectProps={{
             disabled:

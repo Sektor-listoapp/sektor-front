@@ -114,6 +114,7 @@ const CustomerForm = ({userId}: CustomerIdProps) => {
           name="name"
           className="col-span-1"
           placeholder="Nombre completo"
+          showFloatingLabel
           icon={faPerson}
           error={!requiredFields.name}
           disabled={customerLoading || isUpdatingCustomer}
