@@ -19,7 +19,7 @@ export const useRedirectBasedOnOrganization = (
   const { id, group } = userInfo;
   const { replace } = useRouter();
 
-  
+
   useEffect(() => {
     if (group === "Admin") {
       replace(redirectTo || ROUTES.HOME);
@@ -36,7 +36,7 @@ export const useRedirectBasedOnOrganization = (
 
   useEffect(() => {
     if (
-      group === "Admin" || 
+      group === "Admin" ||
       !organizationDataResponse?.organizationById ||
       loading ||
       error

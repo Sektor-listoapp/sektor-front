@@ -23,13 +23,13 @@ const Companies = () => {
     if (!isAdmin) {
       push(ROUTES.HOME);
     } else {
-      setCheckingAccess(false); 
+      setCheckingAccess(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userGroup]);
 
   if (checkingAccess) {
-    return null; 
+    return null;
   }
 
   return (
@@ -39,7 +39,7 @@ const Companies = () => {
       <main className="text-blue-500 w-11/12 max-w-screen-xl flex flex-col items-center justify-center gap-10 py-5 !font-century-gothic pb-32">
         <CompanyList />
       </main>
-    
+
     </div>
   );
 };

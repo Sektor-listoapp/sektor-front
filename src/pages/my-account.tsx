@@ -9,6 +9,7 @@ import { useQuery } from "@apollo/client";
 import { Empty } from "antd";
 import {
   OrganizationType,
+  OrganizationTypes,
   Query,
   UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
@@ -18,7 +19,6 @@ const { Admin, Customer } = UserGroups;
 
 const MyAccount = () => {
   const userId = useAuthStore(useShallow((state) => state.user?.id));
-  console.log('my-account userId:', userId)
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
   const isAdmin = userGroup === Admin;
   const isCustomer = userGroup === Customer;
@@ -33,8 +33,19 @@ const MyAccount = () => {
   });
 
   const organizationData = organizationDataResponse?.organizationById;
+  console.log(organizationData?.type)
   const FormComponent = getUserForm(organizationData);
 
+  const showMessage =
+    organizationData?.type !== OrganizationTypes.Admin
+      ? "Tú perfil es la ventana a nuevos prospectos asegurados. Por favor, completa los campos"
+      : (
+        <>
+          Tú perfil es la ventana a nuevos prospectos asegurados, completa cada campo necesario y <b>Sektor</b> potenciará tu marca
+        </>
+      );
+
+      
   return (
     <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start gap-8  overflow-hidden">
       <Navbar />
@@ -62,8 +73,7 @@ const MyAccount = () => {
                 Llena el siguiente formulario
               </h2>
               <p className="font-century-gothic text-base text-center max-w-xl text-balance">
-                Tú perfil es la ventana a nuevos prospectos asegurados, completa
-                cada campo necesario y <b>Sektor</b> potenciará tu marca
+                {showMessage}
               </p>
             </header>
           )}
