@@ -15,7 +15,7 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
     genre,
     search,
     segment,
-    location,
+    city,
     serviceType,
     minAge,
     maxAge,
@@ -44,7 +44,7 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
       name: search,
       lineOfBusiness: segment,
       serviceType: serviceType,
-      address: location ? { city: Number(location) } : undefined,
+      address: city ? { city: Number(city) } : undefined,
     },
     (value) => Boolean(value)
   );
