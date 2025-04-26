@@ -34,6 +34,7 @@ import UploadInput from "@/components/ui/upload-input";
 import LocalContactInput from "../local-contact-input";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
 import { FormProps } from "@/types/forms";
+import SocialMediaInput from "../social-media-input";
 
 type InsuranceCompanyIdProps = FormProps;
 
@@ -376,6 +377,11 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
         <LocalContactInput
           links={company?.contact?.links || []}
           setHasLocalContact={setHasLocalContact}
+          disabled={loadingCompany || isUpdatingCompany}
+        />
+
+        <SocialMediaInput
+          setHasSocialLinks={setHasLocalContact}
           disabled={loadingCompany || isUpdatingCompany}
         />
       </div>
