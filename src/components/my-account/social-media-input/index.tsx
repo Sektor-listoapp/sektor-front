@@ -6,7 +6,6 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import { PLATFORM_LABELS_MAP } from "@/constants/forms";
 import { cn } from "@/utils/class-name";
 import SocialMediaModal from "./social-media-modal";
-import SelectMultiple from "@/components/ui/select-multiple";
 // import SocialMediaModal from "./social-media-modal";
 
 interface SocialMediaInputProps {
@@ -60,7 +59,7 @@ const SocialMediaInput = ({
                     value={null}
                     options={options}
                     notFoundContent="No hay redes agregadas"
-                    optionRender={(option) => (
+                    optionRender={() => (
                         <div className="flex items-center gap-3 justify-between p-2 bg-transparent">
                             <div>
                                 {/* <b>{option.data.label}:</b> {option.data.url} */}
