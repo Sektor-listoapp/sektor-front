@@ -131,7 +131,6 @@ const LocalOfficeModal = ({
     !input?.address?.cityId ||
     !input?.address?.stateId ||
     !input?.phone?.trim()?.length ||
-    !input?.photoUrl?.trim()?.length ||
     !input?.address?.street?.trim()?.length;
 
   const { data: countryDataResponse, loading: isLoadingCountryData } =

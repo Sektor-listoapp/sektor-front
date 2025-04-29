@@ -24,19 +24,26 @@ const SocialMediaInput = ({
     const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
     const [openModal, setOpenModal] = useState(false);
 
+    console.log(socialLinks)
+
     useEffect(() => {
         setHasSocialLinks(Object.keys(socialLinks).length > 0);
     }, [socialLinks, setHasSocialLinks]);
 
-    const options = Object.entries(socialLinks).map(([platform, url]) => ({
-        value: platform,
-        label: `${PLATFORM_LABELS_MAP[platform]}: ${url}`,
-        data: {
-            platform,
-            url,
-            label: PLATFORM_LABELS_MAP[platform],
-        },
-    }));
+    const options = Object.entries(socialLinks).map(([key, value]) => {
+        const label = PLATFORM_LABELS_MAP[key] || key; 
+        return {
+            value,
+            label: `${label}: ${value}`,
+            data: {
+                label,
+                value: key,
+                platform: key,
+                user: value,
+            },
+        };
+    });
+    
 
     return (
         <>
@@ -50,7 +57,7 @@ const SocialMediaInput = ({
             >
                 <span className="text-sm">Redes Sociales</span>
 
-             
+
                 <Select
                     className="w-full absolute inset-0 h-full opacity-0"
                     suffixIcon={null}
@@ -59,10 +66,11 @@ const SocialMediaInput = ({
                     value={null}
                     options={options}
                     notFoundContent="No hay redes agregadas"
-                    optionRender={() => (
+                    optionRender={(option) => (
                         <div className="flex items-center gap-3 justify-between p-2 bg-transparent">
                             <div>
-                                {/* <b>{option.data.label}:</b> {option.data.url} */}
+                            <b>{option?.data?.data?.label}: </b>
+                            {option?.data?.data?.user || ""}
                             </div>
                             <FontAwesomeIcon
                                 className="ml-auto cursor-pointer"
@@ -70,7 +78,7 @@ const SocialMediaInput = ({
                                 size="lg"
                                 title="Editar"
                                 onClick={() => {
-                                    // setSelectedPlatform(option.data.platform);
+                                    setSelectedPlatform(option?.data?.data.platform);
                                     setOpenModal(true);
                                 }}
                             />
@@ -81,7 +89,7 @@ const SocialMediaInput = ({
                                 title="Eliminar"
                                 onClick={() => {
                                     const updated = { ...socialLinks };
-                                    // delete updated[option.data.platform];
+                                    delete updated[option?.data?.data.platform];
                                     setSocialLinks(updated);
                                 }}
                             />
@@ -108,6 +116,8 @@ const SocialMediaInput = ({
                 socialLinks={socialLinks}
                 setSocialLinks={setSocialLinks}
             />
+
+
 
         </>
     );

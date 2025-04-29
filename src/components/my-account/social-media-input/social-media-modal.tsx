@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Modal, ModalProps, Select } from "antd";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
+import { Modal, ModalProps, Space } from "antd";
 import Button from "@/components/ui/button";
 import TextInput from "@/components/ui/text-input";
+import SelectMultiple from "@/components/ui/select-multiple";
 import { SocialMediaPlatform } from "@/lib/sektor-api/__generated__/types";
 import { PLATFORM_LABELS_MAP } from "@/constants/forms";
+import { pickBy } from "lodash";
 
 interface SocialMediaModalProps extends ModalProps {
   open: boolean;
@@ -39,19 +39,43 @@ const SocialMediaModal = ({
 
   const handleSubmit = () => {
     if (!selectedPlatform || !url.trim()) return;
-    setSocialLinks((prev) => ({
-      ...prev,
+  
+   
+    const updatedLinks = {
+      ...socialLinks,
       [selectedPlatform]: url.trim(),
-    }));
+    };
+  
+
+    const cleanedLinks = pickBy(updatedLinks, (value) => Boolean(value));
+  
+    setSocialLinks(cleanedLinks);
     handleClose();
   };
-
   const isEditMode = Boolean(platform);
   const isDisabled = !selectedPlatform || !url.trim();
 
   const availablePlatforms = Object.values(SocialMediaPlatform).filter(
     (p) => isEditMode || !(p in socialLinks)
   );
+
+  const allowedPlatforms = [
+    SocialMediaPlatform.Facebook,
+    SocialMediaPlatform.Instagram,
+    SocialMediaPlatform.Twitter,
+  ];
+  
+  const platformsOptions = availablePlatforms
+    .filter((p) => allowedPlatforms.includes(p))
+    .map((p) => ({
+      label: PLATFORM_LABELS_MAP[p],
+      value: p,
+      data: {
+        label: PLATFORM_LABELS_MAP[p],
+      },
+    }));
+
+    console.log(platformsOptions)
 
   return (
     <Modal
@@ -60,56 +84,58 @@ const SocialMediaModal = ({
       closeIcon={null}
       onCancel={handleClose}
       width={600}
+      className="!w-11/12 md:!w-3/4 lg:!w-11/12 !max-w-[843px]"
+      bodyStyle={{
+        padding: "3rem 2rem",
+        borderRadius: "1.5rem",
+      }}
       {...modalProps}
     >
-      <section className="text-blue-500 flex flex-col gap-10 pb-10">
-        <header className="flex flex-col gap-4">
-          <div className="w-full flex justify-end">
-            <FontAwesomeIcon
-              icon={faCircleXmark}
-              size="2xl"
-              className="cursor-pointer"
-              onClick={handleClose}
-            />
-          </div>
-          <h2 className="text-xl font-bold md:text-3xl">
-            {isEditMode ? "Editar red social" : "Agregar red social"}
+      <section className="text-[#11284B] flex flex-col gap-10">
+        <header className="flex flex-col gap-6">
+          <h2 className="text-2xl font-bold text-start">
+            {isEditMode ? "Editar red social" : "Añadir tus redes sociales"}
           </h2>
         </header>
 
-        <div className="flex gap-8 items-center md:grid md:grid-cols-2 md:gap-8">
-          <div className="w-full">
-            {/* <label className="text-sm font-medium block mb-2">Plataforma</label> */}
-            <Select
-              className="w-full"
-              disabled={isEditMode}
-              placeholder="Selecciona una plataforma"
-              value={selectedPlatform}
-              onChange={(value) => setSelectedPlatform(value)}
-              options={availablePlatforms.map((p) => ({
-                label: PLATFORM_LABELS_MAP[p],
-                value: p,
-              }))}
-            />
-          </div>
+        <div className="flex flex-col md:flex-row gap-6">
+          <SelectMultiple
+            label="Plataforma"
+            showFloatingLabel
+            wrapperClassName="w-full"
+            selectProps={{
+              disabled: isEditMode,
+              placeholder: "Elige la red social (puedes elegir mas de 1)",
+              options: platformsOptions,
+              value: selectedPlatform,
+              notFoundContent: "No hay plataformas disponibles",
+              onChange: (value) => setSelectedPlatform(value),
+              optionRender: (option) => (
+                <Space>
+                  {option?.data?.label}
+                </Space>
+              ),
+            }}
+          />
 
           <TextInput
-            className=""
-            placeholder="URL del perfil"
+
+            className="w-full h-[45px]"
+            placeholder="Escribe el nombre aqui"
             value={url}
             onChange={(e) => setUrl(e.target.value)}
           />
+        </div>
 
-          <div className="w-full col-span-2 flex justify-center">
-            <Button
-              variant="solid-blue"
-              className="px-10"
-              onClick={handleSubmit}
-              disabled={isDisabled}
-            >
-              Guardar
-            </Button>
-          </div>
+        <div className="w-full flex justify-center">
+          <Button
+            variant="solid-blue"
+            className="rounded-full px-10 py-2 text-lg font-semibold"
+            onClick={handleSubmit}
+            disabled={isDisabled}
+          >
+            Guardar
+          </Button>
         </div>
       </section>
     </Modal>
