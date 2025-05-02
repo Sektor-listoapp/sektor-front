@@ -47,7 +47,7 @@ const LocalOfficeModal = ({
     phone: userPhoneWithoutCode || "",
     phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
     schedule: [],
-    photoUrl: "",
+    photoUrl: undefined,
     address: {
       cityId: 0,
       countryId: 1,
@@ -61,7 +61,7 @@ const LocalOfficeModal = ({
       setInput({
         id: officeToEdit?.id,
         schedule: officeToEdit?.schedule || [],
-        photoUrl: officeToEdit?.photoUrl || "",
+        photoUrl: officeToEdit?.photoUrl || undefined,
         phone: userPhoneWithoutCode || "",
         phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
         address: {
@@ -81,7 +81,7 @@ const LocalOfficeModal = ({
       phone: "",
       phoneCode: DEFAULT_PHONE_CODE,
       schedule: [],
-      photoUrl: "",
+      photoUrl: undefined,
       address: {
         cityId: 0,
         countryId: 1,
@@ -95,7 +95,13 @@ const LocalOfficeModal = ({
   const handleEdit = () => {
     if (officeToEdit?.id) {
       const updatedOffices = localOffices.map((office) =>
-        office?.id === officeToEdit?.id ? { ...office, ...input } : office
+        office?.id === officeToEdit?.id
+          ? {
+            ...office,
+            ...input,
+            photoUrl: input.photoUrl || undefined
+          }
+          : office
       );
       const formattedOffices = updatedOffices.map(
         ({ phone: basePhone, phoneCode, ...restOfficeProps }: any) => ({
@@ -122,6 +128,7 @@ const LocalOfficeModal = ({
         ...restInputProps,
         id: new ObjectId().toHexString(),
         phone: `${phoneCode}${phone}`,
+        photoUrl: input.photoUrl || undefined,
       },
     ]);
     handleClose();
@@ -281,10 +288,10 @@ const LocalOfficeModal = ({
             imageUrl={input?.photoUrl || ""}
             setIsUploadingLogo={setIsUploadingLogo}
             disabled={isLoadingCountryData}
-            onImageChange={(url: string) => {
+            onImageChange={(url: string | null) => {
               setInput((prev) => ({
                 ...prev,
-                photoUrl: url,
+                photoUrl: url || undefined,
               }));
             }}
           />

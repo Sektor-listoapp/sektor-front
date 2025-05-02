@@ -9,8 +9,8 @@ import { cn } from "@/utils/class-name";
 
 interface UploadInputProps {
   className?: string;
-  imageUrl: string;
-  onImageChange: (imageUrl: string) => void;
+  imageUrl: string | null;
+  onImageChange: (imageUrl: string | null) => void;
   setIsUploadingLogo: React.Dispatch<React.SetStateAction<boolean>>;
   disabled?: boolean;
   error?: boolean;
@@ -80,9 +80,9 @@ const UploadInput: React.FC<UploadInputProps> = ({
           className="flex items-center justify-between gap-2 absolute w-full h-full top-0 left-0 p-4 text-base"
           title={localImageFile?.name || placeholder}
         >
-          {Boolean(imageUrl.trim()) && (
+          {Boolean(imageUrl?.trim()) && (
             <Image
-              src={imageUrl}
+              src={imageUrl || ""}
               alt=""
               width={50}
               height={50}
@@ -95,11 +95,11 @@ const UploadInput: React.FC<UploadInputProps> = ({
           ) : (
             <span className="block w-full truncate">
               {(!localImageFile?.name && !imageUrl?.trim()) ||
-              (localImageFile?.name && !imageUrl?.trim())
+                (localImageFile?.name && !imageUrl?.trim())
                 ? placeholder
                 : ""}
-              {localImageFile?.name && imageUrl.trim() && localImageFile?.name}
-              {!localImageFile?.name && imageUrl.trim() && "Imagen cargada"}
+              {localImageFile?.name && imageUrl?.trim() && localImageFile?.name}
+              {!localImageFile?.name && imageUrl?.trim() && "Imagen cargada"}
             </span>
           )}
 

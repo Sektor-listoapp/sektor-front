@@ -150,7 +150,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
 
   const handleInputChange = (
     field: keyof typeof input,
-    value: string | string[] | React.ChangeEvent<HTMLSelectElement>
+    value: string | string[] | React.ChangeEvent<HTMLSelectElement> | null
   ) => {
     if (field in input) {
       setInput((prev) => ({
@@ -171,6 +171,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       const { __typename: _, address, ...restOfficeProps } = office;
       return {
         ...restOfficeProps,
+        photoUrl: office.photoUrl || restOfficeProps.photoUrl,
         address: {
           cityId: address?.cityId || address?.city?.id,
           countryId: address?.countryId || address?.country?.id,
@@ -305,7 +306,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
           error={!requiredFields.logoUrl}
           setIsUploadingLogo={setIsUploadingLogo}
           disabled={loadingSupplier || isUpdatingSupplier || isUploadingLogo}
-          onImageChange={(url: string) => handleInputChange("logoUrl", url)}
+          onImageChange={(url: string | null) => handleInputChange("logoUrl", url || "")}
         />
       </div>
 
