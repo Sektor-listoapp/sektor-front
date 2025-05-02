@@ -53,17 +53,13 @@ const OrganizationFilters = () => {
 
 
   const selectedState = countryStates.find((s) => s.id === Number(selectedStateId));
-  const cityOptions = selectedState?.cities
-    ? [
-      { label: "Ciudad", value: "", disabled: true },
-      ...selectedState.cities.map((city) => ({
-        label: city?.name || "",
-        value: city?.id || "",
-      })),
-    ]
-    : [];
-
-
+  const cityOptions = [
+    { label: "Ciudad", value: "", disabled: true },
+    ...(selectedState?.cities?.map((city) => ({
+      label: city?.name || "",
+      value: city?.id || "",
+    })) || []),
+  ];
 
   const {
     handleGetPublicOrganizations,
@@ -185,8 +181,6 @@ const OrganizationFilters = () => {
                 handleFilterChange("state", stateId);
               }}
             />
-
-            {selectedStateId && (
               <Select
                 wrapperClassName="w-full"
                 value={city}
@@ -198,7 +192,7 @@ const OrganizationFilters = () => {
                   handleFilterChange("city", cityId);
                 }}
               />
-            )}
+          
             {checkAllowedFilter(organizationType, SEGMENT) && (
               <Select
                 wrapperClassName="w-full"
