@@ -123,7 +123,7 @@ const LocalClientModal = ({
             error={logoError}
             setError={setLogoError}
             imageUrl={input?.logoUrl || " "}
-            onImageChange={(url: string) => handleInputChange("logoUrl", url)}
+            onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
           />
 
           <Button

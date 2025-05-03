@@ -513,7 +513,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
             isUpdatingInsuranceBroker ||
             isUploadingLogo
           }
-          onImageChange={(url: string) => handleInputChange("logoUrl", url)}
+          onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
         />
       </div>
 

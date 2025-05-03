@@ -371,7 +371,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
           setError={setLogoHasError}
           setIsUploadingLogo={setIsUploadingLogo}
           disabled={loadingCompany || isUpdatingCompany || isUploadingLogo}
-          onImageChange={(url: string) => handleInputChange("logoUrl", url)}
+          onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
         />
 
         <LocalContactInput

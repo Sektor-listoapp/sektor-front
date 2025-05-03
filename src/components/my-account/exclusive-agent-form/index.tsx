@@ -506,7 +506,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
           disabled={
             loadingExclusiveAgent || isUpdatingExclusiveAgent || isUploadingLogo
           }
-          onImageChange={(url: string) => handleInputChange("logoUrl", url)}
+          onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
         />
       </div>
 
