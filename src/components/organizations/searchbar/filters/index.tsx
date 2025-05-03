@@ -8,7 +8,7 @@ import Select from "@/components/ui/select";
 import { checkAllowedFilter, getRangeQueries } from "./utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import usePublicOrganizations from "@/hooks/use-public-organizations";
-import { faArrowLeft, faFilter } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faSliders } from "@fortawesome/free-solid-svg-icons";
 import {
   SELECT_GENRE_OPTIONS,
   SELECT_LINE_OF_BUSINESS_OPTIONS,
@@ -142,6 +142,14 @@ const OrganizationFilters = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refetchCleaned]);
 
+  const countActiveFilters = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { search: _, type: __, ...filters } = query;
+    return Object.values(filters).filter(value => Boolean(value)).length;
+  };
+
+  const activeFiltersCount = countActiveFilters();
+
   return (
     <>
       <Drawer
@@ -181,18 +189,18 @@ const OrganizationFilters = () => {
                 handleFilterChange("state", stateId);
               }}
             />
-              <Select
-                wrapperClassName="w-full"
-                value={city}
-                disabled={isLoadingCountryData || !selectedState}
-                options={cityOptions}
-                onChange={(e) => {
-                  const cityId = e.target.value;
-                  setSelectedCityId(cityId);
-                  handleFilterChange("city", cityId);
-                }}
-              />
-          
+            <Select
+              wrapperClassName="w-full"
+              value={city}
+              disabled={isLoadingCountryData || !selectedState}
+              options={cityOptions}
+              onChange={(e) => {
+                const cityId = e.target.value;
+                setSelectedCityId(cityId);
+                handleFilterChange("city", cityId);
+              }}
+            />
+
             {checkAllowedFilter(organizationType, SEGMENT) && (
               <Select
                 wrapperClassName="w-full"
@@ -287,11 +295,14 @@ const OrganizationFilters = () => {
       </Drawer>
 
       <Button
-        variant="solid-blue"
-        className="p-2 rounded-full"
+        variant="base"
+        className="shadow-none"
         onClick={handleShowDrawer}
       >
-        <FontAwesomeIcon icon={faFilter} size="xl" />
+        <div className="flex items-center whitespace-nowrap gap-2">
+          <FontAwesomeIcon icon={faSliders} size="lg" />
+          <span className="text-xs">Todos los filtros {activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}</span>
+        </div>
       </Button>
     </>
   );
