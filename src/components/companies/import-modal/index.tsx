@@ -60,6 +60,7 @@ const ImportCompaniesModal = ({ open, setOpen }: ImportCompaniesModalProps) => {
         throw new Error("No se pudo obtener la plantilla.");
       }
     } catch (error) {
+      console.error(error)
       toast.error("Error al descargar la plantilla.");
     } finally {
       setIsDownloading(false);
