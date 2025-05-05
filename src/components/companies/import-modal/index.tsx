@@ -1,4 +1,8 @@
 import Button from "@/components/ui/button";
+import { UPLOAD_ORGANIZATION_TEMPLATE_MUTATION } from "@/lib/sektor-api/mutations/companies/upload-organization-template-mutation";
+import { GET_ORGANIZATION_TEMPLATE_QUERY } from "@/lib/sektor-api/queries";
+
+import { useMutation, useQuery } from "@apollo/client";
 import { faFileUpload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Modal } from "antd";
@@ -15,32 +19,48 @@ const ImportCompaniesModal = ({ open, setOpen }: ImportCompaniesModalProps) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const { data } = useQuery(GET_ORGANIZATION_TEMPLATE_QUERY);
+  const [uploadOrganizationTemplate, { error }] = useMutation(UPLOAD_ORGANIZATION_TEMPLATE_MUTATION);
+
+  console.log(error)
+
+  function fileToBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        const result = reader.result as string;
+        resolve(result);
+      };
+
+      reader.onerror = (error) => {
+        reject(error);
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
   const handleClose = () => setOpen(false);
 
   const handleDownloadTemplate = async () => {
     setIsDownloading(true);
+
     try {
-      const response = await fetch(
-        "https://rujojcf4rd.execute-api.us-east-1.amazonaws.com/default/dev/excel-registration/template"
-      );
+      const { data: file, name: fileName } = data.organizationTemplate;
 
-      if (!response.ok) {
-        throw new Error("Error al descargar la plantilla");
+      if (file && fileName) {
+        const link = document.createElement("a");
+        link.href = `data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,${file}`;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else {
+        throw new Error("No se pudo obtener la plantilla.");
       }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "plantilla-empresas.xlsx";
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-    } catch (err) {
-      console.error(err);
-      const errorMessage = err instanceof Error ? err.message : "Error al descargar la plantilla";
-      toast.error(errorMessage);
+    } catch (error) {
+      toast.error("Error al descargar la plantilla.");
     } finally {
       setIsDownloading(false);
     }
@@ -50,44 +70,40 @@ const ImportCompaniesModal = ({ open, setOpen }: ImportCompaniesModalProps) => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
 
- 
-    if (
-      !file.name.endsWith(".xlsx") &&
-      !file.name.endsWith(".xls")
-    ) {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const excel = e.target.files?.[0];
+
+    if (!excel) return;
+
+    if (!excel.name.endsWith(".xlsx") && !excel.name.endsWith(".xls")) {
       toast.error("Por favor, selecciona un archivo Excel válido (.xlsx o .xls)");
       return;
     }
 
+
     setIsUploading(true);
 
+
+
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      const file = await fileToBase64(excel);
+    
+      const { data } = await uploadOrganizationTemplate({
+        variables: { file },
+      });
 
-      const response = await fetch(
-        "https://rujojcf4rd.execute-api.us-east-1.amazonaws.com/default/dev/excel-registration/upload",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
 
-      if (!response.ok) {
-        throw new Error("Error al subir el archivo");
-      }
+      const result = data?.uploadOrganizationTemplate;
 
-      const data = await response.json();
 
-      if (data.success) {
+      if (result?.[0]?.status === "success") {
         toast.success("Archivo subido exitosamente");
         handleClose();
       } else {
-        throw new Error(data.message || "Error al procesar el archivo");
+        if (result?.[0]?.status === "error") {
+          toast.error(result[0].message);
+        }
       }
     } catch (err) {
       console.error(err);
@@ -100,6 +116,7 @@ const ImportCompaniesModal = ({ open, setOpen }: ImportCompaniesModalProps) => {
       }
     }
   };
+
 
   return (
     <Modal

@@ -19,7 +19,6 @@ export default function AccountPage() {
   const { push, query } = useRouter();
   const { id } = query;
   const userId = Array.isArray(id) ? id[0] : id;
-  console.log(userId)
   const [checkingAccess, setCheckingAccess] = useState(true);
 
 

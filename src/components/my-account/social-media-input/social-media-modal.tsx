@@ -75,7 +75,7 @@ const SocialMediaModal = ({
       },
     }));
 
-    console.log(platformsOptions)
+ 
 
   return (
     <Modal
