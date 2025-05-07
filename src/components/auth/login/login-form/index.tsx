@@ -16,7 +16,6 @@ const { EMAIL, PASSWORD, GENERAL } = INPUT_ERROR_MESSAGES;
 
 export type UserInfo = {
   id: string;
-  group: string;
 };
 
 
@@ -30,19 +29,13 @@ const LoginForm = () => {
   const setUser = useAuthStore((state) => state.setUser);
 
 
-  const [userInfo, setUserInfo] = useState<UserInfo>({
-    id: '',
-    group: ''
-  });
-
-
   const [input, setInput] = useState({ email: "", password: "" });
   const [errors, setErrors] = useState<Record<string, string[]>>({
     email: [],
     password: [],
   });
 
-  useRedirectBasedOnOrganization(userInfo, redirectTo);
+  useRedirectBasedOnOrganization(redirectTo);
 
 
   const handleChange = (e: FormEvent<HTMLInputElement>) => {
@@ -90,10 +83,6 @@ const LoginForm = () => {
         setAccessToken(token);
         setRefreshToken(refreshToken);
         setUser(user);
-        setUserInfo({
-          id: user.id,
-          group: user.group
-        });
       })
       .catch((error) => {
         toast.error(

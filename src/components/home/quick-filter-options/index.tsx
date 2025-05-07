@@ -37,7 +37,7 @@ const QuickFilterOptions = () => {
                             className={`font-normal text-lg mb-7 ${query?.type === option.id ? 'bg-blue-200' : ''}`}
                             onClick={() => handleClick(option.id)}
                         >
-                            <span className="text-lg text-[#182F48] font-normal font-century-gothic">
+                            <span className="text-sm md:text-lg text-[#182F48] font-normal font-century-gothic">
                                 {displayName}
                             </span>
                         </button>

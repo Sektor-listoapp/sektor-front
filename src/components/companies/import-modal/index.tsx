@@ -89,7 +89,7 @@ const ImportCompaniesModal = ({ open, setOpen }: ImportCompaniesModalProps) => {
 
     try {
       const file = await fileToBase64(excel);
-    
+
       const { data } = await uploadOrganizationTemplate({
         variables: { file },
       });
