@@ -38,9 +38,13 @@ import {
   PUBLIC_INSURANCE_COMPANIES_QUERY,
 } from "@/lib/sektor-api/queries";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
+import { FormProps } from "@/types/forms";
 
-const ExclusiveAgentForm = () => {
-  const userId = useAuthStore(useShallow((state) => state.user?.id));
+type ExclusiveAgentIdProps = FormProps;
+
+const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
+  const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
+  const targetUserId = userId || loggedUserId;
   const [isUpdatingExclusiveAgent, setIsUpdatingExclusiveAgent] =
     useState(false);
 
@@ -50,7 +54,7 @@ const ExclusiveAgentForm = () => {
     loading: loadingExclusiveAgent,
     refetch: refetchExclusiveAgent,
   } = useQuery<Query>(PUBLIC_EXCLUSIVE_AGENT_BY_ID_QUERY, {
-    variables: { id: userId },
+    variables: { id: targetUserId },
   });
 
   const [updateExclusiveAgent] = useMutation<Mutation>(UPDATE_EXCLUSIVE_AGENT);
@@ -169,15 +173,15 @@ const ExclusiveAgentForm = () => {
       foundationYear > 0 ? currentYear - foundationYear : 0;
     const studies = exclusiveAgent?.studies
       ? exclusiveAgent?.studies.map(
-          ({ id, title, institution, startDate, endDate, description }) => {
-            return { id, title, institution, startDate, endDate, description };
-          }
-        )
+        ({ id, title, institution, startDate, endDate, description }) => {
+          return { id, title, institution, startDate, endDate, description };
+        }
+      )
       : [];
     const clients = exclusiveAgent?.clients
       ? exclusiveAgent?.clients.map(({ id, name, logoUrl }) => {
-          return { id, name, logoUrl };
-        })
+        return { id, name, logoUrl };
+      })
       : [];
     const insuranceCompanies = (exclusiveAgent?.insuranceCompanies?.map(
       ({ id }) => id
@@ -225,7 +229,7 @@ const ExclusiveAgentForm = () => {
     coverageState: Boolean(input.coverageState.length),
     yearsOfExperience: Boolean(
       input.yearsOfExperience.trim().length &&
-        Number(input.yearsOfExperience) > 0
+      Number(input.yearsOfExperience) > 0
     ),
     phone: Boolean(input.phone.trim().length),
     logoUrl: Boolean(input.logoUrl.trim().length),
@@ -236,7 +240,7 @@ const ExclusiveAgentForm = () => {
   if (exclusiveAgentError) {
     toast.error(
       exclusiveAgentError?.message ||
-        "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
+      "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
     );
   }
 
@@ -265,7 +269,7 @@ const ExclusiveAgentForm = () => {
     updateExclusiveAgent({
       variables: {
         input: {
-          id: userId,
+          id: targetUserId,
           foundationYear,
           name: input?.name,
           allies: input?.allies,
@@ -318,6 +322,7 @@ const ExclusiveAgentForm = () => {
           name="name"
           className="col-span-1"
           placeholder="Nombre completo"
+          showFloatingLabel
           error={!requiredFields.name}
           disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
           onChange={(e) => handleInputChange("name", e.target.value)}
@@ -325,11 +330,13 @@ const ExclusiveAgentForm = () => {
         />
 
         <SelectMultiple
+          label="Compañías con las que trabajas"
+          showFloatingLabel
           wrapperClassName="w-full"
           error={!requiredFields.insuranceCompanies}
           selectProps={{
             disabled: loadingInsuranceCompanies || isUpdatingExclusiveAgent,
-            placeholder: "Compañias con las que trabajas",
+            placeholder: "Compañías con las que trabajas",
             options: insuranceCompanyOptions,
             value: input?.insuranceCompanies,
             notFoundContent: "No hay opciones disponibles",
@@ -347,6 +354,7 @@ const ExclusiveAgentForm = () => {
             ),
           }}
         />
+
 
         <SelectWithTextInput
           selectProps={{
@@ -381,6 +389,8 @@ const ExclusiveAgentForm = () => {
 
         <SelectMultiple
           wrapperClassName="w-full"
+          label="Ramos con los que trabajas"
+          showFloatingLabel
           error={!requiredFields.segment}
           selectProps={{
             placeholder: "Ramos con los que trabajas",
@@ -435,6 +445,8 @@ const ExclusiveAgentForm = () => {
         />
 
         <SelectMultiple
+          label="Zona de alcance (estado)"
+          showFloatingLabel
           wrapperClassName="w-full"
           error={!requiredFields.coverageState}
           selectProps={{
@@ -454,6 +466,7 @@ const ExclusiveAgentForm = () => {
           error={!requiredFields.yearsOfExperience}
           name="yearsOfExperience"
           placeholder="Años de experiencia"
+          showFloatingLabel
           type="number"
           min={0}
           disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
@@ -493,7 +506,7 @@ const ExclusiveAgentForm = () => {
           disabled={
             loadingExclusiveAgent || isUpdatingExclusiveAgent || isUploadingLogo
           }
-          onImageChange={(url: string) => handleInputChange("logoUrl", url)}
+          onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
         />
       </div>
 
@@ -506,6 +519,8 @@ const ExclusiveAgentForm = () => {
         />
 
         <SelectMultiple
+          label="Aliados"
+          showFloatingLabel
           wrapperClassName="w-full col-span-1"
           selectProps={{
             disabled:

@@ -32,9 +32,14 @@ import LocalOfficesInput from "../local-offices-input";
 import Select from "@/components/ui/select";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
 import UploadInput from "@/components/ui/upload-input";
+import { FormProps } from "@/types/forms";
 
-const SupplierForm = () => {
-  const userId = useAuthStore(useShallow((state) => state.user?.id));
+
+type supplierIdProps = FormProps;
+
+const SupplierForm = ({ userId }: supplierIdProps) => {
+  const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
+  const targetUserId = userId || loggedUserId;
   const [isUpdatingSupplier, setIsUpdatingSupplier] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
 
@@ -51,7 +56,7 @@ const SupplierForm = () => {
     loading: loadingSupplier,
     refetch: refetchSupplier,
   } = useQuery<Query>(PUBLIC_SUPPLIER_BY_ID_QUERY, {
-    variables: { id: userId },
+    variables: { id: targetUserId },
   });
 
   const supplier = supplierResponse?.publicSupplierById;
@@ -139,13 +144,13 @@ const SupplierForm = () => {
   if (supplierError) {
     toast.error(
       supplierError?.message ||
-        "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
+      "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
     );
   }
 
   const handleInputChange = (
     field: keyof typeof input,
-    value: string | string[] | React.ChangeEvent<HTMLSelectElement>
+    value: string | string[] | React.ChangeEvent<HTMLSelectElement> | null
   ) => {
     if (field in input) {
       setInput((prev) => ({
@@ -166,6 +171,7 @@ const SupplierForm = () => {
       const { __typename: _, address, ...restOfficeProps } = office;
       return {
         ...restOfficeProps,
+        photoUrl: office.photoUrl || restOfficeProps.photoUrl,
         address: {
           cityId: address?.cityId || address?.city?.id,
           countryId: address?.countryId || address?.country?.id,
@@ -178,7 +184,7 @@ const SupplierForm = () => {
     updateSupplier({
       variables: {
         input: {
-          id: userId,
+          id: targetUserId,
           name: input?.name,
           type: supplier?.type,
           lineOfBusiness: input?.segment,
@@ -227,11 +233,13 @@ const SupplierForm = () => {
           name="name"
           className="col-span-1"
           placeholder="Nombre completo"
+          showFloatingLabel
           disabled={loadingSupplier || isUpdatingSupplier}
           onChange={(e) => handleInputChange("name", e.target.value)}
           value={input?.name}
           error={!requiredFields.name}
         />
+
 
         <SelectMultiple
           wrapperClassName="w-full"
@@ -298,7 +306,7 @@ const SupplierForm = () => {
           error={!requiredFields.logoUrl}
           setIsUploadingLogo={setIsUploadingLogo}
           disabled={loadingSupplier || isUpdatingSupplier || isUploadingLogo}
-          onImageChange={(url: string) => handleInputChange("logoUrl", url)}
+          onImageChange={(url: string | null) => handleInputChange("logoUrl", url || "")}
         />
       </div>
 
@@ -309,6 +317,7 @@ const SupplierForm = () => {
           name="motto"
           className="col-span-1"
           placeholder="Lema"
+          showFloatingLabel
           disabled={loadingSupplier || isUpdatingSupplier}
           onChange={(e) => handleInputChange("motto", e.target.value)}
           value={input?.motto}

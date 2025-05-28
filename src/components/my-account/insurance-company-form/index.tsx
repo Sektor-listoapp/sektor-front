@@ -33,9 +33,14 @@ import {
 import UploadInput from "@/components/ui/upload-input";
 import LocalContactInput from "../local-contact-input";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
+import { FormProps } from "@/types/forms";
+import SocialMediaInput from "../social-media-input";
 
-const InsuranceCompanyForm = () => {
-  const userId = useAuthStore(useShallow((state) => state.user?.id));
+type InsuranceCompanyIdProps = FormProps;
+
+const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
+  const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
+  const targetUserId = userId || loggedUserId;;
   const [isUpdatingCompany, setIsUpdatingCompany] = useState(false);
 
   const [updateCompany] = useMutation<Mutation>(UPDATE_INSURANCE_COMPANY);
@@ -49,7 +54,7 @@ const InsuranceCompanyForm = () => {
     loading: loadingCompany,
     refetch: refetchCompany,
   } = useQuery<Query>(PUBLIC_INSURANCE_COMPANY_BY_ID_QUERY, {
-    variables: { id: userId },
+    variables: { id: targetUserId },
   });
 
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
@@ -147,7 +152,7 @@ const InsuranceCompanyForm = () => {
     identification: Boolean(input.identification?.trim()?.length),
     yearsOfExperience: Boolean(
       input.yearsOfExperience?.trim()?.length &&
-        Number(input.yearsOfExperience) > 0
+      Number(input.yearsOfExperience) > 0
     ),
     logoUrl: Boolean(input.logoUrl?.trim()?.length),
   };
@@ -159,7 +164,7 @@ const InsuranceCompanyForm = () => {
   if (companyError) {
     toast.error(
       companyError?.message ||
-        "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
+      "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
     );
   }
 
@@ -231,7 +236,7 @@ const InsuranceCompanyForm = () => {
     updateCompany({
       variables: {
         input: {
-          id: userId,
+          id: targetUserId,
           type: company?.type,
           name: input?.name,
           suppliers: input?.suppliers || [],
@@ -278,12 +283,15 @@ const InsuranceCompanyForm = () => {
           className="col-span-1"
           error={!requiredFields.name}
           placeholder="Nombre completo"
+          showFloatingLabel
           disabled={loadingCompany || isUpdatingCompany}
           onChange={(e) => handleInputChange("name", e.target.value)}
           value={input?.name}
         />
 
         <SelectMultiple
+          label="Ramos con los que trabajas"
+          showFloatingLabel
           wrapperClassName="w-full"
           error={!requiredFields.segment}
           selectProps={{
@@ -322,6 +330,7 @@ const InsuranceCompanyForm = () => {
         <TextInput
           name="yearsOfExperience"
           placeholder="Años de experiencia"
+          showFloatingLabel
           error={!requiredFields.yearsOfExperience}
           type="number"
           min={0}
@@ -362,12 +371,17 @@ const InsuranceCompanyForm = () => {
           setError={setLogoHasError}
           setIsUploadingLogo={setIsUploadingLogo}
           disabled={loadingCompany || isUpdatingCompany || isUploadingLogo}
-          onImageChange={(url: string) => handleInputChange("logoUrl", url)}
+          onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
         />
 
         <LocalContactInput
           links={company?.contact?.links || []}
           setHasLocalContact={setHasLocalContact}
+          disabled={loadingCompany || isUpdatingCompany}
+        />
+
+        <SocialMediaInput
+          setHasSocialLinks={setHasLocalContact}
           disabled={loadingCompany || isUpdatingCompany}
         />
       </div>
@@ -379,6 +393,7 @@ const InsuranceCompanyForm = () => {
           name="motto"
           className="col-span-1"
           placeholder="Lema"
+          showFloatingLabel
           disabled={loadingCompany || isUpdatingCompany}
           onChange={(e) => handleInputChange("motto", e.target.value)}
           value={input?.motto}
@@ -390,6 +405,8 @@ const InsuranceCompanyForm = () => {
         />
 
         <SelectMultiple
+          label="Proveedores"
+          showFloatingLabel
           wrapperClassName="w-full"
           selectProps={{
             disabled: loadingSuppliers || isUpdatingCompany,

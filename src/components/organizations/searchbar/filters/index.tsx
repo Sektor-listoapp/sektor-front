@@ -8,7 +8,7 @@ import Select from "@/components/ui/select";
 import { checkAllowedFilter, getRangeQueries } from "./utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import usePublicOrganizations from "@/hooks/use-public-organizations";
-import { faArrowLeft, faFilter } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faSliders } from "@fortawesome/free-solid-svg-icons";
 import {
   SELECT_GENRE_OPTIONS,
   SELECT_LINE_OF_BUSINESS_OPTIONS,
@@ -32,32 +32,33 @@ const OrganizationFilters = () => {
   const [openDrawer, setOpenDrawer] = useState(false);
   const handleCloseDrawer = () => setOpenDrawer(false);
   const [refetchCleaned, setRefetchCleaned] = useState(false);
+  const [selectedStateId, setSelectedStateId] = useState("");
+  const [selectedCityId, setSelectedCityId] = useState("");
 
   const { data: countryData, loading: isLoadingCountryData } = useQuery<Query>(
     COUNTRY_BY_CODE_QUERY,
     { variables: { code: "VE" } }
   );
 
+
   const countryStates = countryData?.getCountryByCode?.states || [];
-  const stateCities = countryStates
-    .map((state) => {
-      return state.cities.map((city) => {
-        return {
-          label: `${city?.name}, ${state?.name}`,
-          value: city?.id,
-          stateId: state?.id,
-        };
-      });
-    })
-    .flat();
-  const formattedLocationOptions = [
-    {
-      label: "Ubicación",
-      value: "",
-      disabled: true,
-      hidden: true,
-    },
-    ...stateCities,
+
+  const stateOptions = [
+    { label: "Estado", value: "", disabled: true },
+    ...countryStates.map((state) => ({
+      label: state?.name || "",
+      value: state?.id || "",
+    })),
+  ];
+
+
+  const selectedState = countryStates.find((s) => s.id === Number(selectedStateId));
+  const cityOptions = [
+    { label: "Ciudad", value: "", disabled: true },
+    ...(selectedState?.cities?.map((city) => ({
+      label: city?.name || "",
+      value: city?.id || "",
+    })) || []),
   ];
 
   const {
@@ -72,7 +73,8 @@ const OrganizationFilters = () => {
     search = "",
     genre = "",
     segment = "",
-    location = "",
+    state = selectedStateId,
+    city = selectedCityId,
     serviceType = "",
     minAge = 0,
     maxAge = 50,
@@ -118,6 +120,9 @@ const OrganizationFilters = () => {
     }
 
     handleGetPublicOrganizationsWithNewFilters({ ...defaultFilters });
+    setSelectedStateId('');
+    setSelectedCityId('');
+
   };
 
   const disableResetFiltersButton = () => {
@@ -136,6 +141,14 @@ const OrganizationFilters = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refetchCleaned]);
+
+  const countActiveFilters = () => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { search: _, type: __, ...filters } = query;
+    return Object.values(filters).filter(value => Boolean(value)).length;
+  };
+
+  const activeFiltersCount = countActiveFilters();
 
   return (
     <>
@@ -166,11 +179,26 @@ const OrganizationFilters = () => {
           <section className="w-full flex flex-col gap-6 items-center justify-center">
             <Select
               wrapperClassName="w-full"
-              value={location || ""}
+              value={state}
               disabled={isLoadingCountryData}
-              options={formattedLocationOptions}
-              onChange={(e) => handleFilterChange("location", e?.target?.value)}
-              defaultValue={formattedLocationOptions[0].value}
+              options={stateOptions}
+              onChange={(e) => {
+                const stateId = e.target.value;
+                setSelectedStateId(stateId);
+                setSelectedCityId("");
+                handleFilterChange("state", stateId);
+              }}
+            />
+            <Select
+              wrapperClassName="w-full"
+              value={city}
+              disabled={isLoadingCountryData || !selectedState}
+              options={cityOptions}
+              onChange={(e) => {
+                const cityId = e.target.value;
+                setSelectedCityId(cityId);
+                handleFilterChange("city", cityId);
+              }}
             />
 
             {checkAllowedFilter(organizationType, SEGMENT) && (
@@ -267,11 +295,14 @@ const OrganizationFilters = () => {
       </Drawer>
 
       <Button
-        variant="solid-blue"
-        className="p-2 rounded-full"
+        variant="base"
+        className="shadow-none"
         onClick={handleShowDrawer}
       >
-        <FontAwesomeIcon icon={faFilter} size="xl" />
+        <div className="flex items-center whitespace-nowrap gap-2">
+          <FontAwesomeIcon icon={faSliders} size="lg" />
+          <span className="text-xs">Todos los filtros {activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}</span>
+        </div>
       </Button>
     </>
   );

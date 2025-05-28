@@ -9,3 +9,4 @@ export * from "./public/public-exclusive-agents";
 export * from "./public/public-suppliers";
 export * from "./public/country-by-code";
 export * from "./public/quotes";
+export * from "./public/get-organization-template"

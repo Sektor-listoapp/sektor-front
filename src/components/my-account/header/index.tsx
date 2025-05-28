@@ -13,18 +13,25 @@ import { useAuthStore } from "@/store/auth";
 
 interface HeaderProps {
   data: OrganizationType;
+  accountEdit?: boolean;
 }
 
-const Header = ({ data }: HeaderProps) => {
+const Header = ({ data, accountEdit = false }: HeaderProps) => {
   const userName = useAuthStore((state) => state.user?.name);
   const isAccountVerified = data?.isActive;
   const userTypeLabel =
     ORGANIZATION_TYPE_LABEL.SINGULAR[data?.type] || "Sektor";
 
+
+  const editUserName = data?.name || ''
+  const message = accountEdit
+    ? `Editando la cuenta de ${editUserName}`
+    : `¡Hola ${userName ?? ""}! Bienvenido a tu cuenta de ${userTypeLabel}`
+
   return (
-    <header className="w-11/12 max-w-screen-xl border-b-2 border-b-gray-300 flex justify-between items-end text-blue-500 pb-3 gap-2 md:gap-5 md:pb-5 md:items-center">
+    <header className="w-11/12 max-w-screen-xl border-b border-b-[#B7D9E2] flex justify-between items-end text-blue-500 pb-3 gap-2 md:gap-5 md:pb-5 md:items-center">
       <h1 className="text-lg text-balance md:text-2xl lg:text-3xl">
-        ¡Hola {userName ?? ""}! Bienvenido a tu cuenta de {userTypeLabel}
+        {message}
       </h1>
 
       {Boolean(userName) && Boolean(data) && (

@@ -4,37 +4,36 @@ import Header from "@/components/my-account/header";
 import Navbar from "@/components/my-account/navbar";
 import { useAuthStore } from "@/store/auth";
 import { useShallow } from "zustand/shallow";
-import { ORGANIZATION_BY_ID_QUERY } from "@/lib/sektor-api/queries";
-import { useQuery } from "@apollo/client";
-import { USER_FORM } from "@/components/my-account/constants";
 import { Empty } from "antd";
 import {
   OrganizationType,
-  Query,
+  OrganizationTypes,
   UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
-import CustomerForm from "@/components/my-account/customer-form";
+import { getUserForm } from "@/utils/form/get-user-form";
+import { useOrganizationData } from "@/hooks/use-organization-data";
 
 const { Admin, Customer } = UserGroups;
 
 const MyAccount = () => {
-  const userId = useAuthStore(useShallow((state) => state.user?.id));
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
   const isAdmin = userGroup === Admin;
   const isCustomer = userGroup === Customer;
 
-  const {
-    data: organizationDataResponse,
-    error,
-    loading,
-  } = useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
-    variables: { id: userId },
-    skip: isCustomer,
-  });
+  const { organizationData, loading, error } = useOrganizationData();
 
-  const organizationData = organizationDataResponse?.organizationById;
-  const OrganizationForm = USER_FORM[organizationData?.type || ""];
+  const FormComponent = getUserForm(organizationData);
 
+  const showMessage =
+    organizationData?.type !== OrganizationTypes.Admin
+      ? "Tú perfil es la ventana a nuevos prospectos asegurados. Por favor, completa los campos"
+      : (
+        <>
+          Tú perfil es la ventana a nuevos prospectos asegurados, completa cada campo necesario y <b>Sektor</b> potenciará tu marca
+        </>
+      );
+
+      
   return (
     <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start gap-8  overflow-hidden">
       <Navbar />
@@ -62,14 +61,11 @@ const MyAccount = () => {
                 Llena el siguiente formulario
               </h2>
               <p className="font-century-gothic text-base text-center max-w-xl text-balance">
-                Tú perfil es la ventana a nuevos prospectos asegurados, completa
-                cada campo necesario y <b>Sektor</b> potenciará tu marca
+                {showMessage}
               </p>
             </header>
           )}
-
-          {isCustomer && <CustomerForm />}
-          {Boolean(OrganizationForm) && <OrganizationForm />}
+          {FormComponent && <FormComponent data={organizationData} />}
         </main>
       )}
     </div>

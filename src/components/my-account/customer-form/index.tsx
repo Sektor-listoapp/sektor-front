@@ -13,9 +13,12 @@ import { SELECT_GENRE_OPTIONS } from "@/constants/forms";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
 import { CUSTOMER_BY_ID_QUERY } from "@/lib/sektor-api/queries/auth/customer-by-id";
 import { faPerson, faPersonHalfDress } from "@fortawesome/free-solid-svg-icons";
+import { FormProps } from "@/types/forms";
 
-const CustomerForm = () => {
-  const userId = useAuthStore(useShallow((state) => state.user?.id));
+type CustomerIdProps = FormProps;
+const CustomerForm = ({userId}: CustomerIdProps) => {
+  const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
+  const targetUserId = userId || loggedUserId;
   const [isUpdatingCustomer, setIsUpdatingCustomer] = useState(false);
 
   const {
@@ -23,7 +26,7 @@ const CustomerForm = () => {
     error: customerError,
     loading: customerLoading,
     refetch: refetchCustomer,
-  } = useQuery<Query>(CUSTOMER_BY_ID_QUERY, { variables: { id: userId } });
+  } = useQuery<Query>(CUSTOMER_BY_ID_QUERY, { variables: { id: targetUserId } });
 
   const customerData = customerDataResponse?.customerById;
 
@@ -76,7 +79,7 @@ const CustomerForm = () => {
     updateCustomer({
       variables: {
         input: {
-          id: userId,
+          id: targetUserId,
           sex: input?.sex,
           name: input?.name,
         },
@@ -111,6 +114,7 @@ const CustomerForm = () => {
           name="name"
           className="col-span-1"
           placeholder="Nombre completo"
+          showFloatingLabel
           icon={faPerson}
           error={!requiredFields.name}
           disabled={customerLoading || isUpdatingCustomer}

@@ -29,10 +29,15 @@ const usePublicOrganizations = ({
       variables: {
         pagination: { offset: 0, limit: 6 },
         ...currentFilters,
+        state: "Distrito Capital",  
+        city: "Caracas", 
         ...variables,
       },
     }
   );
+
+
+  
 
   const setPublicBrokerageSocieties = usePublicOrganizationsStore(
     (state) => state.setPublicBrokerageSocieties
@@ -91,6 +96,8 @@ const usePublicOrganizations = ({
         pagination: { offset: 0, limit },
         ...currentFilters,
       });
+
+    
       setPublicOrganizations(data);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {

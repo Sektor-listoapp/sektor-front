@@ -10,7 +10,8 @@ import { useRouter } from "next/router";
 import { useAuthStore } from "@/store/auth";
 import { ROUTES } from "@/constants/router";
 import { useShallow } from "zustand/shallow";
-import { UserGroups } from "@/lib/sektor-api/__generated__/types";
+import { OrganizationTypes, UserGroups } from "@/lib/sektor-api/__generated__/types";
+import { useOrganizationData } from "@/hooks/use-organization-data";
 
 interface NavbarProps extends React.HTMLAttributes<HTMLDivElement> {
   variant?: "light" | "dark";
@@ -34,6 +35,12 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
     window?.localStorage?.clear();
     push(ROUTES.HOME);
   };
+
+  const { BrokerageSociety, InsuranceBroker, ExclusiveAgent } = OrganizationTypes;
+  const allowedTypes = [BrokerageSociety, InsuranceBroker, ExclusiveAgent];
+  const { organizationData } = useOrganizationData();
+  const isCompany = allowedTypes.includes(organizationData?.type as OrganizationTypes);
+  
 
   return (
     <nav className={cn("w-full", className)} {...props}>
@@ -106,18 +113,8 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                 Empresa
               </Link>
             )}
-            {isAdmin && (
-              <Link
-                className={cn(
-                  " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
-                  { "font-bold": pathname === ROUTES.COMPANIES }
-                )}
-                href={ROUTES.COMPANIES}
-              >
-                Empresa
-              </Link>
-            )}
-            {isAuthenticated && !isCustomer && (
+
+            {isAuthenticated && (isCustomer || isCompany) &&(
               <Link
                 className={cn(
                   " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
@@ -220,7 +217,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
               Empresa
             </Link>
           )}
-          {isAuthenticated && !isCustomer && (
+          {isAuthenticated && (isCustomer || isCompany) && (
             <Link
               className={cn(
                 "focus:outline-none",

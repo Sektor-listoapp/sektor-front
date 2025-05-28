@@ -35,7 +35,7 @@ const Organizations = () => {
               <Organization key={`${type}-organization-${index}`} />
             )
           )
-        )}
+        )}     
       </main>
       {isReady && query?.details && <OrganizationDetailsModal />}
     </div>
