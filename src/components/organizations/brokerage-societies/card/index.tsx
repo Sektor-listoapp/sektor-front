@@ -42,11 +42,11 @@ const BrokerageSocietyCard = ({
         </div>
       )}
       <Image
-        className="w-full h-full object-cover object-center rounded-l-2xl min-h-48"
+        className="w-full h-full rounded-l-2xl min-h-48"
         src={data?.logoUrl || "/images/placeholder.png"}
         alt={name}
-        width={500}
-        height={400}
+        width={350}
+        height={350}
       />
       <div className="w-full col-span-2 p-2 text-xs rounded-r-2xl border-l-0 border border-blue-500 border-opacity-10 md:text-sm flex flex-col justify-between gap-2 lg:p-4">
         <h3
