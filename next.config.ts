@@ -8,6 +8,7 @@ const nextConfig: NextConfig = {
       { hostname: "web-api.s3.amazonaws.com" },
       { hostname: "avatars.githubusercontent.com" },
       { hostname: "web-api.s3.us-east-1.amazonaws.com" },
+      { hostname: "placehold.co" },
     ],
   },
   reactStrictMode: true,
