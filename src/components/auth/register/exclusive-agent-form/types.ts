@@ -3,6 +3,7 @@ import { FormEvent } from "react";
 export interface ExclusiveAgentFormInput {
   name: string;
   email: string;
+  sex: string;
   license: string;
   licenseType: string;
   password: string;
@@ -12,6 +13,7 @@ export interface ExclusiveAgentFormInput {
 export interface ExclusiveAgentFormInputErrors {
   name: string[];
   email: string[];
+  sex: string[];
   license: string[];
   licenseType: string[];
   password: string[];

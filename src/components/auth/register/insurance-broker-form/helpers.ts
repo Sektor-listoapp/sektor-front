@@ -84,6 +84,7 @@ export const validateFormFields = ({
       ...prev,
       name: !input.name.trim().length ? [GENERAL.REQUIRED] : prev.name,
       email: !input.email.trim().length ? [GENERAL.REQUIRED] : prev.email,
+      sex: !input.sex.trim().length ? [GENERAL.REQUIRED] : prev.sex,
       license: !input.license.trim().length ? [GENERAL.REQUIRED] : prev.license,
       password: !input.password.trim().length
         ? [GENERAL.REQUIRED]
