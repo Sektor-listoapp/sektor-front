@@ -117,6 +117,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     // additional
     motto: "",
     suppliers: [],
+    socialMediaLinks: [],
   });
 
   useEffect(() => {
@@ -127,6 +128,15 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     const foundationYear = Number(company?.foundationYear || 0);
     const supplierIds = (company?.suppliers?.map(({ id }) => id) ||
       []) as never[];
+
+    const formattedSocialMediaLinks = company?.socialMediaLinks?.map((link: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { __typename, ...restLinkProps } = link;
+      return {
+        platform: restLinkProps.platform,
+        url: restLinkProps.url,
+      };
+    }) || [];
 
     setInput({
       name: company?.name || "",
@@ -142,7 +152,18 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       yearsOfExperience: String(foundationYear) || "",
       motto: company?.motto || "",
       logoUrl: company?.logoUrl || "",
+      socialMediaLinks: [],
     });
+
+    window?.localStorage?.setItem(
+      "social-links",
+      JSON.stringify(formattedSocialMediaLinks)
+    );
+
+    window?.localStorage?.setItem(
+      "sektor-local-offices",
+      JSON.stringify(company?.offices || [])
+    );
   }, [company]);
 
   const requiredFields = {
@@ -183,21 +204,13 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    setIsUpdatingCompany(true);
+    console.log('=== INSURANCE COMPANY FORM SUBMISSION DEBUG ===');
+    console.log('Form input data:', input);
+    console.log('Target user ID:', targetUserId);
+    console.log('Company data:', company);
+    console.log('Has errors:', hasErrors);
 
-    const localContactLinks = JSON.parse(
-      window?.localStorage?.getItem("sektor-local-contact") ?? "{}"
-    );
-    const formattedContact = {
-      name: company?.contact?.name || "Contacto",
-      links:
-        Object?.entries(localContactLinks)?.map(([platform, url]) => {
-          return {
-            platform,
-            url,
-          };
-        }) ?? [],
-    };
+    setIsUpdatingCompany(true);
 
     const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
     const formattedOffices = JSON.parse(offices).map((office: any) => {
@@ -228,36 +241,78 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       };
     });
 
-    const coverageStates =
-      formattedOffices?.map(
-        (office: OrganizationOfficeInputType) => office?.address?.stateId
-      ) || [];
+    const contact = window.localStorage.getItem("sektor-local-contact") ?? "{}";
+    const contactData = JSON.parse(contact);
+
+
+    const cleanedLinks = Array.isArray(contactData.links)
+      ? contactData.links.map((link: any) => ({
+        platform: link.platform,
+        url: link.url,
+      }))
+      : [];
+
+    const formattedContact: InsuranceCompanyContactInputType = {
+      name: contactData.name || "",
+      links: cleanedLinks,
+    };
+
+    const socialMediaLinks = window.localStorage.getItem("social-links") ?? "[]";
+    const formattedSocialMediaLinks = JSON.parse(socialMediaLinks).map((link: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { __typename, ...restLinkProps } = link;
+      return {
+        platform: restLinkProps.platform,
+        url: restLinkProps.url,
+      };
+    });
+
+    console.log('Formatted offices:', formattedOffices);
+    console.log('Formatted contact:', formattedContact);
+    console.log('Formatted social media links:', formattedSocialMediaLinks);
+
+    const coverageStates = formattedOffices?.map(
+      (office: OrganizationOfficeInputType) => office?.address?.stateId
+    ) || [];
+
+    const mutationVariables = {
+      input: {
+        id: targetUserId,
+        type: company?.type,
+        name: input?.name,
+        suppliers: input?.suppliers || [],
+        lineOfBusiness: input?.segment,
+        foundationYear: Number(input?.yearsOfExperience) || 0,
+        license: `${input?.licenseType}${input?.license}`,
+        identification: `${input?.identificationType}${input?.identification}`,
+        motto: input?.motto,
+        offices: formattedOffices,
+        coverageStates: coverageStates,
+        modality: company?.modality,
+        logoUrl: input?.logoUrl,
+        contact: formattedContact,
+        socialMediaLinks: formattedSocialMediaLinks || [],
+      },
+    };
+
+    console.log('Mutation variables:', mutationVariables);
 
     updateCompany({
-      variables: {
-        input: {
-          id: targetUserId,
-          type: company?.type,
-          name: input?.name,
-          suppliers: input?.suppliers || [],
-          lineOfBusiness: input?.segment,
-          foundationYear: Number(input?.yearsOfExperience) || 0,
-          license: `${input?.licenseType}${input?.license}`,
-          identification: `${input?.identificationType}${input?.identification}`,
-          motto: input?.motto,
-          offices: formattedOffices,
-          coverageStates: coverageStates || [],
-          modality: company?.modality,
-          logoUrl: input?.logoUrl,
-          contact: formattedContact,
-        },
-      },
+      variables: mutationVariables,
     })
-      .then(() => {
+      .then((response) => {
+        console.log('Insurance company update success response:', response);
         toast.success("Información actualizada correctamente");
         refetchCompany();
       })
       .catch((error) => {
+        console.error('=== INSURANCE COMPANY FORM ERROR DEBUG ===');
+        console.error('Error object:', error);
+        console.error('Error message:', error?.message);
+        console.error('Error graphQLErrors:', error?.graphQLErrors);
+        console.error('Error networkError:', error?.networkError);
+        console.error('Error extensions:', error?.extensions);
+        console.error('Full error details:', JSON.stringify(error, null, 2));
         toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
       })
       .finally(() => setIsUpdatingCompany(false));
@@ -372,6 +427,8 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
           setIsUploadingLogo={setIsUploadingLogo}
           disabled={loadingCompany || isUpdatingCompany || isUploadingLogo}
           onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
+          placeholder="Subir logo de la empresa"
+          aspect={1}
         />
 
         <LocalContactInput
@@ -452,18 +509,3 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
 export default InsuranceCompanyForm;
 
-/*
-{
-  "name": "Laura Martinez",
-  "links": [
-    {
-      "url": "https://linkedin.com/company/travelsafe",
-      "platform": "Instagram",
-    },
-    {
-      "url": "https://instagram.com/travelsafe",
-      "platform": "Instagram",
-    }
-  ],
-}
-*/

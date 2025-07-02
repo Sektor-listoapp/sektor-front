@@ -19,8 +19,8 @@ const OrganizationDetailsModal = () => {
   const orgType = (detailsQuery?.split("-")[0] as OrgType) || "";
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const OrganizationDetails = 
-      ORGANIZATION_DETAILS_CONTENT_MAP[orgType as OrgType];
+  const OrganizationDetails =
+    ORGANIZATION_DETAILS_CONTENT_MAP[orgType as OrgType];
 
   const handleModalClose = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars

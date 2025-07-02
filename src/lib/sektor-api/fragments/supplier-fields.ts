@@ -42,6 +42,9 @@ export const SUPPLIER_FIELDS_FRAGMENT = gql`
     services {
       ...SupplierServiceFields
     }
+    socialMediaLinks {
+      ...SocialMediaLinkFields
+    }
   }
 
   ${INSURANCE_COMPANY_FIELDS_FRAGMENT}

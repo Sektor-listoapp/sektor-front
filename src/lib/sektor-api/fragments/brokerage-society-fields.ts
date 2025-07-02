@@ -52,6 +52,9 @@ export const BROKERAGE_SOCIETY_FIELDS_FRAGMENT = gql`
     clients {
       ...OrganizationClientFields
     }
+    socialMediaLinks {
+      ...SocialMediaLinkFields
+    }
   }
 
   ${ORGANIZATION_RECOGNITION_FIELDS_FRAGMENT}

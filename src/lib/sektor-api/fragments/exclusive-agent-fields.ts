@@ -45,6 +45,12 @@ export const EXCLUSIVE_AGENT_FIELDS_FRAGMENT = gql`
     studies {
       ...studiesFields
     }
+    socialMediaLinks {
+      ...SocialMediaLinkFields
+    }
+    offices {
+      ...OrganizationOfficeFields
+    }
   }
 
   ${INSURANCE_COMPANY_FIELDS_FRAGMENT}

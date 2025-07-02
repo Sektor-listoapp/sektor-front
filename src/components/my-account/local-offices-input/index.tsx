@@ -24,6 +24,7 @@ const LocalOfficesInput = ({
   disabled,
   error = false,
 }: LocalOfficesInputProps) => {
+  
   const [localOffices, setLocalOffices] = useLocalStorage(
     "sektor-local-offices",
     offices ?? []

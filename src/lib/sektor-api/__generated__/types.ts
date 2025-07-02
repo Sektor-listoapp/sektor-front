@@ -191,6 +191,8 @@ export type BrokerageSocietyType = BasePublicOrganizationType & {
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
   workTeam: Array<TeamMemberType>;
+  socialMediaLinks: Array<SocialMediaLinkType>;
+  
 };
 
 export type ChangeOrganizationFeatureInputType = {
@@ -329,6 +331,8 @@ export type ExclusiveAgentType = BasePublicOrganizationType & {
   studies: Array<StudyType>;
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
+  socialMediaLinks: Array<SocialMediaLinkType>;
+  offices: Array<OrganizationOfficeType>;
 };
 
 export type HealthQuoteInputType = {
@@ -398,6 +402,7 @@ export type InsuranceBrokerInputType = {
   sex: Sexes;
   studies: Array<StudyInputType>;
   type: OrganizationTypes;
+  socialMediaLinks: Array<SocialMediaLinkInputType>;
 };
 
 export type InsuranceBrokerPaginatedType = {
@@ -435,6 +440,8 @@ export type InsuranceBrokerType = BasePublicOrganizationType & {
   studies: Array<StudyType>;
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
+  socialMediaLinks: Array<SocialMediaLinkType>;
+  offices: Array<OrganizationOfficeType>;
 };
 
 export type InsuranceCompanyContactInputType = {
@@ -503,6 +510,7 @@ export type InsuranceCompanyType = BasePublicOrganizationType & {
   suppliers: Array<SupplierType>;
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
+  socialMediaLinks: Array<SocialMediaLinkType>;
 };
 
 export type LoginInputType = {

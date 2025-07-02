@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { Modal, ModalProps, Space } from "antd";
+import { Modal, ModalProps } from "antd";
 import Button from "@/components/ui/button";
 import TextInput from "@/components/ui/text-input";
-import SelectMultiple from "@/components/ui/select-multiple";
-import { SocialMediaPlatform } from "@/lib/sektor-api/__generated__/types";
+import Select from "@/components/ui/select";
+import { SocialMediaPlatform, SocialMediaLinkType } from "@/lib/sektor-api/__generated__/types";
 import { PLATFORM_LABELS_MAP } from "@/constants/forms";
-import { pickBy } from "lodash";
 
 interface SocialMediaModalProps extends ModalProps {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   platform: string | null;
-  socialLinks: Record<string, string>;
-  setSocialLinks: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  socialLinks: SocialMediaLinkType[];
+  setSocialLinks: React.Dispatch<React.SetStateAction<SocialMediaLinkType[]>>;
 }
 
 const SocialMediaModal = ({
@@ -23,40 +22,54 @@ const SocialMediaModal = ({
   setSocialLinks,
   ...modalProps
 }: SocialMediaModalProps) => {
-  const [selectedPlatform, setSelectedPlatform] = useState<string | undefined>(platform ?? undefined);
+  const [selectedPlatform, setSelectedPlatform] = useState<string>(platform || "");
   const [url, setUrl] = useState<string>("");
 
   useEffect(() => {
-    setSelectedPlatform(platform ?? undefined);
-    setUrl(platform && socialLinks?.[platform] ? socialLinks[platform] : "");
+    if (platform) {
+      setSelectedPlatform(platform);
+      const existingLink = socialLinks.find(link => link.platform === platform);
+      setUrl(existingLink?.url || "");
+    } else {
+      setSelectedPlatform("");
+      setUrl("");
+    }
   }, [platform, socialLinks]);
 
   const handleClose = () => {
-    setSelectedPlatform(undefined);
+    setSelectedPlatform("");
     setUrl("");
     setOpen(false);
   };
 
   const handleSubmit = () => {
     if (!selectedPlatform || !url.trim()) return;
-  
-   
-    const updatedLinks = {
-      ...socialLinks,
-      [selectedPlatform]: url.trim(),
-    };
-  
 
-    const cleanedLinks = pickBy(updatedLinks, (value) => Boolean(value));
-  
-    setSocialLinks(cleanedLinks);
+    const newLink = {
+      platform: selectedPlatform,
+      url: url.trim(),
+    };
+
+    let updatedLinks;
+    if (platform) {
+      updatedLinks = socialLinks.map(link =>
+        link.platform === platform
+          ? newLink
+          : link
+      );
+    } else {
+      updatedLinks = [...socialLinks, newLink];
+    }
+
+    setSocialLinks(updatedLinks);
     handleClose();
   };
+
   const isEditMode = Boolean(platform);
   const isDisabled = !selectedPlatform || !url.trim();
 
   const availablePlatforms = Object.values(SocialMediaPlatform).filter(
-    (p) => isEditMode || !(p in socialLinks)
+    (p) => isEditMode || !socialLinks.some(link => link.platform === p)
   );
 
   const allowedPlatforms = [
@@ -64,7 +77,7 @@ const SocialMediaModal = ({
     SocialMediaPlatform.Instagram,
     SocialMediaPlatform.Twitter,
   ];
-  
+
   const platformsOptions = availablePlatforms
     .filter((p) => allowedPlatforms.includes(p))
     .map((p) => ({
@@ -74,8 +87,6 @@ const SocialMediaModal = ({
         label: PLATFORM_LABELS_MAP[p],
       },
     }));
-
- 
 
   return (
     <Modal
@@ -99,27 +110,19 @@ const SocialMediaModal = ({
         </header>
 
         <div className="flex flex-col md:flex-row gap-6">
-          <SelectMultiple
-            label="Plataforma"
-            showFloatingLabel
+          <Select
+            className="w-full"
+            disabled={isEditMode}
             wrapperClassName="w-full"
-            selectProps={{
-              disabled: isEditMode,
-              placeholder: "Elige la red social (puedes elegir mas de 1)",
-              options: platformsOptions,
-              value: selectedPlatform,
-              notFoundContent: "No hay plataformas disponibles",
-              onChange: (value) => setSelectedPlatform(value),
-              optionRender: (option) => (
-                <Space>
-                  {option?.data?.label}
-                </Space>
-              ),
-            }}
+            options={[
+              { label: "Elige una opción", value: "", disabled: true, hidden: false },
+              ...platformsOptions
+            ]}
+            value={selectedPlatform}
+            onChange={e => setSelectedPlatform(e.target.value)}
           />
 
           <TextInput
-
             className="w-full h-[45px]"
             placeholder="Escribe el nombre aqui"
             value={url}

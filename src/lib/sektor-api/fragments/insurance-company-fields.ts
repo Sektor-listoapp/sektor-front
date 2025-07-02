@@ -39,6 +39,9 @@ export const INSURANCE_COMPANY_FIELDS_FRAGMENT = gql`
     contact {
       ...InsuranceCompanyContactFields
     }
+    socialMediaLinks {
+      ...SocialMediaLinkFields
+    }
   }
 
   ${ORGANIZATION_OFFICE_FIELDS_FRAGMENT}
