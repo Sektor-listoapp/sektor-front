@@ -7,6 +7,7 @@ import {
   Mutation,
   UserGroups,
   TrackingUserInputType,
+  SupplierType,
 } from "@/lib/sektor-api/__generated__/types";
 import { CREATE_TRACKING } from "@/lib/sektor-api/mutations";
 import { useAuthStore } from "@/store/auth";
@@ -17,9 +18,10 @@ import { Modal } from "antd";
 import { pickBy } from "lodash";
 import React, { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
+import OrganizationSocialMediaLinks from "../organization-social-media-links";
 
 interface ContactDetailsModalProps {
-  contact: InsuranceBrokerType | BrokerageSocietyType | ExclusiveAgentType;
+  contact: InsuranceBrokerType | BrokerageSocietyType | ExclusiveAgentType | SupplierType;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -104,6 +106,11 @@ const ContactDetailsModal = ({
   const email = contact?.email || contact?.contact?.email || null;
   // @ts-expect-error Unknown type
   const phone = contact?.phone || contact?.contact?.phone || null;
+  // Obtener redes sociales
+  // Para InsuranceCompanyType, los links están en contact?.links
+  // Para los demás, están en contact?.socialMediaLinks
+  // Si no existen, dejar array vacío
+  const socialMediaLinks = contact?.socialMediaLinks || contact?.contact?.links || [];
 
   return (
     <Modal
@@ -136,6 +143,13 @@ const ContactDetailsModal = ({
             </b>
           </div>
         </div>
+        {/* Redes sociales */}
+        {socialMediaLinks.length > 0 && (
+          <div className="w-full mt-4">
+            <h4 className="text-base font-semibold mb-2 text-center">Redes sociales</h4>
+            <OrganizationSocialMediaLinks socialMediaLinks={socialMediaLinks} />
+          </div>
+        )}
       </section>
     </Modal>
   );

@@ -123,6 +123,7 @@ export type BrokerageSocietyContactType = {
   name: Scalars['String']['output'];
   phone: Scalars['String']['output'];
   position: Scalars['String']['output'];
+  links: Array<SocialMediaLinkType>;
 };
 
 export type BrokerageSocietyFilterType = {
@@ -192,6 +193,7 @@ export type BrokerageSocietyType = BasePublicOrganizationType & {
   updatedAt: Scalars['DateTime']['output'];
   workTeam: Array<TeamMemberType>;
   socialMediaLinks: Array<SocialMediaLinkType>;
+
   
 };
 
@@ -333,6 +335,7 @@ export type ExclusiveAgentType = BasePublicOrganizationType & {
   updatedAt: Scalars['DateTime']['output'];
   socialMediaLinks: Array<SocialMediaLinkType>;
   offices: Array<OrganizationOfficeType>;
+  contact: BrokerageSocietyContactType;
 };
 
 export type HealthQuoteInputType = {
@@ -412,6 +415,12 @@ export type InsuranceBrokerPaginatedType = {
   pages: Scalars['Int']['output'];
 };
 
+export type InsuranceBrokerContactType = {
+  __typename?: 'InsuranceBrokerContactType';
+  links: Array<SocialMediaLinkType>;
+  name: Scalars['String']['output'];
+};
+
 export type InsuranceBrokerType = BasePublicOrganizationType & {
   __typename?: 'InsuranceBrokerType';
   address?: Maybe<AddressType>;
@@ -442,6 +451,7 @@ export type InsuranceBrokerType = BasePublicOrganizationType & {
   updatedAt: Scalars['DateTime']['output'];
   socialMediaLinks: Array<SocialMediaLinkType>;
   offices: Array<OrganizationOfficeType>;
+  contact: InsuranceBrokerContactType;
 };
 
 export type InsuranceCompanyContactInputType = {
@@ -1375,6 +1385,12 @@ export type SupplierServiceType = {
   name: Scalars['String']['output'];
 };
 
+export type SupplierContactType = {
+  __typename?: 'SupplierContactType';
+  links: Array<SocialMediaLinkType>;
+  name: Scalars['String']['output'];
+};
+
 export type SupplierType = BasePublicOrganizationType & {
   __typename?: 'SupplierType';
   allies: Array<PublicOrganizationType>;
@@ -1400,6 +1416,7 @@ export type SupplierType = BasePublicOrganizationType & {
   socialMediaLinks: Array<SocialMediaLinkType>;
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
+  contact: SupplierContactType;
 };
 
 export type TeamMemberType = {

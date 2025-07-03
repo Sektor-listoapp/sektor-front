@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Tabs, TabsProps } from "antd";
 import { PUBLIC_SUPPLIER_BY_ID_QUERY } from "@/lib/sektor-api/queries";
 import { useQuery } from "@apollo/client";
@@ -17,6 +17,7 @@ import OrganizationSocialMediaLinks from "../organization-social-media-links";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import OrganizationOfficesSlider from "../offices-slider";
+import ContactDetailsModal from "../contact-details-modal";
 
 const SupplierDetails = () => {
   const router = useRouter();
@@ -48,7 +49,7 @@ const SupplierDetails = () => {
 
   const serviceTypeLabel =
     SUPPLIER_SERVICE_TYPE_LABEL[
-      serviceType as keyof typeof SUPPLIER_SERVICE_TYPE_LABEL
+    serviceType as keyof typeof SUPPLIER_SERVICE_TYPE_LABEL
     ];
 
   const tabComponents = {
@@ -80,6 +81,8 @@ const SupplierDetails = () => {
       children: tabComponents[item?.component as keyof typeof tabComponents],
     };
   });
+
+  const [openContactDetailsModal, setOpenContactDetailsModal] = useState(false);
 
   if (error) {
     toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
@@ -118,6 +121,18 @@ const SupplierDetails = () => {
         {Boolean(insuranceCompanies?.length > 0) && (
           <OrganizationsSlider organizations={insuranceCompanies} />
         )}
+
+        <button
+          className="text-blue-500 underline w-fit mt-2"
+          onClick={() => setOpenContactDetailsModal(true)}
+        >
+          Ver contacto
+        </button>
+        <ContactDetailsModal
+          contact={supplierData}
+          open={openContactDetailsModal}
+          setOpen={setOpenContactDetailsModal}
+        />
       </section>
 
       <div className="col-span-6 w-full lg:col-span-4">
