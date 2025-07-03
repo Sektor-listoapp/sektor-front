@@ -39,6 +39,7 @@ const SupplierDetails = () => {
     name = "",
     motto = "",
     logoUrl = "",
+    license = "",
     offices = [],
     serviceType = "",
     lineOfBusiness = [],
@@ -96,6 +97,7 @@ const SupplierDetails = () => {
     );
   }
 
+
   return (
     <section className="w-full grid grid-cols-6 gap-6 overflow-x-hidden lg:gap-12 lg:p-5 pb-10 lg:pb-16">
       <section className="col-span-6 w-full flex flex-col gap-6 lg:col-span-2">
@@ -114,6 +116,7 @@ const SupplierDetails = () => {
 
         <OrganizationFlipCard
           heading={name}
+          license={license || ""}
           logoUrl={logoUrl || "/images/placeholder.png"}
           serviceType={serviceTypeLabel || ""}
         />

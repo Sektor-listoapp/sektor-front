@@ -51,6 +51,7 @@ const BrokerageSocietyDetails = () => {
     lineOfBusiness = [],
     workTeam = [],
     insuranceCompanies = [],
+    license = "",
     plan,
   } = brokerageSocietyData || {};
 
@@ -107,6 +108,7 @@ const BrokerageSocietyDetails = () => {
         </header>
 
         <OrganizationFlipCard
+          license={license || ""}
           heading={name}
           logoUrl={logoUrl || "/images/placeholder.png"}
           yearsOfExperience={yearsOfExperience || ""}

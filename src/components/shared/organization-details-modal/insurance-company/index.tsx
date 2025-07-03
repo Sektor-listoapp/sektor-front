@@ -102,6 +102,7 @@ const InsuranceCompanyDetails = () => {
 
         <OrganizationFlipCard
           heading={name}
+          license={license || ""}
           logoUrl={logoUrl || "/images/placeholder.png"}
           yearsOfExperience={yearsOfExperience || ""}
         />
