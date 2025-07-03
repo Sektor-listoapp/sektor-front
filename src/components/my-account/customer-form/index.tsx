@@ -14,7 +14,7 @@ import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo
 import { CUSTOMER_BY_ID_QUERY } from "@/lib/sektor-api/queries/auth/customer-by-id";
 import { faPerson, faPersonHalfDress } from "@fortawesome/free-solid-svg-icons";
 import { FormProps } from "@/types/forms";
-import SocialMediaInput from "../social-media-input";
+
 
 type CustomerIdProps = FormProps;
 const CustomerForm = ({ userId }: CustomerIdProps) => {
@@ -156,11 +156,7 @@ const CustomerForm = ({ userId }: CustomerIdProps) => {
         />
       </div>
 
-      <SocialMediaInput
-        setHasSocialLinks={setHasSocialLinks}
-        disabled={customerLoading || isUpdatingCustomer}
-      />
-
+  
       <Button
         variant="solid-blue"
         className="w-fit px-7"
