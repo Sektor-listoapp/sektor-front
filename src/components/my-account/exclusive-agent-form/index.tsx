@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SelectMultiple from "@/components/ui/select-multiple";
 import TextInput from "@/components/ui/text-input";
-import { Mutation, Query } from "@/lib/sektor-api/__generated__/types";
+import { Mutation, OrganizationOfficeInputType, Query } from "@/lib/sektor-api/__generated__/types";
 import { useMutation, useQuery } from "@apollo/client";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
 import Select from "@/components/ui/select";
@@ -19,6 +19,7 @@ import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import {
   faAddressCard,
   faHashtag,
+  faPersonHalfDress,
   faPhone,
 } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -28,6 +29,7 @@ import {
   MODALITY_OPTIONS,
   PHONE_CODE_OPTIONS,
   SELECT_LINE_OF_BUSINESS_OPTIONS,
+  SELECT_GENRE_OPTIONS,
 } from "@/constants/forms";
 import {
   COUNTRY_BY_CODE_QUERY,
@@ -39,6 +41,8 @@ import {
 } from "@/lib/sektor-api/queries";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
 import { FormProps } from "@/types/forms";
+import SocialMediaInput from "../social-media-input";
+import LocalOfficesInput from "../local-offices-input";
 
 type ExclusiveAgentIdProps = FormProps;
 
@@ -47,6 +51,9 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
   const targetUserId = userId || loggedUserId;
   const [isUpdatingExclusiveAgent, setIsUpdatingExclusiveAgent] =
     useState(false);
+  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
+  const [hasSocialLinks, setHasSocialLinks] = useState(false);
+  console.log('exclusiveAgent: ', hasSocialLinks);
 
   const {
     error: exclusiveAgentError,
@@ -130,6 +137,27 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     })),
   ];
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const formattedOffices = exclusiveAgent?.offices?.map((office: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { __typename: _, address, ...restOfficeProps } = office;
+    return {
+      ...restOfficeProps,
+      address: {
+        cityId: address?.cityId || address?.city?.id,
+        countryId: address?.countryId || address?.country?.id,
+        stateId: address?.stateId || address?.state?.id,
+        street: address?.street,
+      },
+    };
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const socialMediaLinks = exclusiveAgent?.socialMediaLinks?.map((link: any) => ({
+    url: link.url,
+    platform: link.platform,
+  })) || [];
+
   const allies = [...(exclusiveAgent?.allies?.map(({ id }) => id) || [])];
   const phoneCodes = PHONE_CODE_OPTIONS.map(({ value }) => value);
   const userPhone = exclusiveAgent?.phone || "";
@@ -141,16 +169,30 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
   const [identificationType, identification] =
     exclusiveAgent?.identification?.split("-") || [];
 
-  const [isUploadingLogo, setIsUploadingLogo] = useState(false);
-
-  const [input, setInput] = useState({
+  const [input, setInput] = useState<{
+    // required
+    name: string;
+    insuranceCompanies: string[];
+    license: string;
+    licenseType: string;
+    segment: string[];
+    identification: string;
+    identificationType: string;
+    modality: string;
+    coverageState: string[];
+    yearsOfExperience: string;
+    phone: string;
+    phoneCode: string;
+    logoUrl: string;
+    // additional
+    allies: string[];
+    sex: string;
+  }>({
     // required
     name: exclusiveAgent?.name || "",
     insuranceCompanies: [],
     license: license || "",
-    licenseType: licenseType
-      ? `${licenseType}-`
-      : LICENSE_TYPE_OPTIONS[0].value,
+    licenseType: licenseType || LICENSE_TYPE_OPTIONS[0].value,
     segment: exclusiveAgent?.lineOfBusiness || [],
     identification: identification || "",
     identificationType: identificationType
@@ -164,6 +206,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     logoUrl: "",
     // additional
     allies: allies || [],
+    sex: exclusiveAgent?.sex || "",
   });
 
   useEffect(() => {
@@ -195,14 +238,20 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
       "sektor-local-clients",
       JSON.stringify(clients)
     );
+    window?.localStorage?.setItem(
+      "sektor-local-offices",
+      JSON.stringify(exclusiveAgent?.offices || [])
+    );
+    window?.localStorage?.setItem(
+      "social-links",
+      JSON.stringify(exclusiveAgent?.socialMediaLinks || [])
+    );
 
     setInput({
       name: exclusiveAgent?.name || "",
       insuranceCompanies: insuranceCompanies || [],
       license: license || "",
-      licenseType: licenseType
-        ? `${licenseType}-`
-        : LICENSE_TYPE_OPTIONS[0].value,
+      licenseType: licenseType || LICENSE_TYPE_OPTIONS[0].value,
       segment: exclusiveAgent?.lineOfBusiness || [],
       identification: identification || "",
       identificationType: identificationType
@@ -215,6 +264,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
       phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
       logoUrl: exclusiveAgent?.logoUrl || "",
       allies: [...(exclusiveAgent?.allies?.map(({ id }) => id) || [])],
+      sex: exclusiveAgent?.sex || "",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exclusiveAgent]);
@@ -233,6 +283,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     ),
     phone: Boolean(input.phone.trim().length),
     logoUrl: Boolean(input.logoUrl.trim().length),
+    sex: Boolean(input.sex.trim().length),
   };
 
   const hasErrors = Object.values(requiredFields).some((field) => !field);
@@ -265,31 +316,63 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     const foundationYear = currentYear - Number(input?.yearsOfExperience || 0);
     const studies = window.localStorage.getItem("sektor-local-studies") ?? "[]";
     const clients = window.localStorage.getItem("sektor-local-clients") ?? "[]";
+    const socialMediaLinks = window.localStorage.getItem("social-links") ?? "[]";
+    const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedOffices = JSON.parse(offices).map((office: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { __typename: _, address, ...restOfficeProps } = office;
+      return {
+        ...restOfficeProps,
+        address: {
+          cityId: address?.cityId || address?.city?.id,
+          countryId: address?.countryId || address?.country?.id,
+          stateId: address?.stateId || address?.state?.id,
+          street: address?.street,
+        },
+      };
+    });
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedSocialMediaLinks = JSON.parse(socialMediaLinks).map((link: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { __typename, ...restLinkProps } = link;
+      return {
+        platform: restLinkProps.platform,
+        url: restLinkProps.url,
+      };
+    });
+
+    const mutationVariables = {
+      input: {
+        id: targetUserId,
+        foundationYear,
+        name: input?.name,
+        allies: input?.allies,
+        logoUrl: input?.logoUrl,
+        modality: input?.modality,
+        sex: input?.sex,
+        type: exclusiveAgent?.type,
+        clients: JSON.parse(clients),
+        studies: JSON.parse(studies),
+        lineOfBusiness: input?.segment,
+        coverageStates: input?.coverageState,
+        phone: `${input?.phoneCode}${input?.phone}`,
+        insuranceCompanies: input?.insuranceCompanies,
+        license: `${input?.licenseType}${input?.license}`,
+        recognitions: exclusiveAgent?.recognitions || [],
+        identification: `${input?.identificationType}${input?.identification}`,
+        socialMediaLinks: formattedSocialMediaLinks || [],
+        offices: formattedOffices || [],
+      },
+    };
 
     updateExclusiveAgent({
-      variables: {
-        input: {
-          id: targetUserId,
-          foundationYear,
-          name: input?.name,
-          allies: input?.allies,
-          logoUrl: input?.logoUrl,
-          modality: input?.modality,
-          sex: exclusiveAgent?.sex,
-          type: exclusiveAgent?.type,
-          clients: JSON.parse(clients),
-          studies: JSON.parse(studies),
-          lineOfBusiness: input?.segment,
-          coverageStates: input?.coverageState,
-          phone: `${input?.phoneCode}${input?.phone}`,
-          insuranceCompanies: input?.insuranceCompanies,
-          license: `${input?.licenseType}${input?.license}`,
-          recognitions: exclusiveAgent?.recognitions || [],
-          identification: `${input?.identificationType}${input?.identification}`,
-        },
-      },
+      variables: mutationVariables,
     })
-      .then(() => {
+      .then((response) => {
+        console.log('Exclusive agent update success response:', response);
         toast.success("Información actualizada correctamente");
         refetchExclusiveAgent();
       })
@@ -444,6 +527,16 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
           onChange={(e) => handleInputChange("modality", e?.target?.value)}
         />
 
+        <Select
+          name="sex"
+          value={input.sex}
+          options={SELECT_GENRE_OPTIONS}
+          icon={faPersonHalfDress}
+          disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
+          onChange={(e) => handleInputChange("sex", e.target.value)}
+          error={!requiredFields.sex}
+        />
+
         <SelectMultiple
           label="Zona de alcance (estado)"
           showFloatingLabel
@@ -507,11 +600,24 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
             loadingExclusiveAgent || isUpdatingExclusiveAgent || isUploadingLogo
           }
           onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
+          placeholder="Subir logo del agente"
+          aspect={1}
+        />
+
+        <SocialMediaInput
+          setHasSocialLinks={setHasSocialLinks}
+          socialMediaLinks={socialMediaLinks}
+          disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
         />
       </div>
 
       <div className="w-full flex flex-col gap-7 md:gap-10 md:grid md:grid-cols-2">
         <h3 className="w-full font-bold col-span-2">Datos adicionales</h3>
+
+        <LocalOfficesInput
+          disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
+          offices={formattedOffices as unknown as OrganizationOfficeInputType[]}
+        />
 
         <LocalClientsInput
           clients={exclusiveAgentClients}
@@ -568,6 +674,8 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
           disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
         />
       </div>
+
+
 
       <Button
         variant="solid-blue"

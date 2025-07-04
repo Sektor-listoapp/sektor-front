@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 
 interface OrganizationFlipCardProps {
   logoUrl: string;
+  license: string;
   heading: string;
   yearsOfExperience?: string;
   serviceType?: string;
@@ -18,12 +19,14 @@ interface OrganizationFlipCardProps {
 const OrganizationFlipCard = ({
   heading,
   logoUrl,
+  license,
   yearsOfExperience,
   serviceType,
 }: OrganizationFlipCardProps) => {
   const router = useRouter();
   const detailsQuery = router?.query?.details as string;
   const organizationUrl = `${window.location.origin}/organizations?details=${detailsQuery}`;
+
 
   return (
     <FlipCard
@@ -44,6 +47,11 @@ const OrganizationFlipCard = ({
               height={350}
               width={350}
             />
+            {license && (
+              <div className="absolute bottom-3 left-3 bg-blue-500 text-white font-semibold rounded-xl px-5 py-2 text-lg shadow-md">
+                {license}
+              </div>
+            )}
           </div>
         ),
       }}
@@ -86,7 +94,6 @@ const OrganizationFlipCard = ({
                 >
                   <FontAwesomeIcon icon={faWhatsapp} size="lg" />
                 </button>
-
                 <button
                   aria-label="Copiar enlace"
                   title="Copiar enlace"

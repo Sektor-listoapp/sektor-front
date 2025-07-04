@@ -123,6 +123,7 @@ export type BrokerageSocietyContactType = {
   name: Scalars['String']['output'];
   phone: Scalars['String']['output'];
   position: Scalars['String']['output'];
+  links: Array<SocialMediaLinkType>;
 };
 
 export type BrokerageSocietyFilterType = {
@@ -191,6 +192,8 @@ export type BrokerageSocietyType = BasePublicOrganizationType & {
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
   workTeam: Array<TeamMemberType>;
+  socialMediaLinks: Array<SocialMediaLinkType>;
+  organization: PublicOrganizationType;
 };
 
 export type ChangeOrganizationFeatureInputType = {
@@ -329,6 +332,9 @@ export type ExclusiveAgentType = BasePublicOrganizationType & {
   studies: Array<StudyType>;
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
+  socialMediaLinks: Array<SocialMediaLinkType>;
+  offices: Array<OrganizationOfficeType>;
+  contact: BrokerageSocietyContactType;
 };
 
 export type HealthQuoteInputType = {
@@ -398,6 +404,7 @@ export type InsuranceBrokerInputType = {
   sex: Sexes;
   studies: Array<StudyInputType>;
   type: OrganizationTypes;
+  socialMediaLinks: Array<SocialMediaLinkInputType>;
 };
 
 export type InsuranceBrokerPaginatedType = {
@@ -405,6 +412,12 @@ export type InsuranceBrokerPaginatedType = {
   count: Scalars['Int']['output'];
   items?: Maybe<Array<InsuranceBrokerType>>;
   pages: Scalars['Int']['output'];
+};
+
+export type InsuranceBrokerContactType = {
+  __typename?: 'InsuranceBrokerContactType';
+  links: Array<SocialMediaLinkType>;
+  name: Scalars['String']['output'];
 };
 
 export type InsuranceBrokerType = BasePublicOrganizationType & {
@@ -435,6 +448,9 @@ export type InsuranceBrokerType = BasePublicOrganizationType & {
   studies: Array<StudyType>;
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
+  socialMediaLinks: Array<SocialMediaLinkType>;
+  offices: Array<OrganizationOfficeType>;
+  contact: InsuranceBrokerContactType;
 };
 
 export type InsuranceCompanyContactInputType = {
@@ -503,6 +519,8 @@ export type InsuranceCompanyType = BasePublicOrganizationType & {
   suppliers: Array<SupplierType>;
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
+  socialMediaLinks: Array<SocialMediaLinkType>;
+  sex: Sexes;
 };
 
 export type LoginInputType = {
@@ -948,6 +966,7 @@ export type PublicOrganizationType = BasePublicOrganizationType & {
   rating: Scalars['Float']['output'];
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
+
 };
 
 export type Query = {
@@ -1367,6 +1386,12 @@ export type SupplierServiceType = {
   name: Scalars['String']['output'];
 };
 
+export type SupplierContactType = {
+  __typename?: 'SupplierContactType';
+  links: Array<SocialMediaLinkType>;
+  name: Scalars['String']['output'];
+};
+
 export type SupplierType = BasePublicOrganizationType & {
   __typename?: 'SupplierType';
   allies: Array<PublicOrganizationType>;
@@ -1392,6 +1417,7 @@ export type SupplierType = BasePublicOrganizationType & {
   socialMediaLinks: Array<SocialMediaLinkType>;
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
+  contact: SupplierContactType;
 };
 
 export type TeamMemberType = {
@@ -1400,6 +1426,7 @@ export type TeamMemberType = {
   name: Scalars['String']['output'];
   photoUrl?: Maybe<Scalars['String']['output']>;
   position: Scalars['String']['output'];
+  organization: PublicOrganizationType;
 };
 
 export type TrackingInputType = {

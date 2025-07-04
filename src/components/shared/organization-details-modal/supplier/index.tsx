@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Tabs, TabsProps } from "antd";
 import { PUBLIC_SUPPLIER_BY_ID_QUERY } from "@/lib/sektor-api/queries";
 import { useQuery } from "@apollo/client";
@@ -17,6 +17,7 @@ import OrganizationSocialMediaLinks from "../organization-social-media-links";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot } from "@fortawesome/free-solid-svg-icons";
 import OrganizationOfficesSlider from "../offices-slider";
+import ContactDetailsModal from "../contact-details-modal";
 
 const SupplierDetails = () => {
   const router = useRouter();
@@ -38,6 +39,7 @@ const SupplierDetails = () => {
     name = "",
     motto = "",
     logoUrl = "",
+    license = "",
     offices = [],
     serviceType = "",
     lineOfBusiness = [],
@@ -48,7 +50,7 @@ const SupplierDetails = () => {
 
   const serviceTypeLabel =
     SUPPLIER_SERVICE_TYPE_LABEL[
-      serviceType as keyof typeof SUPPLIER_SERVICE_TYPE_LABEL
+    serviceType as keyof typeof SUPPLIER_SERVICE_TYPE_LABEL
     ];
 
   const tabComponents = {
@@ -81,6 +83,8 @@ const SupplierDetails = () => {
     };
   });
 
+  const [openContactDetailsModal, setOpenContactDetailsModal] = useState(false);
+
   if (error) {
     toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
   }
@@ -92,6 +96,7 @@ const SupplierDetails = () => {
       </div>
     );
   }
+
 
   return (
     <section className="w-full grid grid-cols-6 gap-6 overflow-x-hidden lg:gap-12 lg:p-5 pb-10 lg:pb-16">
@@ -111,6 +116,7 @@ const SupplierDetails = () => {
 
         <OrganizationFlipCard
           heading={name}
+          license={license || ""}
           logoUrl={logoUrl || "/images/placeholder.png"}
           serviceType={serviceTypeLabel || ""}
         />
@@ -118,6 +124,18 @@ const SupplierDetails = () => {
         {Boolean(insuranceCompanies?.length > 0) && (
           <OrganizationsSlider organizations={insuranceCompanies} />
         )}
+
+        <button
+          className="text-blue-500 underline w-fit mt-2"
+          onClick={() => setOpenContactDetailsModal(true)}
+        >
+          Ver contacto
+        </button>
+        <ContactDetailsModal
+          contact={supplierData}
+          open={openContactDetailsModal}
+          setOpen={setOpenContactDetailsModal}
+        />
       </section>
 
       <div className="col-span-6 w-full lg:col-span-4">

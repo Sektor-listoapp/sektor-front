@@ -124,6 +124,8 @@ const LocalClientModal = ({
             setError={setLogoError}
             imageUrl={input?.logoUrl || " "}
             onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
+            placeholder="Subir logo del cliente"
+            aspect={1}
           />
 
           <Button

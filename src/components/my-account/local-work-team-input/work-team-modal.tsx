@@ -35,7 +35,7 @@ const LocalWorkTeamModal = ({
     if (teamMemberToEdit?.id) {
       setInput({
         id: teamMemberToEdit?.id || "",
-        organization: teamMemberToEdit?.id || "",
+        organization: teamMemberToEdit?.organization?.id || "",
         position: teamMemberToEdit?.position || "",
       });
     }
@@ -66,7 +66,11 @@ const LocalWorkTeamModal = ({
     if (teamMemberToEdit?.id) {
       const updatedTeamMember = localWorkTeam?.map((teamMember) =>
         teamMember?.id === teamMemberToEdit?.id
-          ? { ...teamMember, ...input }
+          ? {
+            ...teamMember,
+            organization: teamMemberToEdit?.organization,
+            position: input.position
+          }
           : teamMember
       );
       setLocalWorkTeam(updatedTeamMember);

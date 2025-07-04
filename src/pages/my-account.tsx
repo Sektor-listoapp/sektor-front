@@ -12,6 +12,7 @@ import {
 } from "@/lib/sektor-api/__generated__/types";
 import { getUserForm } from "@/utils/form/get-user-form";
 import { useOrganizationData } from "@/hooks/use-organization-data";
+import CustomerForm from "@/components/my-account/customer-form";
 
 const { Admin, Customer } = UserGroups;
 
@@ -22,7 +23,7 @@ const MyAccount = () => {
 
   const { organizationData, loading, error } = useOrganizationData();
 
-  const FormComponent = getUserForm(organizationData);
+  const FormComponent = !isCustomer ? getUserForm(organizationData) : null;
 
   const showMessage =
     organizationData?.type !== OrganizationTypes.Admin
@@ -33,14 +34,14 @@ const MyAccount = () => {
         </>
       );
 
-      
+
   return (
     <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start gap-8  overflow-hidden">
       <Navbar />
 
       <Header data={organizationData as OrganizationType} />
 
-      {error && !loading ? (
+      {error && !loading && !isCustomer ? (
         <section className="w-full flex flex-col items-center justify-center gap-4 font-century-gothic py-20">
           <Empty
             description="No se pudo cargar la información de la cuenta, por favor intenta de nuevo más tarde."
@@ -65,7 +66,11 @@ const MyAccount = () => {
               </p>
             </header>
           )}
-          {FormComponent && <FormComponent data={organizationData} />}
+          {isCustomer ? (
+            <CustomerForm userId={organizationData?.id} />
+          ) : (
+            FormComponent && <FormComponent data={organizationData} />
+          )}
         </main>
       )}
     </div>

@@ -45,6 +45,7 @@ const InsuranceBrokerDetails = () => {
     name = "",
     modality = "",
     logoUrl = "",
+    license = "",
     foundationYear = 0,
     address,
     allies = [],
@@ -116,6 +117,7 @@ const InsuranceBrokerDetails = () => {
 
         <OrganizationFlipCard
           heading={heading}
+          license={license || ""}
           logoUrl={logoUrl || "/images/placeholder.png"}
           yearsOfExperience={yearsOfExperience || ""}
         />

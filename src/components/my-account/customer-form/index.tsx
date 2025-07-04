@@ -15,11 +15,15 @@ import { CUSTOMER_BY_ID_QUERY } from "@/lib/sektor-api/queries/auth/customer-by-
 import { faPerson, faPersonHalfDress } from "@fortawesome/free-solid-svg-icons";
 import { FormProps } from "@/types/forms";
 
+
 type CustomerIdProps = FormProps;
-const CustomerForm = ({userId}: CustomerIdProps) => {
+const CustomerForm = ({ userId }: CustomerIdProps) => {
   const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
   const targetUserId = userId || loggedUserId;
   const [isUpdatingCustomer, setIsUpdatingCustomer] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [hasSocialLinks, setHasSocialLinks] = useState(false);
+
 
   const {
     data: customerDataResponse,
@@ -55,7 +59,7 @@ const CustomerForm = ({userId}: CustomerIdProps) => {
   if (customerError) {
     toast.error(
       customerError?.message ||
-        "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
+      "Ha ocurrido un error obteniendo la información de tu cuenta, intenta de nuevo más tarde"
     );
   }
 
@@ -74,22 +78,40 @@ const CustomerForm = ({userId}: CustomerIdProps) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    console.log('=== CUSTOMER FORM SUBMISSION DEBUG ===');
+    console.log('Form input data:', input);
+    console.log('Target user ID:', targetUserId);
+    console.log('Required fields validation:', requiredFields);
+    console.log('Has errors:', hasErrors);
+
     setIsUpdatingCustomer(true);
 
-    updateCustomer({
-      variables: {
-        input: {
-          id: targetUserId,
-          sex: input?.sex,
-          name: input?.name,
-        },
+    const mutationVariables = {
+      input: {
+        id: targetUserId,
+        sex: input?.sex,
+        name: input?.name,
       },
+    };
+
+    console.log('Mutation variables:', mutationVariables);
+
+    updateCustomer({
+      variables: mutationVariables,
     })
-      .then(() => {
+      .then((response) => {
+        console.log('Customer update success response:', response);
         toast.success("Información actualizada correctamente");
         refetchCustomer();
       })
       .catch((error) => {
+        console.error('=== CUSTOMER FORM ERROR DEBUG ===');
+        console.error('Error object:', error);
+        console.error('Error message:', error?.message);
+        console.error('Error graphQLErrors:', error?.graphQLErrors);
+        console.error('Error networkError:', error?.networkError);
+        console.error('Error extensions:', error?.extensions);
+        console.error('Full error details:', JSON.stringify(error, null, 2));
         toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
       })
       .finally(() => setIsUpdatingCustomer(false));
@@ -134,6 +156,7 @@ const CustomerForm = ({userId}: CustomerIdProps) => {
         />
       </div>
 
+  
       <Button
         variant="solid-blue"
         className="w-fit px-7"

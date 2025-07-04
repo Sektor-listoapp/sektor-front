@@ -6,6 +6,8 @@ import {
   InsuranceBrokerType,
   Mutation,
   UserGroups,
+  TrackingUserInputType,
+  SupplierType,
 } from "@/lib/sektor-api/__generated__/types";
 import { CREATE_TRACKING } from "@/lib/sektor-api/mutations";
 import { useAuthStore } from "@/store/auth";
@@ -16,9 +18,10 @@ import { Modal } from "antd";
 import { pickBy } from "lodash";
 import React, { useEffect } from "react";
 import { useShallow } from "zustand/shallow";
+import OrganizationSocialMediaLinks from "../organization-social-media-links";
 
 interface ContactDetailsModalProps {
-  contact: InsuranceBrokerType | BrokerageSocietyType | ExclusiveAgentType;
+  contact: InsuranceBrokerType | BrokerageSocietyType | ExclusiveAgentType | SupplierType;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -35,27 +38,61 @@ const ContactDetailsModal = ({
   const user = useAuthStore(useShallow((state) => state?.user));
 
   const handleCreateTracking = () => {
-    const formattedUser = pickBy(
-      {
-        _id: user?.id,
-        name: user?.name,
-        email: user?.email,
-        group: user?.group || UserGroups.Customer,
-      },
-      (value) => Boolean(value)
-    );
+    console.log("🔍 Debugging tracking creation:");
+    console.log("Contact ID:", contact.id);
+    console.log("User:", user);
+
+    // Verificar si hay token de autenticación
+    const token = useAuthStore.getState().accessToken;
+    console.log("Auth token:", token ? "Present" : "Missing");
+
+    // Asegurar que el group siempre tenga un valor válido
+    const userGroup = user?.group || UserGroups.Customer;
+    console.log("User group:", userGroup);
+
+    // Crear el objeto de usuario solo si hay datos válidos
+    let formattedUser: TrackingUserInputType | null = null;
+    if (user?.id || user?.name || user?.email) {
+      formattedUser = pickBy(
+        {
+          _id: user?.id,
+          name: user?.name,
+          email: user?.email,
+          group: userGroup,
+        },
+        (value) => Boolean(value)
+      ) as TrackingUserInputType;
+    } else {
+
+      formattedUser = {
+        group: userGroup,
+      };
+    }
+
+    console.log("Formatted user:", formattedUser);
+
+    const trackingInput = {
+      entityId: contact.id,
+      eventType: EventType.Click,
+      entityType: EntityType.Organization,
+      ...(formattedUser && { user: formattedUser }),
+    };
+
+    console.log("Tracking input:", trackingInput);
+
     createTracking({
       variables: {
-        input: {
-          entityId: contact.id,
-          eventType: EventType.Click,
-          entityType: EntityType.Organization,
-          user: formattedUser,
-        },
+        input: trackingInput,
       },
     })
-      .then(() => {})
-      .catch((error) => console.log("Error creating tracking:", error));
+      .then((result) => {
+        console.log("✅ Tracking created successfully:", result);
+      })
+      .catch((error) => {
+        console.error("❌ Error creating tracking:", error);
+        console.error("Error details:", error.graphQLErrors);
+        console.error("Network error:", error.networkError);
+      });
   };
 
   useEffect(() => {
@@ -69,6 +106,11 @@ const ContactDetailsModal = ({
   const email = contact?.email || contact?.contact?.email || null;
   // @ts-expect-error Unknown type
   const phone = contact?.phone || contact?.contact?.phone || null;
+  // Obtener redes sociales
+  // Para InsuranceCompanyType, los links están en contact?.links
+  // Para los demás, están en contact?.socialMediaLinks
+  // Si no existen, dejar array vacío
+  const socialMediaLinks = contact?.socialMediaLinks || contact?.contact?.links || [];
 
   return (
     <Modal
@@ -101,6 +143,13 @@ const ContactDetailsModal = ({
             </b>
           </div>
         </div>
+        {/* Redes sociales */}
+        {socialMediaLinks.length > 0 && (
+          <div className="w-full mt-4">
+            <h4 className="text-base font-semibold mb-2 text-center">Redes sociales</h4>
+            <OrganizationSocialMediaLinks socialMediaLinks={socialMediaLinks} />
+          </div>
+        )}
       </section>
     </Modal>
   );

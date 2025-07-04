@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { faPen, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Select } from "antd";
@@ -6,44 +6,53 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import { PLATFORM_LABELS_MAP } from "@/constants/forms";
 import { cn } from "@/utils/class-name";
 import SocialMediaModal from "./social-media-modal";
-// import SocialMediaModal from "./social-media-modal";
+import { SocialMediaLinkType } from "@/lib/sektor-api/__generated__/types";
 
 interface SocialMediaInputProps {
     disabled?: boolean;
     setHasSocialLinks: React.Dispatch<React.SetStateAction<boolean>>;
+    socialMediaLinks?: SocialMediaLinkType[];
 }
 
 const SocialMediaInput = ({
     disabled,
     setHasSocialLinks,
+    socialMediaLinks = [],
 }: SocialMediaInputProps) => {
-    const [socialLinks, setSocialLinks] = useLocalStorage<Record<string, string>>(
+    const [socialLinks, setSocialLinks] = useLocalStorage<SocialMediaLinkType[]>(
         "social-links",
-        {}
+        []
     );
-    const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
-    const [openModal, setOpenModal] = useState(false);
 
-    console.log(socialLinks)
+    const [openModal, setOpenModal] = useState(false);
+    const [platformToEdit, setPlatformToEdit] = useState<string | null>(null);
 
     useEffect(() => {
-        setHasSocialLinks(Object.keys(socialLinks).length > 0);
+        setHasSocialLinks(socialLinks.length > 0);
     }, [socialLinks, setHasSocialLinks]);
 
-    const options = Object.entries(socialLinks).map(([key, value]) => {
-        const label = PLATFORM_LABELS_MAP[key] || key; 
-        return {
-            value,
-            label: `${label}: ${value}`,
-            data: {
-                label,
-                value: key,
-                platform: key,
-                user: value,
-            },
-        };
-    });
-    
+    useEffect(() => {
+        if (socialMediaLinks && socialMediaLinks.length > 0) {
+            setSocialLinks(socialMediaLinks);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Solo al montar
+
+    const options = useMemo(() => {
+        return socialLinks.map((link) => {
+            const label = PLATFORM_LABELS_MAP[link.platform] || link.platform;
+            return {
+                label: `${label}: ${link.url}`,
+                value: link.platform,
+                data: {
+                    label,
+                    value: link.platform,
+                    platform: link.platform,
+                    url: link.url,
+                },
+            };
+        });
+    }, [socialLinks]);
 
     return (
         <>
@@ -51,13 +60,11 @@ const SocialMediaInput = ({
                 className={cn(
                     "w-full border rounded-xl h-[46px] overflow-hidden border-blue-500 relative flex justify-between items-center cursor-pointer px-4",
                     {
-                        "border-red-500": Object.keys(socialLinks).length === 0,
+                        "border-red-500": socialLinks.length === 0,
                     }
                 )}
             >
                 <span className="text-sm">Redes Sociales</span>
-
-
                 <Select
                     className="w-full absolute inset-0 h-full opacity-0"
                     suffixIcon={null}
@@ -69,8 +76,7 @@ const SocialMediaInput = ({
                     optionRender={(option) => (
                         <div className="flex items-center gap-3 justify-between p-2 bg-transparent">
                             <div>
-                            <b>{option?.data?.data?.label}: </b>
-                            {option?.data?.data?.user || ""}
+                                <b>{option?.data?.data?.label}:</b> {option?.data?.data?.url}
                             </div>
                             <FontAwesomeIcon
                                 className="ml-auto cursor-pointer"
@@ -78,7 +84,7 @@ const SocialMediaInput = ({
                                 size="lg"
                                 title="Editar"
                                 onClick={() => {
-                                    setSelectedPlatform(option?.data?.data.platform);
+                                    setPlatformToEdit(option?.data?.data?.platform);
                                     setOpenModal(true);
                                 }}
                             />
@@ -88,9 +94,10 @@ const SocialMediaInput = ({
                                 size="lg"
                                 title="Eliminar"
                                 onClick={() => {
-                                    const updated = { ...socialLinks };
-                                    delete updated[option?.data?.data.platform];
-                                    setSocialLinks(updated);
+                                    const updatedLinks = socialLinks.filter(
+                                        (link) => link.platform !== option?.data?.data?.platform
+                                    );
+                                    setSocialLinks(updatedLinks);
                                 }}
                             />
                         </div>
@@ -98,27 +105,24 @@ const SocialMediaInput = ({
                 />
                 <div className="flex items-center justify-center gap-3 h-full w-fit bg-white z-10">
                     <FontAwesomeIcon
-                        size="xl"
                         icon={faPlus}
+                        size="xl"
+                        title="Agregar"
                         onClick={() => {
-                            setSelectedPlatform(null);
+                            setPlatformToEdit(null);
                             setOpenModal(true);
                         }}
                     />
-
                 </div>
             </div>
 
             <SocialMediaModal
                 open={openModal}
-                platform={selectedPlatform}
+                platform={platformToEdit}
                 setOpen={setOpenModal}
                 socialLinks={socialLinks}
                 setSocialLinks={setSocialLinks}
             />
-
-
-
         </>
     );
 };

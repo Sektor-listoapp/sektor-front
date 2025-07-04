@@ -13,11 +13,13 @@ import RegisterFormHeader from "../register-form-header";
 import TextInput from "@/components/ui/text-input";
 import PasswordInput from "@/components/ui/password-input";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
-import { faHashtag, faPerson, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faHashtag, faPerson, faPersonHalfDress, faUser } from "@fortawesome/free-solid-svg-icons";
 import {
   InsuranceBrokerFormInput,
   InsuranceBrokerFormInputErrors,
 } from "./types";
+import Select from "@/components/ui/select";
+import { SELECT_GENRE_OPTIONS } from "@/constants/forms/options";
 
 interface InsuranceBrokerFormProps {
   formRef: React.RefObject<HTMLFormElement | null>;
@@ -41,6 +43,7 @@ const InsuranceBrokerForm = ({
   const [input, setInput] = useState<InsuranceBrokerFormInput>({
     name: "",
     email: "",
+    sex: "",
     license: "",
     licenseType: LICENSE_TYPE_OPTIONS[0].value,
     password: "",
@@ -50,6 +53,7 @@ const InsuranceBrokerForm = ({
   const [errors, setErrors] = useState<InsuranceBrokerFormInputErrors>({
     name: [],
     email: [],
+    sex: [],
     license: [],
     licenseType: [],
     password: [],
@@ -67,7 +71,7 @@ const InsuranceBrokerForm = ({
     const isValidForm = validateFormFields({ input, errors, setErrors });
     if (!isValidForm) return;
 
-    const { name, email, password, license, licenseType } = input;
+    const { name, email, password, sex, license, licenseType } = input;
     const formattedLicense = `${licenseType}${license}`;
 
     setIsSubmittingForm(true);
@@ -76,6 +80,7 @@ const InsuranceBrokerForm = ({
         input: {
           name,
           email,
+          sex,
           password,
           license: formattedLicense,
         },
@@ -177,6 +182,18 @@ const InsuranceBrokerForm = ({
               </p>
             ),
           }}
+        />
+
+        <Select
+          name="sex"
+          wrapperClassName="col-span-4 sm:col-span-2 xl:col-span-1 xl:w-3/4"
+          icon={faPersonHalfDress}
+          value={input.sex}
+          options={SELECT_GENRE_OPTIONS}
+          disabled={loading}
+          onChange={handleInputChange}
+          error={Boolean(errors.sex.length)}
+          errors={errors.sex}
         />
       </form>
     </section>

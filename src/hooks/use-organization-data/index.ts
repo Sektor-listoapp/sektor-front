@@ -16,7 +16,7 @@ export const useOrganizationData = () => {
     error,
   } = useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
     variables: { id: userId },
-    skip: isCustomer,
+  
   });
 
   return {

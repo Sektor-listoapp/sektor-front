@@ -294,6 +294,7 @@ const LocalOfficeModal = ({
                 photoUrl: url || undefined,
               }));
             }}
+            aspect={16 / 9}
           />
 
           <Button

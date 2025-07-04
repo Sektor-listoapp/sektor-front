@@ -44,6 +44,7 @@ const ExclusiveAgentDetails = () => {
     name = "",
     modality = "",
     logoUrl = "",
+    license = "",
     foundationYear = 0,
     address,
     clients = [],
@@ -113,6 +114,7 @@ const ExclusiveAgentDetails = () => {
 
         <OrganizationFlipCard
           heading={heading}
+          license={license || ""}
           logoUrl={logoUrl || "/images/placeholder.png"}
           yearsOfExperience={yearsOfExperience || ""}
         />

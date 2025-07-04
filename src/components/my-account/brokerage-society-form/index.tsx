@@ -41,12 +41,15 @@ import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo
 import LocalClientsInput from "../local-clients-input";
 import LocalOfficesInput from "../local-offices-input";
 import { FormProps } from "@/types/forms";
+import SocialMediaInput from "../social-media-input";
 
 type BrokerageSocietyIdProps = FormProps;
 
 const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
   const targetUserId = userId || loggedUserId;
+  console.log('targetUserId: ', targetUserId);
+
   const [isUpdatingBrokerageSociety, setIsUpdatingBrokerageSociety] =
     useState(false);
 
@@ -138,6 +141,8 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
 
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [logoHasError, setLogoHasError] = useState(false);
+  const [hasSocialLinks, setHasSocialLinks] = useState(false);
+  console.log('hasSocialLinks: ', hasSocialLinks);
 
   const allies = [...(brokerageSociety?.allies?.map(({ id }) => id) || [])];
   const phoneCodes = PHONE_CODE_OPTIONS.map(({ value }) => value);
@@ -160,6 +165,16 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
         stateId: address?.stateId || address?.state?.id,
         street: address?.street,
       },
+    };
+  });
+
+  const formattedSocialMediaLinks = brokerageSociety?.socialMediaLinks?.map((link: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { __typename, ...restLinkProps } = link;
+
+    return {
+      url: restLinkProps.url,
+      platform: restLinkProps.platform,
     };
   });
 
@@ -203,18 +218,22 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       : [];
 
     const workTeam =
-      brokerageSociety?.workTeam.map(({ id, name, position, photoUrl }) => {
-        return { id, name, position, photoUrl };
+      brokerageSociety?.workTeam.map(({ id, name, position, organization }) => {
+        return { id, name, position, organization };
       }) || [];
+    console.log('workTeam 1: ', workTeam);
 
     const insuranceCompaniesIds = (brokerageSociety?.insuranceCompanies?.map(
       ({ id }) => id
     ) || []) as never[];
 
+
+
     window?.localStorage?.setItem(
       "sektor-local-recognitions",
       JSON.stringify(studies)
     );
+    console.log('workTeam: ', workTeam);
     window?.localStorage?.setItem(
       "sektor-local-work-team",
       JSON.stringify(workTeam)
@@ -227,6 +246,11 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     window?.localStorage?.setItem(
       "sektor-local-offices",
       JSON.stringify(formattedOffices || [])
+    );
+
+    window?.localStorage?.setItem(
+      "social-links",
+      JSON.stringify(formattedSocialMediaLinks || [])
     );
 
     setInput({
@@ -291,21 +315,45 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+
     setIsUpdatingBrokerageSociety(true);
 
     const currentYear = new Date().getFullYear();
     const foundationYear = currentYear - Number(input?.yearsOfExperience || 0);
     const clients = window.localStorage.getItem("sektor-local-clients") ?? "[]";
-    const recognitions =
-      window.localStorage.getItem("sektor-local-recognitions") ?? "[]";
-    const workTeam =
-      window.localStorage.getItem("sektor-local-work-team") ?? "[]";
-    const formattedWorkTeam = JSON.parse(workTeam).map((member) => ({
-      organization: member?.id || "",
-      position: member?.position || "",
-    }));
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { __typename, ...contactData } = brokerageSociety?.contact || {};
+    const recognitions = window.localStorage.getItem("sektor-local-recognitions") ?? "[]";
+    // Limpieza de recognitions
+    const formattedRecognitions = JSON.parse(recognitions).map((rec: any) => {
+      return {
+        id: rec.id,
+        title: rec.title,
+        description: rec.description,
+        date: rec.date,
+        giver: rec.giver,
+      };
+    });
+
+
+    const workTeam = window.localStorage.getItem("sektor-local-work-team") ?? "[]";
+
+    const rawWorkTeam = JSON.parse(workTeam);
+    console.log('rawWorkTeam: ', rawWorkTeam);
+
+    const formattedWorkTeam = rawWorkTeam
+      .filter((member: any) => !!member.organization && !!member.position)
+      .map((member: any) => ({
+        organization: member.organization.id,
+        position: member.position,
+      }));
+
+
+    console.log('formattedWorkTeam: ', formattedWorkTeam);
+
+    if (formattedWorkTeam.length !== rawWorkTeam.length) {
+      toast.error("Todos los miembros del equipo deben tener organización y cargo.");
+      setIsUpdatingBrokerageSociety(false);
+      return;
+    }
 
     const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
     const formattedOffices = JSON.parse(offices).map((office: any) => {
@@ -322,37 +370,68 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       };
     });
 
-    updateBrokerageSociety({
-      variables: {
-        input: {
-          id: targetUserId,
-          clients: JSON.parse(clients),
-          foundationYear,
-          name: input?.name,
-          allies: input?.allies,
-          logoUrl: input?.logoUrl,
-          modality: input?.modality,
-          workTeam: formattedWorkTeam,
-          type: brokerageSociety?.type,
-          recognitions: JSON.parse(recognitions),
-          lineOfBusiness: input?.segment,
-          coverageStates: input?.coverageState,
-          insuranceCompanies: input?.insuranceCompanies,
-          license: `${input?.licenseType}${input?.license}`,
-          identification: input?.identification,
-          offices: formattedOffices,
-          contact: {
-            ...contactData,
-            phone: `${input?.phoneCode}${input?.phone}`,
-          },
-        },
+    const contact = window.localStorage.getItem("sektor-local-contact") ?? "{}";
+    const contactData = JSON.parse(contact);
+
+    const formattedContact = {
+      ...contactData,
+      phone: `${input?.phoneCode}${input?.phone}`,
+      name: contactData.name || "Nombre requerido",
+      position: contactData.position || "Cargo requerido",
+    };
+
+    const socialMediaLinks = window.localStorage.getItem("social-links") ?? "[]";
+    const parsedLinks = JSON.parse(socialMediaLinks);
+    const formattedSocialMediaLinks = parsedLinks.map((link: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { __typename, ...restLinkProps } = link;
+      return {
+        platform: restLinkProps.platform,
+        url: restLinkProps.url,
+      };
+    });
+
+    const mutationVariables = {
+      input: {
+        id: targetUserId,
+        clients: JSON.parse(clients),
+        foundationYear,
+        name: input?.name,
+        allies: input?.allies,
+        logoUrl: input?.logoUrl,
+        modality: input?.modality,
+        workTeam: formattedWorkTeam,
+        type: brokerageSociety?.type,
+        recognitions: formattedRecognitions,
+        lineOfBusiness: input?.segment,
+        coverageStates: input?.coverageState,
+        insuranceCompanies: input?.insuranceCompanies,
+        license: `${input?.licenseType}${input?.license}`,
+        identification: input?.identification,
+        offices: formattedOffices || [],
+        contact: formattedContact,
+        socialMediaLinks: formattedSocialMediaLinks || [],
       },
+    };
+
+    console.log('Mutation variables:', mutationVariables);
+
+    updateBrokerageSociety({
+      variables: mutationVariables,
     })
-      .then(() => {
+      .then((response) => {
+        console.log('Brokerage society update success response:', response);
         toast.success("Información actualizada correctamente");
         refetchBrokerageSociety();
       })
       .catch((error) => {
+        console.error('=== BROKERAGE SOCIETY FORM ERROR DEBUG ===');
+        console.error('Error object:', error);
+        console.error('Error message:', error?.message);
+        console.error('Error graphQLErrors:', error?.graphQLErrors);
+        console.error('Error networkError:', error?.networkError);
+        console.error('Error extensions:', error?.extensions);
+        console.error('Full error details:', JSON.stringify(error, null, 2));
         toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
       })
       .finally(() => setIsUpdatingBrokerageSociety(false));
@@ -532,6 +611,8 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
           }}
         />
 
+
+
         <UploadInput
           imageUrl={input?.logoUrl || ""}
           error={!requiredFields.logoUrl || logoHasError}
@@ -544,6 +625,12 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
             isUploadingLogo
           }
           onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
+          placeholder="Subir logo de la sociedad"
+          aspect={1}
+        />
+        <SocialMediaInput
+          setHasSocialLinks={setHasSocialLinks}
+          disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
         />
       </div>
 
