@@ -19,6 +19,7 @@ import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import {
   faAddressCard,
   faHashtag,
+  faPersonHalfDress,
   faPhone,
 } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -28,6 +29,7 @@ import {
   MODALITY_OPTIONS,
   PHONE_CODE_OPTIONS,
   SELECT_LINE_OF_BUSINESS_OPTIONS,
+  SELECT_GENRE_OPTIONS,
 } from "@/constants/forms";
 import {
   COUNTRY_BY_CODE_QUERY,
@@ -184,7 +186,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     logoUrl: string;
     // additional
     allies: string[];
-
+    sex: string;
   }>({
     // required
     name: exclusiveAgent?.name || "",
@@ -204,6 +206,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     logoUrl: "",
     // additional
     allies: allies || [],
+    sex: exclusiveAgent?.sex || "",
   });
 
   useEffect(() => {
@@ -261,6 +264,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
       phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
       logoUrl: exclusiveAgent?.logoUrl || "",
       allies: [...(exclusiveAgent?.allies?.map(({ id }) => id) || [])],
+      sex: exclusiveAgent?.sex || "",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exclusiveAgent]);
@@ -279,7 +283,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     ),
     phone: Boolean(input.phone.trim().length),
     logoUrl: Boolean(input.logoUrl.trim().length),
-
+    sex: Boolean(input.sex.trim().length),
   };
 
   const hasErrors = Object.values(requiredFields).some((field) => !field);
@@ -348,7 +352,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
         allies: input?.allies,
         logoUrl: input?.logoUrl,
         modality: input?.modality,
-        sex: exclusiveAgent?.sex,
+        sex: input?.sex,
         type: exclusiveAgent?.type,
         clients: JSON.parse(clients),
         studies: JSON.parse(studies),
@@ -521,6 +525,16 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
           options={MODALITY_OPTIONS}
           disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
           onChange={(e) => handleInputChange("modality", e?.target?.value)}
+        />
+
+        <Select
+          name="sex"
+          value={input.sex}
+          options={SELECT_GENRE_OPTIONS}
+          icon={faPersonHalfDress}
+          disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
+          onChange={(e) => handleInputChange("sex", e.target.value)}
+          error={!requiredFields.sex}
         />
 
         <SelectMultiple

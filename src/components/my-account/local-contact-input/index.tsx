@@ -88,7 +88,6 @@ const LocalContactInput = ({
                   icon={faPen}
                   size="lg"
                   title="Editar"
-                  onClick={() => setOpenContactModal(true)}
                 />
                 <FontAwesomeIcon
                   className="ml-2 cursor-pointer text-red-500"

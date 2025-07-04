@@ -19,6 +19,7 @@ import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import {
   faAddressCard,
   faHashtag,
+  faPersonHalfDress,
   faPhone,
 } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -28,6 +29,7 @@ import {
   MODALITY_OPTIONS,
   PHONE_CODE_OPTIONS,
   SELECT_LINE_OF_BUSINESS_OPTIONS,
+  SELECT_GENRE_OPTIONS,
 } from "@/constants/forms";
 import {
   COUNTRY_BY_CODE_QUERY,
@@ -105,20 +107,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
   const insuranceCompanies =
     insuranceCompaniesResponse?.publicInsuranceCompanies?.items || [];
 
-  // // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  // const formattedOffices = insuranceBroker?.offices?.map((office: any) => {
-  //   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  //   const { __typename: _, address, ...restOfficeProps } = office;
-  //   return {
-  //     ...restOfficeProps,
-  //     address: {
-  //       cityId: address?.cityId || address?.city?.id,
-  //       countryId: address?.countryId || address?.country?.id,
-  //       stateId: address?.stateId || address?.state?.id,
-  //       street: address?.street,
-  //     },
-  //   };
-  // });
+
 
   const insuranceCompanyOptions = [
     ...insuranceCompanies?.map(({ id, name, logoUrl }) => ({
@@ -189,6 +178,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     logoUrl: string;
     // additional
     allies: string[];
+    sex: string;
     // socialMediaLinks: SocialMediaLinkType[];
   }>({
     // required
@@ -211,6 +201,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     logoUrl: "",
     // additional
     allies: allies || [],
+    sex: insuranceBroker?.sex || "",
     // socialMediaLinks: JSON.parse(window?.localStorage?.getItem("social-links") || "[]"),
   });
 
@@ -269,6 +260,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
       logoUrl: insuranceBroker?.logoUrl || "",
       allies: [...(insuranceBroker?.allies?.map(({ id }) => id) || [])],
+      sex: insuranceBroker?.sex || "",
       // socialMediaLinks: JSON.parse(window?.localStorage?.getItem("social-links") || "[]"),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -288,6 +280,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     ),
     phone: Boolean(input.phone.trim().length),
     logoUrl: Boolean(input.logoUrl.trim().length),
+    sex: Boolean(input.sex.trim().length),
   };
 
   const hasErrors = Object.values(requiredFields).some((field) => !field);
@@ -368,7 +361,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
         allies: input?.allies,
         logoUrl: input?.logoUrl,
         modality: input?.modality,
-        sex: insuranceBroker?.sex,
+        sex: input?.sex,
         type: insuranceBroker?.type,
         clients: JSON.parse(clients),
         studies: JSON.parse(studies),
@@ -551,6 +544,16 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
           options={MODALITY_OPTIONS}
           disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
           onChange={(e) => handleInputChange("modality", e?.target?.value)}
+        />
+
+        <Select
+          name="sex"
+          value={input?.sex}
+          options={SELECT_GENRE_OPTIONS}
+          icon={faPersonHalfDress}
+          disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
+          onChange={(e) => handleInputChange("sex", e.target.value)}
+          error={!requiredFields.sex}
         />
 
         <SelectMultiple

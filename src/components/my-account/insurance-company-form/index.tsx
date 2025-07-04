@@ -5,6 +5,7 @@ import SelectMultiple from "@/components/ui/select-multiple";
 import TextInput from "@/components/ui/text-input";
 import { useMutation, useQuery } from "@apollo/client";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
+import Select from "@/components/ui/select";
 import LocalOfficesInput from "../local-offices-input";
 import { useShallow } from "zustand/shallow";
 import { useAuthStore } from "@/store/auth";
@@ -61,6 +62,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   const [logoHasError, setLogoHasError] = useState(false);
   const [hasLocalContact, setHasLocalContact] = useState(false);
 
+
   const company = companyResponse?.publicInsuranceCompanyById;
 
   const suppliers = suppliersResponse?.publicSuppliers?.items || [];
@@ -75,6 +77,12 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   const localContacts = JSON.parse(
     window?.localStorage?.getItem("sektor-local-contact") || "{}"
   );
+
+  useEffect(() => {
+    if (Object?.keys(localContacts)?.length > 0) {
+      setHasLocalContact(true);
+    }
+  }, [localContacts]);
 
   const formattedOffices = company?.offices?.map((office: any) => {
     const {
@@ -204,11 +212,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log('=== INSURANCE COMPANY FORM SUBMISSION DEBUG ===');
-    console.log('Form input data:', input);
-    console.log('Target user ID:', targetUserId);
-    console.log('Company data:', company);
-    console.log('Has errors:', hasErrors);
+
 
     setIsUpdatingCompany(true);
 
@@ -257,6 +261,8 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       links: cleanedLinks,
     };
 
+
+
     const socialMediaLinks = window.localStorage.getItem("social-links") ?? "[]";
     const formattedSocialMediaLinks = JSON.parse(socialMediaLinks).map((link: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -267,9 +273,6 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       };
     });
 
-    console.log('Formatted offices:', formattedOffices);
-    console.log('Formatted contact:', formattedContact);
-    console.log('Formatted social media links:', formattedSocialMediaLinks);
 
     const coverageStates = formattedOffices?.map(
       (office: OrganizationOfficeInputType) => office?.address?.stateId
@@ -295,7 +298,6 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       },
     };
 
-    console.log('Mutation variables:', mutationVariables);
 
     updateCompany({
       variables: mutationVariables,
@@ -306,13 +308,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
         refetchCompany();
       })
       .catch((error) => {
-        console.error('=== INSURANCE COMPANY FORM ERROR DEBUG ===');
-        console.error('Error object:', error);
-        console.error('Error message:', error?.message);
-        console.error('Error graphQLErrors:', error?.graphQLErrors);
-        console.error('Error networkError:', error?.networkError);
-        console.error('Error extensions:', error?.extensions);
-        console.error('Full error details:', JSON.stringify(error, null, 2));
+
         toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
       })
       .finally(() => setIsUpdatingCompany(false));
@@ -343,6 +339,8 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
           onChange={(e) => handleInputChange("name", e.target.value)}
           value={input?.name}
         />
+
+
 
         <SelectMultiple
           label="Ramos con los que trabajas"
@@ -438,7 +436,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
         />
 
         <SocialMediaInput
-          setHasSocialLinks={setHasLocalContact}
+          setHasSocialLinks={() => { }}
           disabled={loadingCompany || isUpdatingCompany}
         />
       </div>

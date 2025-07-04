@@ -48,6 +48,7 @@ type BrokerageSocietyIdProps = FormProps;
 const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
   const targetUserId = userId || loggedUserId;
+  console.log('targetUserId: ', targetUserId);
 
   const [isUpdatingBrokerageSociety, setIsUpdatingBrokerageSociety] =
     useState(false);
@@ -141,8 +142,8 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [logoHasError, setLogoHasError] = useState(false);
   const [hasSocialLinks, setHasSocialLinks] = useState(false);
+  console.log('hasSocialLinks: ', hasSocialLinks);
 
-  console.log('brokerageSociety: ', hasSocialLinks);
   const allies = [...(brokerageSociety?.allies?.map(({ id }) => id) || [])];
   const phoneCodes = PHONE_CODE_OPTIONS.map(({ value }) => value);
   const userPhone = brokerageSociety?.contact?.phone || "";
@@ -195,7 +196,6 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     logoUrl: "",
     // additional
     allies: allies || [],
-
   });
 
   useEffect(() => {
@@ -218,9 +218,10 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       : [];
 
     const workTeam =
-      brokerageSociety?.workTeam.map(({ id, name, position, photoUrl }) => {
-        return { id, name, position, photoUrl };
+      brokerageSociety?.workTeam.map(({ id, name, position, organization }) => {
+        return { id, name, position, organization };
       }) || [];
+    console.log('workTeam 1: ', workTeam);
 
     const insuranceCompaniesIds = (brokerageSociety?.insuranceCompanies?.map(
       ({ id }) => id
@@ -232,6 +233,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       "sektor-local-recognitions",
       JSON.stringify(studies)
     );
+    console.log('workTeam: ', workTeam);
     window?.localStorage?.setItem(
       "sektor-local-work-team",
       JSON.stringify(workTeam)
@@ -267,7 +269,6 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
       logoUrl: brokerageSociety?.logoUrl || "",
       allies: [...(brokerageSociety?.allies?.map(({ id }) => id) || [])],
-
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [brokerageSociety]);
@@ -314,11 +315,6 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log('=== BROKERAGE SOCIETY FORM SUBMISSION DEBUG ===');
-    console.log('Form input data:', input);
-    console.log('Target user ID:', targetUserId);
-    console.log('Brokerage society data:', brokerageSociety);
-    console.log('Has errors:', hasErrors);
 
     setIsUpdatingBrokerageSociety(true);
 
@@ -326,8 +322,6 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     const foundationYear = currentYear - Number(input?.yearsOfExperience || 0);
     const clients = window.localStorage.getItem("sektor-local-clients") ?? "[]";
     const recognitions = window.localStorage.getItem("sektor-local-recognitions") ?? "[]";
-    const workTeam = window.localStorage.getItem("sektor-local-work-team") ?? "[]";
-
     // Limpieza de recognitions
     const formattedRecognitions = JSON.parse(recognitions).map((rec: any) => {
       return {
@@ -339,14 +333,21 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       };
     });
 
-    // Limpieza de workTeam
+
+    const workTeam = window.localStorage.getItem("sektor-local-work-team") ?? "[]";
+
     const rawWorkTeam = JSON.parse(workTeam);
+    console.log('rawWorkTeam: ', rawWorkTeam);
+
     const formattedWorkTeam = rawWorkTeam
       .filter((member: any) => !!member.organization && !!member.position)
       .map((member: any) => ({
-        organization: member.organization,
+        organization: member.organization.id,
         position: member.position,
       }));
+
+
+    console.log('formattedWorkTeam: ', formattedWorkTeam);
 
     if (formattedWorkTeam.length !== rawWorkTeam.length) {
       toast.error("Todos los miembros del equipo deben tener organización y cargo.");
@@ -371,7 +372,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
 
     const contact = window.localStorage.getItem("sektor-local-contact") ?? "{}";
     const contactData = JSON.parse(contact);
-    // Asegura que contact tenga name y position si son requeridos
+
     const formattedContact = {
       ...contactData,
       phone: `${input?.phoneCode}${input?.phone}`,
@@ -609,6 +610,8 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
             value: input?.phone,
           }}
         />
+
+
 
         <UploadInput
           imageUrl={input?.logoUrl || ""}

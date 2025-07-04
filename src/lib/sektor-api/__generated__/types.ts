@@ -193,8 +193,7 @@ export type BrokerageSocietyType = BasePublicOrganizationType & {
   updatedAt: Scalars['DateTime']['output'];
   workTeam: Array<TeamMemberType>;
   socialMediaLinks: Array<SocialMediaLinkType>;
-
-  
+  organization: PublicOrganizationType;
 };
 
 export type ChangeOrganizationFeatureInputType = {
@@ -521,6 +520,7 @@ export type InsuranceCompanyType = BasePublicOrganizationType & {
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
   socialMediaLinks: Array<SocialMediaLinkType>;
+  sex: Sexes;
 };
 
 export type LoginInputType = {
@@ -966,6 +966,7 @@ export type PublicOrganizationType = BasePublicOrganizationType & {
   rating: Scalars['Float']['output'];
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
+
 };
 
 export type Query = {
@@ -1425,6 +1426,7 @@ export type TeamMemberType = {
   name: Scalars['String']['output'];
   photoUrl?: Maybe<Scalars['String']['output']>;
   position: Scalars['String']['output'];
+  organization: PublicOrganizationType;
 };
 
 export type TrackingInputType = {

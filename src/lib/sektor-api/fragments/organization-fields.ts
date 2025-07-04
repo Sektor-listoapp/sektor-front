@@ -1,5 +1,7 @@
 import { gql } from "@apollo/client";
 import { ADDRESS_FIELDS_FRAGMENT } from "./address-fields";
+import { PUBLIC_ORGANIZATION_FIELDS_FRAGMENT } from "./public-organization-fields";
+
 
 export const ORGANIZATION_RECOGNITION_FIELDS_FRAGMENT = gql`
   fragment OrganizationRecognitionFields on RecognitionType {
@@ -23,12 +25,17 @@ export const ORGANIZATION_STUDY_FIELDS_FRAGMENT = gql`
 `;
 
 export const ORGANIZATION_TEAM_MEMBER_FIELDS_FRAGMENT = gql`
-  fragment OrganizationTeamMemberFields on TeamMemberType {
+  fragment OrganizationTeamMemberFields on BrokerageSocietyTeamMemberType {
     id
     name
     photoUrl
     position
+    organization {
+      ...PublicOrganizationFields
+    }
   }
+
+  ${PUBLIC_ORGANIZATION_FIELDS_FRAGMENT}
 `;
 
 export const ORGANIZATION_CLIENT_FIELDS_FRAGMENT = gql`
@@ -86,4 +93,6 @@ export const ORGANIZATION_OFFICE_FIELDS_FRAGMENT = gql`
 
   ${ADDRESS_FIELDS_FRAGMENT}
   ${ORGANIZATION_OFFICE_SCHEDULE_FIELDS_FRAGMENT}
+ 
+
 `;

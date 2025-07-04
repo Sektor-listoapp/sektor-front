@@ -376,6 +376,8 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
           offices={formattedOffices as unknown as OrganizationOfficeInputType[]}
         />
 
+
+
         <Select
           value={input?.serviceType}
           options={SELECT_SUPPLIER_SERVICE_OPTIONS}
