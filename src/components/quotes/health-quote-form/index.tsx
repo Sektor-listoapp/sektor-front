@@ -67,6 +67,7 @@ const HealthQuoteForm = () => {
       vision,
     } = input;
 
+    console.log(dateOfBirth);
     requestQuote({
       variables: {
         input: {
@@ -119,7 +120,7 @@ const HealthQuoteForm = () => {
             }));
           }}
           maxDate={dayjs()}
-          format="DD/MM/YYYY"
+          format="YYYY-MM-DD"
         />
         <Select
           name="upToInsuranceAmount"
