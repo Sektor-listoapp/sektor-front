@@ -102,7 +102,7 @@ const UploadInput: React.FC<UploadInputProps> = ({
         const file = new File([result.blob], 'cropped-image.webp', { type: 'image/webp' });
         onImageChange(result.url, file);
       } else {
-        onImageChange(result.url);
+      onImageChange(result.url);
       }
       setIsModalOpen(false);
       setImageSrc(null);

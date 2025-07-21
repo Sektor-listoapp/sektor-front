@@ -36,22 +36,26 @@ const SocialMediaInput = ({
             setSocialLinks(socialMediaLinks);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Solo al montar
+    }, []);
+
+    const SOCIAL_PLATFORMS = ["Instagram", "Facebook", "Twitter"];
 
     const options = useMemo(() => {
-        return socialLinks.map((link) => {
-            const label = PLATFORM_LABELS_MAP[link.platform] || link.platform;
-            return {
-                label: `${label}: ${link.url}`,
-                value: link.platform,
-                data: {
-                    label,
+        return socialLinks
+            .filter(link => SOCIAL_PLATFORMS.includes(link.platform))
+            .map((link) => {
+                const label = PLATFORM_LABELS_MAP[link.platform] || link.platform;
+                return {
+                    label: `${label}: ${link.url}`,
                     value: link.platform,
-                    platform: link.platform,
-                    url: link.url,
-                },
-            };
-        });
+                    data: {
+                        label,
+                        value: link.platform,
+                        platform: link.platform,
+                        url: link.url,
+                    },
+                };
+            });
     }, [socialLinks]);
 
     return (

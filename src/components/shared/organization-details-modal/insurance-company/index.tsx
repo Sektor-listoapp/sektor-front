@@ -33,9 +33,10 @@ const InsuranceCompanyDetails = () => {
 
   const insuranceCompanyData =
     data?.publicInsuranceCompanyById as InsuranceCompanyType;
+  console.log("insuranceCompanyData", insuranceCompanyData);
 
   const {
-    contact,
+    socialMediaLinks,
     name = "",
     motto = "",
     license = "",
@@ -47,7 +48,6 @@ const InsuranceCompanyDetails = () => {
   } = insuranceCompanyData || {};
 
   const yearsOfExperience = getFormattedYearsOfExperience(foundationYear || 0);
-  const socialMediaLinks = contact?.links || [];
 
   const tabComponents = {
     OrganizationCoverageStates: (
