@@ -113,7 +113,7 @@ const LocalContactModal = ({
               }));
             }}
           />
-          <TextInput
+          {/* <TextInput
             placeholder="Facebook"
             value={input?.[Facebook]}
             required
@@ -123,7 +123,7 @@ const LocalContactModal = ({
                 [Facebook]: e?.target?.value?.trim(),
               }));
             }}
-          />
+          /> */}
           <TextInput
             placeholder="Teléfono de emergencia"
             value={input?.[EmergencyPhone]}
@@ -135,7 +135,7 @@ const LocalContactModal = ({
               }));
             }}
           />
-          <TextInput
+          {/* <TextInput
             placeholder="Instagram"
             value={input?.[Instagram]}
             required
@@ -156,7 +156,7 @@ const LocalContactModal = ({
                 [Twitter]: e?.target?.value?.trim(),
               }));
             }}
-          />
+          /> */}
 
           <div className="w-full col-span-2 flex justify-center items-center">
             <Button

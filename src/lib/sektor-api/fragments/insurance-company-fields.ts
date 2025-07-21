@@ -5,9 +5,6 @@ import { SOCIAL_MEDIA_LINK_FIELDS_FRAGMENT } from "./social-media-link-fields";
 export const INSURANCE_COMPANY_CONTACT_FIELDS_FRAGMENT = gql`
   fragment InsuranceCompanyContactFields on InsuranceCompanyContactType {
     name
-    links {
-      ...SocialMediaLinkFields
-    }
   }
 
   ${SOCIAL_MEDIA_LINK_FIELDS_FRAGMENT}

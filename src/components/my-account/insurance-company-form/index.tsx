@@ -36,6 +36,7 @@ import LocalContactInput from "../local-contact-input";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
 import { FormProps } from "@/types/forms";
 import SocialMediaInput from "../social-media-input";
+import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/update-organization-logo";
 
 type InsuranceCompanyIdProps = FormProps;
 
@@ -49,6 +50,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   const { data: suppliersResponse, loading: loadingSuppliers } =
     useQuery<Query>(PUBLIC_SUPPLIERS_QUERY);
 
+
   const {
     error: companyError,
     data: companyResponse,
@@ -57,6 +59,10 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   } = useQuery<Query>(PUBLIC_INSURANCE_COMPANY_BY_ID_QUERY, {
     variables: { id: targetUserId },
   });
+
+
+  const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
+
 
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [logoHasError, setLogoHasError] = useState(false);
@@ -77,6 +83,23 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   const localContacts = JSON.parse(
     window?.localStorage?.getItem("sektor-local-contact") || "{}"
   );
+
+  const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
+    try {
+      const { data } = await updateOrganizationLogo({
+        variables: {
+          id: organizationId,
+          logo: logoFile
+        }
+      });
+
+      console.log(data);
+
+      console.log("Logo actualizado:", data?.updateOrganizationLogo);
+    } catch (error) {
+      console.error("Error al actualizar logo:", error);
+    }
+  };
 
   useEffect(() => {
     if (Object?.keys(localContacts)?.length > 0) {
@@ -122,11 +145,13 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     identificationType: "",
     yearsOfExperience: "",
     logoUrl: "",
+    logoFile: null as File | null,
     // additional
     motto: "",
     suppliers: [],
     socialMediaLinks: [],
   });
+
 
   useEffect(() => {
     const [licenseType, license] = company?.license?.split("-") || [];
@@ -160,6 +185,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       yearsOfExperience: String(foundationYear) || "",
       motto: company?.motto || "",
       logoUrl: company?.logoUrl || "",
+      logoFile: null,
       socialMediaLinks: [],
     });
 
@@ -214,6 +240,8 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
 
 
+
+
     setIsUpdatingCompany(true);
 
     const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
@@ -249,16 +277,15 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     const contactData = JSON.parse(contact);
 
 
-    const cleanedLinks = Array.isArray(contactData.links)
-      ? contactData.links.map((link: any) => ({
-        platform: link.platform,
-        url: link.url,
-      }))
-      : [];
+    // const cleanedLinks = Array.isArray(contactData.links)
+    //   ? contactData.links.map((link: any) => ({
+    //     platform: link.platform,
+    //     url: link.url,
+    //   }))
+    //   : [];
 
     const formattedContact: InsuranceCompanyContactInputType = {
-      name: contactData.name || "",
-      links: cleanedLinks,
+      name: contactData.name || input?.name || "Contacto Principal",
     };
 
 
@@ -275,8 +302,8 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
 
     const coverageStates = formattedOffices?.map(
-      (office: OrganizationOfficeInputType) => office?.address?.stateId
-    ) || [];
+      (office: OrganizationOfficeInputType) => Number(office?.address?.stateId)
+    ).filter(Boolean) || [];
 
     const mutationVariables = {
       input: {
@@ -285,19 +312,28 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
         name: input?.name,
         suppliers: input?.suppliers || [],
         lineOfBusiness: input?.segment,
-        foundationYear: Number(input?.yearsOfExperience) || 0,
+        foundationYear: Number(input?.yearsOfExperience) || 2024,
         license: `${input?.licenseType}${input?.license}`,
         identification: `${input?.identificationType}${input?.identification}`,
         motto: input?.motto,
         offices: formattedOffices,
         coverageStates: coverageStates,
         modality: company?.modality,
-        logoUrl: input?.logoUrl,
         contact: formattedContact,
         socialMediaLinks: formattedSocialMediaLinks || [],
       },
     };
 
+
+
+    if (input?.logoFile) {
+      if (!targetUserId) {
+        toast.error("No se pudo actualizar el logo, intenta de nuevo más tarde");
+        return;
+      }
+      console.log('input.logoFile', input.logoFile);
+      handleUpdateLogo(targetUserId, input.logoFile);
+    }
 
     updateCompany({
       variables: mutationVariables,
@@ -308,7 +344,9 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
         refetchCompany();
       })
       .catch((error) => {
-
+        console.error('Insurance company update error:', error);
+        console.error('Error details:', error.graphQLErrors);
+        console.error('Network error:', error.networkError);
         toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
       })
       .finally(() => setIsUpdatingCompany(false));
@@ -424,7 +462,15 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
           setError={setLogoHasError}
           setIsUploadingLogo={setIsUploadingLogo}
           disabled={loadingCompany || isUpdatingCompany || isUploadingLogo}
-          onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
+          onImageChange={(url: string | null, file?: File) => {
+            handleInputChange("logoUrl", url || '');
+            if (file) {
+              setInput(prev => {
+                const newState = { ...prev, logoFile: file };
+                return newState;
+              });
+            }
+          }}
           placeholder="Subir logo de la empresa"
           aspect={1}
         />

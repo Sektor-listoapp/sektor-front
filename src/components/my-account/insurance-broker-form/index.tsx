@@ -43,6 +43,7 @@ import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo
 import { FormProps } from "@/types/forms";
 import LocalOfficesInput from "../local-offices-input";
 import SocialMediaInput from "../social-media-input";
+import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/update-organization-logo";
 
 type InsuranceBrokerIdProps = FormProps;
 
@@ -69,6 +70,8 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
   const [updateInsuranceBroker] = useMutation<Mutation>(
     UPDATE_INSURANCE_BROKER
   );
+
+  const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
 
   const {
     data: insuranceCompaniesResponse,
@@ -176,6 +179,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     phone: string;
     phoneCode: string;
     logoUrl: string;
+    logoFile: File | null;
     // additional
     allies: string[];
     sex: string;
@@ -199,11 +203,27 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     phone: userPhoneWithoutCode || "",
     phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
     logoUrl: "",
+    logoFile: null,
     // additional
     allies: allies || [],
     sex: insuranceBroker?.sex || "",
     // socialMediaLinks: JSON.parse(window?.localStorage?.getItem("social-links") || "[]"),
   });
+
+  const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
+    try {
+      const { data } = await updateOrganizationLogo({
+        variables: {
+          id: organizationId,
+          logo: logoFile
+        }
+      });
+      console.log(data);
+      console.log("Logo actualizado:", data?.updateOrganizationLogo);
+    } catch (error) {
+      console.error("Error al actualizar logo:", error);
+    }
+  };
 
   useEffect(() => {
     const currentYear = new Date().getFullYear();
@@ -259,6 +279,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       phone: userPhoneWithoutCode || "",
       phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
       logoUrl: insuranceBroker?.logoUrl || "",
+      logoFile: null,
       allies: [...(insuranceBroker?.allies?.map(({ id }) => id) || [])],
       sex: insuranceBroker?.sex || "",
       // socialMediaLinks: JSON.parse(window?.localStorage?.getItem("social-links") || "[]"),
@@ -347,11 +368,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       };
     });
 
-    console.log('Foundation year:', foundationYear);
-    console.log('Studies from localStorage:', studies);
-    console.log('Clients from localStorage:', clients);
-    console.log('Formatted offices:', formattedOffices);
-    console.log('Formatted social media links:', formattedSocialMediaLinks);
+
 
     const mutationVariables = {
       input: {
@@ -377,7 +394,16 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       },
     };
 
-    console.log('Mutation variables:', mutationVariables);
+
+
+    if (input?.logoFile) {
+      if (!targetUserId) {
+        toast.error("No se pudo actualizar el logo, intenta de nuevo más tarde");
+        return;
+      }
+      console.log('input.logoFile', input.logoFile);
+      handleUpdateLogo(targetUserId, input.logoFile);
+    }
 
     updateInsuranceBroker({
       variables: mutationVariables,
@@ -610,18 +636,21 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
             value: input?.phone,
           }}
         />
-
         <UploadInput
           imageUrl={input?.logoUrl || ""}
-          error={!requiredFields.logoUrl || logoHasError}
+          error={!requiredFields.logoUrl}
           setError={setLogoHasError}
           setIsUploadingLogo={setIsUploadingLogo}
-          disabled={
-            loadingInsuranceBroker ||
-            isUpdatingInsuranceBroker ||
-            isUploadingLogo
-          }
-          onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
+          disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker || isUploadingLogo}
+          onImageChange={(url: string | null, file?: File) => {
+            handleInputChange("logoUrl", url || '');
+            if (file) {
+              setInput(prev => {
+                const newState = { ...prev, logoFile: file };
+                return newState;
+              });
+            }
+          }}
           placeholder="Subir logo del corredor"
           aspect={1}
         />

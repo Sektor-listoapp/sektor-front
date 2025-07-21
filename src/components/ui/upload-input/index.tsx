@@ -13,7 +13,7 @@ import { cropImage, fileToBase64, CropArea } from '@/lib/cropImage';
 interface UploadInputProps {
   className?: string;
   imageUrl: string | null;
-  onImageChange: (imageUrl: string | null) => void;
+  onImageChange: (imageUrl: string | null, file?: File) => void;
   setIsUploadingLogo: React.Dispatch<React.SetStateAction<boolean>>;
   disabled?: boolean;
   error?: boolean;
@@ -81,7 +81,7 @@ const UploadInput: React.FC<UploadInputProps> = ({
         getBase64(info.file.originFileObj, (imageUrl) => {
           setLoadingLocalImage(false);
           setIsUploadingLogo(false);
-          onImageChange(imageUrl);
+          onImageChange(imageUrl, info.file.originFileObj);
         });
       }
     }
@@ -98,7 +98,12 @@ const UploadInput: React.FC<UploadInputProps> = ({
     try {
       setIsCropping(true);
       const result = await cropImage(imageSrc, croppedAreaPixels, aspect);
-      onImageChange(result.url);
+      if (result.blob) {
+        const file = new File([result.blob], 'cropped-image.webp', { type: 'image/webp' });
+        onImageChange(result.url, file);
+      } else {
+        onImageChange(result.url);
+      }
       setIsModalOpen(false);
       setImageSrc(null);
       setCrop({ x: 0, y: 0 });

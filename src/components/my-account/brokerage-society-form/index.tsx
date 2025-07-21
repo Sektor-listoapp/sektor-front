@@ -42,13 +42,14 @@ import LocalClientsInput from "../local-clients-input";
 import LocalOfficesInput from "../local-offices-input";
 import { FormProps } from "@/types/forms";
 import SocialMediaInput from "../social-media-input";
+import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/update-organization-logo";
 
 type BrokerageSocietyIdProps = FormProps;
 
 const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
   const targetUserId = userId || loggedUserId;
-  console.log('targetUserId: ', targetUserId);
+
 
   const [isUpdatingBrokerageSociety, setIsUpdatingBrokerageSociety] =
     useState(false);
@@ -65,6 +66,8 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const [updateBrokerageSociety] = useMutation<Mutation>(
     UPDATE_BROKERAGE_SOCIETY
   );
+
+  const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
 
   const {
     data: insuranceCompaniesResponse,
@@ -194,9 +197,25 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     phone: userPhoneWithoutCode || "",
     phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
     logoUrl: "",
+    logoFile: null as File | null,
     // additional
     allies: allies || [],
   });
+
+  const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
+    try {
+      const { data } = await updateOrganizationLogo({
+        variables: {
+          id: organizationId,
+          logo: logoFile
+        }
+      });
+      console.log(data);
+      console.log("Logo actualizado:", data?.updateOrganizationLogo);
+    } catch (error) {
+      console.error("Error al actualizar logo:", error);
+    }
+  };
 
   useEffect(() => {
     const currentYear = new Date().getFullYear();
@@ -269,6 +288,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
       logoUrl: brokerageSociety?.logoUrl || "",
       allies: [...(brokerageSociety?.allies?.map(({ id }) => id) || [])],
+      logoFile: null,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [brokerageSociety]);
@@ -414,7 +434,14 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       },
     };
 
-    console.log('Mutation variables:', mutationVariables);
+    if (input?.logoFile) {
+      if (!targetUserId) {
+        toast.error("No se pudo actualizar el logo, intenta de nuevo más tarde");
+        return;
+      }
+      console.log('input.logoFile', input.logoFile);
+      handleUpdateLogo(targetUserId, input.logoFile);
+    }
 
     updateBrokerageSociety({
       variables: mutationVariables,
@@ -612,7 +639,6 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
         />
 
 
-
         <UploadInput
           imageUrl={input?.logoUrl || ""}
           error={!requiredFields.logoUrl || logoHasError}
@@ -624,7 +650,15 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
             isUpdatingBrokerageSociety ||
             isUploadingLogo
           }
-          onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
+          onImageChange={(url: string | null, file?: File) => {
+            handleInputChange("logoUrl", url || '');
+            if (file) {
+              setInput(prev => {
+                const newState = { ...prev, logoFile: file };
+                return newState;
+              });
+            }
+          }}
           placeholder="Subir logo de la sociedad"
           aspect={1}
         />

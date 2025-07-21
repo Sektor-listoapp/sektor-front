@@ -454,7 +454,6 @@ export type InsuranceBrokerType = BasePublicOrganizationType & {
 };
 
 export type InsuranceCompanyContactInputType = {
-  links: Array<SocialMediaLinkInputType>;
   name: Scalars['String']['input'];
 };
 
@@ -481,13 +480,15 @@ export type InsuranceCompanyInputType = {
   identification?: InputMaybe<Scalars['String']['input']>;
   license: Scalars['String']['input'];
   lineOfBusiness: Array<OrganizationLineOfBusiness>;
-  logoUrl?: InputMaybe<Scalars['String']['input']>;
   modality: OrganizationModality;
   motto?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   offices: Array<OrganizationOfficeInputType>;
+  socialMediaLinks: Array<SocialMediaLinkInputType>;
   suppliers?: Array<Scalars['String']['input']>;
   type: OrganizationTypes;
+  logoUrl?: InputMaybe<Scalars['String']['input']>;
+
 };
 
 export type InsuranceCompanyPaginatedType = {
@@ -847,6 +848,7 @@ export enum OrganizationPlans {
 }
 
 export type OrganizationType = {
+
   __typename?: 'OrganizationType';
   clicks: Scalars['Int']['output'];
   coverageStates: Array<Scalars['Float']['output']>;
