@@ -43,6 +43,7 @@ import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo
 import { FormProps } from "@/types/forms";
 import SocialMediaInput from "../social-media-input";
 import LocalOfficesInput from "../local-offices-input";
+import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/update-organization-logo";
 
 type ExclusiveAgentIdProps = FormProps;
 
@@ -65,6 +66,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
   });
 
   const [updateExclusiveAgent] = useMutation<Mutation>(UPDATE_EXCLUSIVE_AGENT);
+  const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
 
   const {
     data: insuranceCompaniesResponse,
@@ -184,6 +186,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     phone: string;
     phoneCode: string;
     logoUrl: string;
+    logoFile: File | null;
     // additional
     allies: string[];
     sex: string;
@@ -204,10 +207,26 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     phone: userPhoneWithoutCode || "",
     phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
     logoUrl: "",
+    logoFile: null,
     // additional
     allies: allies || [],
     sex: exclusiveAgent?.sex || "",
   });
+
+  const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
+    try {
+      const { data } = await updateOrganizationLogo({
+        variables: {
+          id: organizationId,
+          logo: logoFile
+        }
+      });
+      console.log(data);
+      console.log("Logo actualizado:", data?.updateOrganizationLogo);
+    } catch (error) {
+      console.error("Error al actualizar logo:", error);
+    }
+  };
 
   useEffect(() => {
     const currentYear = new Date().getFullYear();
@@ -265,6 +284,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
       logoUrl: exclusiveAgent?.logoUrl || "",
       allies: [...(exclusiveAgent?.allies?.map(({ id }) => id) || [])],
       sex: exclusiveAgent?.sex || "",
+      logoFile: null,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exclusiveAgent]);
@@ -367,6 +387,15 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
         offices: formattedOffices || [],
       },
     };
+
+    if (input?.logoFile) {
+      if (!targetUserId) {
+        toast.error("No se pudo actualizar el logo, intenta de nuevo más tarde");
+        return;
+      }
+      console.log('input.logoFile', input.logoFile);
+      handleUpdateLogo(targetUserId, input.logoFile);
+    }
 
     updateExclusiveAgent({
       variables: mutationVariables,
@@ -596,10 +625,16 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
           imageUrl={input?.logoUrl || ""}
           error={!requiredFields.logoUrl}
           setIsUploadingLogo={setIsUploadingLogo}
-          disabled={
-            loadingExclusiveAgent || isUpdatingExclusiveAgent || isUploadingLogo
-          }
-          onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
+          disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent || isUploadingLogo}
+          onImageChange={(url: string | null, file?: File) => {
+            handleInputChange("logoUrl", url || '');
+            if (file) {
+              setInput(prev => {
+                const newState = { ...prev, logoFile: file };
+                return newState;
+              });
+            }
+          }}
           placeholder="Subir logo del agente"
           aspect={1}
         />

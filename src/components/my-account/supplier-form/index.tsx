@@ -34,6 +34,7 @@ import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo
 import UploadInput from "@/components/ui/upload-input";
 import { FormProps } from "@/types/forms";
 import SocialMediaInput from "../social-media-input";
+import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/update-organization-logo";
 
 
 type supplierIdProps = FormProps;
@@ -47,6 +48,8 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
   console.log('hasSocialLinks: ', hasSocialLinks);
 
   const [updateSupplier] = useMutation<Mutation>(UPDATE_SUPPLIER);
+
+  const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
 
   const {
     data: insuranceCompaniesResponse,
@@ -100,6 +103,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     identificationType: "",
     serviceType: "",
     logoUrl: "",
+    logoFile: null as File | null,
     // additional
     motto: "",
     insuranceCompanies: [],
@@ -139,6 +143,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       motto: supplier?.motto || "",
       logoUrl: supplier?.logoUrl || "",
       socialMediaLinks: [],
+      logoFile: null,
     });
   }, [supplier]);
 
@@ -168,6 +173,24 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
         ...prev,
         [field]: value || "",
       }));
+    }
+  };
+
+
+  const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
+    try {
+      const { data } = await updateOrganizationLogo({
+        variables: {
+          id: organizationId,
+          logo: logoFile
+        }
+      });
+
+      console.log(data);
+
+      console.log("Logo actualizado:", data?.updateOrganizationLogo);
+    } catch (error) {
+      console.error("Error al actualizar logo:", error);
     }
   };
 
@@ -228,12 +251,21 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
         offices: formattedOffices,
         modality: supplier?.modality,
         serviceType: input?.serviceType,
-        logoUrl: input?.logoUrl,
         socialMediaLinks: formattedSocialMediaLinks || [],
       },
     };
 
     console.log('Mutation variables:', mutationVariables);
+
+    if (input?.logoFile) {
+      if (!targetUserId) {
+        toast.error("No se pudo actualizar el logo, intenta de nuevo más tarde");
+        return;
+      }
+      console.log('input.logoFile', input.logoFile);
+      handleUpdateLogo(targetUserId, input.logoFile);
+    }
+
 
     updateSupplier({
       variables: mutationVariables,
@@ -343,15 +375,24 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
           }}
         />
 
-        <UploadInput
+              <UploadInput
           imageUrl={input?.logoUrl || ""}
           error={!requiredFields.logoUrl}
           setIsUploadingLogo={setIsUploadingLogo}
           disabled={loadingSupplier || isUpdatingSupplier || isUploadingLogo}
-          onImageChange={(url: string | null) => handleInputChange("logoUrl", url || "")}
+          onImageChange={(url: string | null, file?: File) => {
+            handleInputChange("logoUrl", url || '');
+            if (file) {
+              setInput(prev => {
+                const newState = { ...prev, logoFile: file };
+                return newState;
+              });
+            }
+          }}
           placeholder="Subir logo del proveedor"
           aspect={1}
         />
+
         <SocialMediaInput
           setHasSocialLinks={setHasSocialLinks}
           disabled={loadingSupplier || isUpdatingSupplier}
