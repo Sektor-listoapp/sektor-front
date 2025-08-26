@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const UPDATE_ORGANIZATION_LOGO = gql`
-  mutation updateOrganizationLogo($id: String!, $logo: File) {
-    updateOrganizationLogo(id: $id, logo: $logo) {
+  mutation updateOrganizationLogo($logo: File, $organizationId: String) {
+    updateOrganizationLogo(logo: $logo, organizationId: $organizationId) {
       id
     }
   }

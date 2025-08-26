@@ -17,6 +17,10 @@ const LocalClientsInput = ({ clients, disabled }: ClientsInputProps) => {
     "sektor-local-clients",
     clients ?? []
   );
+
+  const [localClientLogos, setLocalClientLogos] = useLocalStorage<{ [id: string]: File }>("sektor-local-client-logo", {});
+
+
   const localClientsOptions = useMemo(
     () =>
       localClients.map((client) => ({
@@ -27,6 +31,7 @@ const LocalClientsInput = ({ clients, disabled }: ClientsInputProps) => {
       })),
     [localClients]
   );
+
   const [openAddClientModal, setOpenAddClientModal] = useState(false);
   const [clientToEdit, setClientToEdit] =
     useState<OrganizationClientType | null>(null);
@@ -93,6 +98,8 @@ const LocalClientsInput = ({ clients, disabled }: ClientsInputProps) => {
         setOpenAddClientModal={setOpenAddClientModal}
         localClients={localClients}
         setLocalClients={setLocalClients}
+        localClientLogos={localClientLogos}
+        setLocalClientLogos={setLocalClientLogos}
         clientToEdit={clientToEdit}
       />
     </>

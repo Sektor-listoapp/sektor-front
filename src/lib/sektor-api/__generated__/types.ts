@@ -772,7 +772,9 @@ export type OrganizationClientType = {
   __typename?: 'OrganizationClientType';
   id: Scalars['String']['output'];
   logoUrl?: Maybe<Scalars['String']['output']>;
+  logoFile?: Maybe<Scalars['File']['output']>;
   name: Scalars['String']['output'];
+  
 };
 
 export enum OrganizationFeatures {
