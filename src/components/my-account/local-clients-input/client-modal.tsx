@@ -15,6 +15,8 @@ interface ClientModalProps extends ModalProps {
   setLocalClients: React.Dispatch<
     React.SetStateAction<OrganizationClientType[]>
   >;
+  localClientLogos: { [id: string]: File };
+  setLocalClientLogos: React.Dispatch<React.SetStateAction<{ [id: string]: File }>>;
 }
 
 const LocalClientModal = ({
@@ -22,12 +24,14 @@ const LocalClientModal = ({
   localClients,
   setLocalClients,
   clientToEdit,
+  setLocalClientLogos,
   ...modalProps
 }: ClientModalProps) => {
   const isEditing = Boolean(clientToEdit?.id);
   const [input, setInput] = useState({
     name: clientToEdit?.name || "",
     logoUrl: clientToEdit?.logoUrl || " ",
+    logoFile: null as File | null,
   });
 
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
@@ -38,12 +42,13 @@ const LocalClientModal = ({
       setInput({
         name: clientToEdit?.name || "",
         logoUrl: clientToEdit?.logoUrl || " ",
+        logoFile: null as File | null,
       });
     }
   }, [clientToEdit]);
 
   const handleClose = () => {
-    setInput({ name: "", logoUrl: " " });
+    setInput({ name: "", logoUrl: " ", logoFile: null as File | null });
     setOpenAddClientModal(false);
   };
 
@@ -75,14 +80,24 @@ const LocalClientModal = ({
       return;
     }
 
+    const newId = new ObjectId() as unknown as string;
+
     setLocalClients([
       ...localClients,
       {
-        id: new ObjectId() as unknown as string,
+        id: newId,
         name: input?.name,
         logoUrl: input?.logoUrl,
       },
     ]);
+
+    if (input.logoFile) {
+      setLocalClientLogos(prev => ({
+        ...prev,
+        [newId]: input.logoFile as File,
+      }));
+    }
+
     handleClose();
   };
 
@@ -118,12 +133,20 @@ const LocalClientModal = ({
           />
 
           <UploadInput
-            setIsUploadingLogo={setIsUploadingLogo}
-            disabled={isUploadingLogo}
+            imageUrl={input?.logoUrl || ""}
             error={logoError}
             setError={setLogoError}
-            imageUrl={input?.logoUrl || " "}
-            onImageChange={(url: string | null) => handleInputChange("logoUrl", url || '')}
+            setIsUploadingLogo={setIsUploadingLogo}
+            disabled={isUploadingLogo}
+            onImageChange={(url: string | null, file?: File) => {
+              handleInputChange("logoUrl", url || '');
+              if (file) {
+                setInput(prev => {
+                  const newState = { ...prev, logoFile: file };
+                  return newState;
+                });
+              }
+            }}
             placeholder="Subir logo del cliente"
             aspect={1}
           />
@@ -135,6 +158,7 @@ const LocalClientModal = ({
             disabled={
               !input?.name?.trim() ||
               !input?.logoUrl ||
+              !input?.logoFile ||
               isUploadingLogo ||
               logoError
             }
