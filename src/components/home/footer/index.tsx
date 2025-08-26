@@ -4,6 +4,7 @@ import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo
 import TwitterIcon from "@/components/icons/twitter";
 import { cn } from "@/utils/class-name";
 import Image from "next/image";
+import Link from "next/link";
 import React from "react";
 
 const Footer = ({ className, ...props }: React.HTMLProps<HTMLDivElement>) => {
@@ -26,12 +27,12 @@ const Footer = ({ className, ...props }: React.HTMLProps<HTMLDivElement>) => {
             </a>
           </p>
           <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-            <a
+            <Link
               href="/terminos-y-condiciones"
               className="font-century-gothic text-sm text-white hover:text-gray-200 transition-colors duration-200 underline"
             >
               Términos y Condiciones
-            </a>
+            </Link>
             <div className="flex justify-center items-center gap-4">
               <InstagramIcon width={40} height={40} />
               <FacebookIcon width={35} height={35} />

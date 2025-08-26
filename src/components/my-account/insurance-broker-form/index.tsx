@@ -15,7 +15,7 @@ import Button from "@/components/ui/button";
 import LocalClientsInput from "../local-clients-input";
 import StudiesInput from "../studies-input";
 import { UPDATE_INSURANCE_BROKER } from "@/lib/sektor-api/mutations";
-import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
+// import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import {
   faAddressCard,
   faHashtag,
@@ -43,7 +43,8 @@ import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo
 import { FormProps } from "@/types/forms";
 import LocalOfficesInput from "../local-offices-input";
 import SocialMediaInput from "../social-media-input";
-import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/update-organization-logo";
+// import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/update-organization-logo";
+import { UPDATE_INSURANCE_BROKER_CLIENT_LOGO } from "@/lib/sektor-api/mutations/my-account/update-insurance-broker-client-logo";
 
 type InsuranceBrokerIdProps = FormProps;
 
@@ -71,7 +72,8 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     UPDATE_INSURANCE_BROKER
   );
 
-  const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
+  // const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
+  const [updateInsuranceBrokerClientLogo] = useMutation<Mutation>(UPDATE_INSURANCE_BROKER_CLIENT_LOGO);
 
   const {
     data: insuranceCompaniesResponse,
@@ -210,16 +212,32 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     // socialMediaLinks: JSON.parse(window?.localStorage?.getItem("social-links") || "[]"),
   });
 
-  const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
+  // const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
+  //   try {
+  //     const { data } = await updateOrganizationLogo({
+  //       variables: {
+  //         id: organizationId,
+  //         logo: logoFile
+  //       }
+  //     });
+  //     console.log(data);
+  //     console.log("Logo actualizado:", data?.updateOrganizationLogo);
+  //   } catch (error) {
+  //     console.error("Error al actualizar logo:", error);
+  //   }
+  // };
+
+  const handleUpdateClientLogo = async (clientId: string, logoFile: File, organizationId: string) => {
+    console.log("clientId", clientId);
+    console.log("logoFile", logoFile);
+    console.log("organizationId", organizationId);
     try {
-      const { data } = await updateOrganizationLogo({
-        variables: {
-          id: organizationId,
-          logo: logoFile
-        }
+      const { data } = await updateInsuranceBrokerClientLogo({
+        variables: { clientId, logo: logoFile, organizationId }
       });
+
       console.log(data);
-      console.log("Logo actualizado:", data?.updateOrganizationLogo);
+      console.log("Logo actualizado:", data?.updateInsuranceBrokerClientLogo);
     } catch (error) {
       console.error("Error al actualizar logo:", error);
     }
@@ -255,6 +273,8 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       "sektor-local-clients",
       JSON.stringify(clients)
     );
+
+
     window?.localStorage?.setItem(
       "social-links",
       JSON.stringify(insuranceBroker?.socialMediaLinks || [])
@@ -325,14 +345,8 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    console.log('=== INSURANCE BROKER FORM SUBMISSION DEBUG ===');
-    console.log('Form input data:', input);
-    console.log('Target user ID:', targetUserId);
-    console.log('Insurance broker data:', insuranceBroker);
-    console.log('Has errors:', hasErrors);
 
     setIsUpdatingInsuranceBroker(true);
 
@@ -340,6 +354,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     const foundationYear = currentYear - Number(input?.yearsOfExperience || 0);
     const studies = window.localStorage.getItem("sektor-local-studies") ?? "[]";
     const clients = window.localStorage.getItem("sektor-local-clients") ?? "[]";
+    const localClientLogos = JSON.parse(window.localStorage.getItem("sektor-local-client-logo") ?? "{}");
 
     const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -358,6 +373,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     });
 
     const socialMediaLinks = window.localStorage.getItem("social-links") ?? "[]";
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const formattedSocialMediaLinks = JSON.parse(socialMediaLinks).map((link: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -367,8 +383,6 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
         url: restLinkProps.url,
       };
     });
-
-
 
     const mutationVariables = {
       input: {
@@ -394,37 +408,35 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       },
     };
 
+    try {
+      const response = await updateInsuranceBroker({
+        variables: mutationVariables,
+      });
+      console.log('Insurance broker update success response:', response);
+      toast.success("Información actualizada correctamente");
+      refetchInsuranceBroker();
 
-
-    if (input?.logoFile) {
-      if (!targetUserId) {
-        toast.error("No se pudo actualizar el logo, intenta de nuevo más tarde");
-        return;
+      // Subir imágenes de clientes después de guardar los clientes
+      const organizationId = insuranceBroker?.id || "";
+      const savedClients = mutationVariables.input.clients;
+      for (const client of savedClients) {
+        const file = localClientLogos[client.id];
+        if (file) {
+          await handleUpdateClientLogo(client.id, file, organizationId || "");
+        }
       }
-      console.log('input.logoFile', input.logoFile);
-      handleUpdateLogo(targetUserId, input.logoFile);
+    } catch (error) {
+      console.error('=== INSURANCE BROKER FORM ERROR DEBUG ===');
+      console.error('Error object:', error);
+    } finally {
+      setIsUpdatingInsuranceBroker(false);
     }
-
-    updateInsuranceBroker({
-      variables: mutationVariables,
-    })
-      .then((response) => {
-        console.log('Insurance broker update success response:', response);
-        toast.success("Información actualizada correctamente");
-        refetchInsuranceBroker();
-      })
-      .catch((error) => {
-        console.error('=== INSURANCE BROKER FORM ERROR DEBUG ===');
-        console.error('Error object:', error);
-        console.error('Error message:', error?.message);
-        console.error('Error graphQLErrors:', error?.graphQLErrors);
-        console.error('Error networkError:', error?.networkError);
-        console.error('Error extensions:', error?.extensions);
-        console.error('Full error details:', JSON.stringify(error, null, 2));
-        toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
-      })
-      .finally(() => setIsUpdatingInsuranceBroker(false));
   };
+
+
+  console.log('input?.logoFile', input?.logoFile)
+
+
 
   const showLoading =
     loadingInsuranceCompanies ||
@@ -636,6 +648,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
             value: input?.phone,
           }}
         />
+
         <UploadInput
           imageUrl={input?.logoUrl || ""}
           error={!requiredFields.logoUrl}
