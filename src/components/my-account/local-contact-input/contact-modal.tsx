@@ -13,7 +13,7 @@ interface ContactModalProps extends ModalProps {
   setLocalContact: React.Dispatch<React.SetStateAction<Record<string, string>>>;
 }
 
-const { Website, Phone, Facebook, EmergencyPhone, Instagram, Twitter } =
+const { Website, Phone, EmergencyPhone } =
   SocialMediaPlatform;
 
 const LocalContactModal = ({
@@ -25,20 +25,14 @@ const LocalContactModal = ({
   const [input, setInput] = useState({
     [Website]: "",
     [Phone]: "",
-    [Facebook]: "",
     [EmergencyPhone]: "",
-    [Instagram]: "",
-    [Twitter]: "",
   });
 
   useEffect(() => {
     setInput({
       [Website]: localContact?.[Website] || "",
       [Phone]: localContact?.[Phone] || "",
-      [Facebook]: localContact?.[Facebook] || "",
       [EmergencyPhone]: localContact?.[EmergencyPhone] || "",
-      [Instagram]: localContact?.[Instagram] || "",
-      [Twitter]: localContact?.[Twitter] || "",
     });
   }, [localContact]);
 
@@ -46,10 +40,7 @@ const LocalContactModal = ({
     setInput({
       [Website]: "",
       [Phone]: "",
-      [Facebook]: "",
       [EmergencyPhone]: "",
-      [Instagram]: "",
-      [Twitter]: "",
     });
     setOpenContactModal(false);
   };

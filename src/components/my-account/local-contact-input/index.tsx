@@ -19,6 +19,7 @@ const LocalContactInput = ({
   disabled,
   setHasLocalContact,
 }: LocalContactInputProps) => {
+  
   const [localContact, setLocalContact] = useLocalStorage(
     "sektor-local-contact",
     {}

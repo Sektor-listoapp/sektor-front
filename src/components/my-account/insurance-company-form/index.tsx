@@ -275,18 +275,23 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
     const contact = window.localStorage.getItem("sektor-local-contact") ?? "{}";
     const contactData = JSON.parse(contact);
+    console.log("contactData", contactData)
 
 
-    // const cleanedLinks = Array.isArray(contactData.links)
-    //   ? contactData.links.map((link: any) => ({
-    //     platform: link.platform,
-    //     url: link.url,
-    //   }))
-    //   : [];
+    const cleanedLinks = Object.entries(contactData)
+      .filter(([key, value]) => typeof value === 'string' && value.trim() !== '')
+      .map(([platform, url]) => ({
+        platform,
+        url,
+      }));
+
+    console.log("cleanedLinks", cleanedLinks)
 
     const formattedContact: InsuranceCompanyContactInputType = {
-      name: contactData.name || input?.name || "Contacto Principal",
+      name: input?.name || "Contacto Principal",
     };
+
+
 
 
 
@@ -299,6 +304,12 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
         url: restLinkProps.url,
       };
     });
+
+    console.log("formattedSocialMediaLinks", formattedSocialMediaLinks)
+
+    const formattedFullContactInfo = [...formattedSocialMediaLinks, ...cleanedLinks]
+    console.log("formattedFullContactInfo", formattedFullContactInfo)
+
 
 
     const coverageStates = formattedOffices?.map(
@@ -320,7 +331,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
         coverageStates: coverageStates,
         modality: company?.modality,
         contact: formattedContact,
-        socialMediaLinks: formattedSocialMediaLinks || [],
+        socialMediaLinks: formattedFullContactInfo || [],
       },
     };
 
