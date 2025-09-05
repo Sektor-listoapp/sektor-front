@@ -12,8 +12,6 @@ import SelectWithTextInput from "@/components/ui/select-with-text-input";
 import { useShallow } from "zustand/shallow";
 import { useAuthStore } from "@/store/auth";
 import { toast } from "react-toastify";
-import Image from "next/image";
-import { Space } from "antd";
 import Button from "@/components/ui/button";
 import { UPDATE_SUPPLIER } from "@/lib/sektor-api/mutations";
 import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
@@ -35,6 +33,7 @@ import UploadInput from "@/components/ui/upload-input";
 import { FormProps } from "@/types/forms";
 import SocialMediaInput from "../social-media-input";
 import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/update-organization-logo";
+import InsuranceCompaniesInput from "../insurance-companies-input";
 
 
 type supplierIdProps = FormProps;
@@ -45,7 +44,9 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
   const [isUpdatingSupplier, setIsUpdatingSupplier] = useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [hasSocialLinks, setHasSocialLinks] = useState(false);
+  const [hasInsuranceCompanies, setHasInsuranceCompanies] = useState(false);
   console.log('hasSocialLinks: ', hasSocialLinks);
+  console.log('hasInsuranceCompanies: ', hasInsuranceCompanies);
 
   const [updateSupplier] = useMutation<Mutation>(UPDATE_SUPPLIER);
 
@@ -69,13 +70,9 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
 
   const insuranceCompanies =
     insuranceCompaniesResponse?.publicInsuranceCompanies?.items || [];
-  const insuranceCompanyOptions = [
-    ...insuranceCompanies?.map(({ id, name, logoUrl }) => ({
-      label: name,
-      value: id,
-      image: logoUrl,
-    })),
-  ];
+
+  console.log('Insurance companies loaded:', insuranceCompanies);
+  console.log('Insurance companies response:', insuranceCompaniesResponse);
 
   const formattedOffices = supplier?.offices?.map((office: any) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -107,6 +104,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     // additional
     motto: "",
     insuranceCompanies: [],
+    insuranceCompanyRelations: [] as any[],
     socialMediaLinks: [],
   });
 
@@ -118,6 +116,16 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     const insuranceCompaniesIds = (supplier?.insuranceCompanies?.map(
       ({ id }) => id
     ) || []) as never[];
+
+    const insuranceCompanyRelations = supplier?.insuranceCompanyRelations?.map(relation => ({
+      insuranceCompanyId: relation.insuranceCompanyId,
+      depositRequired: relation.depositRequired,
+      fullyContractedClinic: relation.fullyContractedClinic,
+      reasonableExpensesApplicable: relation.reasonableExpensesApplicable
+    })) || [];
+
+    console.log('🔍 DEBUG - Supplier insurance company relations:', supplier?.insuranceCompanyRelations);
+    console.log('🔍 DEBUG - Mapped insurance company relations:', insuranceCompanyRelations);
 
     window?.localStorage?.setItem(
       "sektor-local-offices",
@@ -131,6 +139,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     setInput({
       name: supplier?.name || "",
       insuranceCompanies: insuranceCompaniesIds || [],
+      insuranceCompanyRelations: insuranceCompanyRelations,
       license: license || "",
       licenseType: licenseType
         ? `${licenseType}-`
@@ -166,12 +175,12 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
 
   const handleInputChange = (
     field: keyof typeof input,
-    value: string | string[] | React.ChangeEvent<HTMLSelectElement> | null
+    value: string | string[] | React.ChangeEvent<HTMLSelectElement> | any[] | null
   ) => {
     if (field in input) {
       setInput((prev) => ({
         ...prev,
-        [field]: value || "",
+        [field]: value || (field === 'insuranceCompanyRelations' ? [] : ""),
       }));
     }
   };
@@ -197,11 +206,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    console.log('=== SUPPLIER FORM SUBMISSION DEBUG ===');
-    console.log('Form input data:', input);
-    console.log('Target user ID:', targetUserId);
-    console.log('Supplier data:', supplier);
-    console.log('Has errors:', hasErrors);
+
 
     setIsUpdatingSupplier(true);
 
@@ -231,8 +236,23 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       };
     });
 
+    const insuranceCompanyRelations = window.localStorage.getItem("insurance-company-relations") ?? "[]";
+    const formattedInsuranceCompanyRelations = JSON.parse(insuranceCompanyRelations).map((relation: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { __typename, ...restRelationProps } = relation;
+      return {
+        insuranceCompanyId: restRelationProps.insuranceCompanyId,
+        depositRequired: restRelationProps.depositRequired || false,
+        fullyContractedClinic: restRelationProps.fullyContractedClinic || false,
+        reasonableExpensesApplicable: restRelationProps.reasonableExpensesApplicable || false,
+      };
+    });
+
     console.log('Formatted offices:', formattedOffices);
     console.log('Formatted social media links:', formattedSocialMediaLinks);
+    console.log('Formatted insurance company relations:', formattedInsuranceCompanyRelations);
+
+    console.log('Formatted insurance company relations:', formattedInsuranceCompanyRelations);
 
     const mutationVariables = {
       input: {
@@ -247,15 +267,25 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
         license: `${input?.licenseType}${input?.license}`,
         identification: `${input?.identificationType}${input?.identification}`,
         motto: input?.motto,
-        insuranceCompanies: input?.insuranceCompanies,
+        insuranceCompanies: formattedInsuranceCompanyRelations.length > 0
+          ? formattedInsuranceCompanyRelations.map(rel => rel.insuranceCompanyId)
+          : input?.insuranceCompanies,
+        insuranceCompanyRelations: formattedInsuranceCompanyRelations,
         offices: formattedOffices,
         modality: supplier?.modality,
         serviceType: input?.serviceType,
         socialMediaLinks: formattedSocialMediaLinks || [],
+
       },
     };
 
     console.log('Mutation variables:', mutationVariables);
+    console.log('Raw insurance company relations from localStorage:', insuranceCompanyRelations);
+    console.log('Formatted insurance company relations:', formattedInsuranceCompanyRelations);
+    console.log('Insurance companies:', input?.insuranceCompanies);
+    console.log('Derived insurance companies:', formattedInsuranceCompanyRelations.length > 0
+      ? formattedInsuranceCompanyRelations.map(rel => rel.insuranceCompanyId)
+      : input?.insuranceCompanies);
 
     if (input?.logoFile) {
       if (!targetUserId) {
@@ -276,13 +306,9 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
         refetchSupplier();
       })
       .catch((error) => {
-        console.error('=== SUPPLIER FORM ERROR DEBUG ===');
-        console.error('Error object:', error);
-        console.error('Error message:', error?.message);
-        console.error('Error graphQLErrors:', error?.graphQLErrors);
-        console.error('Error networkError:', error?.networkError);
-        console.error('Error extensions:', error?.extensions);
-        console.error('Full error details:', JSON.stringify(error, null, 2));
+        console.error('Supplier update error:', error);
+        console.error('Error details:', error?.graphQLErrors);
+        console.error('Network error:', error?.networkError);
         toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
       })
       .finally(() => setIsUpdatingSupplier(false));
@@ -375,7 +401,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
           }}
         />
 
-              <UploadInput
+        <UploadInput
           imageUrl={input?.logoUrl || ""}
           error={!requiredFields.logoUrl}
           setIsUploadingLogo={setIsUploadingLogo}
@@ -395,6 +421,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
 
         <SocialMediaInput
           setHasSocialLinks={setHasSocialLinks}
+          socialMediaLinks={supplier?.socialMediaLinks}
           disabled={loadingSupplier || isUpdatingSupplier}
         />
       </div>
@@ -427,27 +454,11 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
           wrapperClassName="w-full"
         />
 
-        <SelectMultiple
-          wrapperClassName="w-full"
-          selectProps={{
-            disabled: loadingInsuranceCompanies || isUpdatingSupplier,
-            placeholder: "Compañias con las que trabajas",
-            options: insuranceCompanyOptions,
-            value: input?.insuranceCompanies,
-            notFoundContent: "No hay opciones disponibles",
-            onChange: (value) => handleInputChange("insuranceCompanies", value),
-            optionRender: (option) => (
-              <Space>
-                <Image
-                  src={option.data.image || "/images/placeholder.png"}
-                  alt={"Compañia de seguros"}
-                  width={40}
-                  height={40}
-                />
-                {option.data.label}
-              </Space>
-            ),
-          }}
+        <InsuranceCompaniesInput
+          setHasInsuranceCompanies={setHasInsuranceCompanies}
+          insuranceCompanyRelations={supplier?.insuranceCompanyRelations}
+          insuranceCompanies={insuranceCompanies}
+          disabled={loadingInsuranceCompanies || isUpdatingSupplier}
         />
       </div>
 

@@ -9,4 +9,7 @@ export * from "./public/public-exclusive-agents";
 export * from "./public/public-suppliers";
 export * from "./public/country-by-code";
 export * from "./public/quotes";
-export * from "./public/get-organization-template"
+export * from "./public/get-organization-template";
+export * from "./public/clinics";
+export * from "./public/states";
+export * from "./public/insurance-companies";

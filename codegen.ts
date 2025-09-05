@@ -1,8 +1,8 @@
 import { CodegenConfig } from "@graphql-codegen/cli";
 
 const config: CodegenConfig = {
-  schema:
-    process.env.NEXT_PUBLIC_SEKTOR_API_URL || "http://localhost:3001/graphql",
+  schema: 
+  process.env.NEXT_PUBLIC_SEKTOR_API_URL || "http://localhost:3001/graphql",
   documents: ["src/**/*.tsx"],
   generates: {
     "./src/lib/sektor-api/__generated__/": {

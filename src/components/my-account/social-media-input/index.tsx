@@ -8,6 +8,8 @@ import { cn } from "@/utils/class-name";
 import SocialMediaModal from "./social-media-modal";
 import { SocialMediaLinkType } from "@/lib/sektor-api/__generated__/types";
 
+const SOCIAL_PLATFORMS = ["Instagram", "Facebook", "Twitter"];
+
 interface SocialMediaInputProps {
     disabled?: boolean;
     setHasSocialLinks: React.Dispatch<React.SetStateAction<boolean>>;
@@ -37,8 +39,6 @@ const SocialMediaInput = ({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    const SOCIAL_PLATFORMS = ["Instagram", "Facebook", "Twitter"];
 
     const options = useMemo(() => {
         return socialLinks

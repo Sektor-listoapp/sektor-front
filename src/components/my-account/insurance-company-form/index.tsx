@@ -5,7 +5,6 @@ import SelectMultiple from "@/components/ui/select-multiple";
 import TextInput from "@/components/ui/text-input";
 import { useMutation, useQuery } from "@apollo/client";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
-import Select from "@/components/ui/select";
 import LocalOfficesInput from "../local-offices-input";
 import { useShallow } from "zustand/shallow";
 import { useAuthStore } from "@/store/auth";
@@ -163,7 +162,6 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       []) as never[];
 
     const formattedSocialMediaLinks = company?.socialMediaLinks?.map((link: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename, ...restLinkProps } = link;
       return {
         platform: restLinkProps.platform,
@@ -297,7 +295,6 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
     const socialMediaLinks = window.localStorage.getItem("social-links") ?? "[]";
     const formattedSocialMediaLinks = JSON.parse(socialMediaLinks).map((link: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename, ...restLinkProps } = link;
       return {
         platform: restLinkProps.platform,

@@ -737,7 +737,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
         />
 
         <LocalWorkTeamInput
-          workTeam={brokerageSociety?.workTeam || []}
+          workTeam={brokerageSociety?.workTeam as any || []}
           disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
           options={[
             {

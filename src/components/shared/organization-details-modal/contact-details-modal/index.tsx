@@ -89,7 +89,7 @@ const ContactDetailsModal = ({
         console.log("✅ Tracking created successfully:", result);
       })
       .catch((error) => {
-        console.error("❌ Error creating tracking:", error);
+        console.error(" Error creating tracking:", error);
         console.error("Error details:", error.graphQLErrors);
         console.error("Network error:", error.networkError);
       });
@@ -106,11 +106,8 @@ const ContactDetailsModal = ({
   const email = contact?.email || contact?.contact?.email || null;
   // @ts-expect-error Unknown type
   const phone = contact?.phone || contact?.contact?.phone || null;
-  // Obtener redes sociales
-  // Para InsuranceCompanyType, los links están en contact?.links
-  // Para los demás, están en contact?.socialMediaLinks
-  // Si no existen, dejar array vacío
-  const socialMediaLinks = contact?.socialMediaLinks || contact?.contact?.links || [];
+
+  const socialMediaLinks = contact?.socialMediaLinks || ('contact' in contact && 'links' in contact.contact ? contact.contact.links : []) || [];
 
   return (
     <Modal
