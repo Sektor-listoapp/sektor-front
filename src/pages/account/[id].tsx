@@ -22,7 +22,7 @@ export default function AccountPage() {
   const [checkingAccess, setCheckingAccess] = useState(true);
 
 
-  // const currentUserId = useAuthStore(useShallow((state) => state.user?.id));
+
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
   const isAdmin = userGroup === Admin;
 

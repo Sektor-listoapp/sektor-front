@@ -153,9 +153,13 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
 
   useEffect(() => {
-    const [licenseType, license] = company?.license?.split("-") || [];
-    const [identificationType, identification] =
-      company?.identification?.split("-") || [];
+    const licenseParts = company?.license?.split("-") || [];
+    const licenseType = licenseParts[0] || "";
+    const license = licenseParts.slice(1).join("-") || "";
+
+    const identificationParts = company?.identification?.split("-") || [];
+    const identificationType = identificationParts[0] || "";
+    const identification = identificationParts.slice(1).join("-") || "";
 
     const foundationYear = Number(company?.foundationYear || 0);
     const supplierIds = (company?.suppliers?.map(({ id }) => id) ||
@@ -321,7 +325,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
         suppliers: input?.suppliers || [],
         lineOfBusiness: input?.segment,
         foundationYear: Number(input?.yearsOfExperience) || 2024,
-        license: `${input?.licenseType}${input?.license}`,
+        license: `${input?.licenseType}${input?.license}`.replace(/--/g, '-'),
         identification: `${input?.identificationType}${input?.identification}`,
         motto: input?.motto,
         offices: formattedOffices,

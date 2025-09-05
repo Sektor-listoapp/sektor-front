@@ -17,7 +17,7 @@ import { UPDATE_SUPPLIER } from "@/lib/sektor-api/mutations";
 import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import { faHashtag } from "@fortawesome/free-solid-svg-icons";
 import {
-  BROKERAGE_SOCIETY_LICENSE_TYPE_OPTIONS,
+  LICENSE_TYPE_OPTIONS,
   IDENTIFICATION_TYPE_OPTIONS,
   SELECT_LINE_OF_BUSINESS_OPTIONS,
   SELECT_SUPPLIER_SERVICE_OPTIONS,
@@ -109,9 +109,13 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
   });
 
   useEffect(() => {
-    const [licenseType, license] = supplier?.license?.split("-") || [];
-    const [identificationType, identification] =
-      supplier?.identification?.split("-") || [];
+    const licenseParts = supplier?.license?.split("-") || [];
+    const licenseType = licenseParts[0] || "";
+    const license = licenseParts.slice(1).join("-") || "";
+
+    const identificationParts = supplier?.identification?.split("-") || [];
+    const identificationType = identificationParts[0] || "";
+    const identification = identificationParts.slice(1).join("-") || "";
 
     const insuranceCompaniesIds = (supplier?.insuranceCompanies?.map(
       ({ id }) => id
@@ -124,8 +128,6 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       reasonableExpensesApplicable: relation.reasonableExpensesApplicable
     })) || [];
 
-    console.log('🔍 DEBUG - Supplier insurance company relations:', supplier?.insuranceCompanyRelations);
-    console.log('🔍 DEBUG - Mapped insurance company relations:', insuranceCompanyRelations);
 
     window?.localStorage?.setItem(
       "sektor-local-offices",
@@ -135,6 +137,10 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       "social-links",
       JSON.stringify(supplier?.socialMediaLinks || [])
     );
+    window?.localStorage?.setItem(
+      "insurance-company-relations",
+      JSON.stringify(insuranceCompanyRelations || [])
+    );
 
     setInput({
       name: supplier?.name || "",
@@ -143,7 +149,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       license: license || "",
       licenseType: licenseType
         ? `${licenseType}-`
-        : BROKERAGE_SOCIETY_LICENSE_TYPE_OPTIONS[0].value,
+        : LICENSE_TYPE_OPTIONS[0].value,
       segment: (supplier?.lineOfBusiness || []) as never[],
       identification: identification || "",
       identificationType:
@@ -213,10 +219,19 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
     const formattedOffices = JSON.parse(offices).map((office: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { __typename: _, address, ...restOfficeProps } = office;
+      const { __typename: _, address, schedule = [], ...restOfficeProps } = office;
+
+
+      const formattedSchedule = schedule.map((scheduleItem: any) => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { __typename: __, ...restScheduleProps } = scheduleItem;
+        return restScheduleProps;
+      });
+
       return {
         ...restOfficeProps,
         photoUrl: office.photoUrl || restOfficeProps.photoUrl,
+        schedule: formattedSchedule,
         address: {
           cityId: address?.cityId || address?.city?.id,
           countryId: address?.countryId || address?.country?.id,
@@ -248,44 +263,36 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       };
     });
 
-    console.log('Formatted offices:', formattedOffices);
-    console.log('Formatted social media links:', formattedSocialMediaLinks);
-    console.log('Formatted insurance company relations:', formattedInsuranceCompanyRelations);
 
-    console.log('Formatted insurance company relations:', formattedInsuranceCompanyRelations);
 
     const mutationVariables = {
       input: {
         id: targetUserId,
-        name: input?.name,
-        type: supplier?.type,
-        lineOfBusiness: input?.segment,
+        name: input?.name || "",
+        type: supplier?.type || "Supplier",
+        lineOfBusiness: input?.segment || [],
         coverageStates: supplier?.coverageStates || [],
         foundationYear: supplier?.foundationYear || 0,
-        services: supplier?.services || [],
-        allies: supplier?.allies || [],
-        license: `${input?.licenseType}${input?.license}`,
+        services: supplier?.services?.map((service: any) => {
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+          const { __typename, ...restServiceProps } = service;
+          return restServiceProps;
+        }) || [],
+        allies: supplier?.allies?.map((ally: any) => ally.id) || [],
+        license: `${input?.licenseType}${input?.license}`.replace(/--/g, '-'),
         identification: `${input?.identificationType}${input?.identification}`,
         motto: input?.motto,
         insuranceCompanies: formattedInsuranceCompanyRelations.length > 0
           ? formattedInsuranceCompanyRelations.map(rel => rel.insuranceCompanyId)
-          : input?.insuranceCompanies,
+          : input?.insuranceCompanies || [],
         insuranceCompanyRelations: formattedInsuranceCompanyRelations,
-        offices: formattedOffices,
-        modality: supplier?.modality,
-        serviceType: input?.serviceType,
+        offices: formattedOffices || [],
+        modality: supplier?.modality || "Physical",
+        serviceType: input?.serviceType || "CLINIC",
         socialMediaLinks: formattedSocialMediaLinks || [],
-
       },
     };
 
-    console.log('Mutation variables:', mutationVariables);
-    console.log('Raw insurance company relations from localStorage:', insuranceCompanyRelations);
-    console.log('Formatted insurance company relations:', formattedInsuranceCompanyRelations);
-    console.log('Insurance companies:', input?.insuranceCompanies);
-    console.log('Derived insurance companies:', formattedInsuranceCompanyRelations.length > 0
-      ? formattedInsuranceCompanyRelations.map(rel => rel.insuranceCompanyId)
-      : input?.insuranceCompanies);
 
     if (input?.logoFile) {
       if (!targetUserId) {
@@ -306,9 +313,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
         refetchSupplier();
       })
       .catch((error) => {
-        console.error('Supplier update error:', error);
-        console.error('Error details:', error?.graphQLErrors);
-        console.error('Network error:', error?.networkError);
+
         toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
       })
       .finally(() => setIsUpdatingSupplier(false));
@@ -361,7 +366,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
             value: input?.licenseType,
             wrapperClassName: "w-56",
             className: "border-r-0",
-            options: BROKERAGE_SOCIETY_LICENSE_TYPE_OPTIONS,
+            options: LICENSE_TYPE_OPTIONS,
             disabled: loadingSupplier || isUpdatingSupplier,
             onChange: (e) => handleInputChange("licenseType", e?.target?.value),
           }}
