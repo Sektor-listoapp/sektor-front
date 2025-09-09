@@ -9,7 +9,7 @@ import {
     STATES_QUERY,
     INSURANCE_COMPANIES_QUERY,
 } from "@/lib/sektor-api/queries";
-import { Query, SupplierType, StateType, InsuranceCompanyType } from "@/lib/sektor-api/__generated__/types";
+import { Query, SupplierType, StateType, InsuranceCompanyType, SupplierInsuranceCompanyRelationType } from "@/lib/sektor-api/__generated__/types";
 import { CustomDropdown } from '@/components/ui/custom-dropdown';
 import CloseIcon from '@/components/icons/close-icon';
 import CheckIcon from '@/components/icons/check-icon';
@@ -22,6 +22,7 @@ const ClinicList = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedState, setSelectedState] = useState<string>("");
     const [selectedClinic, setSelectedClinic] = useState("");
+
     const [selectedInsurance, setSelectedInsurance] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -36,6 +37,11 @@ const ClinicList = () => {
     });
 
 
+
+    const insuranceIds = insuranceData?.publicInsuranceCompanies?.items?.map((insurance: InsuranceCompanyType) => insurance.id) || [];
+
+    console.log('insuranceIds: ', insuranceIds);
+
     const { data: clinicsData, loading: isLoadingClinics } = useQuery<Query>(CLINICS_SIMPLE_QUERY, {
         variables: {
             filter: {
@@ -47,6 +53,7 @@ const ClinicList = () => {
         skip: false
     });
 
+    console.log(clinicsData)
 
     const stateOptions = isLoadingStates
         ? [{ label: "Cargando estados...", value: "", disabled: true }]
@@ -59,15 +66,6 @@ const ClinicList = () => {
         ];
 
 
-
-    const insuranceOptions = isLoadingInsurance
-        ? [{ label: "Cargando seguros...", value: "", disabled: true }]
-        : insuranceData?.publicInsuranceCompanies?.items && insuranceData.publicInsuranceCompanies.items.length > 0
-            ? insuranceData.publicInsuranceCompanies.items.map((insurance: InsuranceCompanyType) => ({
-                label: insurance.name,
-                value: insurance.id
-            }))
-            : [{ label: "No hay seguros disponibles", value: "", disabled: true }];
 
 
     const allClinics = clinicsData?.clinics?.items || [];
@@ -93,16 +91,42 @@ const ClinicList = () => {
     });
 
 
-    const clinicOptions = isLoadingClinics
+    type ClinicOption =
+        | { label: string; value: string; disabled: true }
+        | { label: string; value: string; relations: SupplierInsuranceCompanyRelationType[] | undefined };
+
+    const clinicOptions: ClinicOption[] = isLoadingClinics
         ? [{ label: "Cargando clínicas...", value: "", disabled: true }]
         : allClinics.length > 0
             ? allClinics.map((clinic: SupplierType) => ({
                 label: clinic.name,
-                value: clinic.id
+                value: clinic.id,
+                relations: clinic.insuranceCompanyRelations
             }))
             : selectedState
                 ? [{ label: `No hay clínicas en este estado`, value: "", disabled: true }]
                 : [{ label: "Buscar clínicas", value: "", disabled: true }];
+
+    const insuranceOptions = isLoadingInsurance
+        ? [{ label: "Cargando seguros...", value: "", disabled: true }]
+        : (() => {
+            const selectedClinicOption = clinicOptions.find((opt) => 'relations' in opt && opt.value === selectedClinic) as { label: string; value: string; relations?: SupplierInsuranceCompanyRelationType[] } | undefined;
+
+            if (!selectedClinicOption) {
+                return [{ label: "Selecciona una clínica primero", value: "", disabled: true }];
+            }
+
+            const items = insuranceData?.publicInsuranceCompanies?.items || [];
+            const allowedInsuranceIds = selectedClinicOption.relations
+                ? selectedClinicOption.relations.map((rel) => rel.insuranceCompanyId)
+                : [];
+
+            const filteredItems = items.filter((insurance: InsuranceCompanyType) => allowedInsuranceIds.includes(insurance.id));
+
+            return filteredItems.length > 0
+                ? filteredItems.map((insurance: InsuranceCompanyType) => ({ label: insurance.name, value: insurance.id }))
+                : [{ label: "No hay seguros disponibles", value: "", disabled: true }];
+        })();
 
 
 
@@ -127,9 +151,6 @@ const ClinicList = () => {
         setSelectedInsurance(value);
         setCurrentPage(1);
     };
-
-
-
 
     return (
         <div className="min-h-svh bg-white w-full flex flex-col items-center justify-start overflow-hidden">
