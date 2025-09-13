@@ -5,7 +5,6 @@ import SelectMultiple from "@/components/ui/select-multiple";
 import TextInput from "@/components/ui/text-input";
 import { useMutation, useQuery } from "@apollo/client";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
-import Select from "@/components/ui/select";
 import LocalOfficesInput from "../local-offices-input";
 import { useShallow } from "zustand/shallow";
 import { useAuthStore } from "@/store/auth";
@@ -154,16 +153,19 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
 
   useEffect(() => {
-    const [licenseType, license] = company?.license?.split("-") || [];
-    const [identificationType, identification] =
-      company?.identification?.split("-") || [];
+    const licenseParts = company?.license?.split("-") || [];
+    const licenseType = licenseParts[0] || "";
+    const license = licenseParts.slice(1).join("-") || "";
+
+    const identificationParts = company?.identification?.split("-") || [];
+    const identificationType = identificationParts[0] || "";
+    const identification = identificationParts.slice(1).join("-") || "";
 
     const foundationYear = Number(company?.foundationYear || 0);
     const supplierIds = (company?.suppliers?.map(({ id }) => id) ||
       []) as never[];
 
     const formattedSocialMediaLinks = company?.socialMediaLinks?.map((link: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename, ...restLinkProps } = link;
       return {
         platform: restLinkProps.platform,
@@ -297,7 +299,6 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
     const socialMediaLinks = window.localStorage.getItem("social-links") ?? "[]";
     const formattedSocialMediaLinks = JSON.parse(socialMediaLinks).map((link: any) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename, ...restLinkProps } = link;
       return {
         platform: restLinkProps.platform,
@@ -324,7 +325,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
         suppliers: input?.suppliers || [],
         lineOfBusiness: input?.segment,
         foundationYear: Number(input?.yearsOfExperience) || 2024,
-        license: `${input?.licenseType}${input?.license}`,
+        license: `${input?.licenseType}${input?.license}`.replace(/--/g, '-'),
         identification: `${input?.identificationType}${input?.identification}`,
         motto: input?.motto,
         offices: formattedOffices,

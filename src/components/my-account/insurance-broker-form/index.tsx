@@ -400,7 +400,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
         coverageStates: input?.coverageState,
         phone: `${input?.phoneCode}${input?.phone}`,
         insuranceCompanies: input?.insuranceCompanies,
-        license: `${input?.licenseType}${input?.license}`,
+        license: `${input?.licenseType}${input?.license}`.replace(/--/g, '-'),
         recognitions: insuranceBroker?.recognitions || [],
         identification: `${input?.identificationType}${input?.identification}`,
         offices: formattedOffices || [],

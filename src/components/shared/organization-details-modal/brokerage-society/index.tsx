@@ -18,6 +18,7 @@ import {
   BrokerageSocietyType,
   OrganizationPlans,
   Query,
+  TeamMemberType,
 } from "@/lib/sektor-api/__generated__/types";
 import BasicOrganizationOffices from "../basic-organization-offices";
 import { ROUTES } from "@/constants/router";
@@ -63,14 +64,14 @@ const BrokerageSocietyDetails = () => {
       <OrganizationLineOfBusiness lineOfBusiness={lineOfBusiness} />
     ),
     OrganizationOffices: <BasicOrganizationOffices offices={offices} />,
-    OrganizationWorkTeam: <OrganizationPartners partners={workTeam} />,
+    OrganizationWorkTeam: <OrganizationPartners partners={workTeam as TeamMemberType[]} />,
     OrganizationClients: <OrganizationPartners partners={clients} />,
   };
 
   const tabItems = getTabItems({
     lineOfBusiness,
     clients,
-    workTeam,
+    workTeam: workTeam as TeamMemberType[],
     offices,
   }).map((item) => {
     if (!item || !tabComponents[item?.component as keyof typeof tabComponents])

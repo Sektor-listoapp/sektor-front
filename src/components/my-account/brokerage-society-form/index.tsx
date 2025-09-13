@@ -426,7 +426,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
         lineOfBusiness: input?.segment,
         coverageStates: input?.coverageState,
         insuranceCompanies: input?.insuranceCompanies,
-        license: `${input?.licenseType}${input?.license}`,
+        license: `${input?.licenseType}${input?.license}`.replace(/--/g, '-'),
         identification: input?.identification,
         offices: formattedOffices || [],
         contact: formattedContact,
@@ -737,7 +737,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
         />
 
         <LocalWorkTeamInput
-          workTeam={brokerageSociety?.workTeam || []}
+          workTeam={brokerageSociety?.workTeam as any || []}
           disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
           options={[
             {

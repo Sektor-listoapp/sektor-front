@@ -1,29 +1,25 @@
 import Button from "@/components/ui/button";
 import Image from "next/image";
-import OrganizationsSheetModal from "../organizations-sheet-modal";
-import { useState } from "react";
+import Link from "next/link";
+
 
 const DefaultHeroBannerContent = () => {
-  const [openOrganizationsSheetModal, setOpenOrganizationsSheetModal] =
-    useState(false);
+
 
   return (
     <div className="w-full gap-2 grid grid-cols-2 relative mx-auto sm:max-w-md md:max-w-full">
-      <header className="py-12 sm:py-16 md:py-24 z-10">
-        <h1 className="text-balance text-start text-3xl sm:text-4xl lg:text-7xl w-full mb-10">
+      <header className="py-6 sm:py-16 md:py-24 z-10">
+        <h1 className="text-balance text-start text-lg sm:text-4xl lg:text-7xl w-full mb-6 sm:mb-8 md:mb-10">
           Nuestros Intermediarios
         </h1>
 
-        <Button
-          onClick={() => setOpenOrganizationsSheetModal(true)}
-          className="hidden md:block"
-        >
-          Ver listado de clínicas y seguros disponibles
-        </Button>
-        <OrganizationsSheetModal
-          open={openOrganizationsSheetModal}
-          setOpen={setOpenOrganizationsSheetModal}
-        />
+        <Link href="/clinic-list">
+          <Button className="text-xs sm:text-base px-4 sm:px-6 py-2 sm:py-3">
+            Ver listado de clínicas y seguros disponibles
+          </Button>
+        </Link>
+
+
       </header>
 
       <div className="md:relative">
