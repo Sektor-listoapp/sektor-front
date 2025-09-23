@@ -45,8 +45,8 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [hasSocialLinks, setHasSocialLinks] = useState(false);
   const [hasInsuranceCompanies, setHasInsuranceCompanies] = useState(false);
-      console.log('hasSocialLinks: ', hasSocialLinks);
-      console.log('hasInsuranceCompanies: ', hasInsuranceCompanies);
+  console.log('hasSocialLinks: ', hasSocialLinks);
+  console.log('hasInsuranceCompanies: ', hasInsuranceCompanies);
 
   const [updateSupplier] = useMutation<Mutation>(UPDATE_SUPPLIER);
 
@@ -126,18 +126,33 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     })) || [];
 
 
-    window?.localStorage?.setItem(
-      "sektor-local-offices",
-      JSON.stringify(supplier?.offices || [])
-    );
-    window?.localStorage?.setItem(
-      "social-links",
-      JSON.stringify(supplier?.socialMediaLinks || [])
-    );
-    window?.localStorage?.setItem(
-      "insurance-company-relations",
-      JSON.stringify(insuranceCompanyRelations || [])
-    );
+    // Solo inicializar localStorage si aún no hay datos guardados por el usuario
+    if (typeof window !== "undefined") {
+      const existingOffices = window.localStorage.getItem("sektor-local-offices");
+      const existingSocialLinks = window.localStorage.getItem("social-links");
+      const existingRelations = window.localStorage.getItem("insurance-company-relations");
+
+      if (!existingOffices || existingOffices === "[]") {
+        window.localStorage.setItem(
+          "sektor-local-offices",
+          JSON.stringify(supplier?.offices || [])
+        );
+      }
+
+      if (!existingSocialLinks || existingSocialLinks === "[]") {
+        window.localStorage.setItem(
+          "social-links",
+          JSON.stringify(supplier?.socialMediaLinks || [])
+        );
+      }
+
+      if (!existingRelations || existingRelations === "[]") {
+        window.localStorage.setItem(
+          "insurance-company-relations",
+          JSON.stringify(insuranceCompanyRelations || [])
+        );
+      }
+    }
 
     setInput({
       name: supplier?.name || "",
