@@ -75,7 +75,7 @@ const UserInfoForm = () => {
     if (!isValidForm) return;
 
     const { name, location, phone, phoneCode, segment, email } = input;
-    const phoneWithCode = `${phoneCode}${phone}`;
+    const phoneWithCode = phone.startsWith('+') ? phone : `${phoneCode || DEFAULT_PHONE_CODE}${phone}`;
 
     setQuoteRequestCustomer({
       name,

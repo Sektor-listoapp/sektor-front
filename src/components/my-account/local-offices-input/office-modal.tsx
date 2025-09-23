@@ -37,8 +37,8 @@ const LocalOfficeModal = ({
   const phoneCodes = PHONE_CODE_OPTIONS.map(({ value }) => value);
   const userPhone = officeToEdit?.phone || "";
   const userPhoneCode =
-    phoneCodes.find((code) => userPhone.startsWith(code)) || "";
-  const userPhoneWithoutCode = userPhone.replace(userPhoneCode, "") || "";
+    phoneCodes.find((code) => userPhone.startsWith(code)) || DEFAULT_PHONE_CODE;
+  const userPhoneWithoutCode = userPhoneCode ? userPhone.substring(userPhoneCode.length) : userPhone;
 
   const isEditing = Boolean(officeToEdit?.id);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
@@ -105,7 +105,7 @@ const LocalOfficeModal = ({
       );
       const formattedOffices = updatedOffices.map(
         ({ phone: basePhone, phoneCode, ...restOfficeProps }: any) => ({
-          phone: `${phoneCode}${basePhone}`,
+          phone: basePhone.startsWith('+') ? basePhone : `${phoneCode || DEFAULT_PHONE_CODE}${basePhone}`,
           ...restOfficeProps,
         })
       );
@@ -127,7 +127,7 @@ const LocalOfficeModal = ({
       {
         ...restInputProps,
         id: new ObjectId().toHexString(),
-        phone: `${phoneCode}${phone}`,
+        phone: phone.startsWith('+') ? phone : `${phoneCode || DEFAULT_PHONE_CODE}${phone}`,
         photoUrl: input.photoUrl || undefined,
       },
     ]);

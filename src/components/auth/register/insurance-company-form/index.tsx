@@ -78,7 +78,7 @@ const InsuranceCompanyForm = ({
 
     const { contactName, email, companyName, instagramUrl, phone, phoneCode } =
       input;
-    const phoneWithCode = `${phoneCode}${phone}`;
+    const phoneWithCode = phone.startsWith('+') ? phone : `${phoneCode || DEFAULT_PHONE_CODE}${phone}`;
 
     setIsSubmittingForm(true);
     registerAsInsuranceCompany({

@@ -45,8 +45,8 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [hasSocialLinks, setHasSocialLinks] = useState(false);
   const [hasInsuranceCompanies, setHasInsuranceCompanies] = useState(false);
-  console.log('hasSocialLinks: ', hasSocialLinks);
-  console.log('hasInsuranceCompanies: ', hasInsuranceCompanies);
+      console.log('hasSocialLinks: ', hasSocialLinks);
+      console.log('hasInsuranceCompanies: ', hasInsuranceCompanies);
 
   const [updateSupplier] = useMutation<Mutation>(UPDATE_SUPPLIER);
 
@@ -70,9 +70,6 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
 
   const insuranceCompanies =
     insuranceCompaniesResponse?.publicInsuranceCompanies?.items || [];
-
-  console.log('Insurance companies loaded:', insuranceCompanies);
-  console.log('Insurance companies response:', insuranceCompaniesResponse);
 
   const formattedOffices = supplier?.offices?.map((office: any) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -217,6 +214,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     setIsUpdatingSupplier(true);
 
     const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
+    console.log('offices', offices);
     const formattedOffices = JSON.parse(offices).map((office: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename: _, address, schedule = [], ...restOfficeProps } = office;
@@ -313,7 +311,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
         refetchSupplier();
       })
       .catch((error) => {
-
+        console.error('Supplier update error:', error);
         toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
       })
       .finally(() => setIsUpdatingSupplier(false));
