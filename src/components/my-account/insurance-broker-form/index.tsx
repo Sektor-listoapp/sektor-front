@@ -159,8 +159,8 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
   const phoneCodes = PHONE_CODE_OPTIONS.map(({ value }) => value);
   const userPhone = insuranceBroker?.phone || "";
   const userPhoneCode =
-    phoneCodes.find((code) => userPhone.startsWith(code)) || "";
-  const userPhoneWithoutCode = userPhone.replace(userPhoneCode, "") || "";
+    phoneCodes.find((code) => userPhone.startsWith(code)) || DEFAULT_PHONE_CODE;
+  const userPhoneWithoutCode = userPhoneCode ? userPhone.substring(userPhoneCode.length) : userPhone;
 
   const [licenseType, license] = insuranceBroker?.license?.split("-") || [];
   const [identificationType, identification] =
@@ -398,7 +398,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
         studies: JSON.parse(studies),
         lineOfBusiness: input?.segment,
         coverageStates: input?.coverageState,
-        phone: `${input?.phoneCode}${input?.phone}`,
+        phone: input?.phone?.startsWith('+') ? input?.phone : `${input?.phoneCode || DEFAULT_PHONE_CODE}${input?.phone}`,
         insuranceCompanies: input?.insuranceCompanies,
         license: `${input?.licenseType}${input?.license}`.replace(/--/g, '-'),
         recognitions: insuranceBroker?.recognitions || [],

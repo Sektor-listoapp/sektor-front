@@ -151,8 +151,8 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const phoneCodes = PHONE_CODE_OPTIONS.map(({ value }) => value);
   const userPhone = brokerageSociety?.contact?.phone || "";
   const userPhoneCode =
-    phoneCodes.find((code) => userPhone.startsWith(code)) || "";
-  const userPhoneWithoutCode = userPhone.replace(userPhoneCode, "") || "";
+    phoneCodes.find((code) => userPhone.startsWith(code)) || DEFAULT_PHONE_CODE;
+  const userPhoneWithoutCode = userPhoneCode ? userPhone.substring(userPhoneCode.length) : userPhone;
 
   const [licenseType, license] = brokerageSociety?.license?.split("-") || [];
   const identification = brokerageSociety?.identification || "";
@@ -395,7 +395,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
 
     const formattedContact = {
       ...contactData,
-      phone: `${input?.phoneCode}${input?.phone}`,
+      phone: input?.phone?.startsWith('+') ? input?.phone : `${input?.phoneCode || DEFAULT_PHONE_CODE}${input?.phone}`,
       name: contactData.name || "Nombre requerido",
       position: contactData.position || "Cargo requerido",
     };
