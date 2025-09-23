@@ -275,6 +275,17 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     );
 
 
+  
+    if (typeof window !== "undefined") {
+      const existingOffices = window.localStorage.getItem("sektor-local-offices");
+      if (!existingOffices || existingOffices === "[]") {
+        window.localStorage.setItem(
+          "sektor-local-offices",
+          JSON.stringify(insuranceBroker?.offices || [])
+        );
+      }
+    }
+
     window?.localStorage?.setItem(
       "social-links",
       JSON.stringify(insuranceBroker?.socialMediaLinks || [])

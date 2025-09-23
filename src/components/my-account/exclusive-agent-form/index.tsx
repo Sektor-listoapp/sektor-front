@@ -257,10 +257,16 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
       "sektor-local-clients",
       JSON.stringify(clients)
     );
-    window?.localStorage?.setItem(
-      "sektor-local-offices",
-      JSON.stringify(exclusiveAgent?.offices || [])
-    );
+   
+    if (typeof window !== "undefined") {
+      const existingOffices = window.localStorage.getItem("sektor-local-offices");
+      if (!existingOffices || existingOffices === "[]") {
+        window.localStorage.setItem(
+          "sektor-local-offices",
+          JSON.stringify(exclusiveAgent?.offices || [])
+        );
+      }
+    }
     window?.localStorage?.setItem(
       "social-links",
       JSON.stringify(exclusiveAgent?.socialMediaLinks || [])

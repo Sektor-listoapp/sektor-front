@@ -262,10 +262,16 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       JSON.stringify(clients)
     );
 
-    window?.localStorage?.setItem(
-      "sektor-local-offices",
-      JSON.stringify(formattedOffices || [])
-    );
+    
+    if (typeof window !== "undefined") {
+      const existingOffices = window.localStorage.getItem("sektor-local-offices");
+      if (!existingOffices || existingOffices === "[]") {
+        window.localStorage.setItem(
+          "sektor-local-offices",
+          JSON.stringify(formattedOffices || [])
+        );
+      }
+    }
 
     window?.localStorage?.setItem(
       "social-links",

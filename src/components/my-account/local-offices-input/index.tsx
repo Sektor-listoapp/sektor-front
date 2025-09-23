@@ -24,7 +24,7 @@ const LocalOfficesInput = ({
   disabled,
   error = false,
 }: LocalOfficesInputProps) => {
-  
+
   const [localOffices, setLocalOffices] = useLocalStorage(
     "sektor-local-offices",
     offices ?? []
@@ -35,8 +35,10 @@ const LocalOfficesInput = ({
 
   const countryStates = countryDataResponse?.getCountryByCode?.states || [];
 
+  // Inicializa desde props solo si no hay oficinas locales almacenadas
   React.useEffect(() => {
-    if (offices) {
+    const hasLocalOffices = Array.isArray(localOffices) && localOffices.length > 0;
+    if (!hasLocalOffices && Array.isArray(offices)) {
       setLocalOffices(offices);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
