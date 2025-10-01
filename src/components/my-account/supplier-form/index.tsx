@@ -126,7 +126,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     })) || [];
 
 
-    // Solo inicializar localStorage si aún no hay datos guardados por el usuario
+   
     if (typeof window !== "undefined") {
       const existingOffices = window.localStorage.getItem("sektor-local-offices");
       const existingSocialLinks = window.localStorage.getItem("social-links");
@@ -160,7 +160,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       insuranceCompanyRelations: insuranceCompanyRelations,
       license: license || "",
       licenseType: licenseType
-        ? `${licenseType}-`
+        ? `${'AAA'}-`
         : LICENSE_TYPE_OPTIONS[0].value,
       segment: (supplier?.lineOfBusiness || []) as never[],
       identification: identification || "",
@@ -305,6 +305,8 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
         socialMediaLinks: formattedSocialMediaLinks || [],
       },
     };
+
+    console.log("mutationVariables", mutationVariables)
 
 
     if (input?.logoFile) {

@@ -46,7 +46,7 @@ export const INSURANCE_COMPANY_LICENSE_TYPE_OPTIONS = [
 ];
 
 export const LICENSE_TYPE_OPTIONS = [
-  { label: "CAA -", value: "CAA-" },
+  // { label: "CAA -", value: "CAA-" },
   { label: "AAA -", value: "AAA-" },
 ];
 

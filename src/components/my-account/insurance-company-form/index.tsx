@@ -178,7 +178,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       suppliers: supplierIds || [],
       license: license || "",
       licenseType: licenseType
-        ? `${licenseType}-`
+        ? `${'ES-'}`
         : INSURANCE_COMPANY_LICENSE_TYPE_OPTIONS[0].value,
       segment: (company?.lineOfBusiness || []) as never[],
       identification: identification || "",
