@@ -17,7 +17,7 @@ import { toast } from "react-toastify";
 import Image from "next/image";
 import { Space } from "antd";
 import Button from "@/components/ui/button";
-import { UPDATE_BROKERAGE_SOCIETY } from "@/lib/sektor-api/mutations";
+import { ADMIN_UPDATE_USER_EMAIL, UPDATE_BROKERAGE_SOCIETY, UPDATE_EMAIL } from "@/lib/sektor-api/mutations";
 import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import { faHashtag, faPhone } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -29,6 +29,7 @@ import {
 } from "@/constants/forms";
 import {
   COUNTRY_BY_CODE_QUERY,
+  ORGANIZATION_BY_ID_QUERY,
   PUBLIC_BROKERAGE_SOCIETY_BY_ID_QUERY,
   PUBLIC_BROKERAGE_SOCIETY_QUERY,
   PUBLIC_EXCLUSIVE_AGENTS_QUERY,
@@ -45,6 +46,25 @@ import SocialMediaInput from "../social-media-input";
 import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/update-organization-logo";
 
 type BrokerageSocietyIdProps = FormProps;
+
+interface BrokerageSocietyInputType {
+  name: string;
+  email: string;
+  insuranceCompanies: never[];
+  license: string;
+  licenseType: string;
+  segment: string[];
+  identification: string;
+  modality: string;
+  coverageState: never[];
+  yearsOfExperience: string;
+  phone: string;
+  phoneCode: string;
+  logoUrl: string;
+  logoFile: File | null;
+  allies: string[];
+  password: string;
+}
 
 const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
@@ -63,9 +83,18 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     variables: { id: targetUserId },
   });
 
+  const {
+    data: organizationResponse,
+  } = useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
+    variables: { id: targetUserId },
+    skip: !targetUserId,
+  });
+
   const [updateBrokerageSociety] = useMutation<Mutation>(
     UPDATE_BROKERAGE_SOCIETY
   );
+  const [updateEmailMutation] = useMutation<Mutation>(UPDATE_EMAIL);
+  const [adminUpdateUserEmailMutation] = useMutation<Mutation>(ADMIN_UPDATE_USER_EMAIL);
 
   const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
 
@@ -145,6 +174,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [logoHasError, setLogoHasError] = useState(false);
   const [hasSocialLinks, setHasSocialLinks] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   console.log('hasSocialLinks: ', hasSocialLinks);
 
   const allies = [...(brokerageSociety?.allies?.map(({ id }) => id) || [])];
@@ -181,9 +211,10 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     };
   });
 
-  const [input, setInput] = useState({
+  const [input, setInput] = useState<BrokerageSocietyInputType>({
     // required
     name: brokerageSociety?.name || "",
+    email: organizationResponse?.organizationById?.email || "",
     insuranceCompanies: [],
     license: license || "",
     licenseType: licenseType
@@ -197,9 +228,10 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     phone: userPhoneWithoutCode || "",
     phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
     logoUrl: "",
-    logoFile: null as File | null,
+    logoFile: null,
     // additional
     allies: allies || [],
+    password: "",
   });
 
   const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
@@ -262,7 +294,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       JSON.stringify(clients)
     );
 
-    
+
     if (typeof window !== "undefined") {
       const existingOffices = window.localStorage.getItem("sektor-local-offices");
       if (!existingOffices || existingOffices === "[]") {
@@ -280,6 +312,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
 
     setInput({
       name: brokerageSociety?.name || "",
+      email: organizationResponse?.organizationById?.email || "",
       insuranceCompanies: insuranceCompaniesIds || [],
       license: license || "",
       licenseType: licenseType
@@ -295,6 +328,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       logoUrl: brokerageSociety?.logoUrl || "",
       allies: [...(brokerageSociety?.allies?.map(({ id }) => id) || [])],
       logoFile: null,
+      password: "",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [brokerageSociety]);
@@ -302,6 +336,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const requiredFields = useMemo(() => {
     return {
       name: Boolean(input.name.trim().length),
+      email: Boolean(input.email.trim().length),
       insuranceCompanies: Boolean(input.insuranceCompanies.length),
       license: Boolean(input.license.trim().length),
       segment: Boolean(input.segment.length),
@@ -316,6 +351,9 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       logoUrl: Boolean(input.logoUrl.trim().length),
     };
   }, [input]);
+  const originalEmail = organizationResponse?.organizationById?.email || "";
+  const isSelfUpdate = loggedUserId === targetUserId;
+  const emailChanged = Boolean(input.email && input.email !== originalEmail);
 
   const hasErrors = Object.values(requiredFields).some((field) => !field);
 
@@ -338,7 +376,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
 
@@ -449,6 +487,36 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       handleUpdateLogo(targetUserId, input.logoFile);
     }
 
+    try {
+      if (emailChanged) {
+        if (isSelfUpdate) {
+          if (!input.password?.trim()?.length) {
+            toast.error("Debes introducir tu contraseña para actualizar el correo");
+            setIsUpdatingBrokerageSociety(false);
+            return;
+          }
+          const { data } = await updateEmailMutation({
+            variables: { input: { newEmail: input.email, password: input.password } },
+          });
+          if (!data?.updateEmail?.success) {
+            throw new Error(data?.updateEmail?.message || "No se pudo actualizar el correo");
+          }
+        } else {
+          const { data } = await adminUpdateUserEmailMutation({
+            variables: { input: { userId: targetUserId as string, newEmail: input.email, skipVerification: true } },
+          });
+          if (!data?.adminUpdateUserEmail?.success) {
+            throw new Error(data?.adminUpdateUserEmail?.message || "No se pudo actualizar el correo (admin)");
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error("Email update error:", err);
+      toast.error(err?.message || GENERIC_TOAST_ERROR_MESSAGE);
+      setIsUpdatingBrokerageSociety(false);
+      return;
+    }
+
     updateBrokerageSociety({
       variables: mutationVariables,
     })
@@ -470,13 +538,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       .finally(() => setIsUpdatingBrokerageSociety(false));
   };
 
-  const showLoading =
-    loadingBrokerageSocieties ||
-    loadingBrokerageSociety ||
-    loadingInsuranceCompanies ||
-    loadingInsuranceBrokers ||
-    loadingExclusiveAgents ||
-    isLoadingCountryData;
+  const showLoading = loadingBrokerageSociety;
 
   return (
     <form
@@ -502,6 +564,49 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
           onChange={(e) => handleInputChange("name", e.target.value)}
           value={input?.name}
         />
+
+        <div className="col-span-1 flex flex-col gap-2">
+          <TextInput
+            name="email"
+            className="col-span-1"
+            placeholder="Correo electrónico"
+            showFloatingLabel
+            error={!requiredFields.email}
+            disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
+            onChange={(e) => handleInputChange("email", e.target.value)}
+            value={input?.email}
+          />
+          {isSelfUpdate && emailChanged && (
+            <div className="col-span-1">
+              <div className="relative w-full">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="off"
+                  spellCheck="false"
+                  className="py-3 px-5 pr-12 block w-full bg-white border border-blue-500 rounded-xl text-blue-500 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none font-century-gothic"
+                  placeholder="Contraseña para confirmar"
+                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  value={input?.password || ""}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 my-auto right-3 text-blue-500"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  <span className="sr-only">Toggle password</span>
+                  <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 576 512">
+                    {showPassword ? (
+                      <path d="M572.52 241.4C518.9 135.5 407.8 64 288 64S57.1 135.5 3.48 241.4a48.07 48.07 0 000 29.2C57.1 376.5 168.2 448 288 448s230.9-71.5 284.52-177.4a48.07 48.07 0 000-29.2zM288 400c-97.05 0-183.2-57.37-233.7-144C104.8 169.4 190.9 112 288 112c97.05 0 183.2 57.37 233.7 144C471.2 342.6 385.1 400 288 400zm0-240a96 96 0 1096 96 96.14 96.14 0 00-96-96z" />
+                    ) : (
+                      <path d="M572.52 241.4C518.9 135.5 407.8 64 288 64S57.1 135.5 3.48 241.4a48.07 48.07 0 000 29.2C57.1 376.5 168.2 448 288 448s230.9-71.5 284.52-177.4a48.07 48.07 0 000-29.2zM288 400c-97.05 0-183.2-57.37-233.7-144C104.8 169.4 190.9 112 288 112c97.05 0 183.2 57.37 233.7 144C471.2 342.6 385.1 400 288 400zm0-208a112 112 0 10112 112A112.12 112.12 0 00288 192z" />
+                    )}
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         <SelectMultiple
           label="Compañias con las que trabajas"

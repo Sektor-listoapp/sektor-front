@@ -7,6 +7,8 @@ export * from "./my-account/update-supplier";
 export * from "./auth/login";
 export * from "./auth/refresh-token";
 export * from "./auth/update-password";
+export * from "./auth/update-email";
+export * from "./auth/admin-update-user-email";
 export * from "./auth/send-password-request";
 export * from "./auth/send-verification-email";
 export * from "./auth/request-auto-quote";

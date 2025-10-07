@@ -38,7 +38,14 @@ export type AdminType = {
   group?: Maybe<UserGroups>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  subscriptionPlan?: Maybe<SubscriptionPlan>;
   verifiedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type AdminUpdateEmailInputType = {
+  newEmail: Scalars['String']['input'];
+  skipVerification?: InputMaybe<Scalars['Boolean']['input']>;
+  userId: Scalars['ID']['input'];
 };
 
 /** Auto coverages options */
@@ -249,6 +256,14 @@ export type CountryType = {
   states: Array<StateType>;
 };
 
+export type CreateModuleInputType = {
+  applicablePlans: Array<SubscriptionPlan>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  icon?: InputMaybe<Scalars['String']['input']>;
+  parentId?: InputMaybe<Scalars['ID']['input']>;
+  title: Scalars['String']['input'];
+};
+
 export type CustomerInputType = {
   birthdate?: InputMaybe<Scalars['DateTime']['input']>;
   id?: InputMaybe<Scalars['String']['input']>;
@@ -265,6 +280,7 @@ export type CustomerType = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   sex: Sexes;
+  subscriptionPlan?: Maybe<SubscriptionPlan>;
   verifiedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -450,12 +466,6 @@ export type InsuranceBrokerPaginatedType = {
   pages: Scalars['Int']['output'];
 };
 
-export type InsuranceBrokerContactType = {
-  __typename?: 'InsuranceBrokerContactType';
-  links: Array<SocialMediaLinkType>;
-  name: Scalars['String']['output'];
-};
-
 export type InsuranceBrokerType = BasePublicOrganizationType & {
   __typename?: 'InsuranceBrokerType';
   address?: Maybe<AddressType>;
@@ -486,7 +496,6 @@ export type InsuranceBrokerType = BasePublicOrganizationType & {
   studies: Array<StudyType>;
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
-  contact: InsuranceBrokerContactType;
 };
 
 export type InsuranceCompanyContactInputType = {
@@ -496,7 +505,6 @@ export type InsuranceCompanyContactInputType = {
 export type InsuranceCompanyContactType = {
   __typename?: 'InsuranceCompanyContactType';
   name: Scalars['String']['output'];
-  links: Array<SocialMediaLinkType>;
 };
 
 export type InsuranceCompanyFilterType = {
@@ -556,7 +564,6 @@ export type InsuranceCompanyType = BasePublicOrganizationType & {
   suppliers: Array<SupplierType>;
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
-
 };
 
 export type LoginInputType = {
@@ -571,8 +578,44 @@ export type LoginResponseType = {
   user: UserType;
 };
 
+export type ModuleFileType = {
+  __typename?: 'ModuleFileType';
+  _id: Scalars['ID']['output'];
+  contentType: Scalars['String']['output'];
+  fileName: Scalars['String']['output'];
+  fileUrl: Scalars['String']['output'];
+  originalName: Scalars['String']['output'];
+  size: Scalars['Float']['output'];
+  uploadedAt: Scalars['DateTime']['output'];
+  uploadedBy: Scalars['ID']['output'];
+};
+
+export type ModuleFilterInputType = {
+  applicablePlans?: InputMaybe<Array<SubscriptionPlan>>;
+  parentId?: InputMaybe<Scalars['ID']['input']>;
+  query?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ModuleType = {
+  __typename?: 'ModuleType';
+  _id: Scalars['ID']['output'];
+  applicablePlans: Array<SubscriptionPlan>;
+  children?: Maybe<Array<ModuleType>>;
+  createdAt: Scalars['DateTime']['output'];
+  createdBy: Scalars['ID']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  files: Array<ModuleFileType>;
+  icon?: Maybe<Scalars['String']['output']>;
+  parent?: Maybe<ModuleType>;
+  parentId?: Maybe<Scalars['ID']['output']>;
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  updatedBy: Scalars['ID']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  adminUpdateUserEmail: UpdateEmailResponseType;
   batchUpdateExclusiveAgentClientLogos: ExclusiveAgentType;
   batchUpdateExclusiveAgentClientLogosWithFiles: ExclusiveAgentType;
   batchUpdateInsuranceBrokerClientLogos: InsuranceBrokerType;
@@ -581,8 +624,11 @@ export type Mutation = {
   changeOrganizationFeature: PublicOrganizationType;
   changeOrganizationPlan: OrganizationType;
   changeOrganizationVisibility: OrganizationType;
+  createModule: ModuleType;
   createNews: NewsType;
   createTracking: TrackingType;
+  deleteFileFromModule: ModuleType;
+  deleteModule: Scalars['Boolean']['output'];
   deleteNews: Scalars['Boolean']['output'];
   deleteOrganization: Scalars['Boolean']['output'];
   deleteTracking: Scalars['Boolean']['output'];
@@ -608,17 +654,25 @@ export type Mutation = {
   submitNews: NewsType;
   updateBrokerageSociety: BrokerageSocietyType;
   updateCustomer: CustomerType;
+  updateEmail: UpdateEmailResponseType;
   updateExclusiveAgent: ExclusiveAgentType;
   updateExclusiveAgentClientLogo: ExclusiveAgentType;
   updateInsuranceBroker: InsuranceBrokerType;
   updateInsuranceBrokerClientLogo: InsuranceBrokerType;
   updateInsuranceCompany: InsuranceCompanyType;
+  updateModule: ModuleType;
   updateNews?: Maybe<NewsType>;
   updateOrganizationLogo: OrganizationType;
   updatePassword: Scalars['Boolean']['output'];
   updateSupplier: SupplierType;
   updateTracking?: Maybe<TrackingType>;
+  uploadFileToModule: ModuleType;
   uploadOrganizationTemplate: Array<UploadFileTemplateResult>;
+};
+
+
+export type MutationAdminUpdateUserEmailArgs = {
+  input: AdminUpdateEmailInputType;
 };
 
 
@@ -665,15 +719,30 @@ export type MutationChangeOrganizationVisibilityArgs = {
 };
 
 
+export type MutationCreateModuleArgs = {
+  input: CreateModuleInputType;
+};
+
+
 export type MutationCreateNewsArgs = {
   input: NewsInputType;
   photo?: InputMaybe<Scalars['File']['input']>;
-  video?: InputMaybe<Scalars['File']['input']>;
 };
 
 
 export type MutationCreateTrackingArgs = {
   input: TrackingInputType;
+};
+
+
+export type MutationDeleteFileFromModuleArgs = {
+  fileId: Scalars['ID']['input'];
+  moduleId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteModuleArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -790,7 +859,6 @@ export type MutationSendVerificationEmailArgs = {
 export type MutationSubmitNewsArgs = {
   input: NewsInputType;
   photo?: InputMaybe<Scalars['File']['input']>;
-  video?: InputMaybe<Scalars['File']['input']>;
 };
 
 
@@ -801,6 +869,11 @@ export type MutationUpdateBrokerageSocietyArgs = {
 
 export type MutationUpdateCustomerArgs = {
   input: CustomerInputType;
+};
+
+
+export type MutationUpdateEmailArgs = {
+  input: UpdateEmailInputType;
 };
 
 
@@ -833,11 +906,16 @@ export type MutationUpdateInsuranceCompanyArgs = {
 };
 
 
+export type MutationUpdateModuleArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateModuleInputType;
+};
+
+
 export type MutationUpdateNewsArgs = {
   id: Scalars['String']['input'];
   input: NewsInputType;
   photo?: InputMaybe<Scalars['File']['input']>;
-  video?: InputMaybe<Scalars['File']['input']>;
 };
 
 
@@ -863,6 +941,12 @@ export type MutationUpdateTrackingArgs = {
 };
 
 
+export type MutationUploadFileToModuleArgs = {
+  file: Scalars['File']['input'];
+  moduleId: Scalars['ID']['input'];
+};
+
+
 export type MutationUploadOrganizationTemplateArgs = {
   file: Scalars['String']['input'];
 };
@@ -885,6 +969,7 @@ export type NewsInputType = {
   title: Scalars['String']['input'];
   type: NewsEntryType;
   uploadedBy: NewsUploadedBy;
+  videoUrl?: InputMaybe<Scalars['String']['input']>;
   visibility: NewsVisibility;
 };
 
@@ -1134,7 +1219,7 @@ export type Query = {
   __typename?: 'Query';
   adminUserById?: Maybe<AdminType>;
   adminUsers: Array<AdminType>;
-  allNews: Array<NewsType>;
+  allModules: Array<ModuleType>;
   autoQuoteById: AutoQuoteType;
   clinics: SupplierPaginatedType;
   customerById: CustomerType;
@@ -1142,8 +1227,11 @@ export type Query = {
   healthQuoteById: HealthQuoteType;
   homeNews: Array<NewsType>;
   insuranceCompaniesByClinic: Array<Scalars['String']['output']>;
+  moduleById?: Maybe<ModuleType>;
+  modules: Array<ModuleType>;
+  news: Array<NewsType>;
+  newsAndInterviewsList: NewsListGroupedType;
   newsById?: Maybe<NewsType>;
-  newsList: NewsListGroupedType;
   organizationById: OrganizationType;
   organizationTemplate: FileTemplateType;
   otherQuoteById: OtherQuoteType;
@@ -1174,8 +1262,8 @@ export type QueryAdminUserByIdArgs = {
 };
 
 
-export type QueryAllNewsArgs = {
-  filter?: InputMaybe<NewsAdminFilterInputType>;
+export type QueryAllModulesArgs = {
+  filter?: InputMaybe<ModuleFilterInputType>;
 };
 
 
@@ -1207,6 +1295,21 @@ export type QueryHealthQuoteByIdArgs = {
 
 export type QueryInsuranceCompaniesByClinicArgs = {
   clinicId: Scalars['String']['input'];
+};
+
+
+export type QueryModuleByIdArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryModulesArgs = {
+  filter?: InputMaybe<ModuleFilterInputType>;
+};
+
+
+export type QueryNewsArgs = {
+  filter?: InputMaybe<NewsAdminFilterInputType>;
 };
 
 
@@ -1528,6 +1631,13 @@ export type StudyType = {
   title: Scalars['String']['output'];
 };
 
+export enum SubscriptionPlan {
+  Bronze = 'Bronze',
+  Diamond = 'Diamond',
+  Free = 'Free',
+  Gold = 'Gold'
+}
+
 export type SupplierFilterType = {
   address?: InputMaybe<PublicOrganizationFilterAddressType>;
   lineOfBusiness?: InputMaybe<OrganizationLineOfBusiness>;
@@ -1622,6 +1732,13 @@ export type SupplierType = BasePublicOrganizationType & {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type TrackingInputType = {
+  entityId: Scalars['String']['input'];
+  entityType: EntityType;
+  eventType: EventType;
+  user?: InputMaybe<TrackingUserInputType>;
+};
+
 export type TeamMemberType = {
   __typename?: 'TeamMemberType';
   id: Scalars['String']['output'];
@@ -1629,13 +1746,6 @@ export type TeamMemberType = {
   photoUrl?: Maybe<Scalars['String']['output']>;
   position: Scalars['String']['output'];
   organization: PublicOrganizationType;
-};
-
-export type TrackingInputType = {
-  entityId: Scalars['String']['input'];
-  entityType: EntityType;
-  eventType: EventType;
-  user?: InputMaybe<TrackingUserInputType>;
 };
 
 export type TrackingType = {
@@ -1666,6 +1776,27 @@ export type TrackingUserType = {
   phone?: Maybe<Scalars['String']['output']>;
 };
 
+export type UpdateEmailInputType = {
+  newEmail: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
+export type UpdateEmailResponseType = {
+  __typename?: 'UpdateEmailResponseType';
+  message: Scalars['String']['output'];
+  newEmail: Scalars['String']['output'];
+  requiresVerification: Scalars['Boolean']['output'];
+  success: Scalars['Boolean']['output'];
+  verificationSent?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type UpdateModuleInputType = {
+  applicablePlans?: InputMaybe<Array<SubscriptionPlan>>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  icon?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type UpdatePasswordInputType = {
   newPassword: Scalars['String']['input'];
   token: Scalars['String']['input'];
@@ -1694,5 +1825,6 @@ export type UserType = {
   group?: Maybe<UserGroups>;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  subscriptionPlan?: Maybe<SubscriptionPlan>;
   verifiedAt?: Maybe<Scalars['DateTime']['output']>;
 };

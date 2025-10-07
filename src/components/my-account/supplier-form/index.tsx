@@ -25,7 +25,9 @@ import {
 import {
   PUBLIC_INSURANCE_COMPANIES_QUERY,
   PUBLIC_SUPPLIER_BY_ID_QUERY,
+  ORGANIZATION_BY_ID_QUERY,
 } from "@/lib/sektor-api/queries";
+import { ADMIN_UPDATE_USER_EMAIL, UPDATE_EMAIL } from "@/lib/sektor-api/mutations";
 import LocalOfficesInput from "../local-offices-input";
 import Select from "@/components/ui/select";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
@@ -45,10 +47,13 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [hasSocialLinks, setHasSocialLinks] = useState(false);
   const [hasInsuranceCompanies, setHasInsuranceCompanies] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   console.log('hasSocialLinks: ', hasSocialLinks);
   console.log('hasInsuranceCompanies: ', hasInsuranceCompanies);
 
   const [updateSupplier] = useMutation<Mutation>(UPDATE_SUPPLIER);
+  const [updateEmailMutation] = useMutation<Mutation>(UPDATE_EMAIL);
+  const [adminUpdateUserEmailMutation] = useMutation<Mutation>(ADMIN_UPDATE_USER_EMAIL);
 
   const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
 
@@ -66,7 +71,18 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     variables: { id: targetUserId },
   });
 
+
+
   const supplier = supplierResponse?.publicSupplierById;
+
+  const {
+    data: organizationResponse,
+  } = useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
+    variables: { id: targetUserId },
+    skip: !targetUserId,
+  });
+  const originalEmail = organizationResponse?.organizationById?.email || "";
+
 
   const insuranceCompanies =
     insuranceCompaniesResponse?.publicInsuranceCompanies?.items || [];
@@ -90,6 +106,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
   const [input, setInput] = useState({
     // required
     name: "",
+    email: "",
     segment: [],
     license: "",
     licenseType: "",
@@ -103,6 +120,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     insuranceCompanies: [],
     insuranceCompanyRelations: [] as any[],
     socialMediaLinks: [],
+    password: "",
   });
 
   useEffect(() => {
@@ -126,7 +144,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     })) || [];
 
 
-   
+
     if (typeof window !== "undefined") {
       const existingOffices = window.localStorage.getItem("sektor-local-offices");
       const existingSocialLinks = window.localStorage.getItem("social-links");
@@ -156,6 +174,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
 
     setInput({
       name: supplier?.name || "",
+      email: organizationResponse?.organizationById?.email || "",
       insuranceCompanies: insuranceCompaniesIds || [],
       insuranceCompanyRelations: insuranceCompanyRelations,
       license: license || "",
@@ -171,16 +190,20 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       logoUrl: supplier?.logoUrl || "",
       socialMediaLinks: [],
       logoFile: null,
+      password: "",
     });
-  }, [supplier]);
+  }, [supplier, organizationResponse]);
 
   const requiredFields = {
     name: Boolean(input.name?.trim()?.length),
+    email: Boolean(input.email?.trim()?.length),
     license: Boolean(input.license?.trim()?.length),
     segment: Boolean(input?.segment?.length),
     identification: Boolean(input.identification?.trim()?.length),
     logoUrl: Boolean(input.logoUrl?.trim()?.length),
   };
+  const isSelfUpdate = loggedUserId === targetUserId;
+  const emailChanged = Boolean(input.email && input.email !== originalEmail);
 
   const hasErrors = Object.values(requiredFields).some((field) => !field);
 
@@ -221,7 +244,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
 
@@ -319,6 +342,37 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     }
 
 
+
+    try {
+      if (emailChanged) {
+        if (isSelfUpdate) {
+          if (!input.password?.trim()?.length) {
+            toast.error("Debes introducir tu contraseña para actualizar el correo");
+            setIsUpdatingSupplier(false);
+            return;
+          }
+          const { data } = await updateEmailMutation({
+            variables: { input: { newEmail: input.email, password: input.password } },
+          });
+          if (!data?.updateEmail?.success) {
+            throw new Error(data?.updateEmail?.message || "No se pudo actualizar el correo");
+          }
+        } else {
+          const { data } = await adminUpdateUserEmailMutation({
+            variables: { input: { userId: targetUserId as string, newEmail: input.email, skipVerification: true } },
+          });
+          if (!data?.adminUpdateUserEmail?.success) {
+            throw new Error(data?.adminUpdateUserEmail?.message || "No se pudo actualizar el correo (admin)");
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error("Email update error:", err);
+      toast.error(err?.message || GENERIC_TOAST_ERROR_MESSAGE);
+      setIsUpdatingSupplier(false);
+      return;
+    }
+
     updateSupplier({
       variables: mutationVariables,
     })
@@ -334,7 +388,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       .finally(() => setIsUpdatingSupplier(false));
   };
 
-  const showLoading = loadingInsuranceCompanies || loadingSupplier;
+  const showLoading = loadingSupplier;
 
   return (
     <form
@@ -359,6 +413,52 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
           value={input?.name}
           error={!requiredFields.name}
         />
+        <div className="col-span-1 flex flex-col gap-2">
+          <TextInput
+            name="email"
+            className="col-span-1"
+            placeholder="Correo electrónico"
+            showFloatingLabel
+            disabled={loadingSupplier || isUpdatingSupplier}
+            onChange={(e) => handleInputChange("email", e.target.value)}
+            value={input?.email}
+            error={!requiredFields.email}
+          />
+          {isSelfUpdate && emailChanged && (
+            <div className="col-span-1">
+              <div className="relative w-full">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="off"
+                  spellCheck="false"
+                  className="py-3 px-5 pr-12 block w-full bg-white border border-blue-500 rounded-xl text-blue-500 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none font-century-gothic"
+                  placeholder="Contraseña para confirmar"
+                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  value={input?.password as unknown as string}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 my-auto right-3 text-blue-500"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  <span className="sr-only">Toggle password</span>
+                  {/* using fontawesome icon via svg path */}
+                  <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 576 512">
+                    {showPassword ? (
+                      // eye-slash
+                      <path d="M572.52 241.4C518.9 135.5 407.8 64 288 64S57.1 135.5 3.48 241.4a48.07 48.07 0 000 29.2C57.1 376.5 168.2 448 288 448s230.9-71.5 284.52-177.4a48.07 48.07 0 000-29.2zM288 400c-97.05 0-183.2-57.37-233.7-144C104.8 169.4 190.9 112 288 112c97.05 0 183.2 57.37 233.7 144C471.2 342.6 385.1 400 288 400zm0-240a96 96 0 1096 96 96.14 96.14 0 00-96-96z" />
+                    ) : (
+                      // eye
+                      <path d="M572.52 241.4C518.9 135.5 407.8 64 288 64S57.1 135.5 3.48 241.4a48.07 48.07 0 000 29.2C57.1 376.5 168.2 448 288 448s230.9-71.5 284.52-177.4a48.07 48.07 0 000-29.2zM288 400c-97.05 0-183.2-57.37-233.7-144C104.8 169.4 190.9 112 288 112c97.05 0 183.2 57.37 233.7 144C471.2 342.6 385.1 400 288 400zm0-208a112 112 0 10112 112A112.12 112.12 0 00288 192z" />
+                    )}
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
+
+        </div>
 
 
         <SelectMultiple

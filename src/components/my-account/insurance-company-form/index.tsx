@@ -12,7 +12,7 @@ import { toast } from "react-toastify";
 import Image from "next/image";
 import { Space } from "antd";
 import Button from "@/components/ui/button";
-import { UPDATE_INSURANCE_COMPANY } from "@/lib/sektor-api/mutations";
+import { ADMIN_UPDATE_USER_EMAIL, UPDATE_EMAIL, UPDATE_INSURANCE_COMPANY } from "@/lib/sektor-api/mutations";
 import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import { faHashtag } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -27,6 +27,7 @@ import {
   Query,
 } from "@/lib/sektor-api/__generated__/types";
 import {
+  ORGANIZATION_BY_ID_QUERY,
   PUBLIC_INSURANCE_COMPANY_BY_ID_QUERY,
   PUBLIC_SUPPLIERS_QUERY,
 } from "@/lib/sektor-api/queries";
@@ -39,12 +40,31 @@ import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/
 
 type InsuranceCompanyIdProps = FormProps;
 
+interface InsuranceCompanyInputType {
+  name: string;
+  email: string;
+  segment: string[];
+  license: string;
+  licenseType: string;
+  identification: string;
+  identificationType: string;
+  yearsOfExperience: string;
+  logoUrl: string;
+  logoFile: File | null;
+  motto: string;
+  suppliers: string[];
+  socialMediaLinks: never[];
+  password: string;
+}
+
 const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
   const targetUserId = userId || loggedUserId;;
   const [isUpdatingCompany, setIsUpdatingCompany] = useState(false);
 
   const [updateCompany] = useMutation<Mutation>(UPDATE_INSURANCE_COMPANY);
+  const [updateEmailMutation] = useMutation<Mutation>(UPDATE_EMAIL);
+  const [adminUpdateUserEmailMutation] = useMutation<Mutation>(ADMIN_UPDATE_USER_EMAIL);
 
   const { data: suppliersResponse, loading: loadingSuppliers } =
     useQuery<Query>(PUBLIC_SUPPLIERS_QUERY);
@@ -59,6 +79,13 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     variables: { id: targetUserId },
   });
 
+  const {
+    data: organizationResponse,
+  } = useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
+    variables: { id: targetUserId },
+    skip: !targetUserId,
+  });
+
 
   const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
 
@@ -66,6 +93,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [logoHasError, setLogoHasError] = useState(false);
   const [hasLocalContact, setHasLocalContact] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
 
   const company = companyResponse?.publicInsuranceCompanyById;
@@ -134,9 +162,10 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     };
   });
 
-  const [input, setInput] = useState({
+  const [input, setInput] = useState<InsuranceCompanyInputType>({
     // required
     name: "",
+    email: "",
     segment: [],
     license: "",
     licenseType: "",
@@ -144,11 +173,12 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     identificationType: "",
     yearsOfExperience: "",
     logoUrl: "",
-    logoFile: null as File | null,
+    logoFile: null,
     // additional
     motto: "",
     suppliers: [],
     socialMediaLinks: [],
+    password: "",
   });
 
 
@@ -175,6 +205,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
     setInput({
       name: company?.name || "",
+      email: organizationResponse?.organizationById?.email || "",
       suppliers: supplierIds || [],
       license: license || "",
       licenseType: licenseType
@@ -189,6 +220,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       logoUrl: company?.logoUrl || "",
       logoFile: null,
       socialMediaLinks: [],
+      password: "",
     });
 
     window?.localStorage?.setItem(
@@ -204,6 +236,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
   const requiredFields = {
     name: Boolean(input.name?.trim()?.length),
+    email: Boolean(input.email?.trim()?.length),
     license: Boolean(input.license?.trim()?.length),
     segment: Boolean(input.segment?.length),
     identification: Boolean(input.identification?.trim()?.length),
@@ -213,6 +246,9 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     ),
     logoUrl: Boolean(input.logoUrl?.trim()?.length),
   };
+  const originalEmail = organizationResponse?.organizationById?.email || "";
+  const isSelfUpdate = loggedUserId === targetUserId;
+  const emailChanged = Boolean(input.email && input.email !== originalEmail);
 
   const hasErrors =
     Object.values(requiredFields).some((field) => !field) ||
@@ -237,7 +273,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
 
@@ -349,6 +385,36 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       handleUpdateLogo(targetUserId, input.logoFile);
     }
 
+    try {
+      if (emailChanged) {
+        if (isSelfUpdate) {
+          if (!input.password?.trim()?.length) {
+            toast.error("Debes introducir tu contraseña para actualizar el correo");
+            setIsUpdatingCompany(false);
+            return;
+          }
+          const { data } = await updateEmailMutation({
+            variables: { input: { newEmail: input.email, password: input.password } },
+          });
+          if (!data?.updateEmail?.success) {
+            throw new Error(data?.updateEmail?.message || "No se pudo actualizar el correo");
+          }
+        } else {
+          const { data } = await adminUpdateUserEmailMutation({
+            variables: { input: { userId: targetUserId as string, newEmail: input.email, skipVerification: true } },
+          });
+          if (!data?.adminUpdateUserEmail?.success) {
+            throw new Error(data?.adminUpdateUserEmail?.message || "No se pudo actualizar el correo (admin)");
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error("Email update error:", err);
+      toast.error(err?.message || GENERIC_TOAST_ERROR_MESSAGE);
+      setIsUpdatingCompany(false);
+      return;
+    }
+
     updateCompany({
       variables: mutationVariables,
     })
@@ -366,7 +432,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       .finally(() => setIsUpdatingCompany(false));
   };
 
-  const showLoading = loadingCompany || loadingSuppliers;
+  const showLoading = loadingCompany;
 
   return (
     <form
@@ -392,6 +458,51 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
           value={input?.name}
         />
 
+        <div className="col-span-1 flex flex-col gap-2">
+          <div className="col-span-1 flex flex-col gap-2">
+            <TextInput
+              name="email"
+              className="col-span-1"
+              error={!requiredFields.email}
+              placeholder="Correo electrónico"
+              showFloatingLabel
+              disabled={loadingCompany || isUpdatingCompany}
+              onChange={(e) => handleInputChange("email", e.target.value)}
+              value={input?.email}
+            />
+            {isSelfUpdate && emailChanged && (
+              <div className="col-span-1">
+                <div className="relative w-full">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    autoComplete="off"
+                    spellCheck="false"
+                    className="py-3 px-5 pr-12 block w-full bg-white border border-blue-500 rounded-xl text-blue-500 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none font-century-gothic"
+                    placeholder="Contraseña para confirmar"
+                    onChange={(e) => handleInputChange("password", e.target.value)}
+                    value={input?.password || ""}
+                  />
+                  <button
+                    type="button"
+                    className="absolute inset-y-0 my-auto right-3 text-blue-500"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    <span className="sr-only">Toggle password</span>
+                    <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 576 512">
+                      {showPassword ? (
+                        <path d="M572.52 241.4C518.9 135.5 407.8 64 288 64S57.1 135.5 3.48 241.4a48.07 48.07 0 000 29.2C57.1 376.5 168.2 448 288 448s230.9-71.5 284.52-177.4a48.07 48.07 0 000-29.2zM288 400c-97.05 0-183.2-57.37-233.7-144C104.8 169.4 190.9 112 288 112c97.05 0 183.2 57.37 233.7 144C471.2 342.6 385.1 400 288 400zm0-240a96 96 0 1096 96 96.14 96.14 0 00-96-96z" />
+                      ) : (
+                        <path d="M572.52 241.4C518.9 135.5 407.8 64 288 64S57.1 135.5 3.48 241.4a48.07 48.07 0 000 29.2C57.1 376.5 168.2 448 288 448s230.9-71.5 284.52-177.4a48.07 48.07 0 000-29.2zM288 400c-97.05 0-183.2-57.37-233.7-144C104.8 169.4 190.9 112 288 112c97.05 0 183.2 57.37 233.7 144C471.2 342.6 385.1 400 288 400zm0-208a112 112 0 10112 112A112.12 112.12 0 00288 192z" />
+                      )}
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+       
+        </div>
 
 
         <SelectMultiple
@@ -490,7 +601,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
         />
 
         <LocalContactInput
-          links={company?.contact?.links || []}
+          links={company?.socialMediaLinks || []}
           setHasLocalContact={setHasLocalContact}
           disabled={loadingCompany || isUpdatingCompany}
         />
