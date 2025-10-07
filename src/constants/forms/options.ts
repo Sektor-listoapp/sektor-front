@@ -41,8 +41,12 @@ export const BROKERAGE_SOCIETY_LICENSE_TYPE_OPTIONS = [
   { label: "SCSMP -", value: "SCSMP-" },
 ];
 
+export const INSURANCE_COMPANY_LICENSE_TYPE_OPTIONS = [
+  { label: "ES -", value: "ES-" },
+];
+
 export const LICENSE_TYPE_OPTIONS = [
-  { label: "CAA -", value: "CAA-" },
+  // { label: "CAA -", value: "CAA-" },
   { label: "AAA -", value: "AAA-" },
 ];
 

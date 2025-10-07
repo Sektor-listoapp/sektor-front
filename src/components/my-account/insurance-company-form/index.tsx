@@ -16,8 +16,8 @@ import { UPDATE_INSURANCE_COMPANY } from "@/lib/sektor-api/mutations";
 import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import { faHashtag } from "@fortawesome/free-solid-svg-icons";
 import {
-  BROKERAGE_SOCIETY_LICENSE_TYPE_OPTIONS,
   IDENTIFICATION_TYPE_OPTIONS,
+  INSURANCE_COMPANY_LICENSE_TYPE_OPTIONS,
   SELECT_LINE_OF_BUSINESS_OPTIONS,
 } from "@/constants/forms";
 import {
@@ -178,8 +178,8 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       suppliers: supplierIds || [],
       license: license || "",
       licenseType: licenseType
-        ? `${licenseType}-`
-        : BROKERAGE_SOCIETY_LICENSE_TYPE_OPTIONS[0].value,
+        ? `${'ES-'}`
+        : INSURANCE_COMPANY_LICENSE_TYPE_OPTIONS[0].value,
       segment: (company?.lineOfBusiness || []) as never[],
       identification: identification || "",
       identificationType:
@@ -336,6 +336,8 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       },
     };
 
+    console.log("mutationVariables", mutationVariables)
+
 
 
     if (input?.logoFile) {
@@ -414,7 +416,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
             value: input?.licenseType,
             wrapperClassName: "w-56",
             className: "border-r-0",
-            options: BROKERAGE_SOCIETY_LICENSE_TYPE_OPTIONS,
+            options: INSURANCE_COMPANY_LICENSE_TYPE_OPTIONS,
             disabled: loadingCompany || isUpdatingCompany,
             onChange: (e) => handleInputChange("licenseType", e?.target?.value),
           }}
