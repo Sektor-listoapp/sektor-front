@@ -289,7 +289,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     );
 
 
-
+  
     if (typeof window !== "undefined") {
       const existingOffices = window.localStorage.getItem("sektor-local-offices");
       if (!existingOffices || existingOffices === "[]") {
@@ -528,16 +528,16 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
         />
 
         <div className="col-span-1 flex flex-col gap-2">
-          <TextInput
-            name="email"
-            className="col-span-1"
-            error={!requiredFields.email}
-            placeholder="Correo electrónico"
-            showFloatingLabel
-            disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
-            onChange={(e) => handleInputChange("email", e.target.value)}
-            value={input?.email}
-          />
+        <TextInput
+          name="email"
+          className="col-span-1"
+          error={!requiredFields.email}
+          placeholder="Correo electrónico"
+          showFloatingLabel
+          disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
+          onChange={(e) => handleInputChange("email", e.target.value)}
+          value={input?.email}
+        />
           {(() => { const originalEmail = organizationResponse?.organizationById?.email || ""; const isSelfUpdate = loggedUserId === targetUserId; const emailChanged = Boolean(input.email && input.email !== originalEmail); return (isSelfUpdate && emailChanged); })() && (
             <div className="col-span-1">
               <div className="relative w-full">

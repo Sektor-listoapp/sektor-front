@@ -414,16 +414,16 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
           error={!requiredFields.name}
         />
         <div className="col-span-1 flex flex-col gap-2">
-          <TextInput
-            name="email"
-            className="col-span-1"
-            placeholder="Correo electrónico"
-            showFloatingLabel
-            disabled={loadingSupplier || isUpdatingSupplier}
-            onChange={(e) => handleInputChange("email", e.target.value)}
-            value={input?.email}
-            error={!requiredFields.email}
-          />
+        <TextInput
+          name="email"
+          className="col-span-1"
+          placeholder="Correo electrónico"
+          showFloatingLabel
+          disabled={loadingSupplier || isUpdatingSupplier}
+          onChange={(e) => handleInputChange("email", e.target.value)}
+          value={input?.email}
+          error={!requiredFields.email}
+        />
           {isSelfUpdate && emailChanged && (
             <div className="col-span-1">
               <div className="relative w-full">
