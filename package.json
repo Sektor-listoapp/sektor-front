@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@ant-design/cssinjs": "1.22.1",
-    "@apollo/client": "3.12.4",
+    "@apollo/client": "^3.12.5",
     "@fortawesome/fontawesome-svg-core": "6.7.1",
     "@fortawesome/free-brands-svg-icons": "6.7.1",
     "@fortawesome/free-regular-svg-icons": "6.7.1",

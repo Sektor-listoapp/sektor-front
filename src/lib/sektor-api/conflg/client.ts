@@ -1,5 +1,5 @@
 import { useAuthStore } from "@/store/auth";
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloClient, InMemoryCache, ApolloLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import createUploadLink from "apollo-upload-client/createUploadLink.mjs";
 
@@ -23,7 +23,7 @@ const createSektorApiClient = () => {
 
   const client = new ApolloClient({
     cache: new InMemoryCache(),
-    link: authLink.concat(httpLink),
+    link: authLink.concat(httpLink as unknown as ApolloLink),
   });
 
   return client;
