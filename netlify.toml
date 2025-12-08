@@ -8,4 +8,5 @@
 [build.environment]
   NODE_VERSION = "20"
   CI = "false"
+  NPM_FLAGS = "--legacy-peer-deps"
 
