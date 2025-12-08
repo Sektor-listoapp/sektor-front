@@ -21,6 +21,7 @@ const ClinicList = () => {
 
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedState, setSelectedState] = useState<string>("");
+    console.log('selectedState: ', selectedState);
     const [selectedClinic, setSelectedClinic] = useState("");
 
     const [selectedInsurance, setSelectedInsurance] = useState("");
@@ -79,7 +80,7 @@ const ClinicList = () => {
             );
 
 
-        const clinicMatch = !selectedClinic || clinic.id === selectedClinic;
+        const clinicMatch = !selectedClinic || clinic.id?.toString() === selectedClinic;
 
 
         const insuranceMatch = !selectedInsurance ||
@@ -100,7 +101,7 @@ const ClinicList = () => {
         : allClinics.length > 0
             ? allClinics.map((clinic: SupplierType) => ({
                 label: clinic.name,
-                value: clinic.id,
+                value: clinic.id?.toString() || "",
                 relations: clinic.insuranceCompanyRelations
             }))
             : selectedState

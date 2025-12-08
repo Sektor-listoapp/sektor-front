@@ -14,7 +14,7 @@ import { Space } from "antd";
 import Button from "@/components/ui/button";
 import LocalClientsInput from "../local-clients-input";
 import StudiesInput from "../studies-input";
-import { UPDATE_INSURANCE_BROKER } from "@/lib/sektor-api/mutations";
+import { ADMIN_UPDATE_USER_EMAIL, UPDATE_EMAIL, UPDATE_INSURANCE_BROKER } from "@/lib/sektor-api/mutations";
 // import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import {
   faAddressCard,
@@ -33,6 +33,7 @@ import {
 } from "@/constants/forms";
 import {
   COUNTRY_BY_CODE_QUERY,
+  ORGANIZATION_BY_ID_QUERY,
   PUBLIC_BROKERAGE_SOCIETY_QUERY,
   PUBLIC_EXCLUSIVE_AGENTS_QUERY,
   PUBLIC_INSURANCE_BROKER_BY_ID_QUERY,
@@ -47,6 +48,27 @@ import SocialMediaInput from "../social-media-input";
 import { UPDATE_INSURANCE_BROKER_CLIENT_LOGO } from "@/lib/sektor-api/mutations/my-account/update-insurance-broker-client-logo";
 
 type InsuranceBrokerIdProps = FormProps;
+
+interface InsuranceBrokerInputType {
+  name: string;
+  email: string;
+  insuranceCompanies: never[];
+  license: string;
+  licenseType: string;
+  segment: string[];
+  identification: string;
+  identificationType: string;
+  modality: string;
+  coverageState: never[];
+  yearsOfExperience: string;
+  phone: string;
+  phoneCode: string;
+  logoUrl: string;
+  logoFile: File | null;
+  allies: string[];
+  sex: string;
+  password: string;
+}
 
 const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
   const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
@@ -67,10 +89,19 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
   const insuranceBrokerClients = [...(insuranceBroker?.clients || [])];
   const insuranceBrokerStudies = [...(insuranceBroker?.studies || [])];
 
+  const {
+    data: organizationResponse,
+  } = useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
+    variables: { id: targetUserId },
+    skip: !targetUserId,
+  });
+
 
   const [updateInsuranceBroker] = useMutation<Mutation>(
     UPDATE_INSURANCE_BROKER
   );
+  const [updateEmailMutation] = useMutation<Mutation>(UPDATE_EMAIL);
+  const [adminUpdateUserEmailMutation] = useMutation<Mutation>(ADMIN_UPDATE_USER_EMAIL);
 
   // const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
   const [updateInsuranceBrokerClientLogo] = useMutation<Mutation>(UPDATE_INSURANCE_BROKER_CLIENT_LOGO);
@@ -98,6 +129,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
   const [logoHasError, setLogoHasError] = useState(false);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hasSocialLinks, setHasSocialLinks] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
 
 
@@ -166,29 +198,10 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
   const [identificationType, identification] =
     insuranceBroker?.identification?.split("-") || [];
 
-  const [input, setInput] = useState<{
-    // required
-    name: string;
-    insuranceCompanies: string[];
-    license: string;
-    licenseType: string;
-    segment: string[];
-    identification: string;
-    identificationType: string;
-    modality: string;
-    coverageState: string[];
-    yearsOfExperience: string;
-    phone: string;
-    phoneCode: string;
-    logoUrl: string;
-    logoFile: File | null;
-    // additional
-    allies: string[];
-    sex: string;
-    // socialMediaLinks: SocialMediaLinkType[];
-  }>({
+  const [input, setInput] = useState<InsuranceBrokerInputType>({
     // required
     name: insuranceBroker?.name || "",
+    email: organizationResponse?.organizationById?.email || "",
     insuranceCompanies: [],
     license: license || "",
     licenseType: licenseType
@@ -210,6 +223,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     allies: allies || [],
     sex: insuranceBroker?.sex || "",
     // socialMediaLinks: JSON.parse(window?.localStorage?.getItem("social-links") || "[]"),
+    password: "",
   });
 
   // const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
@@ -294,6 +308,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
 
     setInput({
       name: insuranceBroker?.name || "",
+      email: organizationResponse?.organizationById?.email || "",
       insuranceCompanies: insuranceCompanies || [],
       license: license || "",
       licenseType: licenseType
@@ -313,13 +328,15 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       logoFile: null,
       allies: [...(insuranceBroker?.allies?.map(({ id }) => id) || [])],
       sex: insuranceBroker?.sex || "",
+      password: "",
       // socialMediaLinks: JSON.parse(window?.localStorage?.getItem("social-links") || "[]"),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [insuranceBroker]);
+  }, [insuranceBroker, organizationResponse]);
 
   const requiredFields = {
     name: Boolean(input.name.trim().length),
+    email: Boolean(input.email.trim().length),
     insuranceCompanies: Boolean(input.insuranceCompanies.length),
     license: Boolean(input.license.trim().length),
     segment: Boolean(input.segment.length),
@@ -358,6 +375,40 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const originalEmail = organizationResponse?.organizationById?.email || "";
+    const isSelfUpdate = loggedUserId === targetUserId;
+    const emailChanged = Boolean(input.email && input.email !== originalEmail);
+
+    try {
+      if (emailChanged) {
+        if (isSelfUpdate) {
+          if (!input.password?.trim()?.length) {
+            toast.error("Debes introducir tu contraseña para actualizar el correo");
+            setIsUpdatingInsuranceBroker(false);
+            return;
+          }
+          const { data } = await updateEmailMutation({
+            variables: { input: { newEmail: input.email, password: input.password } },
+          });
+          if (!data?.updateEmail?.success) {
+            throw new Error(data?.updateEmail?.message || "No se pudo actualizar el correo");
+          }
+        } else {
+          const { data } = await adminUpdateUserEmailMutation({
+            variables: { input: { userId: targetUserId as string, newEmail: input.email, skipVerification: true } },
+          });
+          if (!data?.adminUpdateUserEmail?.success) {
+            throw new Error(data?.adminUpdateUserEmail?.message || "No se pudo actualizar el correo (admin)");
+          }
+        }
+      }
+    } catch (err: unknown) {
+      console.error("Email update error:", err);
+      const errorMessage = (err as { message?: string })?.message || "No se pudo actualizar el correo";
+      toast.error(errorMessage);
+      setIsUpdatingInsuranceBroker(false);
+      return;
+    }
 
     setIsUpdatingInsuranceBroker(true);
 
@@ -449,12 +500,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
 
 
 
-  const showLoading =
-    loadingInsuranceCompanies ||
-    loadingBrokerageSocieties ||
-    loadingExclusiveAgents ||
-    loadingInsuranceBrokers ||
-    isLoadingCountryData;
+  const showLoading = loadingInsuranceBroker;
 
   return (
     <form
@@ -480,6 +526,49 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
           onChange={(e) => handleInputChange("name", e.target.value)}
           value={input?.name}
         />
+
+        <div className="col-span-1 flex flex-col gap-2">
+        <TextInput
+          name="email"
+          className="col-span-1"
+          error={!requiredFields.email}
+          placeholder="Correo electrónico"
+          showFloatingLabel
+          disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
+          onChange={(e) => handleInputChange("email", e.target.value)}
+          value={input?.email}
+        />
+          {(() => { const originalEmail = organizationResponse?.organizationById?.email || ""; const isSelfUpdate = loggedUserId === targetUserId; const emailChanged = Boolean(input.email && input.email !== originalEmail); return (isSelfUpdate && emailChanged); })() && (
+            <div className="col-span-1">
+              <div className="relative w-full">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  autoComplete="off"
+                  spellCheck="false"
+                  className="py-3 px-5 pr-12 block w-full bg-white border border-blue-500 rounded-xl text-blue-500 text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none font-century-gothic"
+                  placeholder="Contraseña para confirmar"
+                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  value={input?.password || ""}
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 my-auto right-3 text-blue-500"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  <span className="sr-only">Toggle password</span>
+                  <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 576 512">
+                    {showPassword ? (
+                      <path d="M572.52 241.4C518.9 135.5 407.8 64 288 64S57.1 135.5 3.48 241.4a48.07 48.07 0 000 29.2C57.1 376.5 168.2 448 288 448s230.9-71.5 284.52-177.4a48.07 48.07 0 000-29.2zM288 400c-97.05 0-183.2-57.37-233.7-144C104.8 169.4 190.9 112 288 112c97.05 0 183.2 57.37 233.7 144C471.2 342.6 385.1 400 288 400zm0-240a96 96 0 1096 96 96.14 96.14 0 00-96-96z" />
+                    ) : (
+                      <path d="M572.52 241.4C518.9 135.5 407.8 64 288 64S57.1 135.5 3.48 241.4a48.07 48.07 0 000 29.2C57.1 376.5 168.2 448 288 448s230.9-71.5 284.52-177.4a48.07 48.07 0 000-29.2zM288 400c-97.05 0-183.2-57.37-233.7-144C104.8 169.4 190.9 112 288 112c97.05 0 183.2 57.37 233.7 144C471.2 342.6 385.1 400 288 400zm0-208a112 112 0 10112 112A112.12 112.12 0 00288 192z" />
+                    )}
+                  </svg>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         <SelectMultiple
           label="Compañias con las que trabajas"

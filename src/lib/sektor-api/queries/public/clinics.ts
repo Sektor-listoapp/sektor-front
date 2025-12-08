@@ -8,12 +8,20 @@ export const CLINICS_SIMPLE_QUERY = gql`
       pages
       count
       items {
+        id
         name
         insuranceCompanyRelations {
           insuranceCompanyId
           depositRequired
           fullyContractedClinic
           reasonableExpensesApplicable
+        }
+        offices {
+          address {
+            state {
+              id
+            }
+          }
         }
       }
     }
