@@ -45,20 +45,24 @@ const OrganizationFilters = () => {
 
   const stateOptions = [
     { label: "Estado", value: "", disabled: true },
-    ...countryStates.map((state) => ({
-      label: state?.name || "",
-      value: state?.id || "",
-    })),
+    ...countryStates
+      .map((state) => ({
+        label: state?.name || "",
+        value: state?.id || "",
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
   ];
 
 
   const selectedState = countryStates.find((s) => s.id === Number(selectedStateId));
   const cityOptions = [
     { label: "Ciudad", value: "", disabled: true },
-    ...(selectedState?.cities?.map((city) => ({
-      label: city?.name || "",
-      value: city?.id || "",
-    })) || []),
+    ...(selectedState?.cities
+      ?.map((city) => ({
+        label: city?.name || "",
+        value: city?.id || "",
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)) || []),
   ];
 
   const {

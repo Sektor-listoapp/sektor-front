@@ -42,12 +42,36 @@ const SocialMediaModal = ({
     setOpen(false);
   };
 
+  const buildSocialMediaUrl = (platform: string, inputUrl: string): string => {
+    const trimmedUrl = inputUrl.trim();
+
+    if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
+      return trimmedUrl;
+    }
+
+    const platformUrls: Record<string, string> = {
+      [SocialMediaPlatform.Facebook]: 'https://www.facebook.com/',
+      [SocialMediaPlatform.Instagram]: 'https://www.instagram.com/',
+      [SocialMediaPlatform.Twitter]: 'https://www.twitter.com/',
+    };
+
+    const baseUrl = platformUrls[platform] || 'https://';
+
+
+    if (trimmedUrl.includes('.com/') || trimmedUrl.includes('.com')) {
+      return trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`;
+    }
+
+
+    return `${baseUrl}${trimmedUrl}`;
+  };
+
   const handleSubmit = () => {
     if (!selectedPlatform || !url.trim()) return;
 
     const newLink = {
       platform: selectedPlatform,
-      url: url.trim(),
+      url: buildSocialMediaUrl(selectedPlatform, url),
     };
 
     let updatedLinks;

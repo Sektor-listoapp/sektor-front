@@ -125,20 +125,24 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
 
   const countryStates = countryDataResponse?.getCountryByCode?.states || [];
   const countryStateOptions = [
-    ...countryStates?.map(({ id, name }) => ({
-      label: name,
-      value: id,
-    })),
+    ...countryStates
+      ?.map(({ id, name }) => ({
+        label: name,
+        value: id,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
   ];
 
   const insuranceCompanies =
     insuranceCompaniesResponse?.publicInsuranceCompanies?.items || [];
   const insuranceCompanyOptions = [
-    ...insuranceCompanies?.map(({ id, name, logoUrl }) => ({
-      label: name,
-      value: id,
-      image: logoUrl,
-    })),
+    ...insuranceCompanies
+      ?.map(({ id, name, logoUrl }) => ({
+        label: name,
+        value: id,
+        image: logoUrl,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
   ];
 
   const insuranceBrokers =

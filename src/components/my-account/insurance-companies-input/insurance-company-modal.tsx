@@ -39,10 +39,12 @@ const InsuranceCompanyModal = ({
 
     const insuranceCompanyOptions = [
         { label: "Elige la compañía de seguro", value: "", disabled: true },
-        ...availableCompanies.map(company => ({
-            label: company.name,
-            value: company.id
-        }))
+        ...availableCompanies
+            .map(company => ({
+                label: company.name,
+                value: company.id
+            }))
+            .sort((a, b) => a.label.localeCompare(b.label))
     ];
 
     const booleanOptions = [
@@ -128,7 +130,7 @@ const InsuranceCompanyModal = ({
                         />
                     </div>
                     <h2 className="text-2xl font-bold text-start">
-                        Añadir tus redes sociales
+                        Añadir compañía de seguros
                     </h2>
                 </header>
                 <div className="space-y-2">
