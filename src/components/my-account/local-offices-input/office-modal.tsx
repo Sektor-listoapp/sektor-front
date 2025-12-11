@@ -152,20 +152,24 @@ const LocalOfficeModal = ({
       disabled: true,
       hidden: true,
     },
-    ...countryStates?.map(({ id, name }) => ({
-      label: name,
-      value: id,
-    })),
+    ...countryStates
+      ?.map(({ id, name }) => ({
+        label: name,
+        value: id,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
   ];
 
   let citiesOptionsMap = {};
   countryStates.forEach(({ id, cities }) => {
     citiesOptionsMap = {
       ...citiesOptionsMap,
-      [id]: cities?.map(({ id, name }) => ({
-        label: name,
-        value: id,
-      })),
+      [id]: cities
+        ?.map(({ id, name }) => ({
+          label: name,
+          value: id,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
     };
   });
 

@@ -15,10 +15,12 @@ export const getLocationOptions = (
 
   if (!countryData) return locationOptions;
 
-  const states = countryData?.states.map((state) => ({
-    label: state?.name,
-    value: String(state?.id),
-  }));
+  const states = countryData?.states
+    .map((state) => ({
+      label: state?.name,
+      value: String(state?.id),
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   const detailedLocations = countryData?.states
     .map((state) => {
@@ -27,7 +29,8 @@ export const getLocationOptions = (
         value: String(city?.id),
       }));
     })
-    .flat();
+    .flat()
+    .sort((a, b) => a.label.localeCompare(b.label));
 
   if (detailed) {
     return [...locationOptions, ...detailedLocations];

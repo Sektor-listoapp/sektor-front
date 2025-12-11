@@ -60,10 +60,12 @@ const ClinicList = () => {
         ? [{ label: "Cargando estados...", value: "", disabled: true }]
         : [
             { label: "Buscar estado", value: "" },
-            ...(statesData?.getCountryByCode?.states?.map((state: StateType) => ({
-                label: state.name,
-                value: state.id.toString()
-            })) || [])
+            ...(statesData?.getCountryByCode?.states
+                ?.map((state: StateType) => ({
+                    label: state.name,
+                    value: state.id.toString()
+                }))
+                .sort((a, b) => a.label.localeCompare(b.label)) || [])
         ];
 
 
@@ -99,11 +101,13 @@ const ClinicList = () => {
     const clinicOptions: ClinicOption[] = isLoadingClinics
         ? [{ label: "Cargando clínicas...", value: "", disabled: true }]
         : allClinics.length > 0
-            ? allClinics.map((clinic: SupplierType) => ({
-                label: clinic.name,
-                value: clinic.id?.toString() || "",
-                relations: clinic.insuranceCompanyRelations
-            }))
+            ? allClinics
+                .map((clinic: SupplierType) => ({
+                    label: clinic.name,
+                    value: clinic.id?.toString() || "",
+                    relations: clinic.insuranceCompanyRelations
+                }))
+                .sort((a, b) => a.label.localeCompare(b.label))
             : selectedState
                 ? [{ label: `No hay clínicas en este estado`, value: "", disabled: true }]
                 : [{ label: "Buscar clínicas", value: "", disabled: true }];
@@ -125,7 +129,9 @@ const ClinicList = () => {
             const filteredItems = items.filter((insurance: InsuranceCompanyType) => allowedInsuranceIds.includes(insurance.id));
 
             return filteredItems.length > 0
-                ? filteredItems.map((insurance: InsuranceCompanyType) => ({ label: insurance.name, value: insurance.id }))
+                ? filteredItems
+                    .map((insurance: InsuranceCompanyType) => ({ label: insurance.name, value: insurance.id }))
+                    .sort((a, b) => a.label.localeCompare(b.label))
                 : [{ label: "No hay seguros disponibles", value: "", disabled: true }];
         })();
 

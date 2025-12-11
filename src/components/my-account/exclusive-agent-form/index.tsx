@@ -125,20 +125,24 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
 
   const countryStates = countryDataResponse?.getCountryByCode?.states || [];
   const countryStateOptions = [
-    ...countryStates?.map(({ id, name }) => ({
-      label: name,
-      value: id,
-    })),
+    ...countryStates
+      ?.map(({ id, name }) => ({
+        label: name,
+        value: id,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
   ];
 
   const insuranceCompanies =
     insuranceCompaniesResponse?.publicInsuranceCompanies?.items || [];
   const insuranceCompanyOptions = [
-    ...insuranceCompanies?.map(({ id, name, logoUrl }) => ({
-      label: name,
-      value: id,
-      image: logoUrl,
-    })),
+    ...insuranceCompanies
+      ?.map(({ id, name, logoUrl }) => ({
+        label: name,
+        value: id,
+        image: logoUrl,
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
   ];
 
   const insuranceBrokers =
@@ -496,16 +500,16 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
 
 
         <div className="col-span-1 flex flex-col gap-2">
-        <TextInput
-          name="email"
-          className="col-span-1"
-          placeholder="Correo electrónico"
-          showFloatingLabel
-          error={!requiredFields.name}
-          disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
-          onChange={(e) => handleInputChange("email", e.target.value)}
-          value={input?.email}
-        />
+          <TextInput
+            name="email"
+            className="col-span-1"
+            placeholder="Correo electrónico"
+            showFloatingLabel
+            error={!requiredFields.name}
+            disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
+            onChange={(e) => handleInputChange("email", e.target.value)}
+            value={input?.email}
+          />
           {(() => { const originalEmail = organizationResponse?.organizationById?.email || ""; const isSelfUpdate = loggedUserId === targetUserId; const emailChanged = Boolean(input.email && input.email !== originalEmail); return (isSelfUpdate && emailChanged); })() && (
             <div className="col-span-1" style={{ zIndex: 60 }}>
               <div className="relative w-full">

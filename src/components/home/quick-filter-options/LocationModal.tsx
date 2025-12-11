@@ -34,10 +34,12 @@ const LocationModal = ({ open, setOpenLocationModal }: LocationModalProps) => {
 
   const stateOptions = [
     { label: "Estado", value: "", disabled: true },
-    ...countryStates.map((state) => ({
-      label: state?.name || "",
-      value: state?.id || "",
-    })),
+    ...countryStates
+      .map((state) => ({
+        label: state?.name || "",
+        value: state?.id || "",
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)),
   ];
 
 
@@ -45,10 +47,12 @@ const LocationModal = ({ open, setOpenLocationModal }: LocationModalProps) => {
   const cityOptions = selectedState?.cities
     ? [
       { label: "Ciudad", value: "", disabled: true },
-      ...selectedState.cities.map((city) => ({
-        label: city?.name || "",
-        value: city?.id || "",
-      })),
+      ...selectedState.cities
+        .map((city) => ({
+          label: city?.name || "",
+          value: city?.id || "",
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
     ]
     : [];
 

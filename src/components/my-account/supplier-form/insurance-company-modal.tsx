@@ -9,9 +9,9 @@ import Button from '@/components/ui/button';
 import { SupplierInsuranceCompanyRelationInputType, InsuranceCompanyType } from '@/lib/sektor-api/__generated__/types';
 
 interface InsuranceCompanyRelation extends SupplierInsuranceCompanyRelationInputType {
-    id?: string; 
-    companyName?: string; 
-    companyLogo?: string; 
+    id?: string;
+    companyName?: string;
+    companyLogo?: string;
 }
 
 interface InsuranceCompanyModalProps {
@@ -21,6 +21,7 @@ interface InsuranceCompanyModalProps {
     existingRelations: InsuranceCompanyRelation[];
     insuranceCompanies: InsuranceCompanyType[];
     disabled?: boolean;
+
 }
 
 const InsuranceCompanyModal: React.FC<InsuranceCompanyModalProps> = ({
@@ -35,19 +36,20 @@ const InsuranceCompanyModal: React.FC<InsuranceCompanyModalProps> = ({
     const [editingRelation, setEditingRelation] = useState<InsuranceCompanyRelation | null>(null);
     const [isEditing, setIsEditing] = useState(false);
 
-   
+
     useEffect(() => {
         if (isOpen) {
-           
+
             setRelations(existingRelations);
         }
     }, [isOpen, existingRelations]);
 
-    const insuranceCompanyOptions = insuranceCompanies.map(company => ({
-        label: company.name,
-        value: company.id,
-        image: company.logoUrl
-    }));
+    const insuranceCompanyOptions = insuranceCompanies
+        .map(company => ({
+            label: company.name,
+            value: company.id,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
 
     const handleAddRelation = () => {
         setEditingRelation({
@@ -69,13 +71,13 @@ const InsuranceCompanyModal: React.FC<InsuranceCompanyModalProps> = ({
     };
 
     const handleSaveRelation = () => {
-       
+
         if (!editingRelation?.insuranceCompanyId) {
             return;
         }
 
-            const company = insuranceCompanies.find(c => c.id === editingRelation.insuranceCompanyId);
-          
+        const company = insuranceCompanies.find(c => c.id === editingRelation.insuranceCompanyId);
+
 
         const newRelation: InsuranceCompanyRelation = {
             ...editingRelation,
@@ -84,15 +86,15 @@ const InsuranceCompanyModal: React.FC<InsuranceCompanyModalProps> = ({
             companyLogo: company?.logoUrl || undefined
         };
 
-       
+
 
         if (editingRelation.id) {
-           
+
             setRelations(prev =>
                 prev.map(rel => rel.id === editingRelation.id ? newRelation : rel)
             );
         } else {
-           
+
             setRelations(prev => [...prev, newRelation]);
         }
 
@@ -113,7 +115,7 @@ const InsuranceCompanyModal: React.FC<InsuranceCompanyModalProps> = ({
             reasonableExpensesApplicable: rel.reasonableExpensesApplicable
         }));
 
-      
+
         onSave(relationsToSave);
         onClose();
     };
@@ -159,7 +161,7 @@ const InsuranceCompanyModal: React.FC<InsuranceCompanyModalProps> = ({
                 </header>
 
                 <div className="space-y-4">
-                  
+
                     <div className="flex justify-end">
                         <Button
                             variant="solid-blue"
@@ -171,7 +173,7 @@ const InsuranceCompanyModal: React.FC<InsuranceCompanyModalProps> = ({
                         </Button>
                     </div>
 
-       
+
                     <div className="space-y-3">
                         {relations.map((relation) => (
                             <div key={relation.id} className="border rounded-lg p-4 bg-gray-50">
@@ -216,7 +218,7 @@ const InsuranceCompanyModal: React.FC<InsuranceCompanyModalProps> = ({
                         ))}
                     </div>
 
-     
+
                     {isEditing && editingRelation && (
                         <div className="border-t pt-4">
                             <h4 className="font-medium mb-4">
@@ -232,7 +234,7 @@ const InsuranceCompanyModal: React.FC<InsuranceCompanyModalProps> = ({
                                         ...insuranceCompanyOptions
                                     ]}
                                     onChange={(e) => {
-                                       
+
                                         setEditingRelation(prev => ({ ...prev!, insuranceCompanyId: e.target.value }));
                                     }}
                                     disabled={disabled}
