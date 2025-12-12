@@ -25,14 +25,19 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
 
   const filterKey =
     ORGANIZATION_FILTER_KEYS[
-      query?.type as keyof typeof ORGANIZATION_FILTER_KEYS
+    query?.type as keyof typeof ORGANIZATION_FILTER_KEYS
     ];
 
-  const ageRange =
-    minAge && maxAge ? [Number(minAge), Number(maxAge)] : undefined;
 
+  const hasAgeFilter = 'minAge' in query || 'maxAge' in query;
+  const ageRange =
+    hasAgeFilter && minAge !== undefined && maxAge !== undefined
+      ? [Number(minAge), Number(maxAge)]
+      : undefined;
+
+  const hasExperienceFilter = 'minExperience' in query || 'maxExperience' in query;
   const experienceRange =
-    minExperience && maxExperience
+    hasExperienceFilter && minExperience !== undefined && maxExperience !== undefined
       ? [Number(minExperience), Number(maxExperience)]
       : undefined;
 
