@@ -2,7 +2,7 @@ import Image from "next/image";
 import React from "react";
 import { cn } from "@/utils/class-name";
 
-interface CompaniesLoaderProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'width' | 'height'> {
+interface CompaniesLoaderProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'width' | 'height' | 'src'> {
     className?: string;
 }
 
