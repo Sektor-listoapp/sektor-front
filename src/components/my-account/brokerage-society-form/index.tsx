@@ -38,7 +38,7 @@ import {
 } from "@/lib/sektor-api/queries";
 import LocalRecognitionsInput from "../local-recognitions-input";
 import LocalWorkTeamInput from "../local-work-team-input";
-import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
+import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import LocalClientsInput from "../local-clients-input";
 import LocalOfficesInput from "../local-offices-input";
 import { FormProps } from "@/types/forms";
@@ -551,7 +551,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     >
       {showLoading && (
         <div className="w-full absolute left-0 top-0 z-50 bg-white bg-opacity-90 h-full flex justify-center">
-          <SektorFullVerticalLogo className="w-20 animate-pulse md:w-24" />
+          <FullScreenLoaderLogo className="w-20 md:w-24" />
         </div>
       )}
 

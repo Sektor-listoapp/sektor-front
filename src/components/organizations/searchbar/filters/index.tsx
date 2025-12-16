@@ -93,6 +93,18 @@ const OrganizationFilters = () => {
     Number(maxExperience),
   ]);
 
+
+  useEffect(() => {
+    setAgeRange([Number(minAge), Number(maxAge)]);
+    setExperienceRange([Number(minExperience), Number(maxExperience)]);
+    if (state && typeof state === 'string') {
+      setSelectedStateId(state);
+    }
+    if (city && typeof city === 'string') {
+      setSelectedCityId(city);
+    }
+  }, [minAge, maxAge, minExperience, maxExperience, state, city]);
+
   const handleFilterChange = (key: string, value: string) => {
     replace({ query: { ...query, [key]: value } }, undefined, {
       scroll: false,
@@ -100,17 +112,22 @@ const OrganizationFilters = () => {
   };
 
   const handleShowDrawer = () => {
-    const rangeQueries = getRangeQueries({
-      ageRange,
-      experienceRange,
-      organizationType,
-    });
+
+    const hasAgeInQuery = 'minAge' in query || 'maxAge' in query;
+    const hasExperienceInQuery = 'minExperience' in query || 'maxExperience' in query;
+
+    if (hasAgeInQuery || hasExperienceInQuery) {
+      const rangeQueries = getRangeQueries({
+        ageRange,
+        experienceRange,
+        organizationType,
+      });
+      replace({ query: { ...query, ...rangeQueries } }, undefined, {
+        scroll: false,
+      });
+    }
 
     setOpenDrawer(true);
-
-    replace({ query: { ...query, ...rangeQueries } }, undefined, {
-      scroll: false,
-    });
   };
 
   const handleResetFilters = () => {
@@ -262,6 +279,7 @@ const OrganizationFilters = () => {
             {checkAllowedFilter(organizationType, AGE_RANGE) && (
               <Range
                 label="Edad"
+                min={0}
                 max={70}
                 value={ageRange}
                 minRangeLabel={`${ageRange[0]} años`}

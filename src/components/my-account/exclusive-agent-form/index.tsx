@@ -40,7 +40,7 @@ import {
   PUBLIC_INSURANCE_BROKERS_QUERY,
   PUBLIC_INSURANCE_COMPANIES_QUERY,
 } from "@/lib/sektor-api/queries";
-import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
+import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { FormProps } from "@/types/forms";
 import SocialMediaInput from "../social-media-input";
 import LocalOfficesInput from "../local-offices-input";
@@ -481,7 +481,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     >
       {showLoading && (
         <div className="w-full absolute left-0 top-0 z-50 bg-white bg-opacity-90 h-full flex justify-center">
-          <SektorFullVerticalLogo className="w-20 animate-pulse md:w-24" />
+          <FullScreenLoaderLogo className="w-20 md:w-24" />
         </div>
       )}
       <div className="w-full flex flex-col gap-7 md:gap-10 md:grid md:grid-cols-2">

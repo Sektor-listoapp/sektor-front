@@ -29,15 +29,15 @@ const usePublicOrganizations = ({
       variables: {
         pagination: { offset: 0, limit: 6 },
         ...currentFilters,
-        state: "Distrito Capital",  
-        city: "Caracas", 
+        state: "Distrito Capital",
+        city: "Caracas",
         ...variables,
       },
     }
   );
 
 
-  
+
 
   const setPublicBrokerageSocieties = usePublicOrganizationsStore(
     (state) => state.setPublicBrokerageSocieties
@@ -75,7 +75,24 @@ const usePublicOrganizations = ({
   const handleGetPublicOrganizations = async () => {
     setIsLoadingPublicOrganizations(true);
     try {
-      const { data } = await getPublicOrganizations();
+
+      const updatedFilters = getCurrentFiltersFromQuery(query);
+
+
+      const variablesToSend = {
+        pagination: { offset: 0, limit: 6 },
+        ...updatedFilters,
+        state: "Distrito Capital",
+        city: "Caracas",
+        ...variables,
+      };
+
+
+
+      const { data } = await getPublicOrganizations(variablesToSend);
+
+  
+
       setPublicOrganizations(data);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
@@ -92,12 +109,16 @@ const usePublicOrganizations = ({
     const currentFilters = getCurrentFiltersFromQuery(query ?? {});
     setIsLoadingPublicOrganizations(true);
     try {
-      const { data } = await getPublicOrganizations({
+      const variablesToSend = {
         pagination: { offset: 0, limit },
         ...currentFilters,
-      });
+      };
 
-    
+
+      const { data } = await getPublicOrganizations(variablesToSend);
+
+
+
       setPublicOrganizations(data);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
