@@ -1,4 +1,4 @@
-import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
+import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { ROUTES } from "@/constants/router";
 import { Query } from "@/lib/sektor-api/__generated__/types";
 import { PROFILE_QUERY } from "@/lib/sektor-api/queries";
@@ -32,7 +32,7 @@ const withAuth = (Component) => {
     if (loading) {
       return (
         <div className="flex justify-center items-center h-screen">
-          <SektorFullVerticalLogo className="animate-pulse transition-all w-28 text-blue-500" />
+          <FullScreenLoaderLogo className="w-28" />
         </div>
       );
     }

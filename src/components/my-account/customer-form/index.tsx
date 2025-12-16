@@ -10,7 +10,7 @@ import Button from "@/components/ui/button";
 import { ADMIN_UPDATE_USER_EMAIL, UPDATE_CUSTOMER, UPDATE_EMAIL } from "@/lib/sektor-api/mutations";
 import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import { SELECT_GENRE_OPTIONS } from "@/constants/forms";
-import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
+import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { CUSTOMER_BY_ID_QUERY } from "@/lib/sektor-api/queries/auth/customer-by-id";
 import { faPerson, faPersonHalfDress, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FormProps } from "@/types/forms";
@@ -190,7 +190,7 @@ const CustomerForm = ({ userId }: CustomerIdProps) => {
     >
       {showLoading && (
         <div className="w-full absolute left-0 top-0 z-50 bg-white bg-opacity-90 h-full flex justify-center">
-          <SektorFullVerticalLogo className="w-20 animate-pulse md:w-24" />
+          <FullScreenLoaderLogo className="w-20 md:w-24" />
         </div>
       )}
       <div className="w-full flex flex-col gap-7 md:gap-10 md:grid md:grid-cols-2">

@@ -1,4 +1,4 @@
-import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
+import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { cn } from "@/utils/class-name";
 import React from "react";
 
@@ -14,7 +14,7 @@ const FullScreenLoader = ({
       )}
       {...props}
     >
-      <SektorFullHorizontalLogo className="w-48 animate-pulse" />
+      <FullScreenLoaderLogo className="w-48" />
     </div>
   );
 };

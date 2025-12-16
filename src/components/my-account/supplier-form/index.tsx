@@ -30,7 +30,7 @@ import {
 import { ADMIN_UPDATE_USER_EMAIL, UPDATE_EMAIL } from "@/lib/sektor-api/mutations";
 import LocalOfficesInput from "../local-offices-input";
 import Select from "@/components/ui/select";
-import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
+import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import UploadInput from "@/components/ui/upload-input";
 import { FormProps } from "@/types/forms";
 import SocialMediaInput from "../social-media-input";
@@ -397,7 +397,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     >
       {showLoading && (
         <div className="w-full absolute left-0 top-0 z-50 bg-white bg-opacity-90 h-full flex justify-center">
-          <SektorFullVerticalLogo className="w-20 animate-pulse md:w-24" />
+          <FullScreenLoaderLogo className="w-20 md:w-24" />
         </div>
       )}
       <div className="w-full flex flex-col gap-7 md:gap-10 md:grid md:grid-cols-2">
@@ -414,16 +414,16 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
           error={!requiredFields.name}
         />
         <div className="col-span-1 flex flex-col gap-2">
-        <TextInput
-          name="email"
-          className="col-span-1"
-          placeholder="Correo electrónico"
-          showFloatingLabel
-          disabled={loadingSupplier || isUpdatingSupplier}
-          onChange={(e) => handleInputChange("email", e.target.value)}
-          value={input?.email}
-          error={!requiredFields.email}
-        />
+          <TextInput
+            name="email"
+            className="col-span-1"
+            placeholder="Correo electrónico"
+            showFloatingLabel
+            disabled={loadingSupplier || isUpdatingSupplier}
+            onChange={(e) => handleInputChange("email", e.target.value)}
+            value={input?.email}
+            error={!requiredFields.email}
+          />
           {isSelfUpdate && emailChanged && (
             <div className="col-span-1">
               <div className="relative w-full">

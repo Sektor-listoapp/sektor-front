@@ -5,7 +5,7 @@ import { QUOTES_QUERY } from "@/lib/sektor-api/queries";
 import QuotesTable from "./table";
 import QuotesAccordion from "./accordion";
 import QuotesHeader from "./header";
-import SektorFullVerticalLogo from "../icons/sektor-full-vertical-logo";
+import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { useAuthStore } from "@/store/auth";
 import { Query, QuoteType } from "@/lib/sektor-api/__generated__/types";
 import NoQuotes from "./no-quotes";
@@ -51,7 +51,7 @@ const QuoteList = () => {
 
       {isLoadingQuotes && (
         <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-white bg-opacity-40 z-50">
-          <SektorFullVerticalLogo className="w-32 animate-pulse" />
+          <FullScreenLoaderLogo className="w-32" />
         </div>
       )}
 

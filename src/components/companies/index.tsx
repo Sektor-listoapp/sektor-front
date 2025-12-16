@@ -21,7 +21,7 @@ import { toast } from "react-toastify";
 import CompaniesAccordion from "./accordion";
 import CompaniesHeader from "./header";
 import NoCompanies from "./no-companies";
-import SektorFullVerticalLogo from "../icons/sektor-full-vertical-logo";
+import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import DeleteOrgModal from "./delete-org-modal";
 
 const CompanyList = () => {
@@ -124,7 +124,7 @@ const CompanyList = () => {
 
         {isLoadingCompanies && (
           <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-white bg-opacity-40 z-50">
-            <SektorFullVerticalLogo className="w-32 animate-pulse" />
+            <FullScreenLoaderLogo className="w-32" />
           </div>
         )}
 
