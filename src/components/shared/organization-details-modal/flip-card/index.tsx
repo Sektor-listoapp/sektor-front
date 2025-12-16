@@ -10,7 +10,7 @@ import { toast } from "react-toastify";
 
 interface OrganizationFlipCardProps {
   logoUrl: string;
-  // license: string;
+  license?: string;
   heading: string;
   yearsOfExperience?: string;
   serviceType?: string;
@@ -19,7 +19,7 @@ interface OrganizationFlipCardProps {
 const OrganizationFlipCard = ({
   heading,
   logoUrl,
-  // license,
+  license,
   yearsOfExperience,
   serviceType,
 }: OrganizationFlipCardProps) => {
@@ -47,11 +47,11 @@ const OrganizationFlipCard = ({
               height={350}
               width={350}
             />
-              {/* {license && (
+              {license && (
                 <div className="absolute bottom-3 left-3 bg-blue-500 text-white font-semibold rounded-xl px-5 py-2 text-lg shadow-md">
                   {license}
                 </div>
-              )} */}
+              )}
           </div>
         ),
       }}
