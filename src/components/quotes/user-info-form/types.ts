@@ -3,7 +3,8 @@ import { FormEvent } from "react";
 export interface UserInfoFormInput {
   name: string;
   email: string;
-  location: string;
+  state: string;
+  city: string;
   phone: string;
   phoneCode: string;
   segment: string;
@@ -12,7 +13,8 @@ export interface UserInfoFormInput {
 export interface UserInfoFormInputErrors {
   name: string[];
   email: string[];
-  location: string[];
+  state: string[];
+  city: string[];
   phone: string[];
   phoneCode: string[];
   segment: string[];

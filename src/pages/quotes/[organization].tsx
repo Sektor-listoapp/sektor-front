@@ -3,7 +3,6 @@ import { useAuthStore } from "@/store/auth";
 import { useShallow } from "zustand/shallow";
 import { useRouter } from "next/router";
 import { QUOTE_FORM_MAP } from "@/components/quotes/constants";
-import withAuth from "@/components/shared/with-auth";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
 import Button from "@/components/ui/button";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -16,7 +15,8 @@ const QuotesPage = () => {
   const router = useRouter();
   const segmentQuery = (router?.query?.segment || "") as string;
   const QuoteForm = QUOTE_FORM_MAP?.[segmentQuery] || QUOTE_FORM_MAP.default;
-  const userName = useAuthStore(useShallow((state) => state.user?.name)) || "!";
+  const user = useAuthStore(useShallow((state) => state.user));
+  const userName = user?.name || "!";
 
   const goToHome = () => router.replace(ROUTES.HOME);
   const goBack = () => router.back();
@@ -78,4 +78,4 @@ const QuotesPage = () => {
   );
 };
 
-export default withAuth(QuotesPage);
+export default QuotesPage;
