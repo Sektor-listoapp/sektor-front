@@ -17,9 +17,21 @@ export const CLINICS_SIMPLE_QUERY = gql`
           reasonableExpensesApplicable
         }
         offices {
+          name
+          phone
           address {
+            street
             state {
               id
+              name
+            }
+            city {
+              id
+              name
+            }
+            country {
+              id
+              name
             }
           }
         }
