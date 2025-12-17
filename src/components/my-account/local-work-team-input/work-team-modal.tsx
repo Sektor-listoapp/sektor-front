@@ -2,17 +2,17 @@
 import React, { useEffect, useState } from "react";
 import Button from "@/components/ui/button";
 import TextInput from "@/components/ui/text-input";
-import { TeamMemberType } from "@/lib/sektor-api/__generated__/types";
+import { BrokerageSocietyTeamMemberType } from "@/lib/sektor-api/__generated__/types";
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Modal, ModalProps } from "antd";
 import Select from "@/components/ui/select";
 
 interface LocalWorkTeamModalProps extends ModalProps {
-  teamMemberToEdit?: TeamMemberType | undefined;
+  teamMemberToEdit?: BrokerageSocietyTeamMemberType | undefined;
   setOpenWorkTeamModal: (value: React.SetStateAction<boolean>) => void;
-  localWorkTeam: TeamMemberType[];
-  setLocalWorkTeam: React.Dispatch<React.SetStateAction<TeamMemberType[]>>;
+  localWorkTeam: BrokerageSocietyTeamMemberType[];
+  setLocalWorkTeam: React.Dispatch<React.SetStateAction<BrokerageSocietyTeamMemberType[]>>;
   options: any[];
 }
 
@@ -90,7 +90,7 @@ const LocalWorkTeamModal = ({
         id: input?.id,
         organization: input?.id,
         position: input?.position,
-      } as unknown as TeamMemberType,
+      } as unknown as BrokerageSocietyTeamMemberType,
     ]);
     handleClose();
   };

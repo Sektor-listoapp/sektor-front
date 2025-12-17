@@ -19,6 +19,7 @@ export type Scalars = {
 export type AddressInputType = {
   cityId: Scalars['Int']['input'];
   countryId: Scalars['Int']['input'];
+  placeId?: InputMaybe<Scalars['String']['input']>;
   stateId: Scalars['Int']['input'];
   street: Scalars['String']['input'];
 };
@@ -27,6 +28,7 @@ export type AddressType = {
   __typename?: 'AddressType';
   city: CityType;
   country: CountryType;
+  placeId?: Maybe<Scalars['String']['output']>;
   state: StateType;
   street: Scalars['String']['output'];
 };
@@ -98,6 +100,12 @@ export enum AutoUsageTypes {
   Pickup = 'Pickup',
   Rustic = 'Rustic'
 }
+
+export type BankType = {
+  __typename?: 'BankType';
+  code: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
 
 export type BasePublicOrganizationType = {
   coverageStates: Array<Scalars['Float']['output']>;
@@ -248,6 +256,12 @@ export type ClientLogoUpdateInputType = {
   logoUrl?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type ConfirmImmediateDebitInputType = {
+  holderName: Scalars['String']['input'];
+  otp: Scalars['String']['input'];
+  paymentId: Scalars['ID']['input'];
+};
+
 export type CountryType = {
   __typename?: 'CountryType';
   code: Scalars['String']['output'];
@@ -260,9 +274,17 @@ export type CreateModuleInputType = {
   applicablePlans: Array<SubscriptionPlan>;
   description?: InputMaybe<Scalars['String']['input']>;
   icon?: InputMaybe<Scalars['String']['input']>;
+  latest?: InputMaybe<Scalars['Boolean']['input']>;
+  order?: InputMaybe<Scalars['Int']['input']>;
   parentId?: InputMaybe<Scalars['ID']['input']>;
   title: Scalars['String']['input'];
 };
+
+/** Supported currencies */
+export enum Currency {
+  Usd = 'USD',
+  Ves = 'VES'
+}
 
 export type CustomerInputType = {
   birthdate?: InputMaybe<Scalars['DateTime']['input']>;
@@ -295,6 +317,13 @@ export enum DayOfWeek {
   Wednesday = 'Wednesday'
 }
 
+export type DirectDebitBillingDataInputType = {
+  bankCode: Scalars['String']['input'];
+  cedula: Scalars['String']['input'];
+  holderName: Scalars['String']['input'];
+  phone: Scalars['String']['input'];
+};
+
 export enum EntityType {
   Organization = 'Organization'
 }
@@ -303,6 +332,14 @@ export enum EventType {
   Click = 'Click',
   View = 'View'
 }
+
+export type ExchangeRateType = {
+  __typename?: 'ExchangeRateType';
+  from: Scalars['String']['output'];
+  rate: Scalars['Float']['output'];
+  timestamp: Scalars['DateTime']['output'];
+  to: Scalars['String']['output'];
+};
 
 export type ExclusiveAgentFilterType = {
   address?: InputMaybe<PublicOrganizationFilterAddressType>;
@@ -422,6 +459,43 @@ export type HealthQuoteType = {
   upToInsuranceAmount: Scalars['Int']['output'];
   updatedAt: Scalars['DateTime']['output'];
   vision: Scalars['Boolean']['output'];
+};
+
+export type ImmediateDebitBillingDataInputType = {
+  bankCode: Scalars['String']['input'];
+  cedula: Scalars['String']['input'];
+  holderName: Scalars['String']['input'];
+  phone: Scalars['String']['input'];
+};
+
+export type InitiateDirectDebitInputType = {
+  autoRenew: Scalars['Boolean']['input'];
+  billingData: DirectDebitBillingDataInputType;
+  period: SubscriptionPeriod;
+  plan: SubscriptionPlan;
+};
+
+export type InitiateImmediateDebitInputType = {
+  billingData: ImmediateDebitBillingDataInputType;
+  period: SubscriptionPeriod;
+  plan: SubscriptionPlan;
+};
+
+export type InitiateMobilePaymentInputType = {
+  billingData: MobilePaymentBillingDataInputType;
+  period: SubscriptionPeriod;
+  plan: SubscriptionPlan;
+};
+
+export type InitiatePaymentResultType = {
+  __typename?: 'InitiatePaymentResultType';
+  amountUsd: Scalars['Float']['output'];
+  amountVes: Scalars['Float']['output'];
+  exchangeRate: Scalars['Float']['output'];
+  expiresAt?: Maybe<Scalars['DateTime']['output']>;
+  message?: Maybe<Scalars['String']['output']>;
+  mobilePaymentData?: Maybe<MobilePaymentDataType>;
+  payment: PaymentType;
 };
 
 export type InsuranceBrokerFilterType = {
@@ -578,6 +652,24 @@ export type LoginResponseType = {
   user: UserType;
 };
 
+export type MobilePaymentBillingDataInputType = {
+  bankCode: Scalars['String']['input'];
+  cedula: Scalars['String']['input'];
+  holderName: Scalars['String']['input'];
+  phone: Scalars['String']['input'];
+  referenceCode: Scalars['String']['input'];
+};
+
+export type MobilePaymentDataType = {
+  __typename?: 'MobilePaymentDataType';
+  amount: Scalars['Float']['output'];
+  bankCode: Scalars['String']['output'];
+  bankName: Scalars['String']['output'];
+  phone: Scalars['String']['output'];
+  reference: Scalars['String']['output'];
+  rif: Scalars['String']['output'];
+};
+
 export type ModuleFileType = {
   __typename?: 'ModuleFileType';
   _id: Scalars['ID']['output'];
@@ -606,6 +698,8 @@ export type ModuleType = {
   description?: Maybe<Scalars['String']['output']>;
   files: Array<ModuleFileType>;
   icon?: Maybe<Scalars['String']['output']>;
+  latest?: Maybe<Scalars['Boolean']['output']>;
+  order?: Maybe<Scalars['Int']['output']>;
   parent?: Maybe<ModuleType>;
   parentId?: Maybe<Scalars['ID']['output']>;
   title: Scalars['String']['output'];
@@ -615,6 +709,7 @@ export type ModuleType = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  adminDeleteUser: Scalars['Boolean']['output'];
   adminUpdateUserEmail: UpdateEmailResponseType;
   batchUpdateExclusiveAgentClientLogos: ExclusiveAgentType;
   batchUpdateExclusiveAgentClientLogosWithFiles: ExclusiveAgentType;
@@ -624,16 +719,27 @@ export type Mutation = {
   changeOrganizationFeature: PublicOrganizationType;
   changeOrganizationPlan: OrganizationType;
   changeOrganizationVisibility: OrganizationType;
+  /** Step 2: Confirm immediate debit with OTP code. */
+  confirmImmediateDebit: InitiatePaymentResultType;
   createModule: ModuleType;
   createNews: NewsType;
   createTracking: TrackingType;
   deleteFileFromModule: ModuleType;
   deleteModule: Scalars['Boolean']['output'];
+  deleteMyAccount: Scalars['Boolean']['output'];
   deleteNews: Scalars['Boolean']['output'];
   deleteOrganization: Scalars['Boolean']['output'];
   deleteTracking: Scalars['Boolean']['output'];
+  /** Process direct debit payment with optional auto-renewal. */
+  initiateDirectDebit: InitiatePaymentResultType;
+  /** Step 1: Initiate immediate debit. Sends OTP to customer phone. */
+  initiateImmediateDebit: OtpResultType;
+  /** Initiate mobile payment (Pago Móvil). User provides referenceCode in billingData which will be matched with webhook Referencia field. */
+  initiateMobilePayment: InitiatePaymentResultType;
   login: LoginResponseType;
+  markAllNotificationsAsRead: Scalars['Int']['output'];
   markAsRead?: Maybe<QuoteType>;
+  markNotificationAsRead?: Maybe<NotificationType>;
   refreshToken: Scalars['String']['output'];
   registerAsBrokerageSociety: RegisterAsOrganizationResponseType;
   registerAsCustomer: RegisterAsCustomerResponseType;
@@ -641,6 +747,7 @@ export type Mutation = {
   registerAsInsuranceBroker: RegisterAsOrganizationResponseType;
   registerAsInsuranceCompany: RegisterAsOrganizationResponseType;
   registerAsSupplier: RegisterAsOrganizationResponseType;
+  registerDevice: Scalars['Boolean']['output'];
   requestAutoQuote: AutoQuoteType;
   requestHealthQuote: HealthQuoteType;
   requestOtherQuote: OtherQuoteType;
@@ -652,6 +759,7 @@ export type Mutation = {
   sendPasswordResetRequest: Scalars['Boolean']['output'];
   sendVerificationEmail: Scalars['Boolean']['output'];
   submitNews: NewsType;
+  unregisterDevice: Scalars['Boolean']['output'];
   updateBrokerageSociety: BrokerageSocietyType;
   updateCustomer: CustomerType;
   updateEmail: UpdateEmailResponseType;
@@ -661,13 +769,21 @@ export type Mutation = {
   updateInsuranceBrokerClientLogo: InsuranceBrokerType;
   updateInsuranceCompany: InsuranceCompanyType;
   updateModule: ModuleType;
+  updateModuleOrder: ModuleType;
   updateNews?: Maybe<NewsType>;
+  updateNotificationPreferences: NotificationPreferencesType;
   updateOrganizationLogo: OrganizationType;
   updatePassword: Scalars['Boolean']['output'];
   updateSupplier: SupplierType;
   updateTracking?: Maybe<TrackingType>;
   uploadFileToModule: ModuleType;
+  uploadOfficesTemplate: Array<UploadFileTemplateResult>;
   uploadOrganizationTemplate: Array<UploadFileTemplateResult>;
+};
+
+
+export type MutationAdminDeleteUserArgs = {
+  userId: Scalars['String']['input'];
 };
 
 
@@ -719,6 +835,11 @@ export type MutationChangeOrganizationVisibilityArgs = {
 };
 
 
+export type MutationConfirmImmediateDebitArgs = {
+  input: ConfirmImmediateDebitInputType;
+};
+
+
 export type MutationCreateModuleArgs = {
   input: CreateModuleInputType;
 };
@@ -746,6 +867,11 @@ export type MutationDeleteModuleArgs = {
 };
 
 
+export type MutationDeleteMyAccountArgs = {
+  password: Scalars['String']['input'];
+};
+
+
 export type MutationDeleteNewsArgs = {
   id: Scalars['String']['input'];
 };
@@ -761,12 +887,32 @@ export type MutationDeleteTrackingArgs = {
 };
 
 
+export type MutationInitiateDirectDebitArgs = {
+  input: InitiateDirectDebitInputType;
+};
+
+
+export type MutationInitiateImmediateDebitArgs = {
+  input: InitiateImmediateDebitInputType;
+};
+
+
+export type MutationInitiateMobilePaymentArgs = {
+  input: InitiateMobilePaymentInputType;
+};
+
+
 export type MutationLoginArgs = {
   input: LoginInputType;
 };
 
 
 export type MutationMarkAsReadArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type MutationMarkNotificationAsReadArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -803,6 +949,11 @@ export type MutationRegisterAsInsuranceCompanyArgs = {
 
 export type MutationRegisterAsSupplierArgs = {
   input: RegisterAsSupplierInputType;
+};
+
+
+export type MutationRegisterDeviceArgs = {
+  input: RegisterDeviceInputType;
 };
 
 
@@ -862,6 +1013,11 @@ export type MutationSubmitNewsArgs = {
 };
 
 
+export type MutationUnregisterDeviceArgs = {
+  token: Scalars['String']['input'];
+};
+
+
 export type MutationUpdateBrokerageSocietyArgs = {
   input: BrokerageSocietyInputType;
 };
@@ -912,10 +1068,21 @@ export type MutationUpdateModuleArgs = {
 };
 
 
+export type MutationUpdateModuleOrderArgs = {
+  id: Scalars['ID']['input'];
+  order: Scalars['Int']['input'];
+};
+
+
 export type MutationUpdateNewsArgs = {
   id: Scalars['String']['input'];
   input: NewsInputType;
   photo?: InputMaybe<Scalars['File']['input']>;
+};
+
+
+export type MutationUpdateNotificationPreferencesArgs = {
+  input: UpdateNotificationPreferencesInputType;
 };
 
 
@@ -947,6 +1114,12 @@ export type MutationUploadFileToModuleArgs = {
 };
 
 
+export type MutationUploadOfficesTemplateArgs = {
+  file: Scalars['String']['input'];
+  organizationId: Scalars['String']['input'];
+};
+
+
 export type MutationUploadOrganizationTemplateArgs = {
   file: Scalars['String']['input'];
 };
@@ -968,9 +1141,9 @@ export type NewsInputType = {
   pendingApproval?: InputMaybe<Scalars['Boolean']['input']>;
   title: Scalars['String']['input'];
   type: NewsEntryType;
-  uploadedBy: NewsUploadedBy;
+  uploadedBy?: InputMaybe<NewsUploadedBy>;
   videoUrl?: InputMaybe<Scalars['String']['input']>;
-  visibility: NewsVisibility;
+  visibility?: InputMaybe<NewsVisibility>;
 };
 
 export type NewsListGroupedType = {
@@ -1007,6 +1180,38 @@ export enum NewsVisibility {
   Public = 'Public',
   RoleBased = 'RoleBased'
 }
+
+export enum NotificationKind {
+  ContactViewed = 'ContactViewed',
+  QuoteReceived = 'QuoteReceived'
+}
+
+export type NotificationPreferencesType = {
+  __typename?: 'NotificationPreferencesType';
+  enablePush: Scalars['Boolean']['output'];
+  enabledTypes: Array<NotificationKind>;
+};
+
+export type NotificationType = {
+  __typename?: 'NotificationType';
+  createdAt: Scalars['DateTime']['output'];
+  data?: Maybe<Scalars['String']['output']>;
+  expiresAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  message: Scalars['String']['output'];
+  readAt?: Maybe<Scalars['DateTime']['output']>;
+  title: Scalars['String']['output'];
+  type: NotificationKind;
+  updatedAt: Scalars['DateTime']['output'];
+  userId: Scalars['String']['output'];
+};
+
+export type NotificationsPaginatedType = {
+  __typename?: 'NotificationsPaginatedType';
+  notifications: Array<NotificationType>;
+  total: Scalars['Float']['output'];
+  unreadCount: Scalars['Float']['output'];
+};
 
 export type OrganizationClientInputType = {
   id?: InputMaybe<Scalars['String']['input']>;
@@ -1050,6 +1255,7 @@ export enum OrganizationModality {
 export type OrganizationOfficeInputType = {
   address: AddressInputType;
   id: Scalars['String']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
   photoUrl?: InputMaybe<Scalars['String']['input']>;
   schedule: Array<OrganizationOfficeScheduleInputType>;
@@ -1076,6 +1282,7 @@ export type OrganizationOfficeType = {
   __typename?: 'OrganizationOfficeType';
   address: AddressType;
   id: Scalars['String']['output'];
+  name?: Maybe<Scalars['String']['output']>;
   phone?: Maybe<Scalars['String']['output']>;
   photoUrl?: Maybe<Scalars['String']['output']>;
   schedule: Array<OrganizationOfficeScheduleType>;
@@ -1105,6 +1312,7 @@ export type OrganizationType = {
   identification?: Maybe<Scalars['String']['output']>;
   isActive: Scalars['Boolean']['output'];
   lineOfBusiness: Array<OrganizationLineOfBusiness>;
+  logoUrlPresigned?: Maybe<Scalars['String']['output']>;
   modality: OrganizationModality;
   name: Scalars['String']['output'];
   plan: OrganizationPlans;
@@ -1143,11 +1351,55 @@ export type OtherQuoteType = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type OtpResultType = {
+  __typename?: 'OtpResultType';
+  message: Scalars['String']['output'];
+  otpSent: Scalars['Boolean']['output'];
+  payment: PaymentType;
+};
+
 export type PaginationType = {
   limit: Scalars['Int']['input'];
   offset: Scalars['Int']['input'];
   sortField?: InputMaybe<Scalars['String']['input']>;
   sortOrder?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Available payment methods */
+export enum PaymentMethod {
+  DirectDebit = 'DirectDebit',
+  ImmediateDebit = 'ImmediateDebit',
+  MobilePayment = 'MobilePayment'
+}
+
+/** Payment transaction status */
+export enum PaymentStatus {
+  Completed = 'Completed',
+  Expired = 'Expired',
+  Failed = 'Failed',
+  Pending = 'Pending',
+  Processing = 'Processing',
+  Refunded = 'Refunded'
+}
+
+export type PaymentType = {
+  __typename?: 'PaymentType';
+  amountUsd: Scalars['Float']['output'];
+  amountVes: Scalars['Float']['output'];
+  concept?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  currency: Currency;
+  errorMessage?: Maybe<Scalars['String']['output']>;
+  exchangeRate: Scalars['Float']['output'];
+  expiresAt?: Maybe<Scalars['DateTime']['output']>;
+  externalReference?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  internalReference?: Maybe<Scalars['String']['output']>;
+  method: PaymentMethod;
+  paidAt?: Maybe<Scalars['DateTime']['output']>;
+  status: PaymentStatus;
+  subscriptionPeriod: SubscriptionPeriod;
+  subscriptionPlan: SubscriptionPlan;
 };
 
 export type PropertyQuoteInputType = {
@@ -1220,21 +1472,36 @@ export type Query = {
   adminUserById?: Maybe<AdminType>;
   adminUsers: Array<AdminType>;
   allModules: Array<ModuleType>;
+  /** Admin: Get all payments */
+  allPayments: Array<PaymentType>;
   autoQuoteById: AutoQuoteType;
+  /** Get list of available banks */
+  banks: Array<BankType>;
   clinics: SupplierPaginatedType;
   customerById: CustomerType;
+  /** Get current USD to VES exchange rate */
+  exchangeRate: ExchangeRateType;
   getCountryByCode?: Maybe<CountryType>;
   healthQuoteById: HealthQuoteType;
   homeNews: Array<NewsType>;
   insuranceCompaniesByClinic: Array<Scalars['String']['output']>;
   moduleById?: Maybe<ModuleType>;
   modules: Array<ModuleType>;
+  /** Get payment history for current user/organization */
+  myPayments: Array<PaymentType>;
   news: Array<NewsType>;
   newsAndInterviewsList: NewsListGroupedType;
   newsById?: Maybe<NewsType>;
+  newsUserById?: Maybe<UserType>;
+  newsUsers: Array<UserType>;
+  notificationPreferences: NotificationPreferencesType;
+  notifications: NotificationsPaginatedType;
+  officesTemplate: FileTemplateType;
   organizationById: OrganizationType;
   organizationTemplate: FileTemplateType;
   otherQuoteById: OtherQuoteType;
+  /** Get payment by ID */
+  payment?: Maybe<PaymentType>;
   profile: UserType;
   propertyQuoteById: PropertyQuoteType;
   publicBrokerageSocieties: BrokerageSocietyPaginatedType;
@@ -1251,9 +1518,12 @@ export type Query = {
   quoteById?: Maybe<QuoteType>;
   quotes: QuotePaginatedType;
   searchOrganizations: OrganizationPaginatedType;
+  /** Get subscription prices */
+  subscriptionPrices: Array<SubscriptionPriceType>;
   trackingByEntityId: Array<TrackingType>;
   trackingByEventType: Array<TrackingType>;
   trackingById?: Maybe<TrackingType>;
+  unreadNotificationCount: Scalars['Int']['output'];
 };
 
 
@@ -1264,6 +1534,11 @@ export type QueryAdminUserByIdArgs = {
 
 export type QueryAllModulesArgs = {
   filter?: InputMaybe<ModuleFilterInputType>;
+};
+
+
+export type QueryAllPaymentsArgs = {
+  organizationId?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1318,12 +1593,27 @@ export type QueryNewsByIdArgs = {
 };
 
 
+export type QueryNewsUserByIdArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryNotificationsArgs = {
+  pagination?: InputMaybe<PaginationType>;
+};
+
+
 export type QueryOrganizationByIdArgs = {
   id: Scalars['String']['input'];
 };
 
 
 export type QueryOtherQuoteByIdArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryPaymentArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -1551,8 +1841,14 @@ export type RegisterAsOrganizationResponseType = {
 export type RegisterAsSupplierInputType = {
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
+  offices?: InputMaybe<Array<OrganizationOfficeInputType>>;
   password: Scalars['String']['input'];
   serviceType: ServiceSupplierTypes;
+};
+
+export type RegisterDeviceInputType = {
+  platform: Scalars['String']['input'];
+  token: Scalars['String']['input'];
 };
 
 export type RegisterRequestInsuranceCompanyInputType = {
@@ -1631,6 +1927,12 @@ export type StudyType = {
   title: Scalars['String']['output'];
 };
 
+/** Subscription billing period */
+export enum SubscriptionPeriod {
+  Annual = 'Annual',
+  Monthly = 'Monthly'
+}
+
 export enum SubscriptionPlan {
   Bronze = 'Bronze',
   Diamond = 'Diamond',
@@ -1638,11 +1940,21 @@ export enum SubscriptionPlan {
   Gold = 'Gold'
 }
 
+export type SubscriptionPriceType = {
+  __typename?: 'SubscriptionPriceType';
+  annualPriceUsd: Scalars['Float']['output'];
+  annualPriceVes?: Maybe<Scalars['Float']['output']>;
+  monthlyPriceUsd: Scalars['Float']['output'];
+  monthlyPriceVes?: Maybe<Scalars['Float']['output']>;
+  plan: SubscriptionPlan;
+};
+
 export type SupplierFilterType = {
   address?: InputMaybe<PublicOrganizationFilterAddressType>;
   lineOfBusiness?: InputMaybe<OrganizationLineOfBusiness>;
   modality?: InputMaybe<OrganizationModality>;
   name?: InputMaybe<Scalars['String']['input']>;
+  office?: InputMaybe<Scalars['String']['input']>;
   serviceType?: InputMaybe<Scalars['String']['input']>;
   stateId?: InputMaybe<Scalars['Float']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
@@ -1739,15 +2051,6 @@ export type TrackingInputType = {
   user?: InputMaybe<TrackingUserInputType>;
 };
 
-export type TeamMemberType = {
-  __typename?: 'TeamMemberType';
-  id: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  photoUrl?: Maybe<Scalars['String']['output']>;
-  position: Scalars['String']['output'];
-  organization: PublicOrganizationType;
-};
-
 export type TrackingType = {
   __typename?: 'TrackingType';
   _id: Scalars['String']['output'];
@@ -1794,7 +2097,14 @@ export type UpdateModuleInputType = {
   applicablePlans?: InputMaybe<Array<SubscriptionPlan>>;
   description?: InputMaybe<Scalars['String']['input']>;
   icon?: InputMaybe<Scalars['String']['input']>;
+  latest?: InputMaybe<Scalars['Boolean']['input']>;
+  order?: InputMaybe<Scalars['Int']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateNotificationPreferencesInputType = {
+  enablePush?: InputMaybe<Scalars['Boolean']['input']>;
+  enabledTypes?: InputMaybe<Array<NotificationKind>>;
 };
 
 export type UpdatePasswordInputType = {
@@ -1815,7 +2125,8 @@ export type UploadFileTemplateResult = {
 export enum UserGroups {
   Admin = 'Admin',
   Customer = 'Customer',
-  Member = 'Member'
+  Member = 'Member',
+  News = 'News'
 }
 
 export type UserType = {

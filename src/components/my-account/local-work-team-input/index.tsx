@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { faPen, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Select } from "antd";
-import { TeamMemberType } from "@/lib/sektor-api/__generated__/types";
+import { BrokerageSocietyTeamMemberType } from "@/lib/sektor-api/__generated__/types";
 import { useLocalStorage } from "@uidotdev/usehooks";
 import LocalWorkTeamModal from "./work-team-modal";
 import Image from "next/image";
 
 interface RecognitionsInputProps {
-  workTeam: TeamMemberType[];
+  workTeam: BrokerageSocietyTeamMemberType[];
   disabled?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   options: any[];
@@ -26,7 +26,7 @@ const LocalWorkTeamInput = ({
 
   const [openWorkTeamModal, setOpenWorkTeamModal] = useState(false);
   const [teamMemberToEdit, setTeamMemberToEdit] = useState<
-    TeamMemberType | null | undefined
+    BrokerageSocietyTeamMemberType | null | undefined
   >(null);
 
   const localWorkTeamOptions = localWorkTeam.map((teamMember) => {

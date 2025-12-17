@@ -3,9 +3,9 @@ import React from "react";
 import { cn } from "@/utils/class-name";
 import Image from "next/image";
 import {
+  BrokerageSocietyTeamMemberType,
   OrganizationClientType,
   PublicOrganizationType,
-  TeamMemberType,
 } from "@/lib/sektor-api/__generated__/types";
 import { useRouter } from "next/router";
 import { ROUTES } from "@/constants/router";
@@ -13,7 +13,7 @@ import { ROUTES } from "@/constants/router";
 interface OrganizationPartnersProps
   extends React.HTMLAttributes<HTMLDivElement> {
   partners: Array<
-    OrganizationClientType | PublicOrganizationType | TeamMemberType
+    OrganizationClientType | PublicOrganizationType | BrokerageSocietyTeamMemberType
   >;
 }
 

@@ -25,3 +25,8 @@ export * from "./companies/change-organization-plan";
 export * from "./companies/change-organization-visibility";
 export * from "./companies/delete-organization";
 export * from "./tracking/create-tracking";
+export * from "./herramientas/create-module";
+export * from "./herramientas/update-module";
+export * from "./herramientas/delete-module";
+export * from "./herramientas/upload-file-to-module";
+export * from "./herramientas/delete-file-from-module";
