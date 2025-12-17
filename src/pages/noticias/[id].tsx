@@ -9,6 +9,7 @@ import { NEWS_BY_ID_QUERY } from "@/lib/sektor-api/queries";
 import { Query, NewsUploadedBy } from "@/lib/sektor-api/__generated__/types";
 import { ROUTES } from "@/constants/router";
 import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
+import { quillDeltaToHtml } from "@/utils/quill-delta-to-html";
 
 const NoticiaDetalle = () => {
     const router = useRouter();
@@ -105,9 +106,12 @@ const NoticiaDetalle = () => {
 
 
                     <article className="prose prose-lg max-w-none">
-                        <div className="text-gray-700 whitespace-pre-wrap leading-relaxed text-base">
-                            {news.description}
-                        </div>
+                        <div
+                            className="text-gray-700 leading-relaxed text-base"
+                            dangerouslySetInnerHTML={{
+                                __html: quillDeltaToHtml(news.description)
+                            }}
+                        />
                     </article>
                 </div>
             </main>

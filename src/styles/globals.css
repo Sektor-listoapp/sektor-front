@@ -62,3 +62,15 @@ body {
 }
 
 
+.ant-upload-wrapper,
+.ant-upload {
+  width: 100% !important;
+  display: block !important;
+}
+
+.upload-full-width .ant-upload-wrapper,
+.upload-full-width .ant-upload {
+  width: 100% !important;
+  display: block !important;
+}
+

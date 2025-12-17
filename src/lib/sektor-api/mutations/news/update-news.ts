@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const NEWS_BY_ID_QUERY = gql`
-  query newsById($id: String!) {
-    newsById(id: $id) {
+export const UPDATE_NEWS = gql`
+  mutation updateNews($id: String!, $input: NewsInputType!, $photo: File) {
+    updateNews(id: $id, input: $input, photo: $photo) {
       id
       title
       description
@@ -19,3 +19,4 @@ export const NEWS_BY_ID_QUERY = gql`
     }
   }
 `;
+

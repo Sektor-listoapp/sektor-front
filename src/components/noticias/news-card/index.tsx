@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { NewsType } from "@/lib/sektor-api/__generated__/types";
 import { ROUTES } from "@/constants/router";
+import { quillDeltaToText } from "@/utils/quill-delta-to-text";
 
 interface NewsCardProps {
   news: NewsType;
@@ -31,7 +32,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ news, variant = "horizontal" }) => 
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
           <h3 className="text-xl font-bold mb-2">{news.title}</h3>
-          <p className="text-sm text-gray-200 line-clamp-2">{news.description}</p>
+          <p className="text-sm text-gray-200 line-clamp-2">{quillDeltaToText(news.description)}</p>
         </div>
       </article>
     );
@@ -76,7 +77,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ news, variant = "horizontal" }) => 
           <h3 className="text-blue-500 font-bold mb-2 group-hover:text-blue-400 transition-colors">
             {news.title}
           </h3>
-          <p className="text-gray-500 text-sm line-clamp-3">{news.description}</p>
+          <p className="text-gray-500 text-sm line-clamp-3">{quillDeltaToText(news.description)}</p>
         </div>
         <div className="flex items-center gap-4 text-xs text-gray-400">
           <span>{news.date}</span>

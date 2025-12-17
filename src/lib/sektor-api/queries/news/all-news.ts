@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
-export const NEWS_BY_ID_QUERY = gql`
-  query newsById($id: String!) {
-    newsById(id: $id) {
+export const ALL_NEWS_QUERY = gql`
+  query news($filter: NewsAdminFilterInputType) {
+    news(filter: $filter) {
       id
       title
       description
@@ -19,3 +19,4 @@ export const NEWS_BY_ID_QUERY = gql`
     }
   }
 `;
+
