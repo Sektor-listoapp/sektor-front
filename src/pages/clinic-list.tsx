@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { faMagnifyingGlass, faCaretLeft, faCaretRight } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass, faCaretLeft, faCaretRight, faCircleXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useQuery } from "@apollo/client";
+import { Modal } from "antd";
 import TextInput from "@/components/ui/text-input";
 import Navbar from '@/components/my-account/navbar';
 import {
@@ -9,10 +10,16 @@ import {
     STATES_QUERY,
     INSURANCE_COMPANIES_QUERY,
 } from "@/lib/sektor-api/queries";
-import { Query, SupplierType, StateType, InsuranceCompanyType, SupplierInsuranceCompanyRelationType } from "@/lib/sektor-api/__generated__/types";
+import { Query, SupplierType, StateType, InsuranceCompanyType, SupplierInsuranceCompanyRelationType, OrganizationOfficeType } from "@/lib/sektor-api/__generated__/types";
 import { CustomDropdown } from '@/components/ui/custom-dropdown';
 import CloseIcon from '@/components/icons/close-icon';
 import CheckIcon from '@/components/icons/check-icon';
+import Image from 'next/image';
+
+
+type OfficeWithName = OrganizationOfficeType & {
+    name?: string;
+};
 
 
 
@@ -23,9 +30,11 @@ const ClinicList = () => {
     const [selectedState, setSelectedState] = useState<string>("");
     console.log('selectedState: ', selectedState);
     const [selectedClinic, setSelectedClinic] = useState("");
+    const [selectedOfficeIndex, setSelectedOfficeIndex] = useState<number>(0);
 
     const [selectedInsurance, setSelectedInsurance] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
+    const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
 
     const { data: statesData, loading: isLoadingStates } = useQuery<Query>(STATES_QUERY, {
         variables: { code: "VE" },
@@ -96,17 +105,28 @@ const ClinicList = () => {
 
     type ClinicOption =
         | { label: string; value: string; disabled: true }
-        | { label: string; value: string; relations: SupplierInsuranceCompanyRelationType[] | undefined };
+        | { label: string; value: string; relations: SupplierInsuranceCompanyRelationType[] | undefined; officeIndex?: number };
 
     const clinicOptions: ClinicOption[] = isLoadingClinics
         ? [{ label: "Cargando clínicas...", value: "", disabled: true }]
         : allClinics.length > 0
-            ? allClinics
-                .map((clinic: SupplierType) => ({
-                    label: clinic.name,
+            ? allClinics.flatMap((clinic: SupplierType) => {
+                const offices = clinic.offices || [];
+                if (offices.length === 0) {
+                    return [{
+                        label: clinic.name,
+                        value: clinic.id?.toString() || "",
+                        relations: clinic.insuranceCompanyRelations,
+                        officeIndex: 0
+                    }];
+                }
+                return offices.map((office, index) => ({
+                    label: `${clinic.name}`,
                     value: clinic.id?.toString() || "",
-                    relations: clinic.insuranceCompanyRelations
-                }))
+                    relations: clinic.insuranceCompanyRelations,
+                    officeIndex: index
+                }));
+            })
                 .sort((a, b) => a.label.localeCompare(b.label))
             : selectedState
                 ? [{ label: `No hay clínicas en este estado`, value: "", disabled: true }]
@@ -151,6 +171,12 @@ const ClinicList = () => {
 
     const handleClinicChange = (value: string) => {
         setSelectedClinic(value);
+        const selectedOption = clinicOptions.find(opt => 'value' in opt && opt.value === value && 'officeIndex' in opt);
+        if (selectedOption && 'officeIndex' in selectedOption) {
+            setSelectedOfficeIndex(selectedOption.officeIndex || 0);
+        } else {
+            setSelectedOfficeIndex(0);
+        }
         setCurrentPage(1);
     };
 
@@ -338,7 +364,7 @@ const ClinicList = () => {
 
 
                     <div className="px-2 md:px-6 block md:hidden">
-                        <div className="w-full h-[120px] bg-white rounded-[20px] shadow-lg text-center py-2">
+                        <div className="w-full bg-white rounded-[20px] shadow-lg text-center py-2">
                             <h1>Tipo de Negociación</h1>
                             <div className="grid grid-cols-3 gap-4">
                                 <div className="flex flex-col items-center justify-center col-span-1 text-xs font-normal font-century-gothic">
@@ -423,8 +449,162 @@ const ClinicList = () => {
                                     </div>
                                 </div>
                             </div>
+
+
+                            {selectedClinic && (() => {
+                                const clinic = allClinics.find(c => c.id === selectedClinic);
+                                const offices = clinic?.offices || [];
+                                const selectedOffice = offices[selectedOfficeIndex] || offices[0];
+
+                                if (!selectedOffice) return null;
+
+                                const address = selectedOffice.address;
+                                const fullAddress = address ? [
+                                    address.street,
+                                    address.city?.name,
+                                    address.state?.name,
+                                    address.country?.name
+                                ].filter(Boolean).join(', ') : '';
+
+                                const googleMapsUrl = fullAddress
+                                    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`
+                                    : '#';
+
+                                return (
+                                    <>
+                                        <div className="w-full h-px bg-gray-300 my-4"></div>
+                                        <div className="grid grid-cols-3 gap-4 px-2 pb-2">
+                                            <div className="flex flex-col items-center justify-center col-span-1 text-xs font-normal font-century-gothic">
+                                                <div className="mb-2">Dirección</div>
+                                                {fullAddress ? (
+                                                    <a
+                                                        href={googleMapsUrl}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
+                                                    >
+                                                        <Image
+                                                            src="/images/location.webp"
+                                                            alt="Location"
+                                                            width={24}
+                                                            height={24}
+                                                        />
+                                                    </a>
+                                                ) : (
+                                                    <span className="text-gray-500 font-bold text-lg">-</span>
+                                                )}
+                                            </div>
+                                            <div className="flex flex-col items-center justify-center col-span-1 text-xs font-normal font-century-gothic">
+                                                <div className="mb-2">Oficina</div>
+                                                {(selectedOffice as OfficeWithName).name ? (
+                                                    <button
+                                                        onClick={() => setIsAddressModalOpen(true)}
+                                                        className="flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity bg-transparent border-none"
+                                                    >
+                                                        <Image
+                                                            src="/images/eye-1.webp"
+                                                            alt="Office"
+                                                            width={24}
+                                                            height={24}
+                                                        />
+                                                    </button>
+                                                ) : (
+                                                    <span className="text-gray-500 font-bold text-lg">-</span>
+                                                )}
+                                            </div>
+                                            <div className="flex flex-col items-center justify-center col-span-1 text-xs font-normal font-century-gothic">
+                                                <div className="mb-2">Teléfono</div>
+                                                {selectedOffice.phone ? (
+                                                    <div className="text-sm font-medium text-gray-800">
+                                                        {selectedOffice.phone}
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-gray-500 font-bold text-lg">-</span>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </>
+                                );
+                            })()}
                         </div>
                     </div>
+
+
+                    {selectedClinic && (() => {
+                        const clinic = allClinics.find(c => c.id === selectedClinic);
+                        const offices = clinic?.offices || [];
+                        const selectedOffice = offices[selectedOfficeIndex] || offices[0];
+
+                        if (!selectedOffice) return null;
+
+                        const address = selectedOffice.address;
+                        const fullAddress = address ? [
+                            address.street,
+                            address.city?.name,
+                            address.state?.name,
+                            address.country?.name
+                        ].filter(Boolean).join(', ') : '';
+
+                        const googleMapsUrl = fullAddress
+                            ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`
+                            : '#';
+
+                        return (
+                            <>
+                                <div className="w-full h-px bg-gray-300 my-6 hidden md:block"></div>
+                                <div className="hidden md:grid grid-cols-3 gap-4 px-2 md:px-6 pb-6">
+                                    <div className="flex flex-col items-center justify-center col-span-1 text-xs font-normal font-century-gothic">
+                                        <div className="mb-2">Dirección</div>
+                                        {fullAddress ? (
+                                            <a
+                                                href={googleMapsUrl}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity"
+                                            >
+                                                <Image
+                                                    src="/images/location.webp"
+                                                    alt="Location"
+                                                    width={24}
+                                                    height={24}
+                                                />
+                                            </a>
+                                        ) : (
+                                            <span className="text-gray-500 font-bold text-lg">-</span>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col items-center justify-center col-span-1 text-xs font-normal font-century-gothic">
+                                        <div className="mb-2">Oficina</div>
+                                        {(selectedOffice as OfficeWithName).name ? (
+                                            <button
+                                                onClick={() => setIsAddressModalOpen(true)}
+                                                className="flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity bg-transparent border-none"
+                                            >
+                                                <Image
+                                                    src="/images/eye-1.webp"
+                                                    alt="Office"
+                                                    width={24}
+                                                    height={24}
+                                                />
+                                            </button>
+                                        ) : (
+                                            <span className="text-gray-500 font-bold text-lg">-</span>
+                                        )}
+                                    </div>
+                                    <div className="flex flex-col items-center justify-center col-span-1 text-xs font-normal font-century-gothic">
+                                        <div className="mb-2">Teléfono</div>
+                                        {selectedOffice.phone ? (
+                                            <div className="text-sm font-medium text-gray-800">
+                                                {selectedOffice.phone}
+                                            </div>
+                                        ) : (
+                                            <span className="text-gray-500 font-bold text-lg">-</span>
+                                        )}
+                                    </div>
+                                </div>
+                            </>
+                        );
+                    })()}
                 </div>
 
 
@@ -452,6 +632,48 @@ const ClinicList = () => {
                     </button>
                 </div>
             </main>
+
+
+            {selectedClinic && (() => {
+                const clinic = allClinics.find(c => c.id === selectedClinic);
+                const offices = clinic?.offices || [];
+                const selectedOffice = offices[selectedOfficeIndex] || offices[0];
+
+                if (!selectedOffice) return null;
+
+                const address = selectedOffice.address;
+                const fullAddress = address ? [
+                    address.street,
+                    address.city?.name,
+                    address.state?.name,
+                    address.country?.name
+                ].filter(Boolean).join(', ') : '';
+
+                return (
+                    <Modal
+                        footer={null}
+                        open={isAddressModalOpen}
+                        onClose={() => setIsAddressModalOpen(false)}
+                        onCancel={() => setIsAddressModalOpen(false)}
+                        className="!w-fit"
+                        centered
+                        closeIcon={
+                            <FontAwesomeIcon
+                                icon={faCircleXmark}
+                                className="text-blue-500"
+                                size="lg"
+                            />
+                        }
+                    >
+                        <section className="flex flex-col items-center justify-center gap-5 text-blue-500 p-5 font-century-gothic w-full">
+                            <h3 className="text-center font-bold text-lg">Dirección oficina</h3>
+                            <p className="text-center text-base">
+                                {fullAddress || 'Dirección no disponible'}
+                            </p>
+                        </section>
+                    </Modal>
+                );
+            })()}
         </div>
     );
 };
