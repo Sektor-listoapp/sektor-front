@@ -39,7 +39,7 @@ const SupplierDetails = () => {
     name = "",
     motto = "",
     logoUrl = "",
-    license = "",
+    // license = "",
     offices = [],
     serviceType = "",
     lineOfBusiness = [],
@@ -116,7 +116,7 @@ const SupplierDetails = () => {
 
         <OrganizationFlipCard
           heading={name}
-          license={license || ""}
+          // license={license || ""}
           logoUrl={logoUrl || "/images/placeholder.png"}
           serviceType={serviceTypeLabel || ""}
         />

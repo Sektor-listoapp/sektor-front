@@ -17,7 +17,7 @@ import { UPDATE_SUPPLIER } from "@/lib/sektor-api/mutations";
 import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import { faHashtag } from "@fortawesome/free-solid-svg-icons";
 import {
-  LICENSE_TYPE_OPTIONS,
+  // LICENSE_TYPE_OPTIONS,
   IDENTIFICATION_TYPE_OPTIONS,
   SELECT_LINE_OF_BUSINESS_OPTIONS,
   SELECT_SUPPLIER_SERVICE_OPTIONS,
@@ -108,8 +108,6 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     name: "",
     email: "",
     segment: [],
-    license: "",
-    licenseType: "",
     identification: "",
     identificationType: "",
     serviceType: "",
@@ -124,9 +122,9 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
   });
 
   useEffect(() => {
-    const licenseParts = supplier?.license?.split("-") || [];
-    const licenseType = licenseParts[0] || "";
-    const license = licenseParts.slice(1).join("-") || "";
+    // const licenseParts = supplier?.license?.split("-") || [];
+    // const licenseType = licenseParts[0] || "";
+    // const license = licenseParts.slice(1).join("-") || "";
 
     const identificationParts = supplier?.identification?.split("-") || [];
     const identificationType = identificationParts[0] || "";
@@ -177,10 +175,6 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       email: organizationResponse?.organizationById?.email || "",
       insuranceCompanies: insuranceCompaniesIds || [],
       insuranceCompanyRelations: insuranceCompanyRelations,
-      license: license || "",
-      licenseType: licenseType
-        ? `${'AAA'}-`
-        : LICENSE_TYPE_OPTIONS[0].value,
       segment: (supplier?.lineOfBusiness || []) as never[],
       identification: identification || "",
       identificationType:
@@ -197,7 +191,6 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
   const requiredFields = {
     name: Boolean(input.name?.trim()?.length),
     email: Boolean(input.email?.trim()?.length),
-    license: Boolean(input.license?.trim()?.length),
     segment: Boolean(input?.segment?.length),
     identification: Boolean(input.identification?.trim()?.length),
     logoUrl: Boolean(input.logoUrl?.trim()?.length),
@@ -315,7 +308,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
           return restServiceProps;
         }) || [],
         allies: supplier?.allies?.map((ally: any) => ally.id) || [],
-        license: `${input?.licenseType}${input?.license}`.replace(/--/g, '-'),
+        // license: `${input?.licenseType}${input?.license}`.replace(/--/g, '-'),
         identification: `${input?.identificationType}${input?.identification}`,
         motto: input?.motto,
         insuranceCompanies: formattedInsuranceCompanyRelations.length > 0
@@ -474,7 +467,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
           }}
         />
 
-        <SelectWithTextInput
+        {/* <SelectWithTextInput
           selectProps={{
             name: "licenseType",
             icon: faHashtag,
@@ -495,7 +488,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
             maxLength: 6,
             value: input?.license,
           }}
-        />
+        /> */}
 
         <SelectWithTextInput
           selectProps={{

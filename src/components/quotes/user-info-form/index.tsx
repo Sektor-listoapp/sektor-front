@@ -1,12 +1,11 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useMemo, useState } from "react";
 import Button from "@/components/ui/button";
 import TextInput from "@/components/ui/text-input";
 import { DEFAULT_PHONE_CODE, PHONE_CODE_OPTIONS } from "@/constants/forms";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
 import { useQuery } from "@apollo/client";
-import { Query } from "@/lib/sektor-api/__generated__/types";
+import { Query, UserGroups } from "@/lib/sektor-api/__generated__/types";
 import { COUNTRY_BY_CODE_QUERY } from "@/lib/sektor-api/queries";
-import { getLocationOptions } from "@/utils/organizations";
 import Select from "@/components/ui/select";
 import { SEGMENT_OPTIONS } from "./constants";
 import { useRouter } from "next/router";
@@ -20,14 +19,18 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { handleUserInfoFormInputChange, validateFormFields } from "./helpers";
 import { useQuoteStore } from "@/store/quotes";
+import { useAuthStore } from "@/store/auth";
 import { ROUTES } from "@/constants/router";
 import { INPUT_ERROR_MESSAGES, REGEX } from "@/constants/validations";
 
 const { EMAIL } = INPUT_ERROR_MESSAGES;
 
+const { Customer } = UserGroups;
+
 const UserInfoForm = () => {
   const router = useRouter();
   const organizationQuery = (router?.query?.organization || "") as string;
+  const loggedUser = useAuthStore((state) => state.user);
   const setQuoteRequestCustomer = useQuoteStore(
     (state) => state.setQuoteRequestCustomer
   );
@@ -35,15 +38,51 @@ const UserInfoForm = () => {
     COUNTRY_BY_CODE_QUERY,
     { variables: { code: "VE" } }
   );
-  const locationOptions = getLocationOptions(
-    countryData?.getCountryByCode,
-    true
+
+  const countryStates = countryData?.getCountryByCode?.states || [];
+
+  const stateOptions = useMemo(
+    () => [
+      { label: "Estado", value: "", disabled: true },
+      ...countryStates
+        .map((state) => ({
+          label: state?.name || "",
+          value: state?.id ? String(state.id) : "",
+        }))
+        .filter((option) => option.value)
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    ],
+    [countryStates]
   );
+
+  const [selectedStateId, setSelectedStateId] = useState<string>("");
+
+  const cityOptions = useMemo(() => {
+    const selectedState = countryStates.find(
+      (s) => String(s.id) === selectedStateId
+    );
+
+    if (!selectedState?.cities?.length) {
+      return [{ label: "Ciudad", value: "", disabled: true }];
+    }
+
+    return [
+      { label: "Ciudad", value: "", disabled: true },
+      ...selectedState.cities
+        .map((city) => ({
+          label: city?.name || "",
+          value: city?.id ? String(city.id) : "",
+        }))
+        .filter((option) => option.value)
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    ];
+  }, [countryStates, selectedStateId]);
 
   const [input, setInput] = useState<UserInfoFormInput>({
     name: "",
     email: "",
-    location: locationOptions[0].value,
+    state: "",
+    city: "",
     phone: "",
     phoneCode: DEFAULT_PHONE_CODE,
     segment: SEGMENT_OPTIONS[0].value,
@@ -52,11 +91,23 @@ const UserInfoForm = () => {
   const [errors, setErrors] = useState<UserInfoFormInputErrors>({
     name: [],
     email: [],
-    location: [],
+    state: [],
+    city: [],
     phone: [],
     phoneCode: [],
     segment: [],
   });
+
+ 
+  useEffect(() => {
+    if (!loggedUser || loggedUser.group !== Customer) return;
+
+    setInput((prev) => ({
+      ...prev,
+      name: loggedUser.name || prev.name,
+      email: loggedUser.email || prev.email,
+    }));
+  }, [loggedUser]);
 
   const handleInputChange = (
     event: FormEvent<HTMLInputElement | HTMLSelectElement>
@@ -74,15 +125,16 @@ const UserInfoForm = () => {
     const isValidForm = validateFormFields({ input, errors, setErrors });
     if (!isValidForm) return;
 
-    const { name, location, phone, phoneCode, segment, email } = input;
+    const { name, city, phone, phoneCode, segment, email } = input;
     const phoneWithCode = phone.startsWith('+') ? phone : `${phoneCode || DEFAULT_PHONE_CODE}${phone}`;
 
     setQuoteRequestCustomer({
       name,
-      location,
       email,
       segment,
       phone: phoneWithCode,
+    
+      location: city,
     });
 
     router.push({
@@ -124,17 +176,53 @@ const UserInfoForm = () => {
         placeholder="Correo electrónico"
       />
 
-      <Select
-        name="location"
-        wrapperClassName="w-full"
-        options={locationOptions}
-        error={Boolean(errors.location.length)}
-        errors={errors.location}
-        value={input.location}
-        disabled={isLoadingCountryData}
-        onChange={handleInputChange}
-        icon={faLocationDot}
-      />
+      <div className="w-full flex flex-col gap-4">
+        <Select
+          name="state"
+          wrapperClassName="w-full"
+          options={stateOptions}
+          error={Boolean(errors.state.length)}
+          errors={errors.state}
+          value={input.state}
+          disabled={isLoadingCountryData}
+          onChange={(event: FormEvent<HTMLSelectElement>) => {
+            const { value } = event.currentTarget;
+            setSelectedStateId(value);
+            setInput((prev) => ({
+              ...prev,
+              state: value,
+              city: "",
+            }));
+            setErrors((prev) => ({
+              ...prev,
+              state: [],
+              city: [],
+            }));
+          }}
+          icon={faLocationDot}
+        />
+        <Select
+          name="city"
+          wrapperClassName="w-full"
+          options={cityOptions}
+          error={Boolean(errors.city.length)}
+          errors={errors.city}
+          value={input.city}
+          disabled={isLoadingCountryData || !selectedStateId}
+          onChange={(event: FormEvent<HTMLSelectElement>) => {
+            const { value } = event.currentTarget;
+            setInput((prev) => ({
+              ...prev,
+              city: value,
+            }));
+            setErrors((prev) => ({
+              ...prev,
+              city: [],
+            }));
+          }}
+          icon={faLocationDot}
+        />
+      </div>
 
       <SelectWithTextInput
         errors={errors.phone}

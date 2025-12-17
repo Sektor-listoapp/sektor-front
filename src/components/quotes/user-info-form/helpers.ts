@@ -52,13 +52,12 @@ export const validateFormFields = ({
       ...prev,
       name: !input.name?.trim()?.length ? [GENERAL.REQUIRED] : prev.name,
       phone: !input.phone?.trim()?.length ? [GENERAL.REQUIRED] : prev.phone,
+      state: !input.state?.trim()?.length ? [GENERAL.REQUIRED] : prev.state,
+      city: !input.city?.trim()?.length ? [GENERAL.REQUIRED] : prev.city,
       segment: !input.segment?.trim()?.length
         ? [GENERAL.REQUIRED]
         : prev.segment,
       email: !input.email?.trim()?.length ? [GENERAL.REQUIRED] : prev.segment,
-      location: !input.location?.trim()?.length
-        ? [GENERAL.REQUIRED]
-        : prev.location,
     }));
   }
 
