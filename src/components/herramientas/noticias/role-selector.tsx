@@ -43,7 +43,7 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({
 }) => {
   const toggleRole = (role: UserGroups) => {
     if (disabled) return;
-
+    
     if (selectedRoles.includes(role)) {
       onChange(selectedRoles.filter((r) => r !== role));
     } else {
@@ -79,7 +79,7 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({
                 src={option.icon}
                 alt={option.label}
                 className="w-full h-full object-contain"
-              />
+            />
             </div>
             <span
               className={cn(

@@ -53,8 +53,9 @@ export const quillDeltaToText = (delta: string | object | null | undefined): str
 
             if (isDeltaFormat) {
                 try {
-                    // Dynamic import only on client side
-                    const Quill = require('quill');
+                  
+                    const QuillModule = require('quill');
+                    const Quill = QuillModule.default || QuillModule;
                     const tempDiv = document.createElement('div');
                     const quill = new Quill(tempDiv);
                     quill.setContents(deltaObj as never);
