@@ -35,8 +35,9 @@ export const quillDeltaToHtml = (delta: string | object | null | undefined): str
         }
 
         if (Array.isArray(deltaObj)) {
-            // Dynamic import only on client side
-            const Quill = require('quill');
+          
+            const QuillModule = require('quill');
+            const Quill = QuillModule.default || QuillModule;
             const tempDiv = document.createElement('div');
             const quill = new Quill(tempDiv);
             quill.setContents(deltaObj);
