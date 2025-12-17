@@ -70,8 +70,8 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
   };
 
   const toolsMenuItems = [
-    { label: "Módulos", href: ROUTES.MODULES },
-    { label: "Noticias", href: ROUTES.NEWS },
+   { label: "Módulos", href: ROUTES.MODULES },
+   { label: "Noticias", href: ROUTES.ADMIN_NEWS },
   ];
 
 
@@ -160,6 +160,20 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
             >
               Seguros
             </Link>
+            <Link
+              className={cn(
+                "focus:outline-none",
+                variant === "light"
+                  ? "hover:text-blue-400"
+                  : "hover:text-gray-200",
+                {
+                  "font-bold": pathname.startsWith(ROUTES.NOTICIAS),
+                }
+              )}
+              href={ROUTES.NOTICIAS}
+            >
+              Noticias
+            </Link>
           </div>
 
 
@@ -233,6 +247,15 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
               href={ROUTES.ORGANIZATIONS}
             >
               Seguros
+            </Link>
+            <Link
+              className={cn(
+                " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
+                { "font-bold": pathname.startsWith(ROUTES.NOTICIAS) }
+              )}
+              href={ROUTES.NOTICIAS}
+            >
+              Noticias
             </Link>
             {isAdmin && (
               <>
@@ -373,6 +396,20 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
             href={ROUTES.ORGANIZATIONS}
           >
             Seguros
+          </Link>
+          <Link
+            className={cn(
+              "focus:outline-none",
+              variant === "light"
+                ? "hover:text-blue-400"
+                : "hover:text-gray-200",
+              {
+                "font-bold": pathname.startsWith(ROUTES.NOTICIAS),
+              }
+            )}
+            href={ROUTES.NOTICIAS}
+          >
+            Noticias
           </Link>
           {isAdmin && (
             <>

@@ -28,11 +28,11 @@ const HerramientasHeader = () => {
             Inicio
           </Link>
           <Link
-            href={ROUTES.NEWS}
+            href={ROUTES.ADMIN_NEWS}
             className={cn(
               "text-blue-500 hover:text-blue-400 transition-colors focus:outline-none",
               {
-                "underline underline-offset-4": pathname === ROUTES.NEWS,
+                "underline underline-offset-4": pathname === ROUTES.ADMIN_NEWS,
               }
             )}
           >

@@ -11,5 +11,6 @@ export const ROUTES = {
   ORGANIZATIONS: "/organizations",
   HERRAMIENTAS: "/herramientas",
   MODULES: "/herramientas/modulos",
-  NEWS: "/herramientas/noticias",
+  ADMIN_NEWS: "/herramientas/noticias",
+  NOTICIAS: "/noticias",
 } as const;
