@@ -10,7 +10,7 @@ import HerramientasList from "@/components/herramientas";
 
 const { Admin } = UserGroups;
 
-const Herramientas = () => {
+const HerramientasModulos = () => {
   const { push } = useRouter();
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
   const isAdmin = userGroup === Admin;
@@ -42,6 +42,5 @@ const Herramientas = () => {
   );
 };
 
-export default withAuth(Herramientas);
-
+export default withAuth(HerramientasModulos);
 

@@ -19,36 +19,31 @@ const HerramientasHeader = () => {
           onClick={() => router.push(ROUTES.HOME)}
         />
 
-       
+
         <nav className="flex-1 flex items-center justify-center gap-8 font-century-gothic text-sm">
           <Link
             href={ROUTES.HOME}
-            className={cn(
-              "text-blue-500 hover:text-blue-400 transition-colors focus:outline-none",
-              {
-                "underline underline-offset-4": pathname === ROUTES.HOME,
-              }
-            )}
+            className="text-blue-500 hover:text-blue-400 transition-colors focus:outline-none"
           >
             Inicio
           </Link>
           <Link
-            href="/noticias"
+            href={ROUTES.NEWS}
             className={cn(
               "text-blue-500 hover:text-blue-400 transition-colors focus:outline-none",
               {
-                "underline underline-offset-4": pathname === "/noticias",
+                "underline underline-offset-4": pathname === ROUTES.NEWS,
               }
             )}
           >
             Noticias
           </Link>
           <Link
-            href={ROUTES.HERRAMIENTAS}
+            href={ROUTES.MODULES}
             className={cn(
               "text-blue-500 hover:text-blue-400 transition-colors focus:outline-none",
               {
-                "underline underline-offset-4": pathname === ROUTES.HERRAMIENTAS,
+                "underline underline-offset-4": pathname === ROUTES.MODULES,
               }
             )}
           >
@@ -56,7 +51,7 @@ const HerramientasHeader = () => {
           </Link>
         </nav>
 
-      
+        {/* Empty div for balance */}
         <div className="w-[140px]" />
       </div>
     </header>

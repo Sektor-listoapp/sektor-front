@@ -10,4 +10,6 @@ export const ROUTES = {
   RESET_PASSWORD: "/reset-password",
   ORGANIZATIONS: "/organizations",
   HERRAMIENTAS: "/herramientas",
+  MODULES: "/herramientas/modulos",
+  NEWS: "/herramientas/noticias",
 } as const;

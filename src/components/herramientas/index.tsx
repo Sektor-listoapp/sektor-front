@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery, useMutation } from "@apollo/client";
@@ -9,6 +8,7 @@ import TextInput from "@/components/ui/text-input";
 import { Query, Mutation, ModuleType } from "@/lib/sektor-api/__generated__/types";
 import { ALL_MODULES_QUERY } from "@/lib/sektor-api/queries";
 import { DELETE_MODULE } from "@/lib/sektor-api/mutations";
+import { ROUTES } from "@/constants/router";
 import CreateModuleModal from "./create-module-modal";
 import EditModuleModal from "./edit-module-modal";
 import FolderDetail from "./folder-detail";
@@ -59,6 +59,7 @@ const HerramientasList = () => {
       await deleteModule({ variables: { id } });
       toast.success("Módulo eliminado correctamente");
       refetchModules();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || "No se pudo eliminar el módulo");
     } finally {
@@ -68,9 +69,9 @@ const HerramientasList = () => {
 
   const handleBack = () => {
     if (subfolderId) {
-      router.push(`/herramientas?folderId=${folderId}`);
+      router.push(`${ROUTES.MODULES}?folderId=${folderId}`);
     } else if (folderId) {
-      router.push("/herramientas");
+      router.push(ROUTES.MODULES);
     }
   };
 
@@ -85,7 +86,7 @@ const HerramientasList = () => {
     );
   }
 
- 
+
   if (subfolderId) {
     const folder = modules.find((m) => m._id === folderId);
     return (
@@ -129,7 +130,7 @@ const HerramientasList = () => {
           <h1 className="text-xl font-medium text-blue-500">Modulos</h1>
         </div>
 
-      
+
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           <div className="w-full sm:w-[400px]">
             <TextInput
@@ -150,7 +151,7 @@ const HerramientasList = () => {
           </Button>
         </div>
 
-       
+
         <div className="w-full">
           <p className="text-sm text-gray-500 mb-4">Archivos subidos</p>
 
@@ -160,7 +161,7 @@ const HerramientasList = () => {
                 No se encontraron módulos
               </p>
             ) : (
-              filteredModules.map((module, index) => {
+              filteredModules.map((module) => {
                 const isEmpty = !module.children?.length && (!module.files || module.files.length === 0);
                 return (
                   <div
@@ -176,7 +177,7 @@ const HerramientasList = () => {
                       <span
                         className="text-blue-500 font-medium cursor-pointer hover:text-blue-400"
                         onClick={() =>
-                          router.push(`/herramientas?folderId=${module._id}`)
+                          router.push(`${ROUTES.MODULES}?folderId=${module._id}`)
                         }
                       >
                         {module.title}

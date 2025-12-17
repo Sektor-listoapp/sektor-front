@@ -21,6 +21,7 @@ import { MODULE_BY_ID_QUERY } from "@/lib/sektor-api/queries";
 import { UPDATE_MODULE, UPLOAD_FILE_TO_MODULE, DELETE_FILE_FROM_MODULE, DELETE_MODULE } from "@/lib/sektor-api/mutations";
 import { toast } from "react-toastify";
 import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
+import { ROUTES } from "@/constants/router";
 
 interface FolderDetailProps {
   folderId: string;
@@ -66,9 +67,9 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
 
   const handleBack = () => {
     if (subfolderId) {
-      router.push(`/herramientas?folderId=${folderId}`);
+      router.push(`${ROUTES.MODULES}?folderId=${folderId}`);
     } else {
-      router.push("/herramientas");
+      router.push(ROUTES.MODULES);
     }
   };
 
@@ -88,7 +89,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
         });
         toast.success("Archivo subido correctamente");
         refetchModule();
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (error: any) {
         toast.error(error?.message || "No se pudo subir el archivo");
       }
@@ -110,7 +111,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
       });
       toast.success("Archivo eliminado correctamente");
       refetchModule();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || "No se pudo eliminar el archivo");
     } finally {
@@ -119,7 +120,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
   };
 
   const handleSubfolderClick = (subfolderId: string) => {
-    router.push(`/herramientas?folderId=${folderId}&subfolderId=${subfolderId}`);
+    router.push(`${ROUTES.MODULES}?folderId=${folderId}&subfolderId=${subfolderId}`);
   };
 
   const handleDeleteSubfolder = async (id: string) => {
@@ -132,7 +133,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
       await deleteModule({ variables: { id } });
       toast.success("Subcarpeta eliminada correctamente");
       refetchModule();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || "No se pudo eliminar la subcarpeta");
     } finally {
@@ -141,7 +142,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
   };
 
   const handleEditSubfolder = (id: string) => {
-    router.push(`/herramientas?folderId=${folderId}&subfolderId=${id}`);
+    router.push(`${ROUTES.MODULES}?folderId=${folderId}&subfolderId=${id}`);
   };
 
   const handleCreateSubfolder = () => {
@@ -161,7 +162,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
       });
       setIsEditingTitle(false);
       refetchModule();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || "No se pudo actualizar el título");
     }
@@ -179,7 +180,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
       });
       setIsEditingDescription(false);
       refetchModule();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || "No se pudo actualizar la descripción");
     }
@@ -196,7 +197,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
         },
       });
       refetchModule();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || "No se pudo actualizar el estado");
     }
