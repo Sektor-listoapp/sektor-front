@@ -1,4 +1,5 @@
 import {
+  BrokerageSocietyTeamMemberType,
   OrganizationClientType,
   OrganizationOfficeType,
   PublicOrganizationType,
@@ -6,7 +7,6 @@ import {
   SocialMediaLinkType,
   StudyType,
   SupplierServiceType,
-  TeamMemberType,
 } from "@/lib/sektor-api/__generated__/types";
 
 export const getTabItems = ({
@@ -26,7 +26,7 @@ export const getTabItems = ({
   clients?: OrganizationClientType[];
   allies?: PublicOrganizationType[];
   recognitions?: string[] | RecognitionType[];
-  workTeam?: TeamMemberType[];
+  workTeam?: BrokerageSocietyTeamMemberType[];
   offices?: OrganizationOfficeType[];
   services?: SupplierServiceType[];
   socialMediaLinks?: SocialMediaLinkType[];

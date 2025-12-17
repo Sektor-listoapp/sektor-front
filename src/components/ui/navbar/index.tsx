@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Button from "../button";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
 import { Drawer } from "antd";
-import { faBars } from "@fortawesome/free-solid-svg-icons";
+import { faBars, faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { cn } from "@/utils/class-name";
 import { useRouter } from "next/router";
@@ -23,6 +23,9 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
  const { push, pathname } = useRouter();
  const [open, setOpen] = useState(false);
  const [isHydrated, setIsHydrated] = useState(false);
+ const [isToolsDropdownOpen, setIsToolsDropdownOpen] = useState(false);
+ const [isMobileToolsOpen, setIsMobileToolsOpen] = useState(false);
+ const toolsDropdownRef = useRef<HTMLDivElement>(null);
 
 
  const isAuthenticated = useAuthStore((state) => state.getIsAuthenticated)();
@@ -32,9 +35,21 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
  const isCustomer = isAuthenticated && userGroup === UserGroups.Customer;
 
 
- // Fix hydration mismatch
+ 
  useEffect(() => {
    setIsHydrated(true);
+ }, []);
+
+
+ useEffect(() => {
+   const handleClickOutside = (event: MouseEvent) => {
+     if (toolsDropdownRef.current && !toolsDropdownRef.current.contains(event.target as Node)) {
+       setIsToolsDropdownOpen(false);
+     }
+   };
+
+   document.addEventListener("mousedown", handleClickOutside);
+   return () => document.removeEventListener("mousedown", handleClickOutside);
  }, []);
 
 
@@ -47,6 +62,17 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
    window?.localStorage?.clear();
    push(ROUTES.HOME);
  };
+
+ const handleToolsNavigation = (href: string) => {
+   push(href);
+   setIsToolsDropdownOpen(false);
+   onClose();
+ };
+
+ const toolsMenuItems = [
+   { label: "Módulos", href: ROUTES.HERRAMIENTAS },
+   { label: "Noticias", href: "/noticias" },
+ ];
 
 
  const { BrokerageSociety, InsuranceBroker, ExclusiveAgent } = OrganizationTypes;
@@ -209,15 +235,51 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
              Seguros
            </Link>
            {isAdmin && (
-             <Link
-               className={cn(
-                 " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
-                 { "font-bold": pathname === ROUTES.COMPANIES }
-               )}
-               href={ROUTES.COMPANIES}
-             >
-               Empresa
-             </Link>
+             <>
+               <Link
+                 className={cn(
+                   " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
+                   { "font-bold": pathname === ROUTES.COMPANIES }
+                 )}
+                 href={ROUTES.COMPANIES}
+               >
+                 Empresa
+               </Link>
+               
+               <div className="border-b border-b-gray-300 pb-2">
+                 <button
+                   onClick={() => setIsMobileToolsOpen(!isMobileToolsOpen)}
+                   className={cn(
+                     "w-full flex items-center justify-between hover:text-blue-400 focus:outline-none text-blue-500 text-lg",
+                     { "font-bold": pathname === ROUTES.HERRAMIENTAS || pathname === "/noticias" }
+                   )}
+                 >
+                   Herramientas
+                   <FontAwesomeIcon
+                     icon={faChevronDown}
+                     className={cn("text-xs transition-transform", {
+                       "rotate-180": isMobileToolsOpen,
+                     })}
+                   />
+                 </button>
+                 {isMobileToolsOpen && (
+                   <div className="mt-2 pl-4 flex flex-col gap-2">
+                     {toolsMenuItems.map((item) => (
+                       <button
+                         key={item.href}
+                         onClick={() => handleToolsNavigation(item.href)}
+                         className={cn(
+                           "text-left text-blue-500 hover:text-blue-400 text-base py-1",
+                           { "font-bold": pathname === item.href }
+                         )}
+                       >
+                         {item.label}
+                       </button>
+                     ))}
+                   </div>
+                 )}
+               </div>
+             </>
            )}
 
 
@@ -313,20 +375,64 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
            Seguros
          </Link>
          {isAdmin && (
-           <Link
-             className={cn(
-               "focus:outline-none",
-               variant === "light"
-                 ? "hover:text-blue-400"
-                 : "hover:text-gray-200",
-               {
-                 "font-bold": pathname === ROUTES.COMPANIES,
-               }
-             )}
-             href={ROUTES.COMPANIES}
-           >
-             Empresa
-           </Link>
+           <>
+             <Link
+               className={cn(
+                 "focus:outline-none",
+                 variant === "light"
+                   ? "hover:text-blue-400"
+                   : "hover:text-gray-200",
+                 {
+                   "font-bold": pathname === ROUTES.COMPANIES,
+                 }
+               )}
+               href={ROUTES.COMPANIES}
+             >
+               Empresa
+             </Link>
+           
+             <div className="relative" ref={toolsDropdownRef}>
+               <button
+                 onClick={() => setIsToolsDropdownOpen(!isToolsDropdownOpen)}
+                 className={cn(
+                   "flex items-center gap-2 focus:outline-none",
+                   variant === "light"
+                     ? "hover:text-blue-400"
+                     : "hover:text-gray-200",
+                   {
+                     "font-bold": pathname === ROUTES.HERRAMIENTAS || pathname === "/noticias",
+                   }
+                 )}
+               >
+                 Herramientas
+                 <FontAwesomeIcon
+                   icon={faChevronDown}
+                   className={cn("text-xs transition-transform", {
+                     "rotate-180": isToolsDropdownOpen,
+                   })}
+                 />
+               </button>
+
+               {isToolsDropdownOpen && (
+                 <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg py-2 min-w-[150px] z-50">
+                   {toolsMenuItems.map((item) => (
+                     <button
+                       key={item.href}
+                       onClick={() => handleToolsNavigation(item.href)}
+                       className={cn(
+                         "w-full px-4 py-2 text-left text-blue-500 hover:bg-gray-50 transition-colors",
+                         {
+                           "font-medium bg-gray-50": pathname === item.href,
+                         }
+                       )}
+                     >
+                       {item.label}
+                     </button>
+                   ))}
+                 </div>
+               )}
+             </div>
+           </>
          )}
          {isAuthenticated && (isCustomer || isCompany) && (
            <Link
@@ -375,6 +481,3 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
 
 
 export default Navbar;
-
-
-
