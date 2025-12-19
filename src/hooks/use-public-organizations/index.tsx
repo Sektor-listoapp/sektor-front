@@ -29,6 +29,8 @@ const usePublicOrganizations = ({
       variables: {
         pagination: { offset: 0, limit: 6 },
         ...currentFilters,
+        state: "Distrito Capital",
+        city: "Caracas",
         ...variables,
       },
     }
@@ -80,6 +82,8 @@ const usePublicOrganizations = ({
       const variablesToSend = {
         pagination: { offset: 0, limit: 6 },
         ...updatedFilters,
+        state: "Distrito Capital",
+        city: "Caracas",
         ...variables,
       };
 
@@ -87,7 +91,7 @@ const usePublicOrganizations = ({
 
       const { data } = await getPublicOrganizations(variablesToSend);
 
-
+  
 
       setPublicOrganizations(data);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

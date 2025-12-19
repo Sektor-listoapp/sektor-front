@@ -121,7 +121,7 @@ export const CustomDropdown = ({ options, placeholder, value, onChange, classNam
                     }
                 }}
             >
-                <span className={`text-[10px] md:text-xs ${selectedValue ? 'text-gray-800' : 'text-gray-500'} break-words flex-1 min-w-0 leading-tight`}>
+                <span className={`text-[10px] md:text-xs ${selectedValue ? 'text-gray-800' : 'text-gray-500'} break-words flex-1 min-w-0 leading-tight pr-2`}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </span>
 
@@ -150,7 +150,7 @@ export const CustomDropdown = ({ options, placeholder, value, onChange, classNam
                             return (
                                 <div key={option.value}>
                                     <div
-                                        className={`px-4 py-2.5 text-xs transition-all duration-150 whitespace-nowrap ${option.disabled
+                                        className={`px-4 py-2.5 text-xs transition-all duration-150 break-words ${option.disabled
                                             ? 'text-gray-400 cursor-not-allowed'
                                             : `cursor-pointer hover:bg-blue-50 hover:text-blue-700 ${option.value === selectedValue ? 'bg-blue-100 text-blue-700 font-medium' : 'text-gray-800'} ${isFocused ? 'bg-blue-50 text-blue-700' : ''}`
                                             }`}
