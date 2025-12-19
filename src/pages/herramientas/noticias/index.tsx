@@ -18,13 +18,13 @@ import {
   NewsUploadedBy,
   NewsVisibility,
 } from "@/lib/sektor-api/__generated__/types";
-import { ALL_NEWS_QUERY } from "@/lib/sektor-api/queries";
-import { DELETE_NEWS, CHANGE_NEWS_VISIBILITY } from "@/lib/sektor-api/mutations";
+import { ALL_NEWS_QUERY, HOME_NEWS_QUERY } from "@/lib/sektor-api/queries";
+import { DELETE_NEWS, UPDATE_NEWS } from "@/lib/sektor-api/mutations";
 import { ROUTES } from "@/constants/router";
 import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { toast } from "react-toastify";
 
-const { Admin } = UserGroups;
+const { Admin, News } = UserGroups;
 
 type FilterType = "all" | "pending" | "sektor" | "thirdParty";
 
@@ -32,6 +32,7 @@ const HerramientasNoticias = () => {
   const router = useRouter();
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
   const isAdmin = userGroup === Admin;
+  const isNews = userGroup === News;
 
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -44,11 +45,11 @@ const HerramientasNoticias = () => {
   });
 
   const [deleteNews, { loading: deletingNews }] = useMutation(DELETE_NEWS);
-  const [changeVisibility, { loading: changingVisibility }] = useMutation(CHANGE_NEWS_VISIBILITY);
+  const [updateNews] = useMutation(UPDATE_NEWS);
 
   useEffect(() => {
     if (!userGroup) return;
-    if (!isAdmin) {
+    if (!isAdmin && !isNews) {
       router.push(ROUTES.HOME);
     } else {
       setCheckingAccess(false);
@@ -58,26 +59,20 @@ const HerramientasNoticias = () => {
 
   const allNews = (data?.news || []) as NewsType[];
 
-  // Debug: Log all news with their pendingApproval status
-  console.log("All news loaded:", allNews.length);
-  allNews.forEach((news) => {
-    console.log(`News "${news.title}": pendingApproval=${news.pendingApproval}, visibility=${news.visibility}`);
-  });
-
-  // Separate pending and approved news FIRST
+  
   const allPendingNews = allNews.filter((news) => news.pendingApproval);
   const allApprovedNews = allNews.filter((news) => !news.pendingApproval);
-  
+
   console.log(`Pending news: ${allPendingNews.length}, Approved news: ${allApprovedNews.length}`);
 
-  // Apply search filter
+  
   const matchesSearch = (news: NewsType) => {
     if (!searchTerm) return true;
     return news.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-           news.description.toLowerCase().includes(searchTerm.toLowerCase());
+      news.description.toLowerCase().includes(searchTerm.toLowerCase());
   };
 
-  // Apply type filter
+ 
   const matchesTypeFilter = (news: NewsType) => {
     if (filterType === "pending") {
       return news.pendingApproval;
@@ -88,16 +83,16 @@ const HerramientasNoticias = () => {
     if (filterType === "thirdParty") {
       return news.uploadedBy === NewsUploadedBy.ThirdParty;
     }
-    return true; // "all"
+    return true; 
   };
 
-  // Filter pending news
-  const pendingNews = allPendingNews.filter((news) => 
+  
+  const pendingNews = allPendingNews.filter((news) =>
     matchesSearch(news) && matchesTypeFilter(news)
   );
 
-  // Filter approved news
-  const approvedNews = allApprovedNews.filter((news) => 
+  
+  const approvedNews = allApprovedNews.filter((news) =>
     matchesSearch(news) && matchesTypeFilter(news)
   );
 
@@ -109,7 +104,7 @@ const HerramientasNoticias = () => {
       toast.success("Noticia eliminada correctamente");
       setNewsToDelete(null);
       refetch();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || "Error al eliminar la noticia");
     }
@@ -117,15 +112,25 @@ const HerramientasNoticias = () => {
 
   const handleAuthorize = async (news: NewsType) => {
     try {
-      await changeVisibility({
+      await updateNews({
         variables: {
           id: news.id,
-          visibility: NewsVisibility.Public as string,
+          input: {
+            title: news.title,
+            description: news.description,
+            type: news.type,
+            videoUrl: news.videoUrl || undefined,
+            allowedRoles: (news.allowedRoles as UserGroups[]) || undefined,
+            pendingApproval: false,
+            visibility: NewsVisibility.Public,
+          },
         },
+        refetchQueries: [{ query: HOME_NEWS_QUERY }, { query: ALL_NEWS_QUERY }],
+        awaitRefetchQueries: true,
       });
       toast.success("Noticia autorizada correctamente");
       await refetch();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || "Error al autorizar la noticia");
     }
@@ -161,7 +166,7 @@ const HerramientasNoticias = () => {
         {/* Title */}
         <div className="flex items-center gap-3 mb-8">
           <button
-            onClick={() => router.push(ROUTES.HERRAMIENTAS)}
+            onClick={() => router.push(ROUTES.HOME)}
             className="text-blue-500 hover:text-blue-400 transition-colors"
           >
             <FontAwesomeIcon icon={faArrowLeft} size="lg" />
@@ -184,7 +189,7 @@ const HerramientasNoticias = () => {
                 className="!border-gray-300 !rounded-lg"
               />
             </div>
-            
+
             {/* Filter Dropdown */}
             <div className="relative">
               <button
@@ -194,7 +199,7 @@ const HerramientasNoticias = () => {
                 Buscar por
                 <FontAwesomeIcon icon={faChevronDown} className="text-xs" />
               </button>
-              
+
               {showFilterDropdown && (
                 <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg py-2 min-w-[180px] z-50">
                   {filterOptions.map((option) => (
@@ -204,11 +209,10 @@ const HerramientasNoticias = () => {
                         setFilterType(option.value as FilterType);
                         setShowFilterDropdown(false);
                       }}
-                      className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 ${
-                        filterType === option.value
-                          ? "text-blue-500 font-medium"
-                          : "text-gray-600"
-                      }`}
+                      className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 ${filterType === option.value
+                        ? "text-blue-500 font-medium"
+                        : "text-gray-600"
+                        }`}
                     >
                       {option.label}
                     </button>

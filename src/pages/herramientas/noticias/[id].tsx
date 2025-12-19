@@ -18,20 +18,21 @@ import {
   Query,
   NewsType,
 } from "@/lib/sektor-api/__generated__/types";
-import { ALL_NEWS_QUERY } from "@/lib/sektor-api/queries";
-import { UPDATE_NEWS, CHANGE_NEWS_VISIBILITY } from "@/lib/sektor-api/mutations";
+import { ALL_NEWS_QUERY, HOME_NEWS_QUERY } from "@/lib/sektor-api/queries";
+import { UPDATE_NEWS } from "@/lib/sektor-api/mutations";
 import { ROUTES } from "@/constants/router";
 import { toast } from "react-toastify";
 import { cn } from "@/utils/class-name";
 import { quillDeltaToText } from "@/utils/quill-delta-to-text";
 
-const { Admin } = UserGroups;
+const { Admin, News } = UserGroups;
 
 const EditarNoticia = () => {
   const router = useRouter();
   const { id } = router.query;
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
   const isAdmin = userGroup === Admin;
+  const isNews = userGroup === News;
 
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [mediaType, setMediaType] = useState<"photo" | "video">("photo");
@@ -74,11 +75,10 @@ const EditarNoticia = () => {
   }, [news]);
 
   const [updateNews, { loading: updating }] = useMutation(UPDATE_NEWS);
-  const [changeVisibility, { loading: changingVisibility }] = useMutation(CHANGE_NEWS_VISIBILITY);
 
   useEffect(() => {
     if (!userGroup) return;
-    if (!isAdmin) {
+    if (!isAdmin && !isNews) {
       router.push(ROUTES.HOME);
     } else {
       setCheckingAccess(false);
@@ -114,6 +114,11 @@ const EditarNoticia = () => {
       return;
     }
 
+    if (!news) {
+      toast.error("No se pudo obtener la información de la noticia");
+      return;
+    }
+
     try {
       await updateNews({
         variables: {
@@ -121,6 +126,7 @@ const EditarNoticia = () => {
           input: {
             title,
             description,
+            type: news.type,
             videoUrl: mediaType === "video" ? videoUrl : undefined,
             allowedRoles: allowedRoles.length > 0 ? allowedRoles : undefined,
           },
@@ -136,12 +142,27 @@ const EditarNoticia = () => {
   };
 
   const handleAuthorize = async () => {
+    if (!news || !id) {
+      toast.error("No se pudo obtener la información de la noticia");
+      return;
+    }
+
     try {
-      await changeVisibility({
+      await updateNews({
         variables: {
           id: id as string,
-          visibility: NewsVisibility.Public as string,
+          input: {
+            title: news.title,
+            description: news.description,
+            type: news.type,
+            videoUrl: news.videoUrl || undefined,
+            allowedRoles: (news.allowedRoles as UserGroups[]) || undefined,
+            pendingApproval: false,
+            visibility: NewsVisibility.Public,
+          },
         },
+        refetchQueries: [{ query: HOME_NEWS_QUERY }, { query: ALL_NEWS_QUERY }],
+        awaitRefetchQueries: true,
       });
       toast.success("Noticia autorizada correctamente");
       router.push(ROUTES.ADMIN_NEWS);
@@ -214,7 +235,7 @@ const EditarNoticia = () => {
             <Button
               variant="solid-blue"
               onClick={handleAuthorize}
-              loading={changingVisibility}
+              loading={updating}
               className="!rounded-full"
             >
               Autorizar

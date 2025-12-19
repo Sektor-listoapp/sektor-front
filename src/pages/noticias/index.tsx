@@ -1,4 +1,3 @@
-import React from "react";
 import { useQuery } from "@apollo/client";
 import NoticiasHeader from "@/components/noticias/header";
 import NewsCard from "@/components/noticias/news-card";
@@ -9,13 +8,15 @@ import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 
 const NoticiasPage = () => {
     const { data, loading, error } = useQuery<Query>(HOME_NEWS_QUERY, {
-        fetchPolicy: "cache-and-network",
+        // fetchPolicy: "network-only",
     });
 
     const allNews = (data?.homeNews || []) as NewsType[];
+    console.log('allNews: ', allNews);
 
 
     const featuredNews = allNews.slice(0, 3);
+
     const moreNews = allNews.slice(3, 7);
     const oldNews = allNews.slice(7);
 
@@ -90,7 +91,7 @@ const NoticiasPage = () => {
 
 
                     <div className="lg:col-span-1">
-                        {oldNews.length > 0 && <OldNewsList news={oldNews} />}
+                        <OldNewsList news={oldNews} />
                     </div>
                 </section>
             </main>

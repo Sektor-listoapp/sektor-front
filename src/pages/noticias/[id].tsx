@@ -82,7 +82,61 @@ const NoticiaDetalle = () => {
                     </div>
 
 
-                    {news.photoUrl && (
+                    {news.videoUrl ? (
+                        <div className="mb-8">
+                            {(() => {
+                                const videoUrl = news.videoUrl;
+                              
+                                const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+                                const youtubeMatch = videoUrl.match(youtubeRegex);
+
+                             
+                                const vimeoRegex = /(?:vimeo\.com\/)(?:channels\/(?:\w+\/)?|groups\/(?:[^\/]*)\/videos\/|album\/(?:\d+)\/video\/|)(\d+)(?:$|\/|\?)/;
+                                const vimeoMatch = videoUrl.match(vimeoRegex);
+
+                                if (youtubeMatch) {
+                                    const videoId = youtubeMatch[1];
+                                    return (
+                                        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                                            <iframe
+                                                src={`https://www.youtube.com/embed/${videoId}`}
+                                                className="absolute top-0 left-0 w-full h-full rounded-lg"
+                                                frameBorder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            />
+                                        </div>
+                                    );
+                                }
+
+                                if (vimeoMatch) {
+                                    const videoId = vimeoMatch[1];
+                                    return (
+                                        <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+                                            <iframe
+                                                src={`https://player.vimeo.com/video/${videoId}`}
+                                                className="absolute top-0 left-0 w-full h-full rounded-lg"
+                                                frameBorder="0"
+                                                allow="autoplay; fullscreen; picture-in-picture"
+                                                allowFullScreen
+                                            />
+                                        </div>
+                                    );
+                                }
+
+                              
+                                return (
+                                    <video
+                                        src={videoUrl}
+                                        controls
+                                        className="w-full rounded-lg"
+                                        preload="metadata"
+                                        playsInline
+                                    />
+                                );
+                            })()}
+                        </div>
+                    ) : news.photoUrl ? (
                         <div className="relative w-full h-[500px] mb-8">
                             <Image
                                 src={news.photoUrl}
@@ -91,18 +145,7 @@ const NoticiaDetalle = () => {
                                 className="object-cover rounded-lg"
                             />
                         </div>
-                    )}
-
-
-                    {news.videoUrl && (
-                        <div className="mb-8">
-                            <video
-                                src={news.videoUrl}
-                                controls
-                                className="w-full"
-                            />
-                        </div>
-                    )}
+                    ) : null}
 
 
                     <article className="prose prose-lg max-w-none">
