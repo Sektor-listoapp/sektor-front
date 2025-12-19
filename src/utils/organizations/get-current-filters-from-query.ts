@@ -30,29 +30,63 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
 
 
   const hasAgeFilter = 'minAge' in query || 'maxAge' in query;
-  const ageRange =
-    hasAgeFilter && minAge !== undefined && maxAge !== undefined
-      ? [Number(minAge), Number(maxAge)]
-      : undefined;
+  let ageRange: [number, number] | undefined = undefined;
+  if (
+    hasAgeFilter &&
+    minAge !== undefined &&
+    maxAge !== undefined &&
+    minAge !== "" &&
+    maxAge !== ""
+  ) {
+    const minAgeNum = Number(minAge);
+    const maxAgeNum = Number(maxAge);
+    if (!isNaN(minAgeNum) && !isNaN(maxAgeNum) && minAgeNum >= 0 && maxAgeNum >= 0) {
+      ageRange = [minAgeNum, maxAgeNum];
+    }
+  }
 
   const hasExperienceFilter = 'minExperience' in query || 'maxExperience' in query;
-  const experienceRange =
-    hasExperienceFilter && minExperience !== undefined && maxExperience !== undefined
-      ? [Number(minExperience), Number(maxExperience)]
-      : undefined;
+  let experienceRange: [number, number] | undefined = undefined;
+  if (
+    hasExperienceFilter &&
+    minExperience !== undefined &&
+    maxExperience !== undefined &&
+    minExperience !== "" &&
+    maxExperience !== ""
+  ) {
+    const minExpNum = Number(minExperience);
+    const maxExpNum = Number(maxExperience);
+    if (!isNaN(minExpNum) && !isNaN(maxExpNum) && minExpNum >= 0 && maxExpNum >= 0) {
+      experienceRange = [minExpNum, maxExpNum];
+    }
+  }
+
+  let cityFilter: { city: number } | undefined = undefined;
+  if (city && city !== "") {
+    const cityNumber = Number(city);
+    if (!isNaN(cityNumber) && isFinite(cityNumber) && cityNumber >= 0 && Number.isInteger(cityNumber)) {
+      cityFilter = { city: cityNumber };
+    }
+  }
 
   const currentFilters = pickBy(
     {
       ageRange,
       experienceRange,
-      sex: genre,
-      name: search,
-      lineOfBusiness: segment,
-      serviceType: serviceType,
-      address: city ? { city: Number(city) } : undefined,
+      sex: genre && genre !== "" ? genre : undefined,
+      name: search && search !== "" ? search : undefined,
+      lineOfBusiness: segment && segment !== "" ? segment : undefined,
+      serviceType: serviceType && serviceType !== "" ? serviceType : undefined,
+      address: cityFilter,
     },
-    (value) => Boolean(value)
+    (value) => value !== undefined && value !== null && value !== ""
   );
+
+  const hasValidFilters = Object.keys(currentFilters).length > 0;
+
+  if (!hasValidFilters) {
+    return {};
+  }
 
   if (isOrganizationTypeSelected && filterKey) {
     return {
@@ -69,7 +103,7 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
         [filterKey]: { ...currentFilters },
       };
     },
-    {}
+    {} as Record<string, typeof currentFilters>
   );
 
   return generalFilters;

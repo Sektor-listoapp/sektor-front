@@ -230,6 +230,17 @@ export type BrokerageSocietyType = BasePublicOrganizationType & {
   workTeam: Array<BrokerageSocietyTeamMemberType>;
 };
 
+export type CalendarEventType = {
+  __typename?: 'CalendarEventType';
+  createdAt: Scalars['DateTime']['output'];
+  date: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  userId: Scalars['ID']['output'];
+};
+
 export type ChangeOrganizationFeatureInputType = {
   featureKey: OrganizationFeatures;
   id: Scalars['String']['input'];
@@ -268,6 +279,12 @@ export type CountryType = {
   id: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   states: Array<StateType>;
+};
+
+export type CreateCalendarEventInput = {
+  date: Scalars['DateTime']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  title: Scalars['String']['input'];
 };
 
 export type CreateModuleInputType = {
@@ -413,6 +430,15 @@ export type ExclusiveAgentType = BasePublicOrganizationType & {
   studies: Array<StudyType>;
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type FeedbackType = {
+  __typename?: 'FeedbackType';
+  content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  userId: Scalars['ID']['output'];
 };
 
 export type FileTemplateType = {
@@ -721,6 +747,7 @@ export type Mutation = {
   changeOrganizationVisibility: OrganizationType;
   /** Step 2: Confirm immediate debit with OTP code. */
   confirmImmediateDebit: InitiatePaymentResultType;
+  createCalendarEvent: CalendarEventType;
   createModule: ModuleType;
   createNews: NewsType;
   createTracking: TrackingType;
@@ -758,9 +785,11 @@ export type Mutation = {
   savePropertyQuote: PropertyQuoteType;
   sendPasswordResetRequest: Scalars['Boolean']['output'];
   sendVerificationEmail: Scalars['Boolean']['output'];
+  submitFeedback: FeedbackType;
   submitNews: NewsType;
   unregisterDevice: Scalars['Boolean']['output'];
   updateBrokerageSociety: BrokerageSocietyType;
+  updateCalendarEvent: CalendarEventType;
   updateCustomer: CustomerType;
   updateEmail: UpdateEmailResponseType;
   updateExclusiveAgent: ExclusiveAgentType;
@@ -774,6 +803,8 @@ export type Mutation = {
   updateNotificationPreferences: NotificationPreferencesType;
   updateOrganizationLogo: OrganizationType;
   updatePassword: Scalars['Boolean']['output'];
+  /** Admin: Update subscription price and details */
+  updateSubscriptionPrice: SubscriptionPriceType;
   updateSupplier: SupplierType;
   updateTracking?: Maybe<TrackingType>;
   uploadFileToModule: ModuleType;
@@ -837,6 +868,11 @@ export type MutationChangeOrganizationVisibilityArgs = {
 
 export type MutationConfirmImmediateDebitArgs = {
   input: ConfirmImmediateDebitInputType;
+};
+
+
+export type MutationCreateCalendarEventArgs = {
+  input: CreateCalendarEventInput;
 };
 
 
@@ -1007,6 +1043,11 @@ export type MutationSendVerificationEmailArgs = {
 };
 
 
+export type MutationSubmitFeedbackArgs = {
+  input: SubmitFeedbackInput;
+};
+
+
 export type MutationSubmitNewsArgs = {
   input: NewsInputType;
   photo?: InputMaybe<Scalars['File']['input']>;
@@ -1020,6 +1061,11 @@ export type MutationUnregisterDeviceArgs = {
 
 export type MutationUpdateBrokerageSocietyArgs = {
   input: BrokerageSocietyInputType;
+};
+
+
+export type MutationUpdateCalendarEventArgs = {
+  input: UpdateCalendarEventInput;
 };
 
 
@@ -1094,6 +1140,11 @@ export type MutationUpdateOrganizationLogoArgs = {
 
 export type MutationUpdatePasswordArgs = {
   input: UpdatePasswordInputType;
+};
+
+
+export type MutationUpdateSubscriptionPriceArgs = {
+  input: UpdateSubscriptionPriceInput;
 };
 
 
@@ -1477,6 +1528,7 @@ export type Query = {
   autoQuoteById: AutoQuoteType;
   /** Get list of available banks */
   banks: Array<BankType>;
+  calendarEventsByYear: Array<CalendarEventType>;
   clinics: SupplierPaginatedType;
   customerById: CustomerType;
   /** Get current USD to VES exchange rate */
@@ -1489,6 +1541,8 @@ export type Query = {
   modules: Array<ModuleType>;
   /** Get payment history for current user/organization */
   myPayments: Array<PaymentType>;
+  /** Get subscription details for the current organization */
+  mySubscription?: Maybe<SubscriptionDetailsType>;
   news: Array<NewsType>;
   newsAndInterviewsList: NewsListGroupedType;
   newsById?: Maybe<NewsType>;
@@ -1518,6 +1572,8 @@ export type Query = {
   quoteById?: Maybe<QuoteType>;
   quotes: QuotePaginatedType;
   searchOrganizations: OrganizationPaginatedType;
+  /** Get subscription price for a specific plan */
+  subscriptionPrice?: Maybe<SubscriptionPriceType>;
   /** Get subscription prices */
   subscriptionPrices: Array<SubscriptionPriceType>;
   trackingByEntityId: Array<TrackingType>;
@@ -1544,6 +1600,11 @@ export type QueryAllPaymentsArgs = {
 
 export type QueryAutoQuoteByIdArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type QueryCalendarEventsByYearArgs = {
+  year: Scalars['Int']['input'];
 };
 
 
@@ -1699,6 +1760,11 @@ export type QueryQuotesArgs = {
 export type QuerySearchOrganizationsArgs = {
   filter?: InputMaybe<SearchOrganizationFilterType>;
   pagination: PaginationType;
+};
+
+
+export type QuerySubscriptionPriceArgs = {
+  plan: SubscriptionPlan;
 };
 
 
@@ -1927,6 +1993,25 @@ export type StudyType = {
   title: Scalars['String']['output'];
 };
 
+export type SubmitFeedbackInput = {
+  content: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+};
+
+export type SubscriptionDetailsType = {
+  __typename?: 'SubscriptionDetailsType';
+  autoRenew: Scalars['Boolean']['output'];
+  endDate?: Maybe<Scalars['DateTime']['output']>;
+  gracePeriodEndDate?: Maybe<Scalars['DateTime']['output']>;
+  isGracePeriod: Scalars['Boolean']['output'];
+  isPaid: Scalars['Boolean']['output'];
+  nextBillingDate?: Maybe<Scalars['DateTime']['output']>;
+  period?: Maybe<SubscriptionPeriod>;
+  plan: SubscriptionPlan;
+  preferredPaymentMethod?: Maybe<PaymentMethod>;
+  startDate?: Maybe<Scalars['DateTime']['output']>;
+};
+
 /** Subscription billing period */
 export enum SubscriptionPeriod {
   Annual = 'Annual',
@@ -1944,9 +2029,11 @@ export type SubscriptionPriceType = {
   __typename?: 'SubscriptionPriceType';
   annualPriceUsd: Scalars['Float']['output'];
   annualPriceVes?: Maybe<Scalars['Float']['output']>;
+  features: Array<Scalars['String']['output']>;
   monthlyPriceUsd: Scalars['Float']['output'];
   monthlyPriceVes?: Maybe<Scalars['Float']['output']>;
   plan: SubscriptionPlan;
+  title: Scalars['String']['output'];
 };
 
 export type SupplierFilterType = {
@@ -2079,6 +2166,13 @@ export type TrackingUserType = {
   phone?: Maybe<Scalars['String']['output']>;
 };
 
+export type UpdateCalendarEventInput = {
+  date?: InputMaybe<Scalars['DateTime']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type UpdateEmailInputType = {
   newEmail: Scalars['String']['input'];
   password: Scalars['String']['input'];
@@ -2110,6 +2204,14 @@ export type UpdateNotificationPreferencesInputType = {
 export type UpdatePasswordInputType = {
   newPassword: Scalars['String']['input'];
   token: Scalars['String']['input'];
+};
+
+export type UpdateSubscriptionPriceInput = {
+  annualPriceUsd?: InputMaybe<Scalars['Float']['input']>;
+  features?: InputMaybe<Array<Scalars['String']['input']>>;
+  monthlyPriceUsd?: InputMaybe<Scalars['Float']['input']>;
+  plan: SubscriptionPlan;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UploadFileTemplateResult = {
