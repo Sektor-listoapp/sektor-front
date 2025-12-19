@@ -23,7 +23,7 @@ const Searchbar = ({
 
   useEffect(() => {
     if (query?.type) {
-      handleGetPublicOrganizationsWithNewFilters(query, 1000);
+      handleGetPublicOrganizationsWithNewFilters(query, 50);
     } else {
       handleGetPublicOrganizations();
     }

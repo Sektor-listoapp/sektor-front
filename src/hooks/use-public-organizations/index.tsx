@@ -29,8 +29,6 @@ const usePublicOrganizations = ({
       variables: {
         pagination: { offset: 0, limit: 6 },
         ...currentFilters,
-        state: "Distrito Capital",
-        city: "Caracas",
         ...variables,
       },
     }
@@ -74,28 +72,21 @@ const usePublicOrganizations = ({
 
   const handleGetPublicOrganizations = async () => {
     setIsLoadingPublicOrganizations(true);
+
+    const updatedFilters = getCurrentFiltersFromQuery(query);
+
+    const variablesToSend = {
+      pagination: { offset: 0, limit: 6 },
+      ...updatedFilters,
+      ...variables,
+    };
+
     try {
-
-      const updatedFilters = getCurrentFiltersFromQuery(query);
-
-
-      const variablesToSend = {
-        pagination: { offset: 0, limit: 6 },
-        ...updatedFilters,
-        state: "Distrito Capital",
-        city: "Caracas",
-        ...variables,
-      };
-
-
-
       const { data } = await getPublicOrganizations(variablesToSend);
-
-  
-
       setPublicOrganizations(data);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
+      console.error('Error fetching public organizations:', error);
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
     } finally {
       setIsLoadingPublicOrganizations(false);
@@ -108,20 +99,18 @@ const usePublicOrganizations = ({
   ) => {
     const currentFilters = getCurrentFiltersFromQuery(query ?? {});
     setIsLoadingPublicOrganizations(true);
+
+    const variablesToSend = {
+      pagination: { offset: 0, limit },
+      ...currentFilters,
+    };
+
     try {
-      const variablesToSend = {
-        pagination: { offset: 0, limit },
-        ...currentFilters,
-      };
-
-
       const { data } = await getPublicOrganizations(variablesToSend);
-
-
-
       setPublicOrganizations(data);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
+
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
     } finally {
       setIsLoadingPublicOrganizations(false);
@@ -131,13 +120,14 @@ const usePublicOrganizations = ({
   const handleGetPublicOrganizationsWithoutFilters = async () => {
     setIsLoadingPublicOrganizations(true);
     try {
-      const { data } = await getPublicOrganizations({
+      const variablesToSend = {
         pagination: { offset: 0, limit: 6 },
-        ...{},
-      });
+      };
+      const { data } = await getPublicOrganizations(variablesToSend);
       setPublicOrganizations(data);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
+
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
     } finally {
       setIsLoadingPublicOrganizations(false);
