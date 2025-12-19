@@ -29,7 +29,7 @@ const CreateSubfolderModal: React.FC<CreateSubfolderModalProps> = ({
 }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [order, setOrder] = useState("");
+  const [order, setOrder] = useState("1");
   const [isFinal, setIsFinal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(SubscriptionPlan.Free);
   const [applicablePlans, setApplicablePlans] = useState<SubscriptionPlan[]>([SubscriptionPlan.Free]);
@@ -69,13 +69,8 @@ const CreateSubfolderModal: React.FC<CreateSubfolderModalProps> = ({
   };
 
   const handleSubmit = async () => {
+    const finalApplicablePlans = applicablePlans.length > 0 ? applicablePlans : [SubscriptionPlan.Free];
 
-
-    if (!title || !icon || applicablePlans.length === 0 || !order) {
-
-      toast.error("Por favor completa todos los campos requeridos");
-      return;
-    }
 
     const orderNumber = order ? parseInt(order, 10) : undefined;
 
@@ -86,7 +81,7 @@ const CreateSubfolderModal: React.FC<CreateSubfolderModalProps> = ({
       order: orderNumber,
       latest: isFinal,
       parentId: parentId,
-      applicablePlans,
+      applicablePlans: finalApplicablePlans,
     };
 
 
@@ -103,7 +98,7 @@ const CreateSubfolderModal: React.FC<CreateSubfolderModalProps> = ({
       setTitle("");
       setDescription("");
       setIcon(iconOptions[0].value);
-      setOrder("");
+      setOrder("1");
       setIsFinal(false);
       setSelectedPlan(SubscriptionPlan.Free);
       setApplicablePlans([SubscriptionPlan.Free]);

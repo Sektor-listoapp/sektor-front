@@ -25,7 +25,7 @@ const CreateModuleModal: React.FC<CreateModuleModalProps> = ({
 }) => {
   const [title, setTitle] = useState("");
   const [selectedPlan, setSelectedPlan] = useState(SubscriptionPlan.Free);
-  const [order, setOrder] = useState("");
+  const [order, setOrder] = useState("1");
   const [description, setDescription] = useState("");
   const [isFinal, setIsFinal] = useState(false);
 
@@ -69,10 +69,7 @@ const CreateModuleModal: React.FC<CreateModuleModalProps> = ({
   const handleSubmit = async () => {
     const applicablePlans = getApplicablePlans();
 
-    if (!title || applicablePlans.length === 0 || !order) {
-      toast.error("Por favor completa todos los campos requeridos");
-      return;
-    }
+
 
     const orderNumber = order ? parseInt(order, 10) : undefined;
 
@@ -105,12 +102,11 @@ const CreateModuleModal: React.FC<CreateModuleModalProps> = ({
       toast.success("Módulo creado correctamente");
 
       setTitle("");
-      setIcon("");
+      setIcon(iconOptions[0].value);
       setSelectedPlan(SubscriptionPlan.Free);
-      setOrder("");
+      setOrder("1");
       setDescription("");
       setIsFinal(false);
-      setIcon(iconOptions[0].value);
       onCreate();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {

@@ -41,7 +41,9 @@ const EditModuleModal: React.FC<EditModuleModalProps> = ({
       setDescription(module.description || "");
 
 
-      const plans = module.applicablePlans || [];
+      const plans = module.applicablePlans && module.applicablePlans.length > 0
+        ? module.applicablePlans
+        : [SubscriptionPlan.Free];
       setApplicablePlans(plans);
 
 
@@ -50,7 +52,7 @@ const EditModuleModal: React.FC<EditModuleModalProps> = ({
       } else if (plans.length > 0) {
         setSelectedPlan(plans[0]);
       } else {
-        setSelectedPlan("");
+        setSelectedPlan(SubscriptionPlan.Free);
       }
     }
   }, [module]);
@@ -96,10 +98,9 @@ const EditModuleModal: React.FC<EditModuleModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!title || !icon || applicablePlans.length === 0 || !order) {
-      toast.error("Por favor completa todos los campos requeridos");
-      return;
-    }
+    const finalApplicablePlans = applicablePlans.length > 0 ? applicablePlans : [SubscriptionPlan.Free];
+
+
 
     try {
       await updateModule({
@@ -110,7 +111,7 @@ const EditModuleModal: React.FC<EditModuleModalProps> = ({
             icon: icon || undefined,
             description: description || undefined,
             order: order ? parseInt(order) : undefined,
-            applicablePlans,
+            applicablePlans: finalApplicablePlans,
           },
         },
       });
