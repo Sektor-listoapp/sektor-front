@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { useRouter } from "next/router";
 import { useQuery, useMutation } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowLeft, faSearch, faTrash, faPencil, faChartLine } from "@fortawesome/free-solid-svg-icons";
+import { faArrowLeft, faSearch, faTrash, faPencil } from "@fortawesome/free-solid-svg-icons";
 import Button from "@/components/ui/button";
 import TextInput from "@/components/ui/text-input";
+import { Modal } from "antd";
 import { Query, Mutation, ModuleType } from "@/lib/sektor-api/__generated__/types";
 import { ALL_MODULES_QUERY } from "@/lib/sektor-api/queries";
 import { DELETE_MODULE } from "@/lib/sektor-api/mutations";
@@ -15,6 +16,11 @@ import FolderDetail from "./folder-detail";
 import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { toast } from "react-toastify";
 
+const getModuleIcon = (icon: string | null | undefined): string => {
+  const iconValue = icon && typeof icon === 'string' && icon.trim() ? icon : "icon1";
+  return iconValue;
+};
+
 const HerramientasList = () => {
   const router = useRouter();
   const { folderId, subfolderId } = router.query;
@@ -23,6 +29,7 @@ const HerramientasList = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [editingModule, setEditingModule] = useState<ModuleType | null>(null);
   const [isDeletingModule, setIsDeletingModule] = useState(false);
+  const [moduleToDelete, setModuleToDelete] = useState<string | null>(null);
 
   const { data: modulesData, loading: isLoadingModules, error: modulesError, refetch: refetchModules } = useQuery<Query>(
     ALL_MODULES_QUERY,
@@ -49,16 +56,19 @@ const HerramientasList = () => {
     setEditingModule(null);
   };
 
-  const handleDeleteModule = async (id: string) => {
-    if (!confirm("¿Estás seguro de que deseas eliminar este módulo?")) {
-      return;
-    }
+  const handleDeleteModuleClick = (id: string) => {
+    setModuleToDelete(id);
+  };
+
+  const handleConfirmDeleteModule = async () => {
+    if (!moduleToDelete) return;
 
     setIsDeletingModule(true);
     try {
-      await deleteModule({ variables: { id } });
+      await deleteModule({ variables: { id: moduleToDelete } });
       toast.success("Módulo eliminado correctamente");
       refetchModules();
+      setModuleToDelete(null);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || "No se pudo eliminar el módulo");
@@ -165,17 +175,27 @@ const HerramientasList = () => {
             ) : (
               filteredModules.map((module) => {
                 const isEmpty = !module.children?.length && (!module.files || module.files.length === 0);
+
                 return (
                   <div
                     key={module._id}
                     className="flex items-center justify-between py-4 border-b border-gray-200 last:border-b-0"
                   >
                     <div className="flex items-center gap-4 flex-1">
-                      <FontAwesomeIcon
-                        icon={faChartLine}
-                        className="text-blue-500"
-                        size="lg"
-                      />
+                      <div className="relative w-6 h-6 flex-shrink-0">
+                        <img
+                          src={`/images/modules-icons/${getModuleIcon(module.icon)}.webp`}
+                          alt={getModuleIcon(module.icon)}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            console.error("Error loading icon:", getModuleIcon(module.icon));
+                            const target = e.target as HTMLImageElement;
+                            if (!target.src.includes('icon1.webp')) {
+                              target.src = `/images/modules-icons/icon1.webp`;
+                            }
+                          }}
+                        />
+                      </div>
                       <span
                         className="text-blue-500 font-medium cursor-pointer hover:text-blue-400"
                         onClick={() =>
@@ -190,7 +210,7 @@ const HerramientasList = () => {
                     </div>
                     <div className="flex items-center gap-4">
                       <button
-                        onClick={() => handleDeleteModule(module._id)}
+                        onClick={() => handleDeleteModuleClick(module._id)}
                         className="text-red-500 hover:text-red-400 transition-colors disabled:opacity-50"
                         disabled={isDeletingModule}
                       >
@@ -226,6 +246,44 @@ const HerramientasList = () => {
           module={editingModule}
         />
       )}
+
+      <Modal
+        open={moduleToDelete !== null}
+        onCancel={() => setModuleToDelete(null)}
+        footer={null}
+        centered
+        closable={false}
+        className="!w-11/12 !max-w-md"
+      >
+        <div className="flex flex-col items-center gap-6 py-4 font-century-gothic">
+          <h2 className="text-xl font-bold text-blue-500 text-center">
+            ¿Seguro que quieres<br />eliminar este módulo?
+          </h2>
+
+          <p className="text-gray-500 text-sm text-center">
+            Esta acción no se puede deshacer
+          </p>
+
+          <div className="flex items-center gap-4 mt-4">
+            <Button
+              variant="solid-blue"
+              className="!bg-red-500 hover:!bg-red-600 !px-8"
+              onClick={handleConfirmDeleteModule}
+              loading={isDeletingModule}
+            >
+              Eliminar
+            </Button>
+            <Button
+              variant="outline"
+              className="!px-8"
+              onClick={() => setModuleToDelete(null)}
+              disabled={isDeletingModule}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
 };

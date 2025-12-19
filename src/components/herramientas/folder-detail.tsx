@@ -7,21 +7,21 @@ import {
   faArrowLeft,
   faTrash,
   faPencil,
-  faChartLine,
-
   faFileAlt,
 } from "@fortawesome/free-solid-svg-icons";
 import Button from "@/components/ui/button";
-import { Upload } from "antd";
+import { Upload, Modal } from "antd";
 import Switch from "@/components/ui/switch";
 import TextInput from "@/components/ui/text-input";
 import CreateSubfolderModal from "./create-subfolder-modal";
+import EditModuleModal from "./edit-module-modal";
 import { Query, Mutation, ModuleType, ModuleFileType } from "@/lib/sektor-api/__generated__/types";
 import { MODULE_BY_ID_QUERY } from "@/lib/sektor-api/queries";
 import { UPDATE_MODULE, UPLOAD_FILE_TO_MODULE, DELETE_FILE_FROM_MODULE, DELETE_MODULE } from "@/lib/sektor-api/mutations";
 import { toast } from "react-toastify";
 import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { ROUTES } from "@/constants/router";
+import { quillDeltaToText } from "@/utils/quill-delta-to-text";
 
 interface FolderDetailProps {
   folderId: string;
@@ -42,6 +42,9 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
   const [isDeletingSubfolder, setIsDeletingSubfolder] = useState(false);
   const [editedTitle, setEditedTitle] = useState("");
   const [editedDescription, setEditedDescription] = useState("");
+  const [fileToDelete, setFileToDelete] = useState<string | null>(null);
+  const [editingSubfolder, setEditingSubfolder] = useState<ModuleType | null>(null);
+  const [subfolderToDelete, setSubfolderToDelete] = useState<string | null>(null);
 
 
   const moduleId = subfolderId || folderId;
@@ -65,6 +68,13 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
   const subfolders = module?.children || [];
   const isFinalFolder = module?.latest || false;
 
+  const getModuleIcon = (icon: string | null | undefined): string => {
+    if (icon && typeof icon === 'string' && icon.trim()) {
+      return icon;
+    }
+    return "icon1";
+  };
+
   const handleBack = () => {
     if (subfolderId) {
       router.push(`${ROUTES.MODULES}?folderId=${folderId}`);
@@ -75,42 +85,40 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handleFileUpload = async (info: any) => {
-    if (info.file.status === "uploading") {
-      return;
-    }
-
-    if (info.file.status === "done" || info.file.originFileObj) {
-      try {
-        await uploadFileToModule({
-          variables: {
-            moduleId: moduleId,
-            file: info.file.originFileObj || info.file,
-          },
-        });
-        toast.success("Archivo subido correctamente");
-        refetchModule();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      } catch (error: any) {
-        toast.error(error?.message || "No se pudo subir el archivo");
-      }
+    try {
+      await uploadFileToModule({
+        variables: {
+          moduleId: moduleId,
+          file: info.file.originFileObj || info.file,
+        },
+      });
+      toast.success("Archivo subido correctamente");
+      refetchModule();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(error?.message || "No se pudo subir el archivo");
+      throw error;
     }
   };
 
-  const handleDeleteFile = async (fileId: string) => {
-    if (!confirm("¿Estás seguro de que deseas eliminar este archivo?")) {
-      return;
-    }
+  const handleDeleteFileClick = (fileId: string) => {
+    setFileToDelete(fileId);
+  };
+
+  const handleConfirmDeleteFile = async () => {
+    if (!fileToDelete) return;
 
     setIsDeletingFile(true);
     try {
       await deleteFileFromModule({
         variables: {
           moduleId: moduleId,
-          fileId: fileId,
+          fileId: fileToDelete,
         },
       });
       toast.success("Archivo eliminado correctamente");
       refetchModule();
+      setFileToDelete(null);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || "No se pudo eliminar el archivo");
@@ -123,16 +131,19 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
     router.push(`${ROUTES.MODULES}?folderId=${folderId}&subfolderId=${subfolderId}`);
   };
 
-  const handleDeleteSubfolder = async (id: string) => {
-    if (!confirm("¿Estás seguro de que deseas eliminar esta subcarpeta?")) {
-      return;
-    }
+  const handleDeleteSubfolderClick = (id: string) => {
+    setSubfolderToDelete(id);
+  };
+
+  const handleConfirmDeleteSubfolder = async () => {
+    if (!subfolderToDelete) return;
 
     setIsDeletingSubfolder(true);
     try {
-      await deleteModule({ variables: { id } });
+      await deleteModule({ variables: { id: subfolderToDelete } });
       toast.success("Subcarpeta eliminada correctamente");
       refetchModule();
+      setSubfolderToDelete(null);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || "No se pudo eliminar la subcarpeta");
@@ -141,8 +152,13 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
     }
   };
 
-  const handleEditSubfolder = (id: string) => {
-    router.push(`${ROUTES.MODULES}?folderId=${folderId}&subfolderId=${id}`);
+  const handleEditSubfolder = (subfolder: ModuleType) => {
+    setEditingSubfolder(subfolder);
+  };
+
+  const handleEditSubfolderComplete = () => {
+    setEditingSubfolder(null);
+    refetchModule();
   };
 
   const handleCreateSubfolder = () => {
@@ -296,7 +312,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
             <div className="relative">
               <div className="max-h-[300px] overflow-y-auto pr-4">
                 <p className="text-gray-600 whitespace-pre-wrap text-sm">
-                  {module.description || "Sin descripción"}
+                  {quillDeltaToText(module.description) || "Sin descripción"}
                 </p>
               </div>
               <button
@@ -310,15 +326,27 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
         </div>
 
 
+        {!isFinalFolder && (
+          <div>
+            <Button
+              variant="solid-blue"
+              onClick={() => setIsCreateSubfolderModalOpen(true)}
+              className="!rounded-lg !px-6 mb-4"
+            >
+              Crear submódulo
+            </Button>
+          </div>
+        )}
+
         <div className="pt-4">
           <p className="text-sm text-gray-500 mb-4">Archivos descargables</p>
 
           <Upload
-            onChange={handleFileUpload}
             showUploadList={false}
-            customRequest={({ file, onSuccess }) => {
-              handleFileUpload({ file: { originFileObj: file, status: "done" } });
-              onSuccess?.("ok");
+            customRequest={({ file, onSuccess, onError }) => {
+              handleFileUpload({ file: { originFileObj: file, status: "done" } })
+                .then(() => onSuccess?.("ok"))
+                .catch((error) => onError?.(error));
             }}
           >
             <Button variant="solid-blue" className="mb-4 !rounded-lg !px-6" loading={isUploadingFile}>
@@ -347,7 +375,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
                     </a>
                   </div>
                   <button
-                    onClick={() => handleDeleteFile(file._id)}
+                    onClick={() => handleDeleteFileClick(file._id)}
                     className="text-red-500 hover:text-red-400 transition-colors disabled:opacity-50"
                     disabled={isDeletingFile}
                   >
@@ -358,6 +386,99 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
             )}
           </div>
         </div>
+
+        <CreateSubfolderModal
+          open={isCreateSubfolderModalOpen}
+          onClose={() => setIsCreateSubfolderModalOpen(false)}
+          onCreate={handleCreateSubfolder}
+          parentId={subfolderId || folderId}
+          isSubmodule={!!subfolderId}
+        />
+
+        {editingSubfolder && (
+          <EditModuleModal
+            open={Boolean(editingSubfolder)}
+            onClose={() => setEditingSubfolder(null)}
+            onEdit={handleEditSubfolderComplete}
+            module={editingSubfolder}
+          />
+        )}
+
+        <Modal
+          open={fileToDelete !== null}
+          onCancel={() => setFileToDelete(null)}
+          footer={null}
+          centered
+          closable={false}
+          className="!w-11/12 !max-w-md"
+        >
+          <div className="flex flex-col items-center gap-6 py-4 font-century-gothic">
+            <h2 className="text-xl font-bold text-blue-500 text-center">
+              ¿Seguro que quieres<br />eliminar este archivo?
+            </h2>
+
+            <p className="text-gray-500 text-sm text-center">
+              Esta acción no se puede deshacer
+            </p>
+
+            <div className="flex items-center gap-4 mt-4">
+              <Button
+                variant="solid-blue"
+                className="!bg-red-500 hover:!bg-red-600 !px-8"
+                onClick={handleConfirmDeleteFile}
+                loading={isDeletingFile}
+              >
+                Eliminar
+              </Button>
+              <Button
+                variant="outline"
+                className="!px-8"
+                onClick={() => setFileToDelete(null)}
+                disabled={isDeletingFile}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
+        <Modal
+          open={subfolderToDelete !== null}
+          onCancel={() => setSubfolderToDelete(null)}
+          footer={null}
+          centered
+          closable={false}
+          className="!w-11/12 !max-w-md"
+        >
+          <div className="flex flex-col items-center gap-6 py-4 font-century-gothic">
+            <h2 className="text-xl font-bold text-blue-500 text-center">
+              ¿Seguro que quieres<br />eliminar esta subcarpeta?
+            </h2>
+
+            <p className="text-gray-500 text-sm text-center">
+              Esta acción no se puede deshacer
+            </p>
+
+            <div className="flex items-center gap-4 mt-4">
+              <Button
+                variant="solid-blue"
+                className="!bg-red-500 hover:!bg-red-600 !px-8"
+                onClick={handleConfirmDeleteSubfolder}
+                loading={isDeletingSubfolder}
+              >
+                Eliminar
+              </Button>
+              <Button
+                variant="outline"
+                className="!px-8"
+                onClick={() => setSubfolderToDelete(null)}
+                disabled={isDeletingSubfolder}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </Modal>
       </section>
     );
   }
@@ -376,15 +497,49 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
         <h1 className="text-xl font-medium text-blue-500">{folderName}</h1>
       </div>
 
+      <div className="relative">
+        {isEditingDescription ? (
+          <textarea
+            value={editedDescription}
+            onChange={(e) => setEditedDescription(e.target.value)}
+            onBlur={() => handleDescriptionSave(editedDescription)}
+            className="w-full py-3 px-5 border border-gray-300 rounded-xl text-blue-500 text-sm focus:border-blue-500 focus:ring-blue-500 font-century-gothic min-h-[150px] resize-y"
+            autoFocus
+          />
+        ) : (
+          <div className="relative">
+            <div className="max-h-[300px] overflow-y-auto pr-4">
+              <p className="text-gray-600 whitespace-pre-wrap text-sm">
+                {quillDeltaToText(module.description) || "Sin descripción"}
+              </p>
+            </div>
+            <button
+              onClick={startEditingDescription}
+              className="text-blue-500 hover:text-blue-400 text-sm underline mt-2"
+            >
+              Editar texto
+            </button>
+          </div>
+        )}
+      </div>
 
-      <div className="flex gap-4">
+      <div className="flex  gap-4">
+        {!isFinalFolder && (
+          <Button
+            variant="solid-blue"
+            onClick={() => setIsCreateSubfolderModalOpen(true)}
+            className="!rounded-lg px-4 min-w-48"
+          >
+            Crear submódulo
+          </Button>
+        )}
 
         <Upload
-          onChange={handleFileUpload}
           showUploadList={false}
-          customRequest={({ file, onSuccess }) => {
-            handleFileUpload({ file: { originFileObj: file, status: "done" } });
-            onSuccess?.("ok");
+          customRequest={({ file, onSuccess, onError }) => {
+            handleFileUpload({ file: { originFileObj: file, status: "done" } })
+              .then(() => onSuccess?.("ok"))
+              .catch((error) => onError?.(error));
           }}
         >
           <Button variant="solid-blue" loading={isUploadingFile} className="!rounded-lg !px-6">
@@ -410,11 +565,20 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
                   className="flex items-center justify-between py-4 border-b border-gray-200 last:border-b-0"
                 >
                   <div className="flex items-center gap-4 flex-1">
-                    <FontAwesomeIcon
-                      icon={faChartLine}
-                      className="text-blue-500"
-                      size="lg"
-                    />
+                    <div className="relative w-6 h-6 flex-shrink-0">
+                      <img
+                        src={`/images/modules-icons/${getModuleIcon(subfolder.icon)}.webp`}
+                        alt={getModuleIcon(subfolder.icon)}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          console.error("Error loading icon:", getModuleIcon(subfolder.icon));
+                          const target = e.target as HTMLImageElement;
+                          if (!target.src.includes('icon1.webp')) {
+                            target.src = `/images/modules-icons/icon1.webp`;
+                          }
+                        }}
+                      />
+                    </div>
                     <span
                       className="text-blue-500 font-medium cursor-pointer hover:text-blue-400"
                       onClick={() => handleSubfolderClick(subfolder._id)}
@@ -427,14 +591,14 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
                   </div>
                   <div className="flex items-center gap-4">
                     <button
-                      onClick={() => handleDeleteSubfolder(subfolder._id)}
+                      onClick={() => handleDeleteSubfolderClick(subfolder._id)}
                       className="text-red-500 hover:text-red-400 transition-colors disabled:opacity-50"
                       disabled={isDeletingSubfolder}
                     >
                       <FontAwesomeIcon icon={faTrash} />
                     </button>
                     <button
-                      onClick={() => handleEditSubfolder(subfolder._id)}
+                      onClick={() => handleEditSubfolder(subfolder)}
                       className="text-blue-500 hover:text-blue-400 transition-colors"
                       disabled={isDeletingSubfolder}
                     >
@@ -469,7 +633,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
                   </a>
                 </div>
                 <button
-                  onClick={() => handleDeleteFile(file._id)}
+                  onClick={() => handleDeleteFileClick(file._id)}
                   className="text-red-500 hover:text-red-400 transition-colors disabled:opacity-50"
                   disabled={isDeletingFile}
                 >
@@ -487,6 +651,91 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
         onCreate={handleCreateSubfolder}
         parentId={folderId}
       />
+
+      {editingSubfolder && (
+        <EditModuleModal
+          open={Boolean(editingSubfolder)}
+          onClose={() => setEditingSubfolder(null)}
+          onEdit={handleEditSubfolderComplete}
+          module={editingSubfolder}
+        />
+      )}
+
+      <Modal
+        open={fileToDelete !== null}
+        onCancel={() => setFileToDelete(null)}
+        footer={null}
+        centered
+        closable={false}
+        className="!w-11/12 !max-w-md"
+      >
+        <div className="flex flex-col items-center gap-6 py-4 font-century-gothic">
+          <h2 className="text-xl font-bold text-blue-500 text-center">
+            ¿Seguro que quieres<br />eliminar este archivo?
+          </h2>
+
+          <p className="text-gray-500 text-sm text-center">
+            Esta acción no se puede deshacer
+          </p>
+
+          <div className="flex items-center gap-4 mt-4">
+            <Button
+              variant="solid-blue"
+              className="!bg-red-500 hover:!bg-red-600 !px-8"
+              onClick={handleConfirmDeleteFile}
+              loading={isDeletingFile}
+            >
+              Eliminar
+            </Button>
+            <Button
+              variant="outline"
+              className="!px-8"
+              onClick={() => setFileToDelete(null)}
+              disabled={isDeletingFile}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      <Modal
+        open={subfolderToDelete !== null}
+        onCancel={() => setSubfolderToDelete(null)}
+        footer={null}
+        centered
+        closable={false}
+        className="!w-11/12 !max-w-md"
+      >
+        <div className="flex flex-col items-center gap-6 py-4 font-century-gothic">
+          <h2 className="text-xl font-bold text-blue-500 text-center">
+            ¿Seguro que quieres<br />eliminar esta subcarpeta?
+          </h2>
+
+          <p className="text-gray-500 text-sm text-center">
+            Esta acción no se puede deshacer
+          </p>
+
+          <div className="flex items-center gap-4 mt-4">
+            <Button
+              variant="solid-blue"
+              className="!bg-red-500 hover:!bg-red-600 !px-8"
+              onClick={handleConfirmDeleteSubfolder}
+              loading={isDeletingSubfolder}
+            >
+              Eliminar
+            </Button>
+            <Button
+              variant="outline"
+              className="!px-8"
+              onClick={() => setSubfolderToDelete(null)}
+              disabled={isDeletingSubfolder}
+            >
+              Cancelar
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </section>
   );
 };

@@ -8,7 +8,9 @@ import { CREATE_MODULE } from "@/lib/sektor-api/mutations";
 import TextInput from "@/components/ui/text-input";
 import Select from "@/components/ui/select";
 import Button from "@/components/ui/button";
+import Switch from "@/components/ui/switch";
 import { toast } from "react-toastify";
+import IconSelector from "./icon-selector";
 
 interface CreateModuleModalProps {
   open: boolean;
@@ -22,22 +24,29 @@ const CreateModuleModal: React.FC<CreateModuleModalProps> = ({
   onCreate,
 }) => {
   const [title, setTitle] = useState("");
-  const [icon, setIcon] = useState("");
-  const [selectedPlan, setSelectedPlan] = useState("");
-  const [order, setOrder] = useState("");
+  const [selectedPlan, setSelectedPlan] = useState(SubscriptionPlan.Free);
+  const [order, setOrder] = useState("1");
   const [description, setDescription] = useState("");
+  const [isFinal, setIsFinal] = useState(false);
 
   const [createModule, { loading }] = useMutation<Mutation>(CREATE_MODULE);
 
   const iconOptions = [
-    { label: "Gráfico", value: "chart" },
-    { label: "Documento", value: "document" },
-    { label: "Carpeta", value: "folder" },
-    { label: "Imagen", value: "image" },
+    { label: "Icono 1", value: "icon1", imagePath: "/images/modules-icons/icon1.webp" },
+    { label: "Icono 2", value: "icon2", imagePath: "/images/modules-icons/icon2.webp" },
+    { label: "Icono 3", value: "icon3", imagePath: "/images/modules-icons/icon3.webp" },
+    { label: "Icono 4", value: "icon4", imagePath: "/images/modules-icons/icon4.webp" },
+    { label: "Icono 5", value: "icon5", imagePath: "/images/modules-icons/icon5.webp" },
+    { label: "Icono 6", value: "icon6", imagePath: "/images/modules-icons/icon6.webp" },
+    { label: "Icono 7", value: "icon7", imagePath: "/images/modules-icons/icon7.webp" },
+    { label: "Icono 8", value: "icon8", imagePath: "/images/modules-icons/icon8.webp" },
+    { label: "Icono 9", value: "icon9", imagePath: "/images/modules-icons/icon9.webp" },
+    { label: "Icono 10", value: "icon10", imagePath: "/images/modules-icons/icon10.webp" },
   ];
 
+  const [icon, setIcon] = useState(iconOptions[0].value);
+
   const planOptions = [
-    { label: "Todos", value: "all" },
     { label: "Free", value: SubscriptionPlan.Free },
     { label: "Bronze", value: SubscriptionPlan.Bronze },
     { label: "Gold", value: SubscriptionPlan.Gold },
@@ -50,50 +59,59 @@ const CreateModuleModal: React.FC<CreateModuleModalProps> = ({
   }));
 
   const handlePlanChange = (value: string) => {
-    setSelectedPlan(value);
+    setSelectedPlan(value as SubscriptionPlan);
   };
 
   const getApplicablePlans = (): SubscriptionPlan[] => {
-    if (selectedPlan === "all") {
-      return [
-        SubscriptionPlan.Free,
-        SubscriptionPlan.Bronze,
-        SubscriptionPlan.Gold,
-        SubscriptionPlan.Diamond,
-      ];
-    }
-    return selectedPlan ? [selectedPlan as SubscriptionPlan] : [];
+    return selectedPlan ? [selectedPlan as SubscriptionPlan] : [SubscriptionPlan.Free];
   };
 
   const handleSubmit = async () => {
-    if (!title || !icon || !selectedPlan || !order) {
-      toast.error("Por favor completa todos los campos requeridos");
-      return;
-    }
-
     const applicablePlans = getApplicablePlans();
 
+
+
+    const orderNumber = order ? parseInt(order, 10) : undefined;
+
+    const input = {
+      title,
+      icon: icon || undefined,
+      description: description || undefined,
+      order: orderNumber,
+      latest: isFinal,
+      applicablePlans,
+    };
+
+    console.log("Input que se enviará a la mutación:", input);
+    console.log("Valores específicos:", {
+      iconValue: icon,
+      iconType: typeof icon,
+      orderValue: order,
+      orderParsed: orderNumber,
+      orderType: typeof orderNumber,
+    });
+
     try {
-      await createModule({
+
+      const result = await createModule({
         variables: {
-          input: {
-            title,
-            icon: icon || undefined,
-            description: description || undefined,
-            order: order ? parseInt(order) : undefined,
-            applicablePlans,
-          },
+          input,
         },
       });
+      console.log("Module created successfully:", result);
       toast.success("Módulo creado correctamente");
-      // Reset form
+
       setTitle("");
-      setIcon("");
-      setSelectedPlan("");
-      setOrder("");
+      setIcon(iconOptions[0].value);
+      setSelectedPlan(SubscriptionPlan.Free);
+      setOrder("1");
       setDescription("");
+      setIsFinal(false);
       onCreate();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
+
+
       toast.error(error?.message || "No se pudo crear el módulo");
     }
   };
@@ -133,10 +151,10 @@ const CreateModuleModal: React.FC<CreateModuleModalProps> = ({
             <label className="block text-sm font-medium mb-2">
               Elige icono del modulo
             </label>
-            <Select
-              options={iconOptions}
+            <IconSelector
               value={icon}
-              onChange={(e) => setIcon(e.target.value)}
+              onChange={setIcon}
+              options={iconOptions}
             />
           </div>
 
@@ -160,6 +178,11 @@ const CreateModuleModal: React.FC<CreateModuleModalProps> = ({
               value={order}
               onChange={(e) => setOrder(e.target.value)}
             />
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="text-blue-500">¿Es carpeta final?</span>
+            <Switch checked={isFinal} onChange={setIsFinal} />
           </div>
 
           <div>

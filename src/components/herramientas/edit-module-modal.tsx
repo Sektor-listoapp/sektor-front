@@ -8,6 +8,7 @@ import { UPDATE_MODULE } from "@/lib/sektor-api/mutations";
 import TextInput from "@/components/ui/text-input";
 import Select from "@/components/ui/select";
 import Button from "@/components/ui/button";
+import IconSelector from "./icon-selector";
 import { toast } from "react-toastify";
 
 interface EditModuleModalProps {
@@ -35,12 +36,14 @@ const EditModuleModal: React.FC<EditModuleModalProps> = ({
   useEffect(() => {
     if (module) {
       setTitle(module.title || "");
-      setIcon(module.icon || "");
+      setIcon(module.icon || "icon1");
       setOrder(module.order?.toString() || "");
       setDescription(module.description || "");
 
 
-      const plans = module.applicablePlans || [];
+      const plans = module.applicablePlans && module.applicablePlans.length > 0
+        ? module.applicablePlans
+        : [SubscriptionPlan.Free];
       setApplicablePlans(plans);
 
 
@@ -49,16 +52,22 @@ const EditModuleModal: React.FC<EditModuleModalProps> = ({
       } else if (plans.length > 0) {
         setSelectedPlan(plans[0]);
       } else {
-        setSelectedPlan("");
+        setSelectedPlan(SubscriptionPlan.Free);
       }
     }
   }, [module]);
 
   const iconOptions = [
-    { label: "Gráfico", value: "chart" },
-    { label: "Documento", value: "document" },
-    { label: "Carpeta", value: "folder" },
-    { label: "Imagen", value: "image" },
+    { label: "Icono 1", value: "icon1", imagePath: "/images/modules-icons/icon1.webp" },
+    { label: "Icono 2", value: "icon2", imagePath: "/images/modules-icons/icon2.webp" },
+    { label: "Icono 3", value: "icon3", imagePath: "/images/modules-icons/icon3.webp" },
+    { label: "Icono 4", value: "icon4", imagePath: "/images/modules-icons/icon4.webp" },
+    { label: "Icono 5", value: "icon5", imagePath: "/images/modules-icons/icon5.webp" },
+    { label: "Icono 6", value: "icon6", imagePath: "/images/modules-icons/icon6.webp" },
+    { label: "Icono 7", value: "icon7", imagePath: "/images/modules-icons/icon7.webp" },
+    { label: "Icono 8", value: "icon8", imagePath: "/images/modules-icons/icon8.webp" },
+    { label: "Icono 9", value: "icon9", imagePath: "/images/modules-icons/icon9.webp" },
+    { label: "Icono 10", value: "icon10", imagePath: "/images/modules-icons/icon10.webp" },
   ];
 
   const planOptions = [
@@ -89,10 +98,9 @@ const EditModuleModal: React.FC<EditModuleModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!title || !icon || applicablePlans.length === 0 || !order) {
-      toast.error("Por favor completa todos los campos requeridos");
-      return;
-    }
+    const finalApplicablePlans = applicablePlans.length > 0 ? applicablePlans : [SubscriptionPlan.Free];
+
+
 
     try {
       await updateModule({
@@ -103,13 +111,13 @@ const EditModuleModal: React.FC<EditModuleModalProps> = ({
             icon: icon || undefined,
             description: description || undefined,
             order: order ? parseInt(order) : undefined,
-            applicablePlans,
+            applicablePlans: finalApplicablePlans,
           },
         },
       });
       toast.success("Módulo actualizado correctamente");
       onEdit();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || "No se pudo actualizar el módulo");
     }
@@ -150,10 +158,10 @@ const EditModuleModal: React.FC<EditModuleModalProps> = ({
             <label className="block text-sm font-medium mb-2">
               Elige icono del modulo
             </label>
-            <Select
-              options={iconOptions}
+            <IconSelector
               value={icon}
-              onChange={(e) => setIcon(e.target.value)}
+              onChange={setIcon}
+              options={iconOptions}
             />
           </div>
 
