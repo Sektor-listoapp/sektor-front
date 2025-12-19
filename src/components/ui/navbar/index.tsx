@@ -281,7 +281,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                   onClick={() => setIsMobileToolsOpen(!isMobileToolsOpen)}
                   className={cn(
                     "w-full flex items-center justify-between hover:text-blue-400 focus:outline-none text-blue-500 text-lg",
-                    { "font-bold": pathname.startsWith(ROUTES.HERRAMIENTAS) }
+                  
                   )}
                 >
                   Herramientas
@@ -446,9 +446,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                   variant === "light"
                     ? "hover:text-blue-400"
                     : "hover:text-gray-200",
-                  {
-                    "font-bold": pathname.startsWith(ROUTES.HERRAMIENTAS),
-                  }
+               
                 )}
               >
                 Herramientas
