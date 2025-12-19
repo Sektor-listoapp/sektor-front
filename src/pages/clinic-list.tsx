@@ -63,7 +63,7 @@ const ClinicList = () => {
         skip: false
     });
 
-    console.log(clinicsData)
+  
 
     const stateOptions = isLoadingStates
         ? [{ label: "Cargando estados...", value: "", disabled: true }]
@@ -81,6 +81,7 @@ const ClinicList = () => {
 
 
     const allClinics = clinicsData?.clinics?.items || [];
+ 
 
 
     const clinics = allClinics.filter(clinic => {
@@ -110,27 +111,18 @@ const ClinicList = () => {
     const clinicOptions: ClinicOption[] = isLoadingClinics
         ? [{ label: "Cargando clínicas...", value: "", disabled: true }]
         : allClinics.length > 0
-            ? allClinics.flatMap((clinic: SupplierType) => {
-                const offices = clinic.offices || [];
-                if (offices.length === 0) {
-                    return [{
-                        label: clinic.name,
-                        value: clinic.id?.toString() || "",
-                        relations: clinic.insuranceCompanyRelations,
-                        officeIndex: 0
-                    }];
-                }
-                return offices.map((office, index) => ({
-                    label: `${clinic.name}`,
-                    value: clinic.id?.toString() || "",
-                    relations: clinic.insuranceCompanyRelations,
-                    officeIndex: index
-                }));
-            })
+            ? allClinics.map((clinic: SupplierType) => ({
+                label: clinic.name,
+                value: clinic.id?.toString() || "",
+                relations: clinic.insuranceCompanyRelations,
+                officeIndex: 0
+            }))
                 .sort((a, b) => a.label.localeCompare(b.label))
             : selectedState
                 ? [{ label: `No hay clínicas en este estado`, value: "", disabled: true }]
                 : [{ label: "Buscar clínicas", value: "", disabled: true }];
+
+   
 
     const insuranceOptions = isLoadingInsurance
         ? [{ label: "Cargando seguros...", value: "", disabled: true }]
