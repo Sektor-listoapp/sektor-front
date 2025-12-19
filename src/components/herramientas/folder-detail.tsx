@@ -394,6 +394,91 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
           parentId={subfolderId || folderId}
           isSubmodule={!!subfolderId}
         />
+
+        {editingSubfolder && (
+          <EditModuleModal
+            open={Boolean(editingSubfolder)}
+            onClose={() => setEditingSubfolder(null)}
+            onEdit={handleEditSubfolderComplete}
+            module={editingSubfolder}
+          />
+        )}
+
+        <Modal
+          open={fileToDelete !== null}
+          onCancel={() => setFileToDelete(null)}
+          footer={null}
+          centered
+          closable={false}
+          className="!w-11/12 !max-w-md"
+        >
+          <div className="flex flex-col items-center gap-6 py-4 font-century-gothic">
+            <h2 className="text-xl font-bold text-blue-500 text-center">
+              ¿Seguro que quieres<br />eliminar este archivo?
+            </h2>
+
+            <p className="text-gray-500 text-sm text-center">
+              Esta acción no se puede deshacer
+            </p>
+
+            <div className="flex items-center gap-4 mt-4">
+              <Button
+                variant="solid-blue"
+                className="!bg-red-500 hover:!bg-red-600 !px-8"
+                onClick={handleConfirmDeleteFile}
+                loading={isDeletingFile}
+              >
+                Eliminar
+              </Button>
+              <Button
+                variant="outline"
+                className="!px-8"
+                onClick={() => setFileToDelete(null)}
+                disabled={isDeletingFile}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </Modal>
+
+        <Modal
+          open={subfolderToDelete !== null}
+          onCancel={() => setSubfolderToDelete(null)}
+          footer={null}
+          centered
+          closable={false}
+          className="!w-11/12 !max-w-md"
+        >
+          <div className="flex flex-col items-center gap-6 py-4 font-century-gothic">
+            <h2 className="text-xl font-bold text-blue-500 text-center">
+              ¿Seguro que quieres<br />eliminar esta subcarpeta?
+            </h2>
+
+            <p className="text-gray-500 text-sm text-center">
+              Esta acción no se puede deshacer
+            </p>
+
+            <div className="flex items-center gap-4 mt-4">
+              <Button
+                variant="solid-blue"
+                className="!bg-red-500 hover:!bg-red-600 !px-8"
+                onClick={handleConfirmDeleteSubfolder}
+                loading={isDeletingSubfolder}
+              >
+                Eliminar
+              </Button>
+              <Button
+                variant="outline"
+                className="!px-8"
+                onClick={() => setSubfolderToDelete(null)}
+                disabled={isDeletingSubfolder}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </Modal>
       </section>
     );
   }

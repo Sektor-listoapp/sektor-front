@@ -25,6 +25,20 @@ export const MODULE_FIELDS_FRAGMENT = gql`
       icon
       order
       latest
+      files {
+        _id
+        fileName
+        originalName
+        fileUrl
+        contentType
+        size
+        uploadedAt
+        uploadedBy
+      }
+      children {
+        _id
+        title
+      }
     }
     files {
       _id
