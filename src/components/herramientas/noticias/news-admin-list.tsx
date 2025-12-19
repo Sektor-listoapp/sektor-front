@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faTrash, faPencil } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
 import { Query, Mutation, NewsType, NewsUploadedBy, NewsVisibility } from "@/lib/sektor-api/__generated__/types";
-import { ALL_NEWS_QUERY } from "@/lib/sektor-api/queries";
+import { ALL_NEWS_QUERY, HOME_NEWS_QUERY } from "@/lib/sektor-api/queries";
 import { DELETE_NEWS, UPDATE_NEWS } from "@/lib/sektor-api/mutations";
 import TextInput from "@/components/ui/text-input";
 import Select from "@/components/ui/select";
@@ -84,10 +84,14 @@ const NewsAdminList: React.FC<NewsAdminListProps> = ({ onEdit, onCreate }) => {
                         title: news.title,
                         description: news.description,
                         type: news.type,
+                        videoUrl: news.videoUrl || undefined,
+                        allowedRoles: (news.allowedRoles as any) || undefined,
                         pendingApproval: false,
                         visibility: NewsVisibility.Public,
                     },
                 },
+                refetchQueries: [{ query: HOME_NEWS_QUERY }, { query: ALL_NEWS_QUERY }],
+                awaitRefetchQueries: true,
             });
             toast.success("Noticia autorizada correctamente");
             refetch();

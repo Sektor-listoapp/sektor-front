@@ -4,10 +4,15 @@ import { useRouter } from "next/router";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
 import { ROUTES } from "@/constants/router";
 import { cn } from "@/utils/class-name";
+import { useAuthStore } from "@/store/auth";
+import { useShallow } from "zustand/shallow";
+import { UserGroups } from "@/lib/sektor-api/__generated__/types";
 
 const HerramientasHeader = () => {
   const router = useRouter();
   const { pathname } = router;
+  const userGroup = useAuthStore(useShallow((state) => state.user?.group));
+  const isAdmin = userGroup === UserGroups.Admin;
 
   return (
     <header className="w-full bg-white py-6 px-8">
@@ -38,20 +43,22 @@ const HerramientasHeader = () => {
           >
             Noticias
           </Link>
-          <Link
-            href={ROUTES.MODULES}
-            className={cn(
-              "text-blue-500 hover:text-blue-400 transition-colors focus:outline-none",
-              {
-                "underline underline-offset-4": pathname === ROUTES.MODULES,
-              }
-            )}
-          >
-            Modulos
-          </Link>
+          {isAdmin && (
+            <Link
+              href={ROUTES.MODULES}
+              className={cn(
+                "text-blue-500 hover:text-blue-400 transition-colors focus:outline-none",
+                {
+                  "underline underline-offset-4": pathname === ROUTES.MODULES,
+                }
+              )}
+            >
+              Modulos
+            </Link>
+          )}
         </nav>
 
-        {/* Empty div for balance */}
+
         <div className="w-[140px]" />
       </div>
     </header>

@@ -16,17 +16,18 @@ import {
   NewsEntryType,
 } from "@/lib/sektor-api/__generated__/types";
 import { CREATE_NEWS } from "@/lib/sektor-api/mutations";
-import { ALL_NEWS_QUERY } from "@/lib/sektor-api/queries";
+import { ALL_NEWS_QUERY, HOME_NEWS_QUERY } from "@/lib/sektor-api/queries";
 import { ROUTES } from "@/constants/router";
 import { toast } from "react-toastify";
 import { cn } from "@/utils/class-name";
 
-const { Admin } = UserGroups;
+const { Admin, News } = UserGroups;
 
 const CrearNoticia = () => {
   const router = useRouter();
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
   const isAdmin = userGroup === Admin;
+  const isNews = userGroup === News;
 
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [mediaType, setMediaType] = useState<"photo" | "video">("photo");
@@ -42,7 +43,7 @@ const CrearNoticia = () => {
 
   useEffect(() => {
     if (!userGroup) return;
-    if (!isAdmin) {
+    if (!isAdmin && !isNews) {
       router.push(ROUTES.HOME);
     } else {
       setCheckingAccess(false);
@@ -78,11 +79,10 @@ const CrearNoticia = () => {
             uploadedBy: NewsUploadedBy.Sektor,
             videoUrl: mediaType === "video" ? videoUrl : undefined,
             allowedRoles: allowedRoles.length > 0 ? allowedRoles : undefined,
-            pendingApproval: true,
           },
           photo: mediaType === "photo" ? photo : undefined,
         },
-        refetchQueries: [{ query: ALL_NEWS_QUERY }],
+        refetchQueries: [{ query: ALL_NEWS_QUERY }, { query: HOME_NEWS_QUERY }],
         awaitRefetchQueries: true,
       });
 
