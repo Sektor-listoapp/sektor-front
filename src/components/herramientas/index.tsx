@@ -72,6 +72,8 @@ const HerramientasList = () => {
       router.push(`${ROUTES.MODULES}?folderId=${folderId}`);
     } else if (folderId) {
       router.push(ROUTES.MODULES);
+    } else {
+      router.push(ROUTES.HOME);
     }
   };
 

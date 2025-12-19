@@ -59,26 +59,20 @@ const HerramientasNoticias = () => {
 
   const allNews = (data?.news || []) as NewsType[];
 
-  // Debug: Log all news with their pendingApproval status
-  console.log("All news loaded:", allNews.length);
-  allNews.forEach((news) => {
-    console.log(`News "${news.title}": pendingApproval=${news.pendingApproval}, visibility=${news.visibility}`);
-  });
-
-  // Separate pending and approved news FIRST
+  
   const allPendingNews = allNews.filter((news) => news.pendingApproval);
   const allApprovedNews = allNews.filter((news) => !news.pendingApproval);
 
   console.log(`Pending news: ${allPendingNews.length}, Approved news: ${allApprovedNews.length}`);
 
-  // Apply search filter
+  
   const matchesSearch = (news: NewsType) => {
     if (!searchTerm) return true;
     return news.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       news.description.toLowerCase().includes(searchTerm.toLowerCase());
   };
 
-  // Apply type filter
+ 
   const matchesTypeFilter = (news: NewsType) => {
     if (filterType === "pending") {
       return news.pendingApproval;
@@ -89,15 +83,15 @@ const HerramientasNoticias = () => {
     if (filterType === "thirdParty") {
       return news.uploadedBy === NewsUploadedBy.ThirdParty;
     }
-    return true; // "all"
+    return true; 
   };
 
-  // Filter pending news
+  
   const pendingNews = allPendingNews.filter((news) =>
     matchesSearch(news) && matchesTypeFilter(news)
   );
 
-  // Filter approved news
+  
   const approvedNews = allApprovedNews.filter((news) =>
     matchesSearch(news) && matchesTypeFilter(news)
   );
@@ -172,7 +166,7 @@ const HerramientasNoticias = () => {
         {/* Title */}
         <div className="flex items-center gap-3 mb-8">
           <button
-            onClick={() => router.push(ROUTES.HERRAMIENTAS)}
+            onClick={() => router.push(ROUTES.HOME)}
             className="text-blue-500 hover:text-blue-400 transition-colors"
           >
             <FontAwesomeIcon icon={faArrowLeft} size="lg" />
