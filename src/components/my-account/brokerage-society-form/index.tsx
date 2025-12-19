@@ -442,7 +442,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     const contactData = JSON.parse(contact);
 
     const formattedContact = {
-      ...contactData,
+      email: contactData.email,
       phone: input?.phone?.startsWith('+') ? input?.phone : `${input?.phoneCode || DEFAULT_PHONE_CODE}${input?.phone}`,
       name: contactData.name || "Nombre requerido",
       position: contactData.position || "Cargo requerido",
@@ -570,16 +570,16 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
         />
 
         <div className="col-span-1 flex flex-col gap-2">
-        <TextInput
-          name="email"
-          className="col-span-1"
-          placeholder="Correo electrónico"
-          showFloatingLabel
-          error={!requiredFields.email}
-          disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
-          onChange={(e) => handleInputChange("email", e.target.value)}
-          value={input?.email}
-        />
+          <TextInput
+            name="email"
+            className="col-span-1"
+            placeholder="Correo electrónico"
+            showFloatingLabel
+            error={!requiredFields.email}
+            disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
+            onChange={(e) => handleInputChange("email", e.target.value)}
+            value={input?.email}
+          />
           {isSelfUpdate && emailChanged && (
             <div className="col-span-1">
               <div className="relative w-full">
