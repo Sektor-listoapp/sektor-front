@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useRouter } from "next/router";
 import { useQuery, useMutation } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -45,6 +45,8 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
   const [fileToDelete, setFileToDelete] = useState<string | null>(null);
   const [editingSubfolder, setEditingSubfolder] = useState<ModuleType | null>(null);
   const [subfolderToDelete, setSubfolderToDelete] = useState<string | null>(null);
+  const [uploadingFilesCount, setUploadingFilesCount] = useState(0);
+  const totalFilesToUploadRef = useRef(0);
 
 
   const moduleId = subfolderId || folderId;
@@ -75,6 +77,18 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
     return "icon1";
   };
 
+
+  const MAX_FILE_SIZE = 15 * 1024 * 1024;
+
+  const validateFileSize = (file: File): boolean => {
+    if (file.size > MAX_FILE_SIZE) {
+      const maxSizeMB = MAX_FILE_SIZE / (1024 * 1024);
+      toast.error(`El archivo "${file.name}" es demasiado grande. El tamaño máximo permitido es ${maxSizeMB}MB`);
+      return false;
+    }
+    return true;
+  };
+
   const handleBack = () => {
     if (subfolderId) {
       router.push(`${ROUTES.MODULES}?folderId=${folderId}`);
@@ -84,18 +98,44 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleFileUpload = async (info: any) => {
+  const handleFileUpload = async (file: File, isFirstFile: boolean = false) => {
+    //ahora si el archivo es demasiado grande, se mostrara un mensaje de error
+    if (!validateFileSize(file)) {
+      throw new Error(`Archivo demasiado grande: ${file.name}`);
+    }
+
     try {
+      if (isFirstFile) {
+        totalFilesToUploadRef.current = 0;
+      }
+      totalFilesToUploadRef.current += 1;
+      setUploadingFilesCount((prev) => prev + 1);
+
       await uploadFileToModule({
         variables: {
           moduleId: moduleId,
-          file: info.file.originFileObj || info.file,
+          file: file,
         },
       });
-      toast.success("Archivo subido correctamente");
-      refetchModule();
+
+      setUploadingFilesCount((prev) => {
+        const newCount = prev - 1;
+        if (newCount === 0) {
+          // Todos los archivos terminaron de subirse
+          const totalUploaded = totalFilesToUploadRef.current;
+          const message = totalUploaded === 1
+            ? "Archivo subido correctamente"
+            : `${totalUploaded} archivos subidos correctamente`;
+          toast.success(message);
+          refetchModule();
+          totalFilesToUploadRef.current = 0;
+        }
+        return newCount;
+      });
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
+      setUploadingFilesCount((prev) => prev - 1);
       toast.error(error?.message || "No se pudo subir el archivo");
       throw error;
     }
@@ -342,15 +382,32 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
           <p className="text-sm text-gray-500 mb-4">Archivos descargables</p>
 
           <Upload
+            multiple
             showUploadList={false}
+            beforeUpload={(file) => {
+
+              if (!validateFileSize(file as File)) {
+                return false;
+              }
+              return true;
+            }}
             customRequest={({ file, onSuccess, onError }) => {
-              handleFileUpload({ file: { originFileObj: file, status: "done" } })
-                .then(() => onSuccess?.("ok"))
+              const fileObj = file as File;
+              const isFirstFile = uploadingFilesCount === 0;
+
+              handleFileUpload(fileObj, isFirstFile)
+                .then(() => {
+                  onSuccess?.("ok");
+                })
                 .catch((error) => onError?.(error));
             }}
           >
-            <Button variant="solid-blue" className="mb-4 !rounded-lg !px-6" loading={isUploadingFile}>
-              Subir archivo
+            <Button
+              variant="solid-blue"
+              className="mb-4 !rounded-lg !px-6"
+              loading={isUploadingFile || uploadingFilesCount > 0}
+            >
+              Subir archivo(s)
             </Button>
           </Upload>
 
@@ -535,15 +592,32 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
         )}
 
         <Upload
+          multiple
           showUploadList={false}
+          beforeUpload={(file) => {
+
+            if (!validateFileSize(file as File)) {
+              return false;
+            }
+            return true;
+          }}
           customRequest={({ file, onSuccess, onError }) => {
-            handleFileUpload({ file: { originFileObj: file, status: "done" } })
-              .then(() => onSuccess?.("ok"))
+            const fileObj = file as File;
+            const isFirstFile = uploadingFilesCount === 0;
+
+            handleFileUpload(fileObj, isFirstFile)
+              .then(() => {
+                onSuccess?.("ok");
+              })
               .catch((error) => onError?.(error));
           }}
         >
-          <Button variant="solid-blue" loading={isUploadingFile} className="!rounded-lg !px-6">
-            Subir dentro de este modulo
+          <Button
+            variant="solid-blue"
+            loading={isUploadingFile || uploadingFilesCount > 0}
+            className="!rounded-lg !px-6"
+          >
+            Subir archivo(s)
           </Button>
         </Upload>
       </div>
