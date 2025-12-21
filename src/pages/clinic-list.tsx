@@ -10,16 +10,11 @@ import {
     STATES_QUERY,
     INSURANCE_COMPANIES_QUERY,
 } from "@/lib/sektor-api/queries";
-import { Query, SupplierType, StateType, InsuranceCompanyType, SupplierInsuranceCompanyRelationType, OrganizationOfficeType } from "@/lib/sektor-api/__generated__/types";
+import { Query, SupplierType, StateType, InsuranceCompanyType, SupplierInsuranceCompanyRelationType } from "@/lib/sektor-api/__generated__/types";
 import { CustomDropdown } from '@/components/ui/custom-dropdown';
 import CloseIcon from '@/components/icons/close-icon';
 import CheckIcon from '@/components/icons/check-icon';
 import Image from 'next/image';
-
-
-type OfficeWithName = OrganizationOfficeType & {
-    name?: string;
-};
 
 
 
@@ -63,7 +58,7 @@ const ClinicList = () => {
         skip: false
     });
 
-  
+
 
     const stateOptions = isLoadingStates
         ? [{ label: "Cargando estados...", value: "", disabled: true }]
@@ -81,7 +76,7 @@ const ClinicList = () => {
 
 
     const allClinics = clinicsData?.clinics?.items || [];
- 
+
 
 
     const clinics = allClinics.filter(clinic => {
@@ -122,7 +117,7 @@ const ClinicList = () => {
                 ? [{ label: `No hay clínicas en este estado`, value: "", disabled: true }]
                 : [{ label: "Buscar clínicas", value: "", disabled: true }];
 
-   
+
 
     const insuranceOptions = isLoadingInsurance
         ? [{ label: "Cargando seguros...", value: "", disabled: true }]
@@ -458,8 +453,16 @@ const ClinicList = () => {
                                     address.country?.name
                                 ].filter(Boolean).join(', ') : '';
 
-                                const googleMapsUrl = fullAddress
-                                    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`
+                                //ahora si no hay dirección completa se mostrara la ciudad y el estado
+                                const hasPartialAddress = address && (address.city?.name || address.state?.name);
+                                const displayAddress = fullAddress || (hasPartialAddress ? [
+                                    address.city?.name,
+                                    address.state?.name,
+                                    address.country?.name
+                                ].filter(Boolean).join(', ') : '');
+
+                                const googleMapsUrl = displayAddress
+                                    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(displayAddress)}`
                                     : '#';
 
                                 return (
@@ -468,7 +471,7 @@ const ClinicList = () => {
                                         <div className="grid grid-cols-3 gap-4 px-2 pb-2">
                                             <div className="flex flex-col items-center justify-center col-span-1 text-xs font-normal font-century-gothic">
                                                 <div className="mb-2">Dirección</div>
-                                                {fullAddress ? (
+                                                {displayAddress ? (
                                                     <a
                                                         href={googleMapsUrl}
                                                         target="_blank"
@@ -488,7 +491,7 @@ const ClinicList = () => {
                                             </div>
                                             <div className="flex flex-col items-center justify-center col-span-1 text-xs font-normal font-century-gothic">
                                                 <div className="mb-2">Oficina</div>
-                                                {(selectedOffice as OfficeWithName).name ? (
+                                                {displayAddress ? (
                                                     <button
                                                         onClick={() => setIsAddressModalOpen(true)}
                                                         className="flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity bg-transparent border-none"
@@ -537,8 +540,16 @@ const ClinicList = () => {
                             address.country?.name
                         ].filter(Boolean).join(', ') : '';
 
-                        const googleMapsUrl = fullAddress
-                            ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress)}`
+
+                        const hasPartialAddress = address && (address.city?.name || address.state?.name);
+                        const displayAddress = fullAddress || (hasPartialAddress ? [
+                            address.city?.name,
+                            address.state?.name,
+                            address.country?.name
+                        ].filter(Boolean).join(', ') : '');
+
+                        const googleMapsUrl = displayAddress
+                            ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(displayAddress)}`
                             : '#';
 
                         return (
@@ -547,7 +558,7 @@ const ClinicList = () => {
                                 <div className="hidden md:grid grid-cols-3 gap-4 px-2 md:px-6 pb-6">
                                     <div className="flex flex-col items-center justify-center col-span-1 text-xs font-normal font-century-gothic">
                                         <div className="mb-2">Dirección</div>
-                                        {fullAddress ? (
+                                        {displayAddress ? (
                                             <a
                                                 href={googleMapsUrl}
                                                 target="_blank"
@@ -567,7 +578,7 @@ const ClinicList = () => {
                                     </div>
                                     <div className="flex flex-col items-center justify-center col-span-1 text-xs font-normal font-century-gothic">
                                         <div className="mb-2">Oficina</div>
-                                        {(selectedOffice as OfficeWithName).name ? (
+                                        {displayAddress ? (
                                             <button
                                                 onClick={() => setIsAddressModalOpen(true)}
                                                 className="flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity bg-transparent border-none"
@@ -641,6 +652,14 @@ const ClinicList = () => {
                     address.country?.name
                 ].filter(Boolean).join(', ') : '';
 
+
+                const hasPartialAddress = address && (address.city?.name || address.state?.name);
+                const displayAddress = fullAddress || (hasPartialAddress ? [
+                    address.city?.name,
+                    address.state?.name,
+                    address.country?.name
+                ].filter(Boolean).join(', ') : '');
+
                 return (
                     <Modal
                         footer={null}
@@ -660,7 +679,7 @@ const ClinicList = () => {
                         <section className="flex flex-col items-center justify-center gap-5 text-blue-500 p-5 font-century-gothic w-full">
                             <h3 className="text-center font-bold text-lg">Dirección oficina</h3>
                             <p className="text-center text-base">
-                                {fullAddress || 'Dirección no disponible'}
+                                {displayAddress || 'Dirección no disponible'}
                             </p>
                         </section>
                     </Modal>
