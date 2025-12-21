@@ -50,6 +50,14 @@ export type AdminUpdateEmailInputType = {
   userId: Scalars['ID']['input'];
 };
 
+export type ApplePurchaseResultType = {
+  __typename?: 'ApplePurchaseResultType';
+  message: Scalars['String']['output'];
+  payment?: Maybe<PaymentType>;
+  subscription?: Maybe<SubscriptionDetailsType>;
+  success: Scalars['Boolean']['output'];
+};
+
 /** Auto coverages options */
 export enum AutoCoverages {
   BasicThirdPartyLiability = 'BasicThirdPartyLiability',
@@ -810,6 +818,8 @@ export type Mutation = {
   uploadFileToModule: ModuleType;
   uploadOfficesTemplate: Array<UploadFileTemplateResult>;
   uploadOrganizationTemplate: Array<UploadFileTemplateResult>;
+  /** Validate an Apple In-App Purchase transaction from StoreKit 2 */
+  validateApplePurchase: ApplePurchaseResultType;
 };
 
 
@@ -1175,6 +1185,11 @@ export type MutationUploadOrganizationTemplateArgs = {
   file: Scalars['String']['input'];
 };
 
+
+export type MutationValidateApplePurchaseArgs = {
+  input: ValidateApplePurchaseInputType;
+};
+
 export type NewsAdminFilterInputType = {
   pendingApproval?: InputMaybe<Scalars['Boolean']['input']>;
   uploadedBy?: InputMaybe<NewsUploadedBy>;
@@ -1418,6 +1433,7 @@ export type PaginationType = {
 
 /** Available payment methods */
 export enum PaymentMethod {
+  AppleInAppPurchase = 'AppleInAppPurchase',
   DirectDebit = 'DirectDebit',
   ImmediateDebit = 'ImmediateDebit',
   MobilePayment = 'MobilePayment'
@@ -2240,4 +2256,11 @@ export type UserType = {
   name: Scalars['String']['output'];
   subscriptionPlan?: Maybe<SubscriptionPlan>;
   verifiedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type ValidateApplePurchaseInputType = {
+  /** Apple product identifier (e.g., com.sektor.subscription.gold.monthly) */
+  productId: Scalars['String']['input'];
+  /** JWS transaction token from StoreKit 2 */
+  transactionToken: Scalars['String']['input'];
 };

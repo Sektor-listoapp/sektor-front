@@ -29,5 +29,6 @@ export * from "./herramientas/create-module";
 export * from "./herramientas/update-module";
 export * from "./herramientas/delete-module";
 export * from "./herramientas/upload-file-to-module";
+export * from "./herramientas/get-module-upload-url";
 export * from "./herramientas/delete-file-from-module";
 export * from "./news";
