@@ -69,7 +69,7 @@ const OrganizationOfficesSlider = ({
               >
                 <Image
                   className="w-full h-full object-cover object-center 2xl:h-72 rounded-t-2xl"
-                  src={office?.photoUrl || "/images/placeholder.png"}
+                  src={office?.photoUrl || "/images/placeholder.webp"}
                   alt={office?.address?.state?.name}
                   width={500}
                   height={400}

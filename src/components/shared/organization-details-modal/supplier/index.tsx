@@ -117,7 +117,7 @@ const SupplierDetails = () => {
         <OrganizationFlipCard
           heading={name}
           // license={license || ""}
-          logoUrl={logoUrl || "/images/placeholder.png"}
+          logoUrl={logoUrl || "/images/placeholder.webp"}
           serviceType={serviceTypeLabel || ""}
         />
 

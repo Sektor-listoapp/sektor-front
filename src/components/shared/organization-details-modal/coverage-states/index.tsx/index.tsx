@@ -35,7 +35,7 @@ const OrganizationCoverageStates = ({
       {!showOfficesList && (
         <div className="w-full text-blue-500 grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-10 overflow-y-auto px-5">
           {Object?.entries(coverageStates)?.map(([location, offices], index) => {
-            const imageSrc = offices[0]?.photoUrl || "/images/placeholder.png";
+            const imageSrc = offices[0]?.photoUrl || "/images/placeholder.webp";
             return (
               <div
                 key={`office-${index}`}

@@ -118,7 +118,7 @@ const InsuranceBrokerDetails = () => {
         <OrganizationFlipCard
           heading={heading}
           license={license || ""}
-          logoUrl={logoUrl || "/images/placeholder.png"}
+          logoUrl={logoUrl || "/images/placeholder.webp"}
           yearsOfExperience={yearsOfExperience || ""}
         />
 

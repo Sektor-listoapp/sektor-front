@@ -181,7 +181,7 @@ const NewsAdminList: React.FC<NewsAdminListProps> = ({ onEdit, onCreate }) => {
                                 >
                                     <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
                                         <Image
-                                            src={news.photoUrl || "/images/placeholder.png"}
+                                            src={news.photoUrl || "/images/placeholder.webp"}
                                             alt={news.title}
                                             fill
                                             className="object-cover"
@@ -238,7 +238,7 @@ const NewsAdminList: React.FC<NewsAdminListProps> = ({ onEdit, onCreate }) => {
                                 >
                                     <div className="relative w-24 h-24 rounded-lg overflow-hidden flex-shrink-0">
                                         <Image
-                                            src={news.photoUrl || "/images/placeholder.png"}
+                                            src={news.photoUrl || "/images/placeholder.webp"}
                                             alt={news.title}
                                             fill
                                             className="object-cover"

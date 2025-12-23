@@ -115,13 +115,13 @@ const ExclusiveAgentDetails = () => {
         <OrganizationFlipCard
           heading={heading}
           license={license || ""}
-          logoUrl={logoUrl || "/images/placeholder.png"}
+          logoUrl={logoUrl || "/images/placeholder.webp"}
           yearsOfExperience={yearsOfExperience || ""}
         />
 
         <div className="w-full mx-auto flex justify-center items-center">
           <Image
-            src={organizationLogoUrl || "/images/placeholder.png"}
+            src={organizationLogoUrl || "/images/placeholder.webp"}
             alt={name}
             width={200}
             height={100}

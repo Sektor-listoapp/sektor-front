@@ -43,7 +43,7 @@ const BrokerageSocietyCard = ({
       )}
       <Image
         className="w-full h-full rounded-l-2xl min-h-48"
-        src={data?.logoUrl || "/images/placeholder.png"}
+        src={data?.logoUrl || "/images/placeholder.webp"}
         alt={name}
         width={350}
         height={350}

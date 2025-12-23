@@ -42,7 +42,7 @@ const ExclusiveAgentCard = ({
       )}
       <Image
         className="w-full min-h-72 h-72 object-cover object-center rounded-t-2x"
-        src={data?.logoUrl || "/images/placeholder.png"}
+        src={data?.logoUrl || "/images/placeholder.webp"}
         alt={name}
         width={500}
         height={400}

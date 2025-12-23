@@ -24,7 +24,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ news, variant = "horizontal" }) => 
         className="relative w-full h-[400px] rounded-xl overflow-hidden cursor-pointer group"
       >
         <Image
-          src={news.photoUrl || "/images/placeholder.png"}
+          src={news.photoUrl || "/images/placeholder.webp"}
           alt={news.title}
           fill
           className="object-cover transition-transform group-hover:scale-105"
@@ -45,7 +45,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ news, variant = "horizontal" }) => 
         className="relative w-full h-[180px] rounded-xl overflow-hidden cursor-pointer group"
       >
         <Image
-          src={news.photoUrl || "/images/placeholder.png"}
+          src={news.photoUrl || "/images/placeholder.webp"}
           alt={news.title}
           fill
           className="object-cover transition-transform group-hover:scale-105"
@@ -66,7 +66,7 @@ const NewsCard: React.FC<NewsCardProps> = ({ news, variant = "horizontal" }) => 
     >
       <div className="relative w-[200px] h-[130px] rounded-xl overflow-hidden flex-shrink-0">
         <Image
-          src={news.photoUrl || "/images/placeholder.png"}
+          src={news.photoUrl || "/images/placeholder.webp"}
           alt={news.title}
           fill
           className="object-cover transition-transform group-hover:scale-105"

@@ -41,7 +41,7 @@ const InsuranceBrokerCard = ({
       )}
       <Image
         className="w-full object-cover object-center rounded-t-2xl h-72"
-        src={data?.logoUrl || "/images/placeholder.png"}
+        src={data?.logoUrl || "/images/placeholder.webp"}
         alt={name}
         width={500}
         height={400}
