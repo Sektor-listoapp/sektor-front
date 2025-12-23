@@ -5,7 +5,7 @@ import {
   InsuranceCompanyType,
   SupplierType,
 } from "@/lib/sektor-api/__generated__/types";
-import { PublicOrganizations } from "@/types/public";
+import { PublicOrganizations, OrganizationPaginationInfo } from "@/types/public";
 
 export interface PublicOrganizationsStoreState {
   publicOrganizations: PublicOrganizations | null;
@@ -15,15 +15,26 @@ export interface PublicOrganizationsStoreState {
 export interface PublicOrganizationsStoreActions {
   setIsLoadingPublicOrganizations: (isLoading: boolean) => void;
   setPublicOrganizations: (organizations: PublicOrganizations | null) => void;
-  setPublicSuppliers: (suppliers: SupplierType[]) => void;
-  setPublicExclusiveAgents: (exclusiveAgents: ExclusiveAgentType[]) => void;
+  setPublicSuppliers: (
+    suppliers: SupplierType[],
+    paginationInfo?: OrganizationPaginationInfo | null
+  ) => void;
+  setPublicExclusiveAgents: (
+    exclusiveAgents: ExclusiveAgentType[],
+    paginationInfo?: OrganizationPaginationInfo | null
+  ) => void;
   setPublicInsuranceCompanies: (
-    insuranceCompanies: InsuranceCompanyType[]
+    insuranceCompanies: InsuranceCompanyType[],
+    paginationInfo?: OrganizationPaginationInfo | null
   ) => void;
   setPublicBrokerageSocieties: (
-    brokerageSocieties: BrokerageSocietyType[]
+    brokerageSocieties: BrokerageSocietyType[],
+    paginationInfo?: OrganizationPaginationInfo | null
   ) => void;
-  setPublicInsuranceBrokers: (insuranceBrokers: InsuranceBrokerType[]) => void;
+  setPublicInsuranceBrokers: (
+    insuranceBrokers: InsuranceBrokerType[],
+    paginationInfo?: OrganizationPaginationInfo | null
+  ) => void;
   resetPublicOrganizations: () => void;
 }
 
@@ -36,8 +47,8 @@ export interface PublicOrganizationsStoreSetter {
       | PublicOrganizationsStore
       | Partial<PublicOrganizationsStore>
       | ((
-          state: PublicOrganizationsStore
-        ) => PublicOrganizationsStore | Partial<PublicOrganizationsStore>),
+        state: PublicOrganizationsStore
+      ) => PublicOrganizationsStore | Partial<PublicOrganizationsStore>),
     replace?: false | undefined,
     action?: string | undefined
   ): void;

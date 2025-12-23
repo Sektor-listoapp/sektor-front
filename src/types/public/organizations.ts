@@ -13,10 +13,23 @@ export interface OrganizationAddress {
   country: string;
 }
 
+export interface OrganizationPaginationInfo {
+  count: number;
+  pages: number;
+  currentPage: number;
+}
+
 export interface PublicOrganizations {
   suppliers?: SupplierType[] | null;
   exclusiveAgents?: ExclusiveAgentType[] | null;
   insuranceBrokers?: InsuranceBrokerType[] | null;
   brokerageSocieties?: BrokerageSocietyType[] | null;
   insuranceCompanies?: InsuranceCompanyType[] | null;
+  pagination?: {
+    suppliers?: OrganizationPaginationInfo | null;
+    exclusiveAgents?: OrganizationPaginationInfo | null;
+    insuranceBrokers?: OrganizationPaginationInfo | null;
+    brokerageSocieties?: OrganizationPaginationInfo | null;
+    insuranceCompanies?: OrganizationPaginationInfo | null;
+  } | null;
 }

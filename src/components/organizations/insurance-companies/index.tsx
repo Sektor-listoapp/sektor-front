@@ -8,6 +8,8 @@ import { useShallow } from "zustand/shallow";
 import InsuranceCompanyCard from "./card";
 import CardCarousel from "@/components/ui/card-carousel";
 import { Empty } from "antd";
+import usePublicOrganizations from "@/hooks/use-public-organizations";
+import Pagination from "@/components/ui/pagination";
 
 interface InsuranceCompaniesProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
@@ -24,6 +26,10 @@ const InsuranceCompanies = ({
     usePublicOrganizationsStore(
       useShallow((state) => state.publicOrganizations?.insuranceCompanies)
     ) || [];
+  const paginationInfo = usePublicOrganizationsStore(
+    useShallow((state) => state.publicOrganizations?.pagination?.insuranceCompanies)
+  );
+  const { handleChangePage, isLoadingPublicOrganizations } = usePublicOrganizations({});
 
   const handleClick = () => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
@@ -32,6 +38,10 @@ const InsuranceCompanies = ({
       undefined,
       { scroll: false }
     );
+  };
+
+  const handlePageChange = (page: number) => {
+    handleChangePage("insuranceCompany", page, 12);
   };
 
   return (
@@ -76,6 +86,15 @@ const InsuranceCompanies = ({
               />
             ))}
           </div>
+
+          {isSelected && paginationInfo && paginationInfo.pages > 1 && (
+            <Pagination
+              currentPage={paginationInfo.currentPage}
+              totalPages={paginationInfo.pages}
+              onPageChange={handlePageChange}
+              disabled={isLoadingPublicOrganizations}
+            />
+          )}
         </>
       ) : (
         <Empty description="No hay compañías de seguros disponibles" />

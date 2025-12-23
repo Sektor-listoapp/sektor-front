@@ -8,6 +8,8 @@ import { useShallow } from "zustand/shallow";
 import ExclusiveAgentCard from "./card";
 import CardCarousel from "@/components/ui/card-carousel";
 import { Empty } from "antd";
+import usePublicOrganizations from "@/hooks/use-public-organizations";
+import Pagination from "@/components/ui/pagination";
 
 interface ExclusiveAgentsProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
@@ -21,6 +23,10 @@ const ExclusiveAgents = ({ className, ...props }: ExclusiveAgentsProps) => {
     usePublicOrganizationsStore(
       useShallow((state) => state.publicOrganizations?.exclusiveAgents)
     ) || [];
+  const paginationInfo = usePublicOrganizationsStore(
+    useShallow((state) => state.publicOrganizations?.pagination?.exclusiveAgents)
+  );
+  const { handleChangePage, isLoadingPublicOrganizations } = usePublicOrganizations({});
 
   const handleClick = () => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
@@ -29,6 +35,10 @@ const ExclusiveAgents = ({ className, ...props }: ExclusiveAgentsProps) => {
       undefined,
       { scroll: false }
     );
+  };
+
+  const handlePageChange = (page: number) => {
+    handleChangePage("exclusiveAgent", page, 12);
   };
 
   return (
@@ -73,6 +83,15 @@ const ExclusiveAgents = ({ className, ...props }: ExclusiveAgentsProps) => {
               />
             ))}
           </div>
+
+          {isSelected && paginationInfo && paginationInfo.pages > 1 && (
+            <Pagination
+              currentPage={paginationInfo.currentPage}
+              totalPages={paginationInfo.pages}
+              onPageChange={handlePageChange}
+              disabled={isLoadingPublicOrganizations}
+            />
+          )}
         </>
       ) : (
         <Empty description="No hay agentes exclusivos disponibles" />

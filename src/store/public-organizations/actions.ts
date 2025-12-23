@@ -17,14 +17,21 @@ export const publicRegistrationsStoreActions = (
   setPublicOrganizations: (publicOrganizations) => {
     set({ publicOrganizations }, false, "setPublicOrganizations");
   },
-  setPublicSuppliers: (publicSuppliers) => {
+  setPublicSuppliers: (publicSuppliers, paginationInfo) => {
     return set(
       (state) => {
         return {
           ...state,
           publicOrganizations: {
-            ...state.publicOrganizations,
             suppliers: publicSuppliers,
+            exclusiveAgents: state.publicOrganizations?.exclusiveAgents,
+            insuranceBrokers: state.publicOrganizations?.insuranceBrokers,
+            brokerageSocieties: state.publicOrganizations?.brokerageSocieties,
+            insuranceCompanies: state.publicOrganizations?.insuranceCompanies,
+            pagination: {
+              ...state.publicOrganizations?.pagination,
+              suppliers: paginationInfo,
+            },
           },
         };
       },
@@ -32,14 +39,21 @@ export const publicRegistrationsStoreActions = (
       "setPublicSuppliers"
     );
   },
-  setPublicExclusiveAgents: (publicExclusiveAgents) => {
+  setPublicExclusiveAgents: (publicExclusiveAgents, paginationInfo) => {
     return set(
       (state) => {
         return {
           ...state,
           publicOrganizations: {
-            ...state.publicOrganizations,
+            suppliers: state.publicOrganizations?.suppliers,
             exclusiveAgents: publicExclusiveAgents,
+            insuranceBrokers: state.publicOrganizations?.insuranceBrokers,
+            brokerageSocieties: state.publicOrganizations?.brokerageSocieties,
+            insuranceCompanies: state.publicOrganizations?.insuranceCompanies,
+            pagination: {
+              ...state.publicOrganizations?.pagination,
+              exclusiveAgents: paginationInfo,
+            },
           },
         };
       },
@@ -47,14 +61,21 @@ export const publicRegistrationsStoreActions = (
       "setPublicExclusiveAgents"
     );
   },
-  setPublicInsuranceCompanies: (publicInsuranceCompanies) => {
+  setPublicInsuranceCompanies: (publicInsuranceCompanies, paginationInfo) => {
     return set(
       (state) => {
         return {
           ...state,
           publicOrganizations: {
-            ...state.publicOrganizations,
+            suppliers: state.publicOrganizations?.suppliers,
+            exclusiveAgents: state.publicOrganizations?.exclusiveAgents,
+            insuranceBrokers: state.publicOrganizations?.insuranceBrokers,
+            brokerageSocieties: state.publicOrganizations?.brokerageSocieties,
             insuranceCompanies: publicInsuranceCompanies,
+            pagination: {
+              ...state.publicOrganizations?.pagination,
+              insuranceCompanies: paginationInfo,
+            },
           },
         };
       },
@@ -62,14 +83,21 @@ export const publicRegistrationsStoreActions = (
       "setPublicInsuranceCompanies"
     );
   },
-  setPublicBrokerageSocieties: (publicBrokerageSocieties) => {
+  setPublicBrokerageSocieties: (publicBrokerageSocieties, paginationInfo) => {
     return set(
       (state) => {
         return {
           ...state,
           publicOrganizations: {
-            ...state.publicOrganizations,
+            suppliers: state.publicOrganizations?.suppliers,
+            exclusiveAgents: state.publicOrganizations?.exclusiveAgents,
+            insuranceBrokers: state.publicOrganizations?.insuranceBrokers,
             brokerageSocieties: publicBrokerageSocieties,
+            insuranceCompanies: state.publicOrganizations?.insuranceCompanies,
+            pagination: {
+              ...state.publicOrganizations?.pagination,
+              brokerageSocieties: paginationInfo,
+            },
           },
         };
       },
@@ -77,14 +105,21 @@ export const publicRegistrationsStoreActions = (
       "setPublicBrokerageSocieties"
     );
   },
-  setPublicInsuranceBrokers: (publicInsuranceBrokers) => {
+  setPublicInsuranceBrokers: (publicInsuranceBrokers, paginationInfo) => {
     return set(
       (state) => {
         return {
           ...state,
           publicOrganizations: {
-            ...state.publicOrganizations,
+            suppliers: state.publicOrganizations?.suppliers,
+            exclusiveAgents: state.publicOrganizations?.exclusiveAgents,
             insuranceBrokers: publicInsuranceBrokers,
+            brokerageSocieties: state.publicOrganizations?.brokerageSocieties,
+            insuranceCompanies: state.publicOrganizations?.insuranceCompanies,
+            pagination: {
+              ...state.publicOrganizations?.pagination,
+              insuranceBrokers: paginationInfo,
+            },
           },
         };
       },

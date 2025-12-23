@@ -8,6 +8,8 @@ import { useShallow } from "zustand/shallow";
 import SupplierCard from "./card";
 import CardCarousel from "@/components/ui/card-carousel";
 import { Empty } from "antd";
+import usePublicOrganizations from "@/hooks/use-public-organizations";
+import Pagination from "@/components/ui/pagination";
 
 interface SuppliersProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
@@ -21,6 +23,10 @@ const Suppliers = ({ className, ...props }: SuppliersProps) => {
     usePublicOrganizationsStore(
       useShallow((state) => state.publicOrganizations?.suppliers)
     ) || [];
+  const paginationInfo = usePublicOrganizationsStore(
+    useShallow((state) => state.publicOrganizations?.pagination?.suppliers)
+  );
+  const { handleChangePage, isLoadingPublicOrganizations } = usePublicOrganizations({});
 
   const handleClick = () => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
@@ -29,6 +35,10 @@ const Suppliers = ({ className, ...props }: SuppliersProps) => {
       undefined,
       { scroll: false }
     );
+  };
+
+  const handlePageChange = (page: number) => {
+    handleChangePage("supplier", page, 12);
   };
 
   return (
@@ -73,6 +83,15 @@ const Suppliers = ({ className, ...props }: SuppliersProps) => {
               />
             ))}
           </div>
+
+          {isSelected && paginationInfo && paginationInfo.pages > 1 && (
+            <Pagination
+              currentPage={paginationInfo.currentPage}
+              totalPages={paginationInfo.pages}
+              onPageChange={handlePageChange}
+              disabled={isLoadingPublicOrganizations}
+            />
+          )}
         </>
       ) : (
         <Empty description="No hay proveedores disponibles" />
