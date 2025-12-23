@@ -36,7 +36,7 @@ const NewsAdminCard: React.FC<NewsAdminCardProps> = ({
       {/* Image */}
       <div className="relative w-[80px] h-[60px] rounded-lg overflow-hidden flex-shrink-0">
         <Image
-          src={news.photoUrl || "/images/placeholder.png"}
+          src={news.photoUrl || "/images/placeholder.webp"}
           alt={news.title}
           fill
           className="object-cover"

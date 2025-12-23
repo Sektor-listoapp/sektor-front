@@ -62,7 +62,7 @@ const OrganizationsSlider = ({
                   "w-full",
                   hasOrganizationQuery && "cursor-pointer"
                 )}
-                src={logoUrl || "/images/placeholder.png"}
+                src={logoUrl || "/images/placeholder.webp"}
                 alt={name}
                 width={300}
                 height={300}

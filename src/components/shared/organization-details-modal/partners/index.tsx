@@ -47,7 +47,7 @@ const OrganizationPartners = ({
             {"logoUrl" in props && (
               <Image
                 className="w-20 h-20 border border-blue-500 border-opacity-20 rounded-xl object-cover object-center"
-                src={props.logoUrl || "/images/placeholder.png"}
+                src={props.logoUrl || "/images/placeholder.webp"}
                 alt={name}
                 width={200}
                 title={name}
@@ -57,7 +57,7 @@ const OrganizationPartners = ({
             {"photoUrl" in props && (
               <Image
                 className="w-20 h-20 border border-blue-500 border-opacity-20 rounded-xl object-cover object-center"
-                src={props.photoUrl || "/images/placeholder.png"}
+                src={props.photoUrl || "/images/placeholder.webp"}
                 alt={name}
                 title={name}
                 width={200}

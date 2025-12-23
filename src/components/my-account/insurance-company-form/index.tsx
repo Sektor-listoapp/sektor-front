@@ -644,7 +644,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
             optionRender: (option) => (
               <Space>
                 <Image
-                  src={option?.data?.image || "/images/placeholder.png"}
+                  src={option?.data?.image || "/images/placeholder.webp"}
                   alt={"Proveedor"}
                   width={40}
                   height={40}

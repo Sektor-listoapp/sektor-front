@@ -627,7 +627,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
             optionRender: (option) => (
               <Space>
                 <Image
-                  src={option.data.image || "/images/placeholder.png"}
+                  src={option.data.image || "/images/placeholder.webp"}
                   alt={"Aliado"}
                   width={40}
                   height={40}
@@ -835,7 +835,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
             optionRender: (option) => (
               <Space>
                 <Image
-                  src={option.data.image || "/images/placeholder.png"}
+                  src={option.data.image || "/images/placeholder.webp"}
                   alt={"Aliado"}
                   width={40}
                   height={40}

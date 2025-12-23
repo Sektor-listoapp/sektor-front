@@ -41,7 +41,7 @@ const InsuranceCompanyCard = ({
       )}
       <Image
         className="w-full min-h-72 h-72 object-cover object-center 2xl:h-72 rounded-t-2xl"
-        src={data?.logoUrl || "/images/placeholder.png"}
+        src={data?.logoUrl || "/images/placeholder.webp"}
         alt={name}
         width={500}
         height={400}

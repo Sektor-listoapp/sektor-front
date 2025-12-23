@@ -51,7 +51,7 @@ const LocalClientsInput = ({ clients, disabled }: ClientsInputProps) => {
           optionRender={(option) => (
             <div className="flex items-center gap-3 justify-between p-2 bg-transparent">
               <Image
-                src={option.data.image || "/images/placeholder.png"}
+                src={option.data.image || "/images/placeholder.webp"}
                 alt={option.data.label || "Client logo"}
                 width={40}
                 height={40}

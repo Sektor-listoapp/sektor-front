@@ -7,6 +7,7 @@ import { ALL_ORGANIZATION_TYPES_QUERY } from "@/lib/sektor-api/queries/public/al
 import { usePublicOrganizationsStore } from "@/store/public-organizations";
 import { Query } from "@/lib/sektor-api/__generated__/types";
 import { ParsedUrlQuery } from "querystring";
+import { OrganizationPaginationInfo } from "@/types/public";
 
 interface UsePublicOrganizationsProps {
   variables?: OperationVariables;
@@ -62,12 +63,40 @@ const usePublicOrganizations = ({
     (state) => state.publicOrganizations
   );
 
-  const setPublicOrganizations = (data: Query) => {
-    setPublicSuppliers(data?.publicSuppliers?.items || []);
-    setPublicExclusiveAgents(data?.publicExclusiveAgents?.items || []);
-    setPublicInsuranceBrokers(data?.publicInsuranceBrokers?.items || []);
-    setPublicBrokerageSocieties(data?.publicBrokerageSocieties?.items || []);
-    setPublicInsuranceCompanies(data?.publicInsuranceCompanies?.items || []);
+  const setPublicOrganizations = (data: Query, currentPage = 1) => {
+    const getPaginationInfo = (
+      paginatedData: { count?: number; pages?: number } | null | undefined
+    ): OrganizationPaginationInfo | null => {
+      if (!paginatedData || paginatedData.count === undefined || paginatedData.pages === undefined) {
+        return null;
+      }
+      return {
+        count: paginatedData.count,
+        pages: paginatedData.pages,
+        currentPage,
+      };
+    };
+
+    setPublicSuppliers(
+      data?.publicSuppliers?.items || [],
+      getPaginationInfo(data?.publicSuppliers)
+    );
+    setPublicExclusiveAgents(
+      data?.publicExclusiveAgents?.items || [],
+      getPaginationInfo(data?.publicExclusiveAgents)
+    );
+    setPublicInsuranceBrokers(
+      data?.publicInsuranceBrokers?.items || [],
+      getPaginationInfo(data?.publicInsuranceBrokers)
+    );
+    setPublicBrokerageSocieties(
+      data?.publicBrokerageSocieties?.items || [],
+      getPaginationInfo(data?.publicBrokerageSocieties)
+    );
+    setPublicInsuranceCompanies(
+      data?.publicInsuranceCompanies?.items || [],
+      getPaginationInfo(data?.publicInsuranceCompanies)
+    );
   };
 
   const handleGetPublicOrganizations = async () => {
@@ -95,22 +124,93 @@ const usePublicOrganizations = ({
 
   const handleGetPublicOrganizationsWithNewFilters = async (
     query?: ParsedUrlQuery,
-    limit = 6
+    limit = 6,
+    page = 1
   ) => {
     const currentFilters = getCurrentFiltersFromQuery(query ?? {});
     setIsLoadingPublicOrganizations(true);
 
+    const offset = (page - 1) * limit;
     const variablesToSend = {
-      pagination: { offset: 0, limit },
+      pagination: { offset, limit },
       ...currentFilters,
     };
 
     try {
       const { data } = await getPublicOrganizations(variablesToSend);
-      setPublicOrganizations(data);
+      setPublicOrganizations(data, page);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
 
+      toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
+    } finally {
+      setIsLoadingPublicOrganizations(false);
+    }
+  };
+
+  const handleChangePage = async (
+    organizationType: string,
+    page: number,
+    limit = 12
+  ) => {
+    const currentFilters = getCurrentFiltersFromQuery(query);
+    setIsLoadingPublicOrganizations(true);
+    const offset = (page - 1) * limit;
+    const variablesToSend = {
+      pagination: { offset, limit },
+      ...currentFilters,
+    };
+
+    try {
+      const { data } = await getPublicOrganizations(variablesToSend);
+
+      const getPaginationInfo = (
+        paginatedData: { count?: number; pages?: number } | null | undefined
+      ): OrganizationPaginationInfo | null => {
+        if (!paginatedData || paginatedData.count === undefined || paginatedData.pages === undefined) {
+          return null;
+        }
+        return {
+          count: paginatedData.count,
+          pages: paginatedData.pages,
+          currentPage: page,
+        };
+      };
+
+      switch (organizationType) {
+        case "supplier":
+          setPublicSuppliers(
+            data?.publicSuppliers?.items || [],
+            getPaginationInfo(data?.publicSuppliers)
+          );
+          break;
+        case "exclusiveAgent":
+          setPublicExclusiveAgents(
+            data?.publicExclusiveAgents?.items || [],
+            getPaginationInfo(data?.publicExclusiveAgents)
+          );
+          break;
+        case "insuranceBroker":
+          setPublicInsuranceBrokers(
+            data?.publicInsuranceBrokers?.items || [],
+            getPaginationInfo(data?.publicInsuranceBrokers)
+          );
+          break;
+        case "brokerageSociety":
+          setPublicBrokerageSocieties(
+            data?.publicBrokerageSocieties?.items || [],
+            getPaginationInfo(data?.publicBrokerageSocieties)
+          );
+          break;
+        case "insuranceCompany":
+          setPublicInsuranceCompanies(
+            data?.publicInsuranceCompanies?.items || [],
+            getPaginationInfo(data?.publicInsuranceCompanies)
+          );
+          break;
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: unknown | any) {
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
     } finally {
       setIsLoadingPublicOrganizations(false);
@@ -141,6 +241,7 @@ const usePublicOrganizations = ({
     isLoadingPublicOrganizations,
     handleGetPublicOrganizationsWithNewFilters,
     handleGetPublicOrganizationsWithoutFilters,
+    handleChangePage,
   };
 };
 

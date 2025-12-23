@@ -49,7 +49,7 @@ const InsuranceCompaniesCarousel = ({
                 "w-11/12 h-32 m-auto max-w-full object-contain md:h-60 xl:h-36",
                 imageClassName
               )}
-              src={logoUrl || "/images/placeholder.png"}
+              src={logoUrl || "/images/placeholder.webp"}
               width={700}
               height={700}
               alt={name}

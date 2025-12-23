@@ -8,6 +8,8 @@ import { usePublicOrganizationsStore } from "@/store/public-organizations";
 import { useShallow } from "zustand/shallow";
 import CardCarousel from "@/components/ui/card-carousel";
 import { Empty } from "antd";
+import usePublicOrganizations from "@/hooks/use-public-organizations";
+import Pagination from "@/components/ui/pagination";
 
 interface BrokerageSocietiesProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
@@ -24,6 +26,10 @@ const BrokerageSocieties = ({
     usePublicOrganizationsStore(
       useShallow((state) => state.publicOrganizations?.brokerageSocieties)
     ) || [];
+  const paginationInfo = usePublicOrganizationsStore(
+    useShallow((state) => state.publicOrganizations?.pagination?.brokerageSocieties)
+  );
+  const { handleChangePage, isLoadingPublicOrganizations } = usePublicOrganizations({});
 
   const handleClick = () => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
@@ -32,6 +38,10 @@ const BrokerageSocieties = ({
       undefined,
       { scroll: false }
     );
+  };
+
+  const handlePageChange = (page: number) => {
+    handleChangePage("brokerageSociety", page, 12);
   };
 
   return (
@@ -76,6 +86,15 @@ const BrokerageSocieties = ({
               />
             ))}
           </div>
+
+          {isSelected && paginationInfo && paginationInfo.pages > 1 && (
+            <Pagination
+              currentPage={paginationInfo.currentPage}
+              totalPages={paginationInfo.pages}
+              onPageChange={handlePageChange}
+              disabled={isLoadingPublicOrganizations}
+            />
+          )}
         </>
       ) : (
         <Empty description="No hay sociedades de corretaje disponibles" />

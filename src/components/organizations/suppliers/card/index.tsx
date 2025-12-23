@@ -24,7 +24,7 @@ const SupplierCard = ({ data, className, ...props }: SupplierCardProps) => {
 
   const supplierServiceType =
     SUPPLIER_SERVICE_TYPE_LABEL[
-      data?.serviceType as keyof typeof SUPPLIER_SERVICE_TYPE_LABEL
+    data?.serviceType as keyof typeof SUPPLIER_SERVICE_TYPE_LABEL
     ];
 
   const allies = data?.allies?.slice(0, 3) || [];
@@ -43,7 +43,7 @@ const SupplierCard = ({ data, className, ...props }: SupplierCardProps) => {
       </div>
       <Image
         className="w-full h-full object-cover object-center rounded-l-2xl min-h-48"
-        src={data?.logoUrl || "/images/placeholder.png"}
+        src={data?.logoUrl || "/images/placeholder.webp"}
         alt={name}
         width={500}
         height={400}

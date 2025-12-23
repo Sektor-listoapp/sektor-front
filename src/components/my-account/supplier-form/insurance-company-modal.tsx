@@ -127,7 +127,7 @@ const InsuranceCompanyModal: React.FC<InsuranceCompanyModalProps> = ({
 
     const getCompanyLogo = (companyId: string) => {
         const company = insuranceCompanies.find(c => c.id === companyId);
-        return company?.logoUrl || '/images/placeholder.png';
+        return company?.logoUrl || '/images/placeholder.webp';
     };
 
     return (

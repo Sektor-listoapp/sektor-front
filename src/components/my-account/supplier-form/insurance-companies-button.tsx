@@ -48,7 +48,7 @@ const InsuranceCompaniesButton: React.FC<InsuranceCompaniesButtonProps> = ({
 
     const getCompanyLogo = (companyId: string) => {
         const company = insuranceCompanies.find(c => c.id === companyId);
-        return company?.logoUrl || '/images/placeholder.png';
+        return company?.logoUrl || '/images/placeholder.webp';
     };
 
     const handleSaveRelations = (newRelations: SupplierInsuranceCompanyRelationInputType[]) => {

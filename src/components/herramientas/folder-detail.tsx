@@ -11,13 +11,14 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Button from "@/components/ui/button";
 import { Upload, Modal } from "antd";
+import { UploadChangeParam, UploadFile } from "antd/lib/upload";
 import Switch from "@/components/ui/switch";
 import TextInput from "@/components/ui/text-input";
 import CreateSubfolderModal from "./create-subfolder-modal";
 import EditModuleModal from "./edit-module-modal";
 import { Query, Mutation, ModuleType, ModuleFileType } from "@/lib/sektor-api/__generated__/types";
 import { MODULE_BY_ID_QUERY } from "@/lib/sektor-api/queries";
-import { UPDATE_MODULE, UPLOAD_FILE_TO_MODULE, DELETE_FILE_FROM_MODULE, DELETE_MODULE } from "@/lib/sektor-api/mutations";
+import { UPDATE_MODULE, GET_MODULE_UPLOAD_URL, DELETE_FILE_FROM_MODULE, DELETE_MODULE } from "@/lib/sektor-api/mutations";
 import { toast } from "react-toastify";
 import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { ROUTES } from "@/constants/router";
@@ -47,6 +48,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
   const [subfolderToDelete, setSubfolderToDelete] = useState<string | null>(null);
   const [uploadingFilesCount, setUploadingFilesCount] = useState(0);
   const totalFilesToUploadRef = useRef(0);
+  const filesStartedUploadingRef = useRef(0);
 
 
   const moduleId = subfolderId || folderId;
@@ -60,7 +62,8 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
   );
 
   const [updateModule, { loading: isUpdatingModule }] = useMutation<Mutation>(UPDATE_MODULE);
-  const [uploadFileToModule, { loading: isUploadingFile }] = useMutation<Mutation>(UPLOAD_FILE_TO_MODULE);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [getModuleUploadUrl, { loading: isUploadingFile }] = useMutation<any>(GET_MODULE_UPLOAD_URL);
   const [deleteFileFromModule] = useMutation<Mutation>(DELETE_FILE_FROM_MODULE);
   const [deleteModule] = useMutation<Mutation>(DELETE_MODULE);
 
@@ -78,7 +81,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
   };
 
 
-  const MAX_FILE_SIZE = 15 * 1024 * 1024;
+  const MAX_FILE_SIZE = 32 * 1024 * 1024; // 32MB
 
   const validateFileSize = (file: File): boolean => {
     if (file.size > MAX_FILE_SIZE) {
@@ -98,36 +101,53 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleFileUpload = async (file: File, isFirstFile: boolean = false) => {
+  const handleFileUpload = async (file: File) => {
     //ahora si el archivo es demasiado grande, se mostrara un mensaje de error
     if (!validateFileSize(file)) {
       throw new Error(`Archivo demasiado grande: ${file.name}`);
     }
 
     try {
-      if (isFirstFile) {
-        totalFilesToUploadRef.current = 0;
-      }
-      totalFilesToUploadRef.current += 1;
+
+      filesStartedUploadingRef.current += 1;
       setUploadingFilesCount((prev) => prev + 1);
 
-      await uploadFileToModule({
+
+      const { data } = await getModuleUploadUrl({
         variables: {
           moduleId: moduleId,
-          file: file,
+          fileName: file.name,
+          contentType: file.type || "application/octet-stream",
+          size: file.size,
         },
       });
+
+      const signedUrl = data?.getModuleUploadUrl?.signedUrl;
+
+      if (!signedUrl) {
+        throw new Error("No se pudo obtener la URL de subida");
+      }
+
+
+      const uploadResponse = await fetch(signedUrl, {
+        method: "PUT",
+        body: file,
+        headers: {
+          "Content-Type": file.type || "application/octet-stream",
+        },
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Error al subir el archivo al storage");
+      }
 
       setUploadingFilesCount((prev) => {
         const newCount = prev - 1;
         if (newCount === 0) {
-          // Todos los archivos terminaron de subirse
-          const totalUploaded = totalFilesToUploadRef.current;
-          const message = totalUploaded === 1
-            ? "Archivo subido correctamente"
-            : `${totalUploaded} archivos subidos correctamente`;
-          toast.success(message);
+
           refetchModule();
+          // Resetear contadores
+          filesStartedUploadingRef.current = 0;
           totalFilesToUploadRef.current = 0;
         }
         return newCount;
@@ -385,17 +405,21 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
             multiple
             showUploadList={false}
             beforeUpload={(file) => {
-
               if (!validateFileSize(file as File)) {
                 return false;
               }
               return true;
             }}
+            onChange={(info: UploadChangeParam<UploadFile<unknown>>) => {
+              const filesUploading = info.fileList.filter((f) => f.status === 'uploading');
+              if (filesUploading.length > 0 && uploadingFilesCount === 0) {
+                filesStartedUploadingRef.current = 0;
+              }
+            }}
             customRequest={({ file, onSuccess, onError }) => {
               const fileObj = file as File;
-              const isFirstFile = uploadingFilesCount === 0;
 
-              handleFileUpload(fileObj, isFirstFile)
+              handleFileUpload(fileObj)
                 .then(() => {
                   onSuccess?.("ok");
                 })
@@ -595,17 +619,23 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
           multiple
           showUploadList={false}
           beforeUpload={(file) => {
-
             if (!validateFileSize(file as File)) {
               return false;
             }
             return true;
           }}
+          onChange={(info: UploadChangeParam<UploadFile<unknown>>) => {
+
+            const filesUploading = info.fileList.filter((f) => f.status === 'uploading');
+            if (filesUploading.length > 0 && uploadingFilesCount === 0) {
+
+              filesStartedUploadingRef.current = 0;
+            }
+          }}
           customRequest={({ file, onSuccess, onError }) => {
             const fileObj = file as File;
-            const isFirstFile = uploadingFilesCount === 0;
 
-            handleFileUpload(fileObj, isFirstFile)
+            handleFileUpload(fileObj)
               .then(() => {
                 onSuccess?.("ok");
               })

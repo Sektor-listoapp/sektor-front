@@ -43,7 +43,7 @@ const OrganizationFlipCard = ({
             <Image
               className="w-full h-full"
               alt={heading}
-              src={logoUrl || "/images/placeholder.png"}
+              src={logoUrl || "/images/placeholder.webp"}
               height={350}
               width={350}
             />
