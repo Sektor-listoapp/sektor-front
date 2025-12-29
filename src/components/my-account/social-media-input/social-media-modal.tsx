@@ -45,6 +45,18 @@ const SocialMediaModal = ({
   const buildSocialMediaUrl = (platform: string, inputUrl: string): string => {
     const trimmedUrl = inputUrl.trim();
 
+
+    const phonePlatforms = [
+      SocialMediaPlatform.Phone,
+      SocialMediaPlatform.EmergencyPhone,
+      SocialMediaPlatform.Whatsapp,
+    ];
+
+    if (phonePlatforms.includes(platform as SocialMediaPlatform)) {
+      return trimmedUrl;
+    }
+
+
     if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
       return trimmedUrl;
     }
@@ -53,15 +65,15 @@ const SocialMediaModal = ({
       [SocialMediaPlatform.Facebook]: 'https://www.facebook.com/',
       [SocialMediaPlatform.Instagram]: 'https://www.instagram.com/',
       [SocialMediaPlatform.Twitter]: 'https://www.twitter.com/',
+      [SocialMediaPlatform.Website]: 'https://',
     };
 
     const baseUrl = platformUrls[platform] || 'https://';
 
 
-    if (trimmedUrl.includes('.com/') || trimmedUrl.includes('.com')) {
+    if (trimmedUrl.includes('.com/') || trimmedUrl.includes('.com') || trimmedUrl.includes('.')) {
       return trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`;
     }
-
 
     return `${baseUrl}${trimmedUrl}`;
   };
@@ -76,13 +88,29 @@ const SocialMediaModal = ({
 
     let updatedLinks;
     if (platform) {
+
       updatedLinks = socialLinks.map(link =>
         link.platform === platform
           ? newLink
           : link
       );
     } else {
-      updatedLinks = [...socialLinks, newLink];
+
+      const normalizedNewUrl = newLink.url.toLowerCase().trim();
+      const existingIndex = socialLinks.findIndex(link =>
+        link.platform === selectedPlatform &&
+        link.url.toLowerCase().trim() === normalizedNewUrl
+      );
+
+      if (existingIndex !== -1) {
+
+        updatedLinks = socialLinks.map((link, index) =>
+          index === existingIndex ? newLink : link
+        );
+      } else {
+
+        updatedLinks = [...socialLinks, newLink];
+      }
     }
 
     setSocialLinks(updatedLinks);
@@ -96,11 +124,8 @@ const SocialMediaModal = ({
     (p) => isEditMode || !socialLinks.some(link => link.platform === p)
   );
 
-  const allowedPlatforms = [
-    SocialMediaPlatform.Facebook,
-    SocialMediaPlatform.Instagram,
-    SocialMediaPlatform.Twitter,
-  ];
+
+  const allowedPlatforms = Object.values(SocialMediaPlatform);
 
   const platformsOptions = availablePlatforms
     .filter((p) => allowedPlatforms.includes(p))
@@ -148,7 +173,13 @@ const SocialMediaModal = ({
 
           <TextInput
             className="w-full h-[45px]"
-            placeholder="Escribe el nombre aqui"
+            placeholder={
+              selectedPlatform === SocialMediaPlatform.Phone ||
+                selectedPlatform === SocialMediaPlatform.EmergencyPhone ||
+                selectedPlatform === SocialMediaPlatform.Whatsapp
+                ? "Escribe el número de teléfono"
+                : "Escribe la URL o nombre de usuario"
+            }
             value={url}
             onChange={(e) => setUrl(e.target.value)}
           />

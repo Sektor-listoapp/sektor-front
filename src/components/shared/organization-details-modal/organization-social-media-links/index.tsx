@@ -14,11 +14,33 @@ interface OrganizationSocialMediaLinksProps
 
 const { EmergencyPhone, Phone, Whatsapp } = SocialMediaPlatform;
 
+
+const removeDuplicateSocialMediaLinks = (
+  links: SocialMediaLinkType[]
+): SocialMediaLinkType[] => {
+  const seen = new Set<string>();
+  return links.filter((link) => {
+
+    const normalizedUrl = link.url.toLowerCase().trim();
+    const key = `${link.platform}-${normalizedUrl}`;
+
+    if (seen.has(key)) {
+      return false;
+    }
+
+    seen.add(key);
+    return true;
+  });
+};
+
 const OrganizationSocialMediaLinks = ({
   socialMediaLinks,
   className,
   ...props
 }: OrganizationSocialMediaLinksProps) => {
+
+  const uniqueLinks = removeDuplicateSocialMediaLinks(socialMediaLinks);
+
   return (
     <section
       className={cn(
@@ -27,7 +49,7 @@ const OrganizationSocialMediaLinks = ({
       )}
       {...props}
     >
-      {socialMediaLinks.map((link, index) => {
+      {uniqueLinks.map((link, index) => {
         const { platform, url } = link;
         const icon = SOCIAL_MEDIA_LINK_ICONS[platform];
 
@@ -39,7 +61,7 @@ const OrganizationSocialMediaLinks = ({
         return (
           <a
             className="w-fit flex items-center justify-start gap-3 text-blue-500"
-            key={`${platform}-${index}`}
+            key={`${platform}-${url}-${index}`}
             href={isPhoneNumber ? `tel:${url}` : normalizedUrl}
             target="_blank"
             rel="noreferrer noopener"
