@@ -42,15 +42,14 @@ const ContactDetailsModal = ({
     console.log("Contact ID:", contact.id);
     console.log("User:", user);
 
-    // Verificar si hay token de autenticación
+
     const token = useAuthStore.getState().accessToken;
     console.log("Auth token:", token ? "Present" : "Missing");
 
-    // Asegurar que el group siempre tenga un valor válido
+
     const userGroup = user?.group || UserGroups.Customer;
     console.log("User group:", userGroup);
 
-    // Crear el objeto de usuario solo si hay datos válidos
     let formattedUser: TrackingUserInputType | null = null;
     if (user?.id || user?.name || user?.email) {
       formattedUser = pickBy(
@@ -107,7 +106,10 @@ const ContactDetailsModal = ({
   // @ts-expect-error Unknown type
   const phone = contact?.phone || contact?.contact?.phone || null;
 
-  const socialMediaLinks = contact?.socialMediaLinks || ('contact' in contact && 'links' in contact.contact ? contact.contact.links : []) || [];
+
+  const contactLinks = ('contact' in contact && 'links' in contact.contact && Array.isArray(contact.contact.links) ? contact.contact.links : []);
+  const directLinks = Array.isArray(contact?.socialMediaLinks) ? contact.socialMediaLinks : [];
+  const socialMediaLinks = [...directLinks, ...contactLinks];
 
   return (
     <Modal
