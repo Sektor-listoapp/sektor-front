@@ -398,6 +398,69 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
           </div>
         )}
 
+        <div>
+          <p className="text-sm text-gray-500 mb-4">Subcarpetas</p>
+          <div className="flex flex-col">
+            {subfolders.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">
+                No hay subcarpetas
+              </p>
+            ) : (
+              subfolders.map((subfolder: ModuleType) => {
+                const isEmpty = !subfolder.children?.length && (!subfolder.files || subfolder.files.length === 0);
+                return (
+                  <div
+                    key={subfolder._id}
+                    className="flex items-center justify-between py-4 border-b border-gray-200 last:border-b-0"
+                  >
+                    <div className="flex items-center gap-4 flex-1">
+                      <div className="relative w-6 h-6 flex-shrink-0">
+                        <img
+                          src={`/images/modules-icons/${getModuleIcon(subfolder.icon)}.webp`}
+                          alt={getModuleIcon(subfolder.icon)}
+                          className="w-full h-full object-contain"
+                          onError={(e) => {
+                            console.error("Error loading icon:", getModuleIcon(subfolder.icon));
+                            const target = e.target as HTMLImageElement;
+                            if (!target.src.includes('icon1.webp')) {
+                              target.src = `/images/modules-icons/icon1.webp`;
+                            }
+                          }}
+                        />
+                      </div>
+                      <span
+                        className="text-blue-500 font-medium cursor-pointer hover:text-blue-400"
+                        onClick={() => handleSubfolderClick(subfolder._id)}
+                      >
+                        {subfolder.title}
+                      </span>
+                      {isEmpty && (
+                        <span className="text-gray-400 text-sm">vacío</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <button
+                        onClick={() => handleDeleteSubfolderClick(subfolder._id)}
+                        className="text-red-500 hover:text-red-400 transition-colors disabled:opacity-50"
+                        disabled={isDeletingSubfolder}
+                      >
+                        <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                      <button
+                        onClick={() => handleEditSubfolder(subfolder)}
+                        className="text-blue-500 hover:text-blue-400 transition-colors"
+                        disabled={isDeletingSubfolder}
+                      >
+                        <FontAwesomeIcon icon={faPencil} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+
         <div className="pt-4">
           <p className="text-sm text-gray-500 mb-4">Archivos descargables</p>
 
