@@ -6,9 +6,7 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 import { PLATFORM_LABELS_MAP } from "@/constants/forms";
 import { cn } from "@/utils/class-name";
 import SocialMediaModal from "./social-media-modal";
-import { SocialMediaLinkType } from "@/lib/sektor-api/__generated__/types";
-
-const SOCIAL_PLATFORMS = ["Instagram", "Facebook", "Twitter"];
+import { SocialMediaLinkType, SocialMediaPlatform } from "@/lib/sektor-api/__generated__/types";
 
 interface SocialMediaInputProps {
     disabled?: boolean;
@@ -35,27 +33,45 @@ const SocialMediaInput = ({
 
     useEffect(() => {
         if (socialMediaLinks && socialMediaLinks.length > 0) {
-            setSocialLinks(socialMediaLinks);
+
+            const uniqueLinks = socialMediaLinks.filter((link, index, self) => {
+                const normalizedUrl = link.url.toLowerCase().trim();
+                return index === self.findIndex((l) =>
+                    l.platform === link.platform &&
+                    l.url.toLowerCase().trim() === normalizedUrl
+                );
+            });
+            setSocialLinks(uniqueLinks);
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const options = useMemo(() => {
-        return socialLinks
-            .filter(link => SOCIAL_PLATFORMS.includes(link.platform))
-            .map((link) => {
-                const label = PLATFORM_LABELS_MAP[link.platform] || link.platform;
-                return {
-                    label: `${label}: ${link.url}`,
+
+        const uniqueLinks = socialLinks.filter((link, index, self) => {
+            const normalizedUrl = link.url.toLowerCase().trim();
+            return index === self.findIndex((l) =>
+                l.platform === link.platform &&
+                l.url.toLowerCase().trim() === normalizedUrl
+            );
+        });
+
+
+        return uniqueLinks.map((link, index) => {
+            const label = PLATFORM_LABELS_MAP[link.platform as SocialMediaPlatform] || link.platform;
+
+            const uniqueValue = `${link.platform}-${link.url}-${index}`;
+            return {
+                label: `${label}: ${link.url}`,
+                value: uniqueValue,
+                data: {
+                    label,
                     value: link.platform,
-                    data: {
-                        label,
-                        value: link.platform,
-                        platform: link.platform,
-                        url: link.url,
-                    },
-                };
-            });
+                    platform: link.platform,
+                    url: link.url,
+                },
+            };
+        });
     }, [socialLinks]);
 
     return (
@@ -98,8 +114,17 @@ const SocialMediaInput = ({
                                 size="lg"
                                 title="Eliminar"
                                 onClick={() => {
+                                    const platformToDelete = option?.data?.data?.platform;
+                                    const urlToDelete = option?.data?.data?.url;
                                     const updatedLinks = socialLinks.filter(
-                                        (link) => link.platform !== option?.data?.data?.platform
+                                        (link) => {
+                                            const normalizedUrl = link.url.toLowerCase().trim();
+                                            const normalizedDeleteUrl = urlToDelete?.toLowerCase().trim();
+                                            return !(
+                                                link.platform === platformToDelete &&
+                                                normalizedUrl === normalizedDeleteUrl
+                                            );
+                                        }
                                     );
                                     setSocialLinks(updatedLinks);
                                 }}
