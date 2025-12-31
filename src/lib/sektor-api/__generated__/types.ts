@@ -1497,6 +1497,7 @@ export type PropertyQuoteType = {
 
 export type PublicOrganizationFilterAddressType = {
   city?: InputMaybe<Scalars['Float']['input']>;
+  state?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type PublicOrganizationFilterType = {

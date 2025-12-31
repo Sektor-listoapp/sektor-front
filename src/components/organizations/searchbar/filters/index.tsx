@@ -31,7 +31,6 @@ const OrganizationFilters = () => {
   const { query, replace } = useRouter();
   const [openDrawer, setOpenDrawer] = useState(false);
   const handleCloseDrawer = () => setOpenDrawer(false);
-  const [refetchCleaned, setRefetchCleaned] = useState(false);
   const [selectedStateId, setSelectedStateId] = useState("");
   const [selectedCityId, setSelectedCityId] = useState("");
 
@@ -39,7 +38,6 @@ const OrganizationFilters = () => {
     COUNTRY_BY_CODE_QUERY,
     { variables: { code: "VE" } }
   );
-
 
   const countryStates = countryData?.getCountryByCode?.states || [];
 
@@ -53,7 +51,6 @@ const OrganizationFilters = () => {
       .sort((a, b) => a.label.localeCompare(b.label)),
   ];
 
-
   const selectedState = countryStates.find((s) => s.id === Number(selectedStateId));
   const cityOptions = [
     { label: "Ciudad", value: "", disabled: true },
@@ -66,7 +63,6 @@ const OrganizationFilters = () => {
   ];
 
   const {
-    handleGetPublicOrganizations,
     isLoadingPublicOrganizations,
     handleGetPublicOrganizationsWithNewFilters,
     handleGetPublicOrganizationsWithoutFilters,
@@ -93,7 +89,6 @@ const OrganizationFilters = () => {
     Number(maxExperience),
   ]);
 
-
   useEffect(() => {
     setAgeRange([Number(minAge), Number(maxAge)]);
     setExperienceRange([Number(minExperience), Number(maxExperience)]);
@@ -112,7 +107,6 @@ const OrganizationFilters = () => {
   };
 
   const handleShowDrawer = () => {
-
     const hasAgeInQuery = 'minAge' in query || 'maxAge' in query;
     const hasExperienceInQuery = 'minExperience' in query || 'maxExperience' in query;
 
@@ -130,20 +124,21 @@ const OrganizationFilters = () => {
     setOpenDrawer(true);
   };
 
-  const handleResetFilters = () => {
+  const handleResetFilters = async () => {
     const defaultFilters = pickBy({ search, type }, (value) => {
       return Boolean(value);
     });
-    replace({ query: { ...defaultFilters } }, undefined, { scroll: false });
 
-    if (!Object?.keys(defaultFilters)?.length) {
-      setRefetchCleaned(true);
-    }
-
-    handleGetPublicOrganizationsWithNewFilters({ ...defaultFilters });
     setSelectedStateId('');
     setSelectedCityId('');
 
+    await replace({ query: { ...defaultFilters } }, undefined, { scroll: false });
+
+    if (Object.keys(defaultFilters).length === 0) {
+      handleGetPublicOrganizationsWithoutFilters();
+    } else {
+      handleGetPublicOrganizationsWithNewFilters(defaultFilters);
+    }
   };
 
   const disableResetFiltersButton = () => {
@@ -152,16 +147,6 @@ const OrganizationFilters = () => {
     const hasFilters = Object.values(filters).some((value) => Boolean(value));
     return !hasFilters;
   };
-
-  useEffect(() => {
-    if (refetchCleaned) {
-      setTimeout(() => {
-        handleGetPublicOrganizationsWithoutFilters();
-        setRefetchCleaned(false);
-      }, 500);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refetchCleaned]);
 
   const countActiveFilters = () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -207,7 +192,19 @@ const OrganizationFilters = () => {
                 const stateId = e.target.value;
                 setSelectedStateId(stateId);
                 setSelectedCityId("");
-                handleFilterChange("state", stateId);
+
+                const newQuery = { ...query };
+                if (stateId === "") {
+                  if ('state' in newQuery) {
+                    delete newQuery.state;
+                  }
+                } else {
+                  newQuery.state = stateId;
+                }
+                if ('city' in newQuery) {
+                  delete newQuery.city;
+                }
+                replace({ query: newQuery }, undefined, { scroll: false });
               }}
             />
             <Select
@@ -298,7 +295,10 @@ const OrganizationFilters = () => {
               variant="solid-blue"
               className="w-full"
               disabled={isLoadingPublicOrganizations}
-              onClick={handleGetPublicOrganizations}
+              onClick={() => {
+                handleGetPublicOrganizationsWithNewFilters(query);
+                handleCloseDrawer();
+              }}
             >
               Aplicar filtros
             </Button>
