@@ -16,6 +16,7 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
     search,
     segment,
     city,
+    state,
     serviceType,
     minAge,
     maxAge,
@@ -27,7 +28,6 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
     ORGANIZATION_FILTER_KEYS[
     query?.type as keyof typeof ORGANIZATION_FILTER_KEYS
     ];
-
 
   const hasAgeFilter = 'minAge' in query || 'maxAge' in query;
   let ageRange: [number, number] | undefined = undefined;
@@ -56,16 +56,25 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
   ) {
     const minExpNum = Number(minExperience);
     const maxExpNum = Number(maxExperience);
-    if (!isNaN(minExpNum) && !isNaN(maxExpNum) && minExpNum >= 0 && maxExpNum >= 0) {
+    if (!isNaN(minExpNum) && !isNaN(maxExpNum) && minExpNum >= 0 && maxExpNum >= 0 && minExpNum <= maxExpNum) {
       experienceRange = [minExpNum, maxExpNum];
     }
   }
 
-  let cityFilter: { city: number } | undefined = undefined;
+  type AddressFilterType = { city?: number; state?: number };
+  let addressFilter: AddressFilterType | undefined = undefined;
+
+  if (state && state !== "") {
+    const stateNumber = Number(state);
+    if (!isNaN(stateNumber) && isFinite(stateNumber) && stateNumber >= 0 && Number.isInteger(stateNumber)) {
+      addressFilter = { state: stateNumber };
+    }
+  }
+
   if (city && city !== "") {
     const cityNumber = Number(city);
     if (!isNaN(cityNumber) && isFinite(cityNumber) && cityNumber >= 0 && Number.isInteger(cityNumber)) {
-      cityFilter = { city: cityNumber };
+      addressFilter = { ...addressFilter, city: cityNumber };
     }
   }
 
@@ -77,7 +86,7 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
       name: search && search !== "" ? search : undefined,
       lineOfBusiness: segment && segment !== "" ? segment : undefined,
       serviceType: serviceType && serviceType !== "" ? serviceType : undefined,
-      address: cityFilter,
+      ...(addressFilter && Object.keys(addressFilter).length > 0 ? { address: addressFilter } : {}),
     },
     (value) => value !== undefined && value !== null && value !== ""
   );

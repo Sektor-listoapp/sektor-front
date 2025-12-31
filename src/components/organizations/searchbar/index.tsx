@@ -51,7 +51,7 @@ const Searchbar = ({
 
       <div className="w-full flex items-center justify-between gap-4 lg:gap-8">
         <form
-          className="w-full"
+          className="w-full flex items-center gap-3"
           onSubmit={(e) => {
             e.preventDefault();
             handleGetPublicOrganizations();
