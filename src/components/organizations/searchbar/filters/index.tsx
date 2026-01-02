@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Drawer } from "antd";
 import { useRouter } from "next/router";
 import Range from "@/components/ui/range";
@@ -33,6 +33,7 @@ const OrganizationFilters = () => {
   const handleCloseDrawer = () => setOpenDrawer(false);
   const [selectedStateId, setSelectedStateId] = useState("");
   const [selectedCityId, setSelectedCityId] = useState("");
+  const isApplyingFiltersRef = useRef(false);
 
   const { data: countryData, loading: isLoadingCountryData } = useQuery<Query>(
     COUNTRY_BY_CODE_QUERY,
@@ -107,20 +108,6 @@ const OrganizationFilters = () => {
   };
 
   const handleShowDrawer = () => {
-    const hasAgeInQuery = 'minAge' in query || 'maxAge' in query;
-    const hasExperienceInQuery = 'minExperience' in query || 'maxExperience' in query;
-
-    if (hasAgeInQuery || hasExperienceInQuery) {
-      const rangeQueries = getRangeQueries({
-        ageRange,
-        experienceRange,
-        organizationType,
-      });
-      replace({ query: { ...query, ...rangeQueries } }, undefined, {
-        scroll: false,
-      });
-    }
-
     setOpenDrawer(true);
   };
 
@@ -261,15 +248,7 @@ const OrganizationFilters = () => {
                 value={experienceRange}
                 minRangeLabel={`${experienceRange[0]} años`}
                 maxRangeLabel={`${experienceRange[1]} años`}
-                onChange={(value) => {
-                  const [minExperience, maxExperience] = value;
-                  setExperienceRange(value);
-                  replace(
-                    { query: { ...query, minExperience, maxExperience } },
-                    undefined,
-                    { scroll: false }
-                  );
-                }}
+                onChange={(value) => setExperienceRange(value)}
               />
             )}
 
@@ -281,13 +260,7 @@ const OrganizationFilters = () => {
                 value={ageRange}
                 minRangeLabel={`${ageRange[0]} años`}
                 maxRangeLabel={`${ageRange[1]} años`}
-                onChange={(value) => {
-                  const [minAge, maxAge] = value;
-                  setAgeRange(value);
-                  replace({ query: { ...query, minAge, maxAge } }, undefined, {
-                    scroll: false,
-                  });
-                }}
+                onChange={(value) => setAgeRange(value)}
               />
             )}
 
@@ -295,9 +268,30 @@ const OrganizationFilters = () => {
               variant="solid-blue"
               className="w-full"
               disabled={isLoadingPublicOrganizations}
-              onClick={() => {
-                handleGetPublicOrganizationsWithNewFilters(query);
+              onClick={async () => {
+                if (isApplyingFiltersRef.current) return;
+                isApplyingFiltersRef.current = true;
+
+                const rangeQueries = getRangeQueries({
+                  ageRange,
+                  experienceRange,
+                  organizationType,
+                });
+                const newQuery = {
+                  ...query,
+                  ...Object.fromEntries(
+                    Object.entries(rangeQueries).map(([key, value]) => [
+                      key,
+                      String(value),
+                    ])
+                  ),
+                };
                 handleCloseDrawer();
+                await handleGetPublicOrganizationsWithNewFilters(newQuery);
+                await replace({ query: newQuery }, undefined, { scroll: false });
+                setTimeout(() => {
+                  isApplyingFiltersRef.current = false;
+                }, 100);
               }}
             >
               Aplicar filtros
