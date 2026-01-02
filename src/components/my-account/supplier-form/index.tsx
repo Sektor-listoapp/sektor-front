@@ -71,6 +71,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     variables: { id: targetUserId },
   });
 
+  
 
 
   const supplier = supplierResponse?.publicSupplierById;

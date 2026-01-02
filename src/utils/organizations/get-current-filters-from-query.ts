@@ -2,6 +2,37 @@ import { pickBy } from "lodash";
 import { ParsedUrlQuery } from "querystring";
 import { ORGANIZATION_FILTER_KEYS } from "@/constants/organizations";
 
+const buildFiltersForType = (
+  organizationType: string,
+  baseFilters: Record<string, unknown>,
+  stateNumber: number | undefined,
+  cityNumber: number | undefined
+) => {
+  const filters = { ...baseFilters };
+
+  if (organizationType === "Supplier") {
+    if (stateNumber !== undefined) {
+      filters.stateId = stateNumber;
+    }
+    if (cityNumber !== undefined) {
+      filters.address = { city: cityNumber };
+    }
+  } else {
+    const addressFilter: { city?: number; state?: number } = {};
+    if (stateNumber !== undefined) {
+      addressFilter.state = stateNumber;
+    }
+    if (cityNumber !== undefined) {
+      addressFilter.city = cityNumber;
+    }
+    if (Object.keys(addressFilter).length > 0) {
+      filters.address = addressFilter;
+    }
+  }
+
+  return filters;
+};
+
 export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
   const hasQueries =
     Object.keys(query).length > 0 && Object.values(query).some(Boolean);
@@ -61,24 +92,23 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
     }
   }
 
-  type AddressFilterType = { city?: number; state?: number };
-  let addressFilter: AddressFilterType | undefined = undefined;
-
+  let stateNumber: number | undefined = undefined;
   if (state && state !== "") {
-    const stateNumber = Number(state);
-    if (!isNaN(stateNumber) && isFinite(stateNumber) && stateNumber >= 0 && Number.isInteger(stateNumber)) {
-      addressFilter = { state: stateNumber };
+    const num = Number(state);
+    if (!isNaN(num) && isFinite(num) && num >= 0 && Number.isInteger(num)) {
+      stateNumber = num;
     }
   }
 
+  let cityNumber: number | undefined = undefined;
   if (city && city !== "") {
-    const cityNumber = Number(city);
-    if (!isNaN(cityNumber) && isFinite(cityNumber) && cityNumber >= 0 && Number.isInteger(cityNumber)) {
-      addressFilter = { ...addressFilter, city: cityNumber };
+    const num = Number(city);
+    if (!isNaN(num) && isFinite(num) && num >= 0 && Number.isInteger(num)) {
+      cityNumber = num;
     }
   }
 
-  const currentFilters = pickBy(
+  const baseFilters = pickBy(
     {
       ageRange,
       experienceRange,
@@ -86,20 +116,25 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
       name: search && search !== "" ? search : undefined,
       lineOfBusiness: segment && segment !== "" ? segment : undefined,
       serviceType: serviceType && serviceType !== "" ? serviceType : undefined,
-      ...(addressFilter && Object.keys(addressFilter).length > 0 ? { address: addressFilter } : {}),
     },
     (value) => value !== undefined && value !== null && value !== ""
   );
 
-  const hasValidFilters = Object.keys(currentFilters).length > 0;
+  const hasValidFilters = Object.keys(baseFilters).length > 0 || stateNumber !== undefined || cityNumber !== undefined;
 
   if (!hasValidFilters) {
     return {};
   }
 
   if (isOrganizationTypeSelected && filterKey) {
+    const filters = buildFiltersForType(
+      query?.type as string,
+      baseFilters,
+      stateNumber,
+      cityNumber
+    );
     return {
-      [filterKey]: { ...currentFilters },
+      [filterKey]: filters,
     };
   }
 
@@ -107,12 +142,13 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
     (acc, key) => {
       const filterKey =
         ORGANIZATION_FILTER_KEYS[key as keyof typeof ORGANIZATION_FILTER_KEYS];
+      const filters = buildFiltersForType(key, baseFilters, stateNumber, cityNumber);
       return {
         ...acc,
-        [filterKey]: { ...currentFilters },
+        [filterKey]: filters,
       };
     },
-    {} as Record<string, typeof currentFilters>
+    {} as Record<string, Record<string, unknown>>
   );
 
   return generalFilters;
