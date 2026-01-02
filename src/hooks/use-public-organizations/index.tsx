@@ -110,6 +110,7 @@ const usePublicOrganizations = ({
     try {
       const { data } = await getPublicOrganizations(variablesToSend);
       setPublicOrganizations(data);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
       console.error('Error fetching public organizations:', error);
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
@@ -134,7 +135,15 @@ const usePublicOrganizations = ({
 
     try {
       const { data } = await getPublicOrganizations(variablesToSend);
-      setPublicOrganizations(data, page);
+      if (data) {
+        setPublicSuppliers([], null);
+        setPublicExclusiveAgents([], null);
+        setPublicInsuranceBrokers([], null);
+        setPublicBrokerageSocieties([], null);
+        setPublicInsuranceCompanies([], null);
+        setPublicOrganizations(data, page);
+      }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
     } finally {
@@ -203,6 +212,7 @@ const usePublicOrganizations = ({
           );
           break;
       }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
     } finally {
@@ -218,6 +228,7 @@ const usePublicOrganizations = ({
       };
       const { data } = await getPublicOrganizations(variablesToSend);
       setPublicOrganizations(data);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
     } finally {

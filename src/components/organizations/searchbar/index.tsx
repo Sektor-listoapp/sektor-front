@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { cn } from "@/utils/class-name";
 import { ORGANIZATION_TYPE_OPTIONS } from "./constants";
 import OrganizationTypeButton from "./organization-type-button";
@@ -14,21 +14,57 @@ const Searchbar = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const isClient = useIsClient();
-  const { replace, query } = useRouter();
+  const { replace, query, isReady } = useRouter();
   const {
     handleGetPublicOrganizations,
     isLoadingPublicOrganizations,
     handleGetPublicOrganizationsWithNewFilters,
   } = usePublicOrganizations({});
+  const isInitialMount = useRef(true);
+  const lastTypeRef = useRef(query?.type);
+  const hasLoadedInitialData = useRef(false);
 
   useEffect(() => {
-    if (query?.type) {
-      handleGetPublicOrganizationsWithNewFilters(query, 12, 1);
-    } else {
-      handleGetPublicOrganizations();
+    if (!isReady) return;
+
+    const filterKeys = [
+      'genre',
+      'segment',
+      'city',
+      'state',
+      'serviceType',
+      'minAge',
+      'maxAge',
+      'minExperience',
+      'maxExperience',
+    ];
+
+    const hasFilters = filterKeys.some(
+      (key) => query[key] !== undefined && query[key] !== null && query[key] !== ''
+    );
+
+    if (isInitialMount.current && !hasLoadedInitialData.current) {
+      isInitialMount.current = false;
+      hasLoadedInitialData.current = true;
+      lastTypeRef.current = query?.type;
+      if (query?.type || hasFilters) {
+        handleGetPublicOrganizationsWithNewFilters(query, 12, 1);
+      } else {
+        handleGetPublicOrganizations();
+      }
+      return;
+    }
+
+    if (lastTypeRef.current !== query?.type) {
+      lastTypeRef.current = query?.type;
+      if (query?.type || hasFilters) {
+        handleGetPublicOrganizationsWithNewFilters(query, 12, 1);
+      } else {
+        handleGetPublicOrganizations();
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query?.type]);
+  }, [query?.type, isReady]);
 
   return (
     <section
