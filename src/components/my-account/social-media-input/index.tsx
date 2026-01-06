@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { faPen, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Select } from "antd";
@@ -17,7 +17,7 @@ interface SocialMediaInputProps {
 const SocialMediaInput = ({
     disabled,
     setHasSocialLinks,
-    socialMediaLinks = [],
+    socialMediaLinks,
 }: SocialMediaInputProps) => {
     const [socialLinks, setSocialLinks] = useLocalStorage<SocialMediaLinkType[]>(
         "social-links",
@@ -26,25 +26,84 @@ const SocialMediaInput = ({
 
     const [openModal, setOpenModal] = useState(false);
     const [platformToEdit, setPlatformToEdit] = useState<string | null>(null);
+    const prevSocialMediaLinksRef = useRef<SocialMediaLinkType[] | undefined>(undefined);
 
     useEffect(() => {
         setHasSocialLinks(socialLinks.length > 0);
     }, [socialLinks, setHasSocialLinks]);
 
     useEffect(() => {
-        if (socialMediaLinks && socialMediaLinks.length > 0) {
+     
+        if (socialMediaLinks === undefined) {
+           
+            return;
+        }
 
-            const uniqueLinks = socialMediaLinks.filter((link, index, self) => {
-                const normalizedUrl = link.url.toLowerCase().trim();
-                return index === self.findIndex((l) =>
-                    l.platform === link.platform &&
-                    l.url.toLowerCase().trim() === normalizedUrl
+   
+        const normalizeLink = (link: SocialMediaLinkType) => ({
+            platform: link.platform,
+            url: link.url.toLowerCase().trim(),
+        });
+
+        const normalizeLinks = (links: SocialMediaLinkType[]) => {
+            return links
+                .map(normalizeLink)
+                .filter((link, index, self) => {
+                    return index === self.findIndex((l) =>
+                        l.platform === link.platform && l.url === link.url
+                    );
+                });
+        };
+
+        const propLinks = socialMediaLinks || [];
+        const currentLinks = socialLinks || [];
+
+      
+        const prevLinks = prevSocialMediaLinksRef.current || [];
+        const normalizedPrev = normalizeLinks(prevLinks);
+        const normalizedProp = normalizeLinks(propLinks);
+        const normalizedCurrent = normalizeLinks(currentLinks);
+
+      
+        const propsChanged =
+            normalizedPrev.length !== normalizedProp.length ||
+            normalizedPrev.some((prevLink) => {
+                return !normalizedProp.some(
+                    (propLink) =>
+                        propLink.platform === prevLink.platform &&
+                        propLink.url === prevLink.url
                 );
             });
-            setSocialLinks(uniqueLinks);
+
+    
+        const areDifferent =
+            normalizedProp.length !== normalizedCurrent.length ||
+            normalizedProp.some((propLink) => {
+                return !normalizedCurrent.some(
+                    (currentLink) =>
+                        currentLink.platform === propLink.platform &&
+                        currentLink.url === propLink.url
+                );
+            });
+
+        if (propsChanged && areDifferent) {
+            if (propLinks.length > 0) {
+                const uniqueLinks = propLinks.filter((link, index, self) => {
+                    const normalizedUrl = link.url.toLowerCase().trim();
+                    return index === self.findIndex((l) =>
+                        l.platform === link.platform &&
+                        l.url.toLowerCase().trim() === normalizedUrl
+                    );
+                });
+                setSocialLinks(uniqueLinks);
+            } else {
+                setSocialLinks([]);
+            }
         }
+
+        prevSocialMediaLinksRef.current = socialMediaLinks;
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [socialMediaLinks]);
 
     const options = useMemo(() => {
 
