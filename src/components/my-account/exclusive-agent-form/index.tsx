@@ -79,6 +79,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [hasSocialLinks, setHasSocialLinks] = useState(false);
+  console.log('hasSocialLinks: ', hasSocialLinks);
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -326,7 +327,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
   };
 
   const age = calculateAge(input.birthDate);
-  const isBirthDateValid = !input.birthDate || input.birthDate.trim() === "" || (age !== null && age >= 18 && age <= 120);
+  const isBirthDateValid = Boolean(input.birthDate && input.birthDate.trim() !== "" && age !== null && age >= 18 && age <= 120);
 
   const requiredFields = {
     name: Boolean(input.name.trim().length),
@@ -756,11 +757,12 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
           maxDate={dayjs().subtract(18, 'year')}
           minDate={dayjs().subtract(120, 'year')}
           format="DD/MM/YYYY"
-          error={!isBirthDateValid && Boolean(input.birthDate && input.birthDate.trim() !== "")}
-          errors={!isBirthDateValid && input.birthDate && input.birthDate.trim() !== "" ?
-            (age !== null && age < 18 ? ["Debes ser mayor de 18 años"] :
-              age !== null && age > 120 ? ["La fecha de nacimiento no es válida"] :
-                ["La fecha de nacimiento no es válida"]) : []}
+          error={!isBirthDateValid}
+          errors={!isBirthDateValid ?
+            (!input.birthDate || input.birthDate.trim() === "" ? ["La fecha de nacimiento es requerida"] :
+              age !== null && age < 18 ? ["Debes ser mayor de 18 años"] :
+                age !== null && age > 120 ? ["La fecha de nacimiento no es válida"] :
+                  ["La fecha de nacimiento no es válida"]) : []}
           onChange={(date) => {
             const dateString = date ? date.format("YYYY-MM-DD") : "";
             handleInputChange("birthDate", dateString);
