@@ -3,33 +3,30 @@ import { faPen, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Select } from "antd";
 import { BrokerageSocietyTeamMemberType } from "@/lib/sektor-api/__generated__/types";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import LocalWorkTeamModal from "./work-team-modal";
 import Image from "next/image";
 
 interface RecognitionsInputProps {
-  workTeam: BrokerageSocietyTeamMemberType[];
+  workTeam?: BrokerageSocietyTeamMemberType[];
+  onWorkTeamChange?: (workTeam: BrokerageSocietyTeamMemberType[]) => void;
   disabled?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   options: any[];
 }
 
 const LocalWorkTeamInput = ({
-  workTeam,
+  workTeam = [],
+  onWorkTeamChange,
   disabled,
   options,
 }: RecognitionsInputProps) => {
-  const [localWorkTeam, setLocalWorkTeam] = useLocalStorage(
-    "sektor-local-work-team",
-    workTeam ?? []
-  );
 
   const [openWorkTeamModal, setOpenWorkTeamModal] = useState(false);
   const [teamMemberToEdit, setTeamMemberToEdit] = useState<
     BrokerageSocietyTeamMemberType | null | undefined
   >(null);
 
-  const localWorkTeamOptions = localWorkTeam.map((teamMember) => {
+  const localWorkTeamOptions = workTeam.map((teamMember) => {
     const memberData = options?.find(
       (option) => option?.value === teamMember?.id
     );
@@ -66,7 +63,7 @@ const LocalWorkTeamInput = ({
                 size="lg"
                 title="Editar"
                 onClick={() => {
-                  const memberData = localWorkTeam.find(
+                  const memberData = workTeam.find(
                     (teamMember) => teamMember.id === option.data.value
                   );
                   setTeamMemberToEdit(memberData);
@@ -79,10 +76,12 @@ const LocalWorkTeamInput = ({
                 size="lg"
                 title="Eliminar"
                 onClick={() => {
-                  const updatedClients = localWorkTeam.filter(
-                    (client) => client.id !== option.data.value
-                  );
-                  setLocalWorkTeam(updatedClients);
+                  if (onWorkTeamChange) {
+                    const updatedWorkTeam = workTeam.filter(
+                      (member) => member.id !== option.data.value
+                    );
+                    onWorkTeamChange(updatedWorkTeam);
+                  }
                 }}
               />
             </div>
@@ -103,8 +102,8 @@ const LocalWorkTeamInput = ({
         options={options ?? []}
         open={openWorkTeamModal}
         setOpenWorkTeamModal={setOpenWorkTeamModal}
-        localWorkTeam={localWorkTeam}
-        setLocalWorkTeam={setLocalWorkTeam}
+        workTeam={workTeam}
+        onWorkTeamChange={onWorkTeamChange}
         teamMemberToEdit={teamMemberToEdit ?? undefined}
       />
     </>

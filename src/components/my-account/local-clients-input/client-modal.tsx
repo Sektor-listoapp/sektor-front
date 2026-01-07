@@ -9,22 +9,23 @@ import { Modal, ModalProps } from "antd";
 import { ObjectId } from "bson";
 
 interface ClientModalProps extends ModalProps {
+  open: boolean;
   clientToEdit?: OrganizationClientType | null;
   setOpenAddClientModal: (value: React.SetStateAction<boolean>) => void;
-  localClients: OrganizationClientType[];
-  setLocalClients: React.Dispatch<
-    React.SetStateAction<OrganizationClientType[]>
-  >;
-  localClientLogos: { [id: string]: File };
-  setLocalClientLogos: React.Dispatch<React.SetStateAction<{ [id: string]: File }>>;
+  clients?: OrganizationClientType[];
+  onClientsChange?: (clients: OrganizationClientType[]) => void;
+  clientLogos?: { [id: string]: File };
+  onClientLogosChange?: (logos: { [id: string]: File }) => void;
 }
 
 const LocalClientModal = ({
+  open,
   setOpenAddClientModal,
-  localClients,
-  setLocalClients,
+  clients = [],
+  onClientsChange,
   clientToEdit,
-  setLocalClientLogos,
+  clientLogos = {},
+  onClientLogosChange,
   ...modalProps
 }: ClientModalProps) => {
   const isEditing = Boolean(clientToEdit?.id);
@@ -42,6 +43,12 @@ const LocalClientModal = ({
       setInput({
         name: clientToEdit?.name || "",
         logoUrl: clientToEdit?.logoUrl || " ",
+        logoFile: null as File | null,
+      });
+    } else {
+      setInput({
+        name: "",
+        logoUrl: " ",
         logoFile: null as File | null,
       });
     }
@@ -65,11 +72,11 @@ const LocalClientModal = ({
   };
 
   const handleEdit = () => {
-    if (clientToEdit?.id) {
-      const updatedClients = localClients.map((client) =>
+    if (clientToEdit?.id && onClientsChange) {
+      const updatedClients = clients.map((client) =>
         client.id === clientToEdit?.id ? { ...client, ...input } : client
       );
-      setLocalClients(updatedClients);
+      onClientsChange(updatedClients);
     }
     handleClose();
   };
@@ -80,22 +87,34 @@ const LocalClientModal = ({
       return;
     }
 
+    if (!onClientsChange) return;
+
     const newId = new ObjectId() as unknown as string;
 
-    setLocalClients([
-      ...localClients,
-      {
-        id: newId,
-        name: input?.name,
-        logoUrl: input?.logoUrl,
-      },
-    ]);
+    const newClient: OrganizationClientType = {
+      id: newId,
+      name: input?.name,
+      logoUrl: input?.logoUrl,
+    };
 
-    if (input.logoFile) {
-      setLocalClientLogos(prev => ({
-        ...prev,
+    const existingIndex = clients.findIndex(
+      client => client.name.toLowerCase().trim() === newClient.name.toLowerCase().trim()
+    );
+
+    if (existingIndex !== -1) {
+      const updatedClients = clients.map((client, index) =>
+        index === existingIndex ? newClient : client
+      );
+      onClientsChange(updatedClients);
+    } else {
+      onClientsChange([...clients, newClient]);
+    }
+
+    if (input.logoFile && onClientLogosChange) {
+      onClientLogosChange({
+        ...clientLogos,
         [newId]: input.logoFile as File,
-      }));
+      });
     }
 
     handleClose();
@@ -103,6 +122,7 @@ const LocalClientModal = ({
 
   return (
     <Modal
+      open={open}
       closeIcon={null}
       footer={null}
       onClose={handleClose}

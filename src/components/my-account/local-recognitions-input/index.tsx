@@ -3,31 +3,27 @@ import { faPen, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Select } from "antd";
 import { RecognitionType } from "@/lib/sektor-api/__generated__/types";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import LocalRecognitionModal from "./recognition-modal";
 
 interface RecognitionsInputProps {
-  recognitions: RecognitionType[];
+  recognitions?: RecognitionType[];
+  onRecognitionsChange?: (recognitions: RecognitionType[]) => void;
   disabled?: boolean;
 }
 
 const LocalRecognitionsInput = ({
-  recognitions,
+  recognitions = [],
+  onRecognitionsChange,
   disabled,
 }: RecognitionsInputProps) => {
-  const [localRecognitions, setLocalRecognitions] = useLocalStorage(
-    "sektor-local-recognitions",
-    recognitions ?? []
-  );
-
   const localRecognitionsOptions = useMemo(
     () =>
-      localRecognitions.map((recognition) => ({
+      recognitions.map((recognition) => ({
         label: recognition?.title || "",
         value: recognition?.id || "",
         data: recognition,
       })),
-    [localRecognitions]
+    [recognitions]
   );
 
   const [openRecognitionModal, setOpenRecognitionModal] = useState(false);
@@ -65,10 +61,12 @@ const LocalRecognitionsInput = ({
                 size="lg"
                 title="Eliminar"
                 onClick={() => {
-                  const updatedClients = localRecognitions.filter(
-                    (client) => client.id !== option.data.value
-                  );
-                  setLocalRecognitions(updatedClients);
+                  if (onRecognitionsChange) {
+                    const updatedRecognitions = recognitions.filter(
+                      (recognition) => recognition.id !== option.data.value
+                    );
+                    onRecognitionsChange(updatedRecognitions);
+                  }
                 }}
               />
             </div>
@@ -88,8 +86,8 @@ const LocalRecognitionsInput = ({
       <LocalRecognitionModal
         open={openRecognitionModal}
         setOpenRecognitionModal={setOpenRecognitionModal}
-        localRecognitions={localRecognitions}
-        setLocalRecognitions={setLocalRecognitions}
+        recognitions={recognitions}
+        onRecognitionsChange={onRecognitionsChange}
         recognitionToEdit={recognitionToEdit}
       />
     </>

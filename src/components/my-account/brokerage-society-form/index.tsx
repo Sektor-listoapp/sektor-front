@@ -6,6 +6,10 @@ import {
   Mutation,
   OrganizationOfficeInputType,
   Query,
+  OrganizationClientType,
+  RecognitionType,
+  BrokerageSocietyTeamMemberType,
+  SocialMediaLinkType,
 } from "@/lib/sektor-api/__generated__/types";
 import { useMutation, useQuery } from "@apollo/client";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
@@ -118,10 +122,6 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     useQuery<Query>(COUNTRY_BY_CODE_QUERY, { variables: { code: "VE" } });
 
   const brokerageSociety = brokerageSocietyResponse?.publicBrokerageSocietyById;
-  const brokerageClients = [...(brokerageSociety?.clients || [])];
-  const exclusiveAgentRecognitions = [
-    ...(brokerageSociety?.recognitions || []),
-  ];
 
   const countryStates = countryDataResponse?.getCountryByCode?.states || [];
   const countryStateOptions = [
@@ -181,6 +181,13 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const [showPassword, setShowPassword] = useState(false);
   console.log('hasSocialLinks: ', hasSocialLinks);
 
+  const [offices, setOffices] = useState<OrganizationOfficeInputType[]>([]);
+  const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLinkType[]>([]);
+  const [clients, setClients] = useState<OrganizationClientType[]>([]);
+  const [recognitions, setRecognitions] = useState<RecognitionType[]>([]);
+  const [workTeam, setWorkTeam] = useState<BrokerageSocietyTeamMemberType[]>([]);
+  const [contact, setContact] = useState<{ [key: string]: string }>({});
+
   const allies = [...(brokerageSociety?.allies?.map(({ id }) => id) || [])];
   const phoneCodes = PHONE_CODE_OPTIONS.map(({ value }) => value);
   const userPhone = brokerageSociety?.contact?.phone || "";
@@ -191,29 +198,6 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   const [licenseType, license] = brokerageSociety?.license?.split("-") || [];
   const identification = brokerageSociety?.identification || "";
 
-  const formattedOffices = brokerageSociety?.offices?.map((office: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { __typename: _, address, ...restOfficeProps } = office;
-    return {
-      ...restOfficeProps,
-      address: {
-        cityId: address?.cityId || address?.city?.id,
-        countryId: address?.countryId || address?.country?.id,
-        stateId: address?.stateId || address?.state?.id,
-        street: address?.street,
-      },
-    };
-  });
-
-  const formattedSocialMediaLinks = brokerageSociety?.socialMediaLinks?.map((link: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { __typename, ...restLinkProps } = link;
-
-    return {
-      url: restLinkProps.url,
-      platform: restLinkProps.platform,
-    };
-  });
 
   const [input, setInput] = useState<BrokerageSocietyInputType>({
     // required
@@ -259,60 +243,60 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     const yearsOfExperience =
       foundationYear > 0 ? currentYear - foundationYear : 0;
 
-    const studies =
+    const formattedRecognitions =
       brokerageSociety?.recognitions.map(
         ({ id, title, date, giver, description }) => {
           return { id, title, date, giver, description };
         }
       ) || [];
 
-    const clients = brokerageSociety?.clients
+    const formattedClients = brokerageSociety?.clients
       ? brokerageSociety?.clients.map(({ id, name, logoUrl }) => {
         return { id, name, logoUrl };
       })
       : [];
 
-    const workTeam =
+    const formattedWorkTeam =
       brokerageSociety?.workTeam.map(({ id, name, position, organization }) => {
         return { id, name, position, organization };
       }) || [];
-    console.log('workTeam 1: ', workTeam);
 
     const insuranceCompaniesIds = (brokerageSociety?.insuranceCompanies?.map(
       ({ id }) => id
     ) || []) as never[];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedOffices = brokerageSociety?.offices?.map((office: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { __typename: _, address, ...restOfficeProps } = office;
+      return {
+        ...restOfficeProps,
+        address: {
+          cityId: address?.cityId || address?.city?.id,
+          countryId: address?.countryId || address?.country?.id,
+          stateId: address?.stateId || address?.state?.id,
+          street: address?.street,
+        },
+      };
+    }) || [];
 
+    const formattedSocialMediaLinks = brokerageSociety?.socialMediaLinks?.map((link: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { __typename, ...restLinkProps } = link;
+      return {
+        url: restLinkProps.url,
+        platform: restLinkProps.platform,
+      };
+    }) || [];
 
-    window?.localStorage?.setItem(
-      "sektor-local-recognitions",
-      JSON.stringify(studies)
-    );
-    console.log('workTeam: ', workTeam);
-    window?.localStorage?.setItem(
-      "sektor-local-work-team",
-      JSON.stringify(workTeam)
-    );
-    window?.localStorage?.setItem(
-      "sektor-local-clients",
-      JSON.stringify(clients)
-    );
-
-
-    if (typeof window !== "undefined") {
-      const existingOffices = window.localStorage.getItem("sektor-local-offices");
-      if (!existingOffices || existingOffices === "[]") {
-        window.localStorage.setItem(
-          "sektor-local-offices",
-          JSON.stringify(formattedOffices || [])
-        );
-      }
+    // Inicializar contact desde brokerageSociety?.contact
+    const initialContact: { [key: string]: string } = {};
+    if (brokerageSociety?.contact) {
+      initialContact.name = brokerageSociety.contact.name || "";
+      initialContact.position = brokerageSociety.contact.position || "";
+      initialContact.email = brokerageSociety.contact.email || "";
+      initialContact.phone = brokerageSociety.contact.phone || "";
     }
-
-    window?.localStorage?.setItem(
-      "social-links",
-      JSON.stringify(formattedSocialMediaLinks || [])
-    );
 
     setInput({
       name: brokerageSociety?.name || "",
@@ -334,8 +318,15 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       logoFile: null,
       password: "",
     });
+
+    setOffices(formattedOffices);
+    setSocialMediaLinks(formattedSocialMediaLinks);
+    setClients(formattedClients);
+    setRecognitions(formattedRecognitions);
+    setWorkTeam(formattedWorkTeam);
+    setContact(initialContact);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [brokerageSociety]);
+  }, [brokerageSociety, organizationResponse]);
 
   const requiredFields = useMemo(() => {
     return {
@@ -388,10 +379,9 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
 
     const currentYear = new Date().getFullYear();
     const foundationYear = currentYear - Number(input?.yearsOfExperience || 0);
-    const clients = window.localStorage.getItem("sektor-local-clients") ?? "[]";
-    const recognitions = window.localStorage.getItem("sektor-local-recognitions") ?? "[]";
+
     // Limpieza de recognitions
-    const formattedRecognitions = JSON.parse(recognitions).map((rec: any) => {
+    const formattedRecognitions = recognitions.map((rec: any) => {
       return {
         id: rec.id,
         title: rec.title,
@@ -401,19 +391,15 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       };
     });
 
-
-    const workTeam = window.localStorage.getItem("sektor-local-work-team") ?? "[]";
-
-    const rawWorkTeam = JSON.parse(workTeam);
+    const rawWorkTeam = workTeam;
     console.log('rawWorkTeam: ', rawWorkTeam);
 
     const formattedWorkTeam = rawWorkTeam
       .filter((member: any) => !!member.organization && !!member.position)
       .map((member: any) => ({
-        organization: member.organization.id,
+        organization: member.organization?.id || member.organization,
         position: member.position,
       }));
-
 
     console.log('formattedWorkTeam: ', formattedWorkTeam);
 
@@ -423,8 +409,8 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       return;
     }
 
-    const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
-    const formattedOffices = JSON.parse(offices).map((office: any) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedOffices = offices.map((office: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename: _, address, ...restOfficeProps } = office;
       return {
@@ -438,19 +424,14 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
       };
     });
 
-    const contact = window.localStorage.getItem("sektor-local-contact") ?? "{}";
-    const contactData = JSON.parse(contact);
-
     const formattedContact = {
-      email: contactData.email,
+      email: contact.email || "",
       phone: input?.phone?.startsWith('+') ? input?.phone : `${input?.phoneCode || DEFAULT_PHONE_CODE}${input?.phone}`,
-      name: contactData.name || "Nombre requerido",
-      position: contactData.position || "Cargo requerido",
+      name: contact.name || "Nombre requerido",
+      position: contact.position || "Cargo requerido",
     };
 
-    const socialMediaLinks = window.localStorage.getItem("social-links") ?? "[]";
-    const parsedLinks = JSON.parse(socialMediaLinks);
-    const formattedSocialMediaLinks = parsedLinks.map((link: any) => {
+    const formattedSocialMediaLinks = socialMediaLinks.map((link: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename, ...restLinkProps } = link;
       return {
@@ -462,7 +443,7 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     const mutationVariables = {
       input: {
         id: targetUserId,
-        clients: JSON.parse(clients),
+        clients: clients,
         foundationYear,
         name: input?.name,
         allies: input?.allies,
@@ -779,6 +760,8 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
         />
         <SocialMediaInput
           setHasSocialLinks={setHasSocialLinks}
+          socialMediaLinks={socialMediaLinks}
+          onSocialLinksChange={setSocialMediaLinks}
           disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
         />
       </div>
@@ -788,11 +771,13 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
 
         <LocalOfficesInput
           disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
-          offices={formattedOffices as unknown as OrganizationOfficeInputType[]}
+          offices={offices}
+          onOfficesChange={setOffices}
         />
 
         <LocalClientsInput
-          clients={brokerageClients}
+          clients={clients}
+          onClientsChange={setClients}
           disabled={
             loadingBrokerageSociety ||
             loadingInsuranceBrokers ||
@@ -847,12 +832,14 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
         />
 
         <LocalRecognitionsInput
-          recognitions={exclusiveAgentRecognitions}
+          recognitions={recognitions}
+          onRecognitionsChange={setRecognitions}
           disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
         />
 
         <LocalWorkTeamInput
-          workTeam={brokerageSociety?.workTeam as any || []}
+          workTeam={workTeam}
+          onWorkTeamChange={setWorkTeam}
           disabled={loadingBrokerageSociety || isUpdatingBrokerageSociety}
           options={[
             {

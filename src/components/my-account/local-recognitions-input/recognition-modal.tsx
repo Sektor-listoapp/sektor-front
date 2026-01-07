@@ -11,16 +11,18 @@ import dayjs from "dayjs";
 import { ObjectId } from "bson";
 
 interface RecognitionModalProps extends ModalProps {
+  open: boolean;
   recognitionToEdit?: RecognitionType | null;
   setOpenRecognitionModal: (value: React.SetStateAction<boolean>) => void;
-  localRecognitions: RecognitionType[];
-  setLocalRecognitions: React.Dispatch<React.SetStateAction<RecognitionType[]>>;
+  recognitions?: RecognitionType[];
+  onRecognitionsChange?: (recognitions: RecognitionType[]) => void;
 }
 
 const LocalRecognitionModal = ({
+  open,
   setOpenRecognitionModal,
-  localRecognitions,
-  setLocalRecognitions,
+  recognitions = [],
+  onRecognitionsChange,
   recognitionToEdit,
   ...modalProps
 }: RecognitionModalProps) => {
@@ -39,6 +41,13 @@ const LocalRecognitionModal = ({
         giver: recognitionToEdit?.giver || "",
         date: recognitionToEdit?.date || "",
         description: recognitionToEdit?.description || "",
+      });
+    } else {
+      setInput({
+        title: "",
+        giver: "",
+        date: "",
+        description: "",
       });
     }
   }, [recognitionToEdit]);
@@ -66,13 +75,13 @@ const LocalRecognitionModal = ({
   };
 
   const handleEdit = () => {
-    if (recognitionToEdit?.id) {
-      const updatedRecognitions = localRecognitions.map((recognition) =>
+    if (recognitionToEdit?.id && onRecognitionsChange) {
+      const updatedRecognitions = recognitions.map((recognition) =>
         recognition.id === recognitionToEdit?.id
           ? { ...recognition, ...input }
           : recognition
       );
-      setLocalRecognitions(updatedRecognitions);
+      onRecognitionsChange(updatedRecognitions);
     }
     handleClose();
   };
@@ -83,16 +92,33 @@ const LocalRecognitionModal = ({
       return;
     }
 
-    setLocalRecognitions([
-      ...localRecognitions,
-      {
-        id: new ObjectId() as unknown as string,
-        title: input?.title,
-        giver: input?.giver,
-        date: input?.date,
-        description: input?.description,
-      },
-    ]);
+    if (!onRecognitionsChange) return;
+
+    const newRecognition: RecognitionType = {
+      id: new ObjectId() as unknown as string,
+      title: input?.title,
+      giver: input?.giver,
+      date: input?.date,
+      description: input?.description,
+    };
+
+    const existingIndex = recognitions.findIndex(recognition => {
+      const titleMatch = recognition.title?.toLowerCase().trim() === newRecognition.title?.toLowerCase().trim();
+      const giverMatch = recognition.giver?.toLowerCase().trim() === newRecognition.giver?.toLowerCase().trim();
+      const dateMatch = recognition.date === newRecognition.date;
+
+      return titleMatch && giverMatch && dateMatch;
+    });
+
+    if (existingIndex !== -1) {
+      const updatedRecognitions = recognitions.map((recognition, index) =>
+        index === existingIndex ? newRecognition : recognition
+      );
+      onRecognitionsChange(updatedRecognitions);
+    } else {
+      onRecognitionsChange([...recognitions, newRecognition]);
+    }
+
     handleClose();
   };
 
@@ -101,6 +127,7 @@ const LocalRecognitionModal = ({
 
   return (
     <Modal
+      open={open}
       closeIcon={null}
       footer={null}
       onClose={handleClose}

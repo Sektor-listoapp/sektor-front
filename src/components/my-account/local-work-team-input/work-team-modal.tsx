@@ -9,17 +9,19 @@ import { Modal, ModalProps } from "antd";
 import Select from "@/components/ui/select";
 
 interface LocalWorkTeamModalProps extends ModalProps {
+  open: boolean;
   teamMemberToEdit?: BrokerageSocietyTeamMemberType | undefined;
   setOpenWorkTeamModal: (value: React.SetStateAction<boolean>) => void;
-  localWorkTeam: BrokerageSocietyTeamMemberType[];
-  setLocalWorkTeam: React.Dispatch<React.SetStateAction<BrokerageSocietyTeamMemberType[]>>;
+  workTeam?: BrokerageSocietyTeamMemberType[];
+  onWorkTeamChange?: (workTeam: BrokerageSocietyTeamMemberType[]) => void;
   options: any[];
 }
 
 const LocalWorkTeamModal = ({
+  open,
   setOpenWorkTeamModal,
-  localWorkTeam,
-  setLocalWorkTeam,
+  workTeam = [],
+  onWorkTeamChange,
   teamMemberToEdit,
   options,
   ...modalProps
@@ -33,10 +35,20 @@ const LocalWorkTeamModal = ({
 
   useEffect(() => {
     if (teamMemberToEdit?.id) {
+      const organizationId = typeof teamMemberToEdit?.organization === 'string'
+        ? teamMemberToEdit.organization
+        : (teamMemberToEdit?.organization?.id || "");
+
       setInput({
         id: teamMemberToEdit?.id || "",
-        organization: teamMemberToEdit?.organization?.id || "",
+        organization: organizationId,
         position: teamMemberToEdit?.position || "",
+      });
+    } else {
+      setInput({
+        id: "",
+        organization: "",
+        position: "",
       });
     }
   }, [teamMemberToEdit]);
@@ -63,8 +75,8 @@ const LocalWorkTeamModal = ({
   };
 
   const handleEdit = () => {
-    if (teamMemberToEdit?.id) {
-      const updatedTeamMember = localWorkTeam?.map((teamMember) =>
+    if (teamMemberToEdit?.id && onWorkTeamChange) {
+      const updatedTeamMember = workTeam?.map((teamMember) =>
         teamMember?.id === teamMemberToEdit?.id
           ? {
             ...teamMember,
@@ -73,7 +85,7 @@ const LocalWorkTeamModal = ({
           }
           : teamMember
       );
-      setLocalWorkTeam(updatedTeamMember);
+      onWorkTeamChange(updatedTeamMember);
     }
     handleClose();
   };
@@ -84,14 +96,34 @@ const LocalWorkTeamModal = ({
       return;
     }
 
-    setLocalWorkTeam([
-      ...localWorkTeam,
-      {
-        id: input?.id,
-        organization: input?.id,
-        position: input?.position,
-      } as unknown as BrokerageSocietyTeamMemberType,
-    ]);
+    if (!onWorkTeamChange) return;
+
+    const organizationId = input?.id || input?.organization || "";
+
+    const newTeamMember: BrokerageSocietyTeamMemberType = {
+      id: input?.id,
+      organization: organizationId,
+      position: input?.position,
+    } as unknown as BrokerageSocietyTeamMemberType;
+
+    const existingIndex = workTeam.findIndex(member => {
+      const memberOrgId = typeof member.organization === 'string'
+        ? member.organization
+        : member.organization?.id;
+
+      return member.id === newTeamMember.id ||
+        (memberOrgId === organizationId && member.position === newTeamMember.position);
+    });
+
+    if (existingIndex !== -1) {
+      const updatedTeam = workTeam.map((member, index) =>
+        index === existingIndex ? newTeamMember : member
+      );
+      onWorkTeamChange(updatedTeam);
+    } else {
+      onWorkTeamChange([...workTeam, newTeamMember]);
+    }
+
     handleClose();
   };
 
@@ -99,6 +131,7 @@ const LocalWorkTeamModal = ({
 
   return (
     <Modal
+      open={open}
       closeIcon={null}
       footer={null}
       onClose={handleClose}

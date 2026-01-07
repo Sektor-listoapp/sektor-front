@@ -19,33 +19,27 @@ import { DEFAULT_PHONE_CODE, PHONE_CODE_OPTIONS } from "@/constants/forms";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
 
 interface OfficeModalProps extends ModalProps {
+  open: boolean;
   officeToEdit?: any;
   setOpenOfficeModal: (value: React.SetStateAction<boolean>) => void;
-  localOffices: OrganizationOfficeType[];
-  setLocalOffices: React.Dispatch<
-    React.SetStateAction<OrganizationOfficeInputType[]>
-  >;
+  offices: OrganizationOfficeType[];
+  onOfficesChange?: (offices: OrganizationOfficeInputType[]) => void;
 }
 
 const LocalOfficeModal = ({
+  open,
   setOpenOfficeModal,
-  localOffices,
-  setLocalOffices,
+  offices,
+  onOfficesChange,
   officeToEdit,
   ...modalProps
 }: OfficeModalProps) => {
-  const phoneCodes = PHONE_CODE_OPTIONS.map(({ value }) => value);
-  const userPhone = officeToEdit?.phone || "";
-  const userPhoneCode =
-    phoneCodes.find((code) => userPhone.startsWith(code)) || DEFAULT_PHONE_CODE;
-  const userPhoneWithoutCode = userPhoneCode ? userPhone.substring(userPhoneCode.length) : userPhone;
-
   const isEditing = Boolean(officeToEdit?.id);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [input, setInput] = useState<OrganizationOfficeInputType>({
     id: "",
-    phone: userPhoneWithoutCode || "",
-    phoneCode: userPhoneCode || DEFAULT_PHONE_CODE,
+    phone: "",
+    phoneCode: DEFAULT_PHONE_CODE,
     schedule: [],
     photoUrl: undefined,
     address: {
@@ -58,6 +52,12 @@ const LocalOfficeModal = ({
 
   useEffect(() => {
     if (officeToEdit?.id) {
+      const phoneCodes = PHONE_CODE_OPTIONS.map(({ value }) => value);
+      const userPhone = officeToEdit?.phone || "";
+      const userPhoneCode =
+        phoneCodes.find((code) => userPhone.startsWith(code)) || DEFAULT_PHONE_CODE;
+      const userPhoneWithoutCode = userPhoneCode ? userPhone.substring(userPhoneCode.length) : userPhone;
+
       setInput({
         id: officeToEdit?.id,
         schedule: officeToEdit?.schedule || [],
@@ -69,6 +69,21 @@ const LocalOfficeModal = ({
           countryId: officeToEdit?.address?.countryId || 1,
           stateId: officeToEdit?.address?.stateId || 1,
           street: officeToEdit?.address?.street || "",
+        },
+      } as OrganizationOfficeInputType);
+    } else {
+
+      setInput({
+        id: "",
+        phone: "",
+        phoneCode: DEFAULT_PHONE_CODE,
+        schedule: [],
+        photoUrl: undefined,
+        address: {
+          cityId: 0,
+          countryId: 1,
+          stateId: 0,
+          street: "",
         },
       } as OrganizationOfficeInputType);
     }
@@ -93,8 +108,8 @@ const LocalOfficeModal = ({
   };
 
   const handleEdit = () => {
-    if (officeToEdit?.id) {
-      const officesArray = Array.isArray(localOffices) ? localOffices : [];
+    if (officeToEdit?.id && onOfficesChange) {
+      const officesArray = Array.isArray(offices) ? offices : [];
       const updatedOffices = officesArray.map((office) =>
         office?.id === officeToEdit?.id
           ? {
@@ -110,7 +125,7 @@ const LocalOfficeModal = ({
           ...restOfficeProps,
         })
       );
-      setLocalOffices(formattedOffices as OrganizationOfficeInputType[]);
+      onOfficesChange(formattedOffices as OrganizationOfficeInputType[]);
     }
     handleClose();
   };
@@ -121,18 +136,40 @@ const LocalOfficeModal = ({
       return;
     }
 
-    const { phone, phoneCode, ...restInputProps } = input as any;
-    const officesArray = Array.isArray(localOffices) ? localOffices : [];
+    if (!onOfficesChange) return;
 
-    setLocalOffices([
-      ...officesArray,
-      {
-        ...restInputProps,
-        id: new ObjectId().toHexString(),
-        phone: phone.startsWith('+') ? phone : `${phoneCode || DEFAULT_PHONE_CODE}${phone}`,
-        photoUrl: input.photoUrl || undefined,
-      },
-    ]);
+    const { phone, phoneCode, ...restInputProps } = input as any;
+    const officesArray = Array.isArray(offices) ? offices : [];
+    const formattedPhone = phone.startsWith('+') ? phone : `${phoneCode || DEFAULT_PHONE_CODE}${phone}`;
+
+    const newOffice = {
+      ...restInputProps,
+      id: new ObjectId().toHexString(),
+      phone: formattedPhone,
+      photoUrl: input.photoUrl || undefined,
+    };
+
+
+    const existingIndex = officesArray.findIndex(office => {
+      const officePhone = (office as any).phone || (office as any).phoneCode + (office as any).phone;
+      const officeCityId = (office as any).address?.cityId || (office as any).address?.city?.id;
+      return (
+        office.address?.street?.toLowerCase().trim() === newOffice.address?.street?.toLowerCase().trim() &&
+        officeCityId === newOffice.address?.cityId &&
+        (officePhone === formattedPhone || office.phone === formattedPhone)
+      );
+    });
+
+    if (existingIndex !== -1) {
+
+      const updatedOffices = officesArray.map((office, index) =>
+        index === existingIndex ? newOffice : office
+      );
+      onOfficesChange(updatedOffices);
+    } else {
+      onOfficesChange([...officesArray, newOffice]);
+    }
+
     handleClose();
   };
 
@@ -187,6 +224,7 @@ const LocalOfficeModal = ({
 
   return (
     <Modal
+      open={open}
       closeIcon={null}
       footer={null}
       onClose={handleClose}

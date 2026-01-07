@@ -1,42 +1,47 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { faPen, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Select } from "antd";
 import { SocialMediaLinkType } from "@/lib/sektor-api/__generated__/types";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import LocalContactModal from "./contact-modal";
 import { PLATFORM_LABELS_MAP } from "@/constants/forms";
 import { cn } from "@/utils/class-name";
 
 interface LocalContactInputProps {
-  links: SocialMediaLinkType[];
-  setHasLocalContact: React.Dispatch<React.SetStateAction<boolean>>;
+  links?: SocialMediaLinkType[];
+  contact?: { [platform: string]: string };
+  onContactChange?: (contact: { [platform: string]: string }) => void;
+  setHasLocalContact?: React.Dispatch<React.SetStateAction<boolean>>;
   disabled?: boolean;
 }
 
 const LocalContactInput = ({
-  links,
+  links = [],
+  contact,
+  onContactChange,
   disabled,
   setHasLocalContact,
 }: LocalContactInputProps) => {
-  
-  const [localContact, setLocalContact] = useLocalStorage(
-    "sektor-local-contact",
-    {}
-  );
-
-  React.useEffect(() => {
+  const contactData = useMemo(() => {
+    if (contact) return contact;
     if (links && Array.isArray(links) && links.length > 0) {
-      const linksMap = {};
+      const linksMap: { [platform: string]: string } = {};
       links.forEach(({ url, platform }) => {
         linksMap[platform] = url;
       });
-      setLocalContact({ ...linksMap });
+      return linksMap;
+    }
+    return {};
+  }, [contact, links]);
+
+  React.useEffect(() => {
+    if (setHasLocalContact) {
+      setHasLocalContact(Object?.keys(contactData)?.length > 0);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [links]);
+  }, [contactData]);
 
-  const localContactOptions = Object.entries(localContact)?.map(
+  const localContactOptions = Object.entries(contactData)?.map(
     ([key, value]) => {
       return {
         value,
@@ -51,11 +56,6 @@ const LocalContactInput = ({
     }
   );
 
-  React.useEffect(() => {
-    setHasLocalContact(Object?.keys(localContact)?.length > 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [localContact]);
-
   const [openContactModal, setOpenContactModal] = useState(false);
 
   return (
@@ -64,7 +64,7 @@ const LocalContactInput = ({
         className={cn(
           "w-full border rounded-xl h-[46px] overflow-hidden border-blue-500 relative flex justify-between items-center cursor-pointer px-4",
           {
-            "border-red-500": Object?.keys(localContact)?.length === 0,
+            "border-red-500": Object?.keys(contactData)?.length === 0,
           }
         )}
       >
@@ -96,9 +96,11 @@ const LocalContactInput = ({
                   size="lg"
                   title="Eliminar"
                   onClick={() => {
-                    const newLocalContact = { ...localContact };
-                    delete newLocalContact[option?.data?.data?.value];
-                    setLocalContact(newLocalContact);
+                    if (onContactChange) {
+                      const newContact = { ...contactData };
+                      delete newContact[option?.data?.data?.value];
+                      onContactChange(newContact);
+                    }
                   }}
                 />
               </div>
@@ -115,8 +117,8 @@ const LocalContactInput = ({
       </div>
       <LocalContactModal
         open={openContactModal}
-        localContact={localContact}
-        setLocalContact={setLocalContact}
+        contact={contactData}
+        onContactChange={onContactChange}
         setOpenContactModal={setOpenContactModal}
       />
     </>
