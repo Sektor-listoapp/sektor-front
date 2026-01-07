@@ -33,13 +33,13 @@ const SocialMediaInput = ({
     }, [socialLinks, setHasSocialLinks]);
 
     useEffect(() => {
-     
+
         if (socialMediaLinks === undefined) {
-           
+
             return;
         }
 
-   
+
         const normalizeLink = (link: SocialMediaLinkType) => ({
             platform: link.platform,
             url: link.url.toLowerCase().trim(),
@@ -58,13 +58,13 @@ const SocialMediaInput = ({
         const propLinks = socialMediaLinks || [];
         const currentLinks = socialLinks || [];
 
-      
+
         const prevLinks = prevSocialMediaLinksRef.current || [];
         const normalizedPrev = normalizeLinks(prevLinks);
         const normalizedProp = normalizeLinks(propLinks);
         const normalizedCurrent = normalizeLinks(currentLinks);
 
-      
+
         const propsChanged =
             normalizedPrev.length !== normalizedProp.length ||
             normalizedPrev.some((prevLink) => {
@@ -75,7 +75,7 @@ const SocialMediaInput = ({
                 );
             });
 
-    
+
         const areDifferent =
             normalizedProp.length !== normalizedCurrent.length ||
             normalizedProp.some((propLink) => {
