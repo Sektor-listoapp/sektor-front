@@ -22,6 +22,8 @@ import {
   faPersonHalfDress,
   faPhone,
 } from "@fortawesome/free-solid-svg-icons";
+import DatePicker from "@/components/ui/date-picker";
+import dayjs from "dayjs";
 import {
   DEFAULT_PHONE_CODE,
   IDENTIFICATION_TYPE_OPTIONS,
@@ -68,6 +70,7 @@ interface InsuranceBrokerInputType {
   allies: string[];
   sex: string;
   password: string;
+  birthDate: string | null;
 }
 
 const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
@@ -228,6 +231,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     sex: insuranceBroker?.sex || "",
     // socialMediaLinks: JSON.parse(window?.localStorage?.getItem("social-links") || "[]"),
     password: "",
+    birthDate: insuranceBroker?.birthDate || null,
   });
 
   // const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
@@ -246,16 +250,10 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
   // };
 
   const handleUpdateClientLogo = async (clientId: string, logoFile: File, organizationId: string) => {
-    console.log("clientId", clientId);
-    console.log("logoFile", logoFile);
-    console.log("organizationId", organizationId);
     try {
-      const { data } = await updateInsuranceBrokerClientLogo({
+      await updateInsuranceBrokerClientLogo({
         variables: { clientId, logo: logoFile, organizationId }
       });
-
-      console.log(data);
-      console.log("Logo actualizado:", data?.updateInsuranceBrokerClientLogo);
     } catch (error) {
       console.error("Error al actualizar logo:", error);
     }
@@ -293,7 +291,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     );
 
 
-  
+
     if (typeof window !== "undefined") {
       const existingOffices = window.localStorage.getItem("sektor-local-offices");
       if (!existingOffices || existingOffices === "[]") {
@@ -308,7 +306,6 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       "social-links",
       JSON.stringify(insuranceBroker?.socialMediaLinks || [])
     );
-    console.log(insuranceBroker);
 
     setInput({
       name: insuranceBroker?.name || "",
@@ -333,10 +330,21 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       allies: [...(insuranceBroker?.allies?.map(({ id }) => id) || [])],
       sex: insuranceBroker?.sex || "",
       password: "",
+      birthDate: insuranceBroker?.birthDate ? (dayjs(insuranceBroker.birthDate).isValid() ? dayjs(insuranceBroker.birthDate).format("YYYY-MM-DD") : null) : null,
       // socialMediaLinks: JSON.parse(window?.localStorage?.getItem("social-links") || "[]"),
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [insuranceBroker, organizationResponse]);
+
+  const calculateAge = (birthDate: string | null): number | null => {
+    if (!birthDate || !birthDate.trim()) return null;
+    const birth = dayjs(birthDate);
+    if (!birth.isValid()) return null;
+    return dayjs().diff(birth, 'year');
+  };
+
+  const age = calculateAge(input.birthDate);
+  const isBirthDateValid = !input.birthDate || input.birthDate.trim() === "" || (age !== null && age >= 18 && age <= 120);
 
   const requiredFields = {
     name: Boolean(input.name.trim().length),
@@ -354,6 +362,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     phone: Boolean(input.phone.trim().length),
     logoUrl: Boolean(input.logoUrl.trim().length),
     sex: Boolean(input.sex.trim().length),
+    birthDate: isBirthDateValid,
   };
 
   const hasErrors = Object.values(requiredFields).some((field) => !field);
@@ -379,6 +388,21 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+
+    const age = calculateAge(input.birthDate);
+    if (input.birthDate && input.birthDate.trim() && (age === null || age < 18 || age > 120)) {
+      if (age === null) {
+        toast.error("La fecha de nacimiento no es válida");
+      } else if (age < 18) {
+        toast.error("Debes ser mayor de 18 años para registrarte");
+      } else if (age > 120) {
+        toast.error("La fecha de nacimiento no es válida");
+      }
+      setIsUpdatingInsuranceBroker(false);
+      return;
+    }
+
     const originalEmail = organizationResponse?.organizationById?.email || "";
     const isSelfUpdate = loggedUserId === targetUserId;
     const emailChanged = Boolean(input.email && input.email !== originalEmail);
@@ -450,6 +474,11 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       };
     });
 
+    let birthDateForMutation: Date | undefined = undefined;
+    if (input?.birthDate && input.birthDate.trim()) {
+      birthDateForMutation = new Date(input.birthDate);
+    }
+
     const mutationVariables = {
       input: {
         id: targetUserId,
@@ -467,42 +496,86 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
         phone: input?.phone?.startsWith('+') ? input?.phone : `${input?.phoneCode || DEFAULT_PHONE_CODE}${input?.phone}`,
         insuranceCompanies: input?.insuranceCompanies,
         license: `${input?.licenseType}${input?.license}`.replace(/--/g, '-'),
-        recognitions: insuranceBroker?.recognitions || [],
+        recognitions: (insuranceBroker?.recognitions || []).map((recognition) => ({
+          title: recognition.title,
+          description: recognition.description,
+          date: recognition.date ? new Date(recognition.date) : new Date(),
+          giver: recognition.giver,
+        })),
         identification: `${input?.identificationType}${input?.identification}`,
         offices: formattedOffices || [],
         socialMediaLinks: formattedSocialMediaLinks || [],
+        birthDate: birthDateForMutation || undefined,
       },
     };
 
     try {
-      const response = await updateInsuranceBroker({
+      await updateInsuranceBroker({
         variables: mutationVariables,
       });
-      console.log('Insurance broker update success response:', response);
       toast.success("Información actualizada correctamente");
       refetchInsuranceBroker();
 
-      // Subir imágenes de clientes después de guardar los clientes
+
       const organizationId = insuranceBroker?.id || "";
-      const savedClients = mutationVariables.input.clients;
+      const savedClients = mutationVariables.input.clients as Array<{ id: string }>;
       for (const client of savedClients) {
         const file = localClientLogos[client.id];
         if (file) {
           await handleUpdateClientLogo(client.id, file, organizationId || "");
         }
       }
-    } catch (error) {
-      console.error('=== INSURANCE BROKER FORM ERROR DEBUG ===');
-      console.error('Error object:', error);
+    } catch (error: unknown) {
+      const errorObj = error as {
+        message?: string;
+        graphQLErrors?: Array<{
+          message?: string;
+          extensions?: {
+            code?: string;
+            errors?: Record<string, string[]>;
+          };
+        }>;
+      };
+
+      const validationErrors: string[] = [];
+      if (errorObj?.graphQLErrors && errorObj.graphQLErrors.length > 0) {
+        errorObj.graphQLErrors.forEach((gqlError) => {
+          if (gqlError?.extensions?.errors) {
+            const errors = gqlError.extensions.errors;
+            if (Array.isArray(errors)) {
+              errors.forEach((err: { message?: string; field?: string }) => {
+                if (err?.message) {
+                  validationErrors.push(err.message);
+                }
+              });
+            } else if (typeof errors === 'object') {
+              Object.keys(errors).forEach((field) => {
+                const fieldErrors = errors[field];
+                if (Array.isArray(fieldErrors)) {
+                  validationErrors.push(...fieldErrors);
+                } else if (typeof fieldErrors === 'string') {
+                  validationErrors.push(fieldErrors);
+                } else if (typeof fieldErrors === 'object' && fieldErrors !== null) {
+                  const errObj = fieldErrors as { message?: string };
+                  if (errObj.message) {
+                    validationErrors.push(errObj.message);
+                  }
+                }
+              });
+            }
+          }
+        });
+      }
+
+      const errorMessage = validationErrors.length > 0
+        ? validationErrors[0]
+        : errorObj?.message || "Error de validación en los datos proporcionados";
+
+      toast.error(errorMessage);
     } finally {
       setIsUpdatingInsuranceBroker(false);
     }
   };
-
-
-  console.log('input?.logoFile', input?.logoFile)
-
-
 
   const showLoading = loadingInsuranceBroker;
 
@@ -532,16 +605,16 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
         />
 
         <div className="col-span-1 flex flex-col gap-2">
-        <TextInput
-          name="email"
-          className="col-span-1"
-          error={!requiredFields.email}
-          placeholder="Correo electrónico"
-          showFloatingLabel
-          disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
-          onChange={(e) => handleInputChange("email", e.target.value)}
-          value={input?.email}
-        />
+          <TextInput
+            name="email"
+            className="col-span-1"
+            error={!requiredFields.email}
+            placeholder="Correo electrónico"
+            showFloatingLabel
+            disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
+            onChange={(e) => handleInputChange("email", e.target.value)}
+            value={input?.email}
+          />
           {(() => { const originalEmail = organizationResponse?.organizationById?.email || ""; const isSelfUpdate = loggedUserId === targetUserId; const emailChanged = Boolean(input.email && input.email !== originalEmail); return (isSelfUpdate && emailChanged); })() && (
             <div className="col-span-1">
               <div className="relative w-full">
@@ -696,6 +769,25 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
           disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
           onChange={(e) => handleInputChange("sex", e.target.value)}
           error={!requiredFields.sex}
+        />
+
+        <DatePicker
+          name="birthDate"
+          placeholder="Fecha de nacimiento"
+          disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
+          value={input?.birthDate && input.birthDate.trim() ? dayjs(input.birthDate) : undefined}
+          maxDate={dayjs().subtract(18, 'year')}
+          minDate={dayjs().subtract(120, 'year')}
+          format="DD/MM/YYYY"
+          error={!isBirthDateValid && Boolean(input.birthDate && input.birthDate.trim() !== "")}
+          errors={!isBirthDateValid && input.birthDate && input.birthDate.trim() !== "" ?
+            (age !== null && age < 18 ? ["Debes ser mayor de 18 años"] :
+              age !== null && age > 120 ? ["La fecha de nacimiento no es válida"] :
+                ["La fecha de nacimiento no es válida"]) : []}
+          onChange={(date) => {
+            const dateString = date ? date.format("YYYY-MM-DD") : "";
+            handleInputChange("birthDate", dateString);
+          }}
         />
 
         <SelectMultiple

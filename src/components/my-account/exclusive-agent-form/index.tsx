@@ -22,6 +22,8 @@ import {
   faPersonHalfDress,
   faPhone,
 } from "@fortawesome/free-solid-svg-icons";
+import DatePicker from "@/components/ui/date-picker";
+import dayjs from "dayjs";
 import {
   DEFAULT_PHONE_CODE,
   IDENTIFICATION_TYPE_OPTIONS,
@@ -67,6 +69,7 @@ interface ExclusiveAgentInputType {
   allies: string[];
   sex: string;
   password: string;
+  birthDate: string | null;
 }
 
 const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
@@ -76,7 +79,6 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     useState(false);
   const [isUploadingLogo, setIsUploadingLogo] = useState(false);
   const [hasSocialLinks, setHasSocialLinks] = useState(false);
-  console.log('exclusiveAgent: ', hasSocialLinks);
   const [showPassword, setShowPassword] = useState(false);
 
   const {
@@ -230,18 +232,17 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     allies: allies || [],
     sex: exclusiveAgent?.sex || "",
     password: "",
+    birthDate: exclusiveAgent?.birthDate || null,
   });
 
   const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
     try {
-      const { data } = await updateOrganizationLogo({
+      await updateOrganizationLogo({
         variables: {
           id: organizationId,
           logo: logoFile
         }
       });
-      console.log(data);
-      console.log("Logo actualizado:", data?.updateOrganizationLogo);
     } catch (error) {
       console.error("Error al actualizar logo:", error);
     }
@@ -312,9 +313,20 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
       sex: exclusiveAgent?.sex || "",
       logoFile: null,
       password: "",
+      birthDate: exclusiveAgent?.birthDate ? (dayjs(exclusiveAgent.birthDate).isValid() ? dayjs(exclusiveAgent.birthDate).format("YYYY-MM-DD") : null) : null,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exclusiveAgent, organizationResponse]);
+
+  const calculateAge = (birthDate: string | null): number | null => {
+    if (!birthDate || !birthDate.trim()) return null;
+    const birth = dayjs(birthDate);
+    if (!birth.isValid()) return null;
+    return dayjs().diff(birth, 'year');
+  };
+
+  const age = calculateAge(input.birthDate);
+  const isBirthDateValid = !input.birthDate || input.birthDate.trim() === "" || (age !== null && age >= 18 && age <= 120);
 
   const requiredFields = {
     name: Boolean(input.name.trim().length),
@@ -331,6 +343,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     phone: Boolean(input.phone.trim().length),
     logoUrl: Boolean(input.logoUrl.trim().length),
     sex: Boolean(input.sex.trim().length),
+    birthDate: isBirthDateValid,
   };
 
   const hasErrors = Object.values(requiredFields).some((field) => !field);
@@ -356,6 +369,20 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+
+    const age = calculateAge(input.birthDate);
+    if (input.birthDate && input.birthDate.trim() && (age === null || age < 18 || age > 120)) {
+      if (age === null) {
+        toast.error("La fecha de nacimiento no es válida");
+      } else if (age < 18) {
+        toast.error("Debes ser mayor de 18 años para registrarte");
+      } else if (age > 120) {
+        toast.error("La fecha de nacimiento no es válida");
+      }
+      return;
+    }
+
     const originalEmail = organizationResponse?.organizationById?.email || "";
     const isSelfUpdate = loggedUserId === targetUserId;
     const emailChanged = Boolean(input.email && input.email !== originalEmail);
@@ -425,6 +452,11 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
       };
     });
 
+    let birthDateForMutation: Date | undefined = undefined;
+    if (input?.birthDate && input.birthDate.trim()) {
+      birthDateForMutation = new Date(input.birthDate);
+    }
+
     const mutationVariables = {
       input: {
         id: targetUserId,
@@ -442,10 +474,16 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
         phone: input?.phone?.startsWith('+') ? input?.phone : `${input?.phoneCode || DEFAULT_PHONE_CODE}${input?.phone}`,
         insuranceCompanies: input?.insuranceCompanies,
         license: `${input?.licenseType}${input?.license}`,
-        recognitions: exclusiveAgent?.recognitions || [],
+        recognitions: (exclusiveAgent?.recognitions || []).map((recognition) => ({
+          title: recognition.title,
+          description: recognition.description,
+          date: recognition.date ? new Date(recognition.date) : new Date(),
+          giver: recognition.giver,
+        })),
         identification: `${input?.identificationType}${input?.identification}`,
         socialMediaLinks: formattedSocialMediaLinks || [],
         offices: formattedOffices || [],
+        birthDate: birthDateForMutation || undefined,
       },
     };
 
@@ -454,20 +492,63 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
         toast.error("No se pudo actualizar el logo, intenta de nuevo más tarde");
         return;
       }
-      console.log('input.logoFile', input.logoFile);
       handleUpdateLogo(targetUserId, input.logoFile);
     }
 
     updateExclusiveAgent({
       variables: mutationVariables,
     })
-      .then((response) => {
-        console.log('Exclusive agent update success response:', response);
+      .then(() => {
         toast.success("Información actualizada correctamente");
         refetchExclusiveAgent();
       })
-      .catch((error) => {
-        toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
+      .catch((error: unknown) => {
+        const errorObj = error as {
+          message?: string;
+          graphQLErrors?: Array<{
+            message?: string;
+            extensions?: {
+              code?: string;
+              errors?: Record<string, string[]>;
+            };
+          }>;
+        };
+
+        const validationErrors: string[] = [];
+        if (errorObj?.graphQLErrors && errorObj.graphQLErrors.length > 0) {
+          errorObj.graphQLErrors.forEach((gqlError) => {
+            if (gqlError?.extensions?.errors) {
+              const errors = gqlError.extensions.errors;
+              if (Array.isArray(errors)) {
+                errors.forEach((err: { message?: string; field?: string }) => {
+                  if (err?.message) {
+                    validationErrors.push(err.message);
+                  }
+                });
+              } else if (typeof errors === 'object') {
+                Object.keys(errors).forEach((field) => {
+                  const fieldErrors = errors[field];
+                  if (Array.isArray(fieldErrors)) {
+                    validationErrors.push(...fieldErrors);
+                  } else if (typeof fieldErrors === 'string') {
+                    validationErrors.push(fieldErrors);
+                  } else if (typeof fieldErrors === 'object' && fieldErrors !== null) {
+                    const errObj = fieldErrors as { message?: string };
+                    if (errObj.message) {
+                      validationErrors.push(errObj.message);
+                    }
+                  }
+                });
+              }
+            }
+          });
+        }
+
+        const errorMessage = validationErrors.length > 0
+          ? validationErrors[0]
+          : errorObj?.message || GENERIC_TOAST_ERROR_MESSAGE;
+
+        toast.error(errorMessage);
       })
       .finally(() => setIsUpdatingExclusiveAgent(false));
   };
@@ -665,6 +746,25 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
           disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
           onChange={(e) => handleInputChange("sex", e.target.value)}
           error={!requiredFields.sex}
+        />
+
+        <DatePicker
+          name="birthDate"
+          placeholder="Fecha de nacimiento"
+          disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
+          value={input?.birthDate && input.birthDate.trim() ? dayjs(input.birthDate) : undefined}
+          maxDate={dayjs().subtract(18, 'year')}
+          minDate={dayjs().subtract(120, 'year')}
+          format="DD/MM/YYYY"
+          error={!isBirthDateValid && Boolean(input.birthDate && input.birthDate.trim() !== "")}
+          errors={!isBirthDateValid && input.birthDate && input.birthDate.trim() !== "" ?
+            (age !== null && age < 18 ? ["Debes ser mayor de 18 años"] :
+              age !== null && age > 120 ? ["La fecha de nacimiento no es válida"] :
+                ["La fecha de nacimiento no es válida"]) : []}
+          onChange={(date) => {
+            const dateString = date ? date.format("YYYY-MM-DD") : "";
+            handleInputChange("birthDate", dateString);
+          }}
         />
 
         <SelectMultiple
