@@ -94,7 +94,8 @@ const LocalOfficeModal = ({
 
   const handleEdit = () => {
     if (officeToEdit?.id) {
-      const updatedOffices = localOffices.map((office) =>
+      const officesArray = Array.isArray(localOffices) ? localOffices : [];
+      const updatedOffices = officesArray.map((office) =>
         office?.id === officeToEdit?.id
           ? {
             ...office,
@@ -121,9 +122,10 @@ const LocalOfficeModal = ({
     }
 
     const { phone, phoneCode, ...restInputProps } = input as any;
+    const officesArray = Array.isArray(localOffices) ? localOffices : [];
 
     setLocalOffices([
-      ...(localOffices as unknown as OrganizationOfficeInputType[]),
+      ...officesArray,
       {
         ...restInputProps,
         id: new ObjectId().toHexString(),
