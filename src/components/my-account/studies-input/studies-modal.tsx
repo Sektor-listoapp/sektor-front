@@ -11,16 +11,18 @@ import dayjs from "dayjs";
 import { ObjectId } from "bson";
 
 interface StudiesModalProps extends ModalProps {
+  open: boolean;
   studyToEdit?: StudyInputType | null;
   setOpenStudiesModal: (value: React.SetStateAction<boolean>) => void;
-  localStudies: StudyInputType[];
-  setLocalStudies: React.Dispatch<React.SetStateAction<StudyInputType[]>>;
+  studies?: StudyInputType[];
+  onStudiesChange?: (studies: StudyInputType[]) => void;
 }
 
 const StudiesModal = ({
+  open,
   setOpenStudiesModal,
-  localStudies,
-  setLocalStudies,
+  studies = [],
+  onStudiesChange,
   studyToEdit,
   ...modalProps
 }: StudiesModalProps) => {
@@ -41,6 +43,14 @@ const StudiesModal = ({
         startDate: studyToEdit?.startDate || "",
         endDate: studyToEdit?.endDate || "",
         description: studyToEdit?.description || "",
+      });
+    } else {
+      setInput({
+        title: "",
+        institution: "",
+        startDate: "",
+        endDate: "",
+        description: "",
       });
     }
   }, [studyToEdit]);
@@ -69,11 +79,11 @@ const StudiesModal = ({
   };
 
   const handleEdit = () => {
-    if (studyToEdit?.id) {
-      const updatedStudies = localStudies.map((study) =>
+    if (studyToEdit?.id && onStudiesChange) {
+      const updatedStudies = studies.map((study) =>
         study.id === studyToEdit?.id ? { ...study, ...input } : study
       );
-      setLocalStudies(updatedStudies);
+      onStudiesChange(updatedStudies);
     }
     handleClose();
   };
@@ -84,17 +94,35 @@ const StudiesModal = ({
       return;
     }
 
-    setLocalStudies([
-      ...localStudies,
-      {
-        id: new ObjectId() as unknown as string,
-        title: input?.title,
-        institution: input?.institution,
-        startDate: input?.startDate,
-        endDate: input?.endDate,
-        description: input?.description,
-      },
-    ]);
+    if (!onStudiesChange) return;
+
+    const newStudy: StudyInputType = {
+      id: new ObjectId() as unknown as string,
+      title: input?.title,
+      institution: input?.institution,
+      startDate: input?.startDate,
+      endDate: input?.endDate,
+      description: input?.description,
+    };
+
+    const existingIndex = studies.findIndex(study => {
+      const titleMatch = study.title?.toLowerCase().trim() === newStudy.title?.toLowerCase().trim();
+      const institutionMatch = study.institution?.toLowerCase().trim() === newStudy.institution?.toLowerCase().trim();
+      const startDateMatch = study.startDate === newStudy.startDate;
+      const endDateMatch = study.endDate === newStudy.endDate;
+
+      return titleMatch && institutionMatch && startDateMatch && endDateMatch;
+    });
+
+    if (existingIndex !== -1) {
+      const updatedStudies = studies.map((study, index) =>
+        index === existingIndex ? newStudy : study
+      );
+      onStudiesChange(updatedStudies);
+    } else {
+      onStudiesChange([...studies, newStudy]);
+    }
+
     handleClose();
   };
 
@@ -106,6 +134,7 @@ const StudiesModal = ({
 
   return (
     <Modal
+      open={open}
       closeIcon={null}
       footer={null}
       onClose={handleClose}

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SelectMultiple from "@/components/ui/select-multiple";
 import TextInput from "@/components/ui/text-input";
-import { Mutation, OrganizationOfficeInputType, Query } from "@/lib/sektor-api/__generated__/types";
+import { Mutation, OrganizationOfficeInputType, Query, StudyInputType, OrganizationClientType, SocialMediaLinkType } from "@/lib/sektor-api/__generated__/types";
 import { useMutation, useQuery } from "@apollo/client";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
 import Select from "@/components/ui/select";
@@ -89,8 +89,6 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
   });
 
   const insuranceBroker = insuranceBrokerResponse?.publicInsuranceBrokerById;
-  const insuranceBrokerClients = [...(insuranceBroker?.clients || [])];
-  const insuranceBrokerStudies = [...(insuranceBroker?.studies || [])];
 
   const {
     data: organizationResponse,
@@ -133,6 +131,12 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hasSocialLinks, setHasSocialLinks] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  const [offices, setOffices] = useState<OrganizationOfficeInputType[]>([]);
+  const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLinkType[]>([]);
+  const [clients, setClients] = useState<OrganizationClientType[]>([]);
+  const [studies, setStudies] = useState<StudyInputType[]>([]);
+  const [clientLogos, setClientLogos] = useState<{ [id: string]: File }>({});
 
 
 
@@ -263,14 +267,14 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     const currentYear = new Date().getFullYear();
     const foundationYear = Number(insuranceBroker?.foundationYear || 0);
     const yearsOfExperience = currentYear - foundationYear;
-    const studies = insuranceBroker?.studies
+    const formattedStudies = insuranceBroker?.studies
       ? insuranceBroker?.studies.map(
         ({ id, title, institution, startDate, endDate, description }) => {
           return { id, title, institution, startDate, endDate, description };
         }
       )
       : [];
-    const clients = insuranceBroker?.clients
+    const formattedClients = insuranceBroker?.clients
       ? insuranceBroker?.clients.map(({ id, name, logoUrl }) => {
         return { id, name, logoUrl };
       })
@@ -279,33 +283,20 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       ({ id }) => id
     ) || []) as never[];
 
-
-
-    window?.localStorage?.setItem(
-      "sektor-local-studies",
-      JSON.stringify(studies)
-    );
-    window?.localStorage?.setItem(
-      "sektor-local-clients",
-      JSON.stringify(clients)
-    );
-
-
-
-    if (typeof window !== "undefined") {
-      const existingOffices = window.localStorage.getItem("sektor-local-offices");
-      if (!existingOffices || existingOffices === "[]") {
-        window.localStorage.setItem(
-          "sektor-local-offices",
-          JSON.stringify(insuranceBroker?.offices || [])
-        );
-      }
-    }
-
-    window?.localStorage?.setItem(
-      "social-links",
-      JSON.stringify(insuranceBroker?.socialMediaLinks || [])
-    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedOffices = insuranceBroker?.offices?.map((office: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { __typename: _, address, ...restOfficeProps } = office;
+      return {
+        ...restOfficeProps,
+        address: {
+          cityId: address?.cityId || address?.city?.id,
+          countryId: address?.countryId || address?.country?.id,
+          stateId: address?.stateId || address?.state?.id,
+          street: address?.street,
+        },
+      };
+    }) || [];
 
     setInput({
       name: insuranceBroker?.name || "",
@@ -331,8 +322,12 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       sex: insuranceBroker?.sex || "",
       password: "",
       birthDate: insuranceBroker?.birthDate ? (dayjs(insuranceBroker.birthDate).isValid() ? dayjs(insuranceBroker.birthDate).format("YYYY-MM-DD") : null) : null,
-      // socialMediaLinks: JSON.parse(window?.localStorage?.getItem("social-links") || "[]"),
     });
+
+    setOffices(formattedOffices);
+    setSocialMediaLinks(insuranceBroker?.socialMediaLinks || []);
+    setClients(formattedClients);
+    setStudies(formattedStudies);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [insuranceBroker, organizationResponse]);
 
@@ -442,13 +437,9 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
 
     const currentYear = new Date().getFullYear();
     const foundationYear = currentYear - Number(input?.yearsOfExperience || 0);
-    const studies = window.localStorage.getItem("sektor-local-studies") ?? "[]";
-    const clients = window.localStorage.getItem("sektor-local-clients") ?? "[]";
-    const localClientLogos = JSON.parse(window.localStorage.getItem("sektor-local-client-logo") ?? "{}");
 
-    const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const formattedOffices = JSON.parse(offices).map((office: any) => {
+    const formattedOffices = offices.map((office: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename: _, address, ...restOfficeProps } = office;
       return {
@@ -462,10 +453,8 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       };
     });
 
-    const socialMediaLinks = window.localStorage.getItem("social-links") ?? "[]";
-
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const formattedSocialMediaLinks = JSON.parse(socialMediaLinks).map((link: any) => {
+    const formattedSocialMediaLinks = socialMediaLinks.map((link: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename, ...restLinkProps } = link;
       return {
@@ -489,8 +478,8 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
         modality: input?.modality,
         sex: input?.sex,
         type: insuranceBroker?.type,
-        clients: JSON.parse(clients),
-        studies: JSON.parse(studies),
+        clients: clients,
+        studies: studies,
         lineOfBusiness: input?.segment,
         coverageStates: input?.coverageState,
         phone: input?.phone?.startsWith('+') ? input?.phone : `${input?.phoneCode || DEFAULT_PHONE_CODE}${input?.phone}`,
@@ -520,7 +509,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
       const organizationId = insuranceBroker?.id || "";
       const savedClients = mutationVariables.input.clients as Array<{ id: string }>;
       for (const client of savedClients) {
-        const file = localClientLogos[client.id];
+        const file = clientLogos[client.id];
         if (file) {
           await handleUpdateClientLogo(client.id, file, organizationId || "");
         }
@@ -866,6 +855,8 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
         />
         <SocialMediaInput
           setHasSocialLinks={setHasSocialLinks}
+          socialMediaLinks={socialMediaLinks}
+          onSocialLinksChange={setSocialMediaLinks}
           disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
         />
       </div>
@@ -875,24 +866,15 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
 
         <LocalOfficesInput
           disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          offices={insuranceBroker?.offices?.map((office: any) => {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const { __typename: _, address, ...restOfficeProps } = office;
-            return {
-              ...restOfficeProps,
-              address: {
-                cityId: address?.cityId || address?.city?.id,
-                countryId: address?.countryId || address?.country?.id,
-                stateId: address?.stateId || address?.state?.id,
-                street: address?.street,
-              },
-            };
-          }) as unknown as OrganizationOfficeInputType[]}
+          offices={offices}
+          onOfficesChange={setOffices}
         />
 
         <LocalClientsInput
-          clients={insuranceBrokerClients}
+          clients={clients}
+          onClientsChange={setClients}
+          clientLogos={clientLogos}
+          onClientLogosChange={setClientLogos}
           disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
         />
 
@@ -942,7 +924,8 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
         />
 
         <StudiesInput
-          studies={insuranceBrokerStudies}
+          studies={studies}
+          onStudiesChange={setStudies}
           disabled={loadingInsuranceBroker || isUpdatingInsuranceBroker}
         />
       </div>

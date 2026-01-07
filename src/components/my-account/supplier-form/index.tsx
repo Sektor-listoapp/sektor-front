@@ -6,6 +6,7 @@ import {
   Mutation,
   OrganizationOfficeInputType,
   Query,
+  SocialMediaLinkType,
 } from "@/lib/sektor-api/__generated__/types";
 import { useMutation, useQuery } from "@apollo/client";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
@@ -71,7 +72,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     variables: { id: targetUserId },
   });
 
-  
+
 
 
   const supplier = supplierResponse?.publicSupplierById;
@@ -117,10 +118,12 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     // additional
     motto: "",
     insuranceCompanies: [],
-    insuranceCompanyRelations: [] as any[],
-    socialMediaLinks: [],
     password: "",
   });
+
+  const [offices, setOffices] = useState<OrganizationOfficeInputType[]>([]);
+  const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLinkType[]>([]);
+  const [insuranceCompanyRelations, setInsuranceCompanyRelations] = useState<any[]>([]);
 
   useEffect(() => {
     // const licenseParts = supplier?.license?.split("-") || [];
@@ -135,47 +138,17 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       ({ id }) => id
     ) || []) as never[];
 
-    const insuranceCompanyRelations = supplier?.insuranceCompanyRelations?.map(relation => ({
+    const formattedInsuranceCompanyRelations = supplier?.insuranceCompanyRelations?.map(relation => ({
       insuranceCompanyId: relation.insuranceCompanyId,
       depositRequired: relation.depositRequired,
       fullyContractedClinic: relation.fullyContractedClinic,
       reasonableExpensesApplicable: relation.reasonableExpensesApplicable
     })) || [];
 
-
-
-    if (typeof window !== "undefined") {
-      const existingOffices = window.localStorage.getItem("sektor-local-offices");
-      const existingSocialLinks = window.localStorage.getItem("social-links");
-      const existingRelations = window.localStorage.getItem("insurance-company-relations");
-
-      if (!existingOffices || existingOffices === "[]") {
-        window.localStorage.setItem(
-          "sektor-local-offices",
-          JSON.stringify(supplier?.offices || [])
-        );
-      }
-
-      if (!existingSocialLinks || existingSocialLinks === "[]") {
-        window.localStorage.setItem(
-          "social-links",
-          JSON.stringify(supplier?.socialMediaLinks || [])
-        );
-      }
-
-      if (!existingRelations || existingRelations === "[]") {
-        window.localStorage.setItem(
-          "insurance-company-relations",
-          JSON.stringify(insuranceCompanyRelations || [])
-        );
-      }
-    }
-
     setInput({
       name: supplier?.name || "",
       email: organizationResponse?.organizationById?.email || "",
       insuranceCompanies: insuranceCompaniesIds || [],
-      insuranceCompanyRelations: insuranceCompanyRelations,
       segment: (supplier?.lineOfBusiness || []) as never[],
       identification: identification || "",
       identificationType:
@@ -183,10 +156,13 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       serviceType: supplier?.serviceType || "",
       motto: supplier?.motto || "",
       logoUrl: supplier?.logoUrl || "",
-      socialMediaLinks: [],
       logoFile: null,
       password: "",
     });
+
+    setOffices(formattedOffices || []);
+    setSocialMediaLinks(supplier?.socialMediaLinks || []);
+    setInsuranceCompanyRelations(formattedInsuranceCompanyRelations);
   }, [supplier, organizationResponse]);
 
   const requiredFields = {
@@ -215,7 +191,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     if (field in input) {
       setInput((prev) => ({
         ...prev,
-        [field]: value || (field === 'insuranceCompanyRelations' ? [] : ""),
+        [field]: value || "",
       }));
     }
   };
@@ -245,12 +221,9 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
 
     setIsUpdatingSupplier(true);
 
-    const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
-    console.log('offices', offices);
-    const formattedOffices = JSON.parse(offices).map((office: any) => {
+    const formattedOffices = offices.map((office: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename: _, address, schedule = [], ...restOfficeProps } = office;
-
 
       const formattedSchedule = schedule.map((scheduleItem: any) => {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -271,8 +244,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       };
     });
 
-    const socialMediaLinks = window.localStorage.getItem("social-links") ?? "[]";
-    const formattedSocialMediaLinks = JSON.parse(socialMediaLinks).map((link: any) => {
+    const formattedSocialMediaLinks = socialMediaLinks.map((link: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename, ...restLinkProps } = link;
       return {
@@ -281,8 +253,7 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
       };
     });
 
-    const insuranceCompanyRelations = window.localStorage.getItem("insurance-company-relations") ?? "[]";
-    const formattedInsuranceCompanyRelations = JSON.parse(insuranceCompanyRelations).map((relation: any) => {
+    const formattedInsuranceCompanyRelations = insuranceCompanyRelations.map((relation: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename, ...restRelationProps } = relation;
       return {
@@ -535,7 +506,8 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
 
         <SocialMediaInput
           setHasSocialLinks={setHasSocialLinks}
-          socialMediaLinks={supplier?.socialMediaLinks}
+          socialMediaLinks={socialMediaLinks}
+          onSocialLinksChange={setSocialMediaLinks}
           disabled={loadingSupplier || isUpdatingSupplier}
         />
       </div>
@@ -555,7 +527,8 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
 
         <LocalOfficesInput
           disabled={loadingSupplier || isUpdatingSupplier}
-          offices={formattedOffices as unknown as OrganizationOfficeInputType[]}
+          offices={offices}
+          onOfficesChange={setOffices}
         />
 
 
@@ -570,7 +543,8 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
 
         <InsuranceCompaniesInput
           setHasInsuranceCompanies={setHasInsuranceCompanies}
-          insuranceCompanyRelations={supplier?.insuranceCompanyRelations}
+          insuranceCompanyRelations={insuranceCompanyRelations}
+          onRelationsChange={setInsuranceCompanyRelations}
           insuranceCompanies={insuranceCompanies}
           disabled={loadingInsuranceCompanies || isUpdatingSupplier}
         />

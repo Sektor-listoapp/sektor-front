@@ -11,7 +11,7 @@ interface SocialMediaModalProps extends ModalProps {
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   platform: string | null;
   socialLinks: SocialMediaLinkType[];
-  setSocialLinks: React.Dispatch<React.SetStateAction<SocialMediaLinkType[]>>;
+  onSocialLinksChange?: (links: SocialMediaLinkType[]) => void;
 }
 
 const SocialMediaModal = ({
@@ -19,7 +19,7 @@ const SocialMediaModal = ({
   setOpen,
   platform,
   socialLinks,
-  setSocialLinks,
+  onSocialLinksChange,
   ...modalProps
 }: SocialMediaModalProps) => {
   const [selectedPlatform, setSelectedPlatform] = useState<string>(platform || "");
@@ -113,7 +113,9 @@ const SocialMediaModal = ({
       }
     }
 
-    setSocialLinks(updatedLinks);
+    if (onSocialLinksChange) {
+      onSocialLinksChange(updatedLinks);
+    }
     handleClose();
   };
 

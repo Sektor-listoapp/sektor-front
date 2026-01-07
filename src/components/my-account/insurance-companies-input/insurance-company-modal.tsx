@@ -10,8 +10,8 @@ interface InsuranceCompanyModalProps extends ModalProps {
     open: boolean;
     setOpen: React.Dispatch<React.SetStateAction<boolean>>;
     relationToEdit: string | null;
-    localRelations: SupplierInsuranceCompanyRelationInputType[];
-    setLocalRelations: React.Dispatch<React.SetStateAction<SupplierInsuranceCompanyRelationInputType[]>>;
+    relations: SupplierInsuranceCompanyRelationInputType[];
+    onRelationsChange?: (relations: SupplierInsuranceCompanyRelationInputType[]) => void;
     insuranceCompanies: InsuranceCompanyType[];
 }
 
@@ -19,8 +19,8 @@ const InsuranceCompanyModal = ({
     open,
     setOpen,
     relationToEdit,
-    localRelations,
-    setLocalRelations,
+    relations = [],
+    onRelationsChange,
     insuranceCompanies,
     ...modalProps
 }: InsuranceCompanyModalProps) => {
@@ -29,12 +29,12 @@ const InsuranceCompanyModal = ({
     const [fullyContractedClinic, setFullyContractedClinic] = useState<string>("");
     const [reasonableExpensesApplicable, setReasonableExpensesApplicable] = useState<string>("");
 
-    // Filter out companies that are already selected (except when editing)
+
     const availableCompanies = insuranceCompanies.filter(company => {
         if (relationToEdit && company.id === relationToEdit) {
-            return true; // Allow the company being edited
+            return true;
         }
-        return !localRelations.some(relation => relation.insuranceCompanyId === company.id);
+        return !relations.some(relation => relation.insuranceCompanyId === company.id);
     });
 
     const insuranceCompanyOptions = [
@@ -54,7 +54,7 @@ const InsuranceCompanyModal = ({
 
     useEffect(() => {
         if (relationToEdit) {
-            const existingRelation = localRelations.find(relation => relation.insuranceCompanyId === relationToEdit);
+            const existingRelation = relations.find(relation => relation.insuranceCompanyId === relationToEdit);
             if (existingRelation) {
                 setSelectedCompanyId(existingRelation.insuranceCompanyId);
                 setDepositRequired(existingRelation.depositRequired ? "true" : "false");
@@ -67,7 +67,7 @@ const InsuranceCompanyModal = ({
             setFullyContractedClinic("");
             setReasonableExpensesApplicable("");
         }
-    }, [relationToEdit, localRelations]);
+    }, [relationToEdit, relations]);
 
     const handleClose = () => {
         setSelectedCompanyId("");
@@ -78,7 +78,7 @@ const InsuranceCompanyModal = ({
     };
 
     const handleSubmit = () => {
-        if (!selectedCompanyId) return;
+        if (!selectedCompanyId || !onRelationsChange) return;
 
         const newRelation: SupplierInsuranceCompanyRelationInputType = {
             insuranceCompanyId: selectedCompanyId,
@@ -88,13 +88,22 @@ const InsuranceCompanyModal = ({
         };
 
         if (relationToEdit) {
-            setLocalRelations(prev =>
-                prev.map(relation =>
-                    relation.insuranceCompanyId === relationToEdit ? newRelation : relation
-                )
+            const updatedRelations = relations.map(relation =>
+                relation.insuranceCompanyId === relationToEdit ? newRelation : relation
             );
+            onRelationsChange(updatedRelations);
         } else {
-            setLocalRelations(prev => [...prev, newRelation]);
+            const existingIndex = relations.findIndex(
+                relation => relation.insuranceCompanyId === newRelation.insuranceCompanyId
+            );
+            if (existingIndex !== -1) {
+                const updatedRelations = relations.map((relation, index) =>
+                    index === existingIndex ? newRelation : relation
+                );
+                onRelationsChange(updatedRelations);
+            } else {
+                onRelationsChange([...relations, newRelation]);
+            }
         }
 
         handleClose();

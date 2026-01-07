@@ -2,15 +2,15 @@ import React, { useEffect, useMemo, useState } from "react";
 import { faPen, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Select } from "antd";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import { cn } from "@/utils/class-name";
 import InsuranceCompanyModal from "./insurance-company-modal";
 import { SupplierInsuranceCompanyRelationInputType, InsuranceCompanyType } from "@/lib/sektor-api/__generated__/types";
 
 interface InsuranceCompaniesInputProps {
     disabled?: boolean;
-    setHasInsuranceCompanies: React.Dispatch<React.SetStateAction<boolean>>;
+    setHasInsuranceCompanies?: React.Dispatch<React.SetStateAction<boolean>>;
     insuranceCompanyRelations?: SupplierInsuranceCompanyRelationInputType[];
+    onRelationsChange?: (relations: SupplierInsuranceCompanyRelationInputType[]) => void;
     insuranceCompanies: InsuranceCompanyType[];
 }
 
@@ -18,32 +18,17 @@ const InsuranceCompaniesInput = ({
     disabled,
     setHasInsuranceCompanies,
     insuranceCompanyRelations = [],
+    onRelationsChange,
     insuranceCompanies = [],
 }: InsuranceCompaniesInputProps) => {
-    const [localRelations, setLocalRelations] = useLocalStorage<SupplierInsuranceCompanyRelationInputType[]>(
-        "insurance-company-relations",
-        []
-    );
-
     const [openModal, setOpenModal] = useState(false);
     const [relationToEdit, setRelationToEdit] = useState<string | null>(null);
 
     useEffect(() => {
-        setHasInsuranceCompanies(localRelations.length > 0);
-    }, [localRelations, setHasInsuranceCompanies]);
-
-    useEffect(() => {
-        if (insuranceCompanyRelations && insuranceCompanyRelations.length > 0) {
-            const formattedRelations = insuranceCompanyRelations.map((relation: SupplierInsuranceCompanyRelationInputType) => ({
-                insuranceCompanyId: relation.insuranceCompanyId,
-                depositRequired: relation.depositRequired,
-                fullyContractedClinic: relation.fullyContractedClinic,
-                reasonableExpensesApplicable: relation.reasonableExpensesApplicable
-            }));
-            setLocalRelations(formattedRelations);
+        if (setHasInsuranceCompanies) {
+            setHasInsuranceCompanies(insuranceCompanyRelations.length > 0);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [insuranceCompanyRelations, setHasInsuranceCompanies]);
 
     const options = useMemo(() => {
         const getCompanyName = (companyId: string) => {
@@ -51,7 +36,7 @@ const InsuranceCompaniesInput = ({
             return company?.name || 'Compañía no encontrada';
         };
 
-        return localRelations.map((relation) => {
+        return insuranceCompanyRelations.map((relation) => {
             const companyName = getCompanyName(relation.insuranceCompanyId);
             const features = [
                 relation.depositRequired && 'Depósito',
@@ -72,7 +57,7 @@ const InsuranceCompaniesInput = ({
                 },
             };
         });
-    }, [localRelations, insuranceCompanies]);
+    }, [insuranceCompanyRelations, insuranceCompanies]);
 
     return (
         <>
@@ -80,7 +65,7 @@ const InsuranceCompaniesInput = ({
                 className={cn(
                     "w-full border rounded-xl h-[46px] overflow-hidden border-blue-500 relative flex justify-between items-center cursor-pointer px-4",
                     {
-                        "border-red-500": localRelations.length === 0,
+                        "border-red-500": insuranceCompanyRelations.length === 0,
                     }
                 )}
             >
@@ -118,10 +103,12 @@ const InsuranceCompaniesInput = ({
                                 size="lg"
                                 title="Eliminar"
                                 onClick={() => {
-                                    const updatedRelations = localRelations.filter(
-                                        (relation) => relation.insuranceCompanyId !== option?.data?.data?.insuranceCompanyId
-                                    );
-                                    setLocalRelations(updatedRelations);
+                                    if (onRelationsChange) {
+                                        const updatedRelations = insuranceCompanyRelations.filter(
+                                            (relation) => relation.insuranceCompanyId !== option?.data?.data?.insuranceCompanyId
+                                        );
+                                        onRelationsChange(updatedRelations);
+                                    }
                                 }}
                             />
                         </div>
@@ -144,8 +131,8 @@ const InsuranceCompaniesInput = ({
                 open={openModal}
                 relationToEdit={relationToEdit}
                 setOpen={setOpenModal}
-                localRelations={localRelations}
-                setLocalRelations={setLocalRelations}
+                relations={insuranceCompanyRelations}
+                onRelationsChange={onRelationsChange}
                 insuranceCompanies={insuranceCompanies}
             />
         </>

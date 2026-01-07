@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SelectMultiple from "@/components/ui/select-multiple";
 import TextInput from "@/components/ui/text-input";
-import { Mutation, OrganizationOfficeInputType, Query } from "@/lib/sektor-api/__generated__/types";
+import { Mutation, OrganizationOfficeInputType, Query, StudyInputType, OrganizationClientType, SocialMediaLinkType } from "@/lib/sektor-api/__generated__/types";
 import { useMutation, useQuery } from "@apollo/client";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
 import Select from "@/components/ui/select";
@@ -82,6 +82,11 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
   console.log('hasSocialLinks: ', hasSocialLinks);
   const [showPassword, setShowPassword] = useState(false);
 
+  const [offices, setOffices] = useState<OrganizationOfficeInputType[]>([]);
+  const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLinkType[]>([]);
+  const [clients, setClients] = useState<OrganizationClientType[]>([]);
+  const [studies, setStudies] = useState<StudyInputType[]>([]);
+
   const {
     error: exclusiveAgentError,
     data: exclusiveAgentResponse,
@@ -123,8 +128,6 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     useQuery<Query>(COUNTRY_BY_CODE_QUERY, { variables: { code: "VE" } });
 
   const exclusiveAgent = exclusiveAgentResponse?.publicExclusiveAgentById;
-  const exclusiveAgentClients = [...(exclusiveAgent?.clients || [])];
-  const exclusiveAgentStudies = [...(exclusiveAgent?.studies || [])];
 
   const countryStates = countryDataResponse?.getCountryByCode?.states || [];
   const countryStateOptions = [
@@ -178,26 +181,6 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     })),
   ];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const formattedOffices = exclusiveAgent?.offices?.map((office: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { __typename: _, address, ...restOfficeProps } = office;
-    return {
-      ...restOfficeProps,
-      address: {
-        cityId: address?.cityId || address?.city?.id,
-        countryId: address?.countryId || address?.country?.id,
-        stateId: address?.stateId || address?.state?.id,
-        street: address?.street,
-      },
-    };
-  });
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const socialMediaLinks = exclusiveAgent?.socialMediaLinks?.map((link: any) => ({
-    url: link.url,
-    platform: link.platform,
-  })) || [];
 
   const allies = [...(exclusiveAgent?.allies?.map(({ id }) => id) || [])];
   const phoneCodes = PHONE_CODE_OPTIONS.map(({ value }) => value);
@@ -254,14 +237,14 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     const foundationYear = Number(exclusiveAgent?.foundationYear || 0);
     const yearsOfExperience =
       foundationYear > 0 ? currentYear - foundationYear : 0;
-    const studies = exclusiveAgent?.studies
+    const formattedStudies = exclusiveAgent?.studies
       ? exclusiveAgent?.studies.map(
         ({ id, title, institution, startDate, endDate, description }) => {
           return { id, title, institution, startDate, endDate, description };
         }
       )
       : [];
-    const clients = exclusiveAgent?.clients
+    const formattedClients = exclusiveAgent?.clients
       ? exclusiveAgent?.clients.map(({ id, name, logoUrl }) => {
         return { id, name, logoUrl };
       })
@@ -270,28 +253,20 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
       ({ id }) => id
     ) || []) as never[];
 
-    window?.localStorage?.setItem(
-      "sektor-local-studies",
-      JSON.stringify(studies)
-    );
-    window?.localStorage?.setItem(
-      "sektor-local-clients",
-      JSON.stringify(clients)
-    );
-
-    if (typeof window !== "undefined") {
-      const existingOffices = window.localStorage.getItem("sektor-local-offices");
-      if (!existingOffices || existingOffices === "[]") {
-        window.localStorage.setItem(
-          "sektor-local-offices",
-          JSON.stringify(exclusiveAgent?.offices || [])
-        );
-      }
-    }
-    window?.localStorage?.setItem(
-      "social-links",
-      JSON.stringify(exclusiveAgent?.socialMediaLinks || [])
-    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedOffices = exclusiveAgent?.offices?.map((office: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { __typename: _, address, ...restOfficeProps } = office;
+      return {
+        ...restOfficeProps,
+        address: {
+          cityId: address?.cityId || address?.city?.id,
+          countryId: address?.countryId || address?.country?.id,
+          stateId: address?.stateId || address?.state?.id,
+          street: address?.street,
+        },
+      };
+    }) || [];
 
     setInput({
       name: exclusiveAgent?.name || "",
@@ -316,6 +291,11 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
       password: "",
       birthDate: exclusiveAgent?.birthDate ? (dayjs(exclusiveAgent.birthDate).isValid() ? dayjs(exclusiveAgent.birthDate).format("YYYY-MM-DD") : null) : null,
     });
+
+    setOffices(formattedOffices || []);
+    setSocialMediaLinks(exclusiveAgent?.socialMediaLinks || []);
+    setClients(formattedClients);
+    setStudies(formattedStudies);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exclusiveAgent, organizationResponse]);
 
@@ -423,13 +403,9 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
 
     const currentYear = new Date().getFullYear();
     const foundationYear = currentYear - Number(input?.yearsOfExperience || 0);
-    const studies = window.localStorage.getItem("sektor-local-studies") ?? "[]";
-    const clients = window.localStorage.getItem("sektor-local-clients") ?? "[]";
-    const socialMediaLinks = window.localStorage.getItem("social-links") ?? "[]";
-    const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const formattedOffices = JSON.parse(offices).map((office: any) => {
+    const formattedOffices = offices.map((office: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename: _, address, ...restOfficeProps } = office;
       return {
@@ -444,7 +420,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const formattedSocialMediaLinks = JSON.parse(socialMediaLinks).map((link: any) => {
+    const formattedSocialMediaLinks = socialMediaLinks.map((link: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename, ...restLinkProps } = link;
       return {
@@ -468,8 +444,8 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
         modality: input?.modality,
         sex: input?.sex,
         type: exclusiveAgent?.type,
-        clients: JSON.parse(clients),
-        studies: JSON.parse(studies),
+        clients: clients,
+        studies: studies,
         lineOfBusiness: input?.segment,
         coverageStates: input?.coverageState,
         phone: input?.phone?.startsWith('+') ? input?.phone : `${input?.phoneCode || DEFAULT_PHONE_CODE}${input?.phone}`,
@@ -845,6 +821,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
         <SocialMediaInput
           setHasSocialLinks={setHasSocialLinks}
           socialMediaLinks={socialMediaLinks}
+          onSocialLinksChange={setSocialMediaLinks}
           disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
         />
       </div>
@@ -854,11 +831,13 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
 
         <LocalOfficesInput
           disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
-          offices={formattedOffices as unknown as OrganizationOfficeInputType[]}
+          offices={offices}
+          onOfficesChange={setOffices}
         />
 
         <LocalClientsInput
-          clients={exclusiveAgentClients}
+          clients={clients}
+          onClientsChange={setClients}
           disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
         />
 
@@ -908,7 +887,8 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
         />
 
         <StudiesInput
-          studies={exclusiveAgentStudies}
+          studies={studies}
+          onStudiesChange={setStudies}
           disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
         />
       </div>

@@ -3,28 +3,23 @@ import { faPen, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Select } from "antd";
 import { StudyInputType } from "@/lib/sektor-api/__generated__/types";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import StudiesModal from "./studies-modal";
 
 interface StudiesInputProps {
-  studies: StudyInputType[];
+  studies?: StudyInputType[];
+  onStudiesChange?: (studies: StudyInputType[]) => void;
   disabled?: boolean;
 }
 
-const StudiesInput = ({ studies, disabled }: StudiesInputProps) => {
-  const [localStudies, setLocalStudies] = useLocalStorage(
-    "sektor-local-studies",
-    studies ?? []
-  );
-
+const StudiesInput = ({ studies = [], onStudiesChange, disabled }: StudiesInputProps) => {
   const localStudiesOptions = useMemo(
     () =>
-      localStudies.map((study) => ({
+      studies.map((study) => ({
         label: study?.title || "",
         value: study?.id || "",
         data: study,
       })),
-    [localStudies]
+    [studies]
   );
 
   const [openStudiesModal, setOpenStudiesModal] = useState(false);
@@ -61,10 +56,12 @@ const StudiesInput = ({ studies, disabled }: StudiesInputProps) => {
                 size="lg"
                 title="Eliminar"
                 onClick={() => {
-                  const updatedClients = localStudies.filter(
-                    (client) => client.id !== option.data.value
-                  );
-                  setLocalStudies(updatedClients);
+                  if (onStudiesChange) {
+                    const updatedStudies = studies.filter(
+                      (study) => study.id !== option.data.value
+                    );
+                    onStudiesChange(updatedStudies);
+                  }
                 }}
               />
             </div>
@@ -84,8 +81,8 @@ const StudiesInput = ({ studies, disabled }: StudiesInputProps) => {
       <StudiesModal
         open={openStudiesModal}
         setOpenStudiesModal={setOpenStudiesModal}
-        localStudies={localStudies}
-        setLocalStudies={setLocalStudies}
+        studies={studies}
+        onStudiesChange={onStudiesChange}
         studyToEdit={studyToEdit}
       />
     </>

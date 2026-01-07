@@ -8,18 +8,20 @@ import { SocialMediaPlatform } from "@/lib/sektor-api/__generated__/types";
 import { pickBy } from "lodash";
 
 interface ContactModalProps extends ModalProps {
+  open: boolean;
   setOpenContactModal: (value: React.SetStateAction<boolean>) => void;
-  localContact: Record<string, string>;
-  setLocalContact: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  contact?: Record<string, string>;
+  onContactChange?: (contact: Record<string, string>) => void;
 }
 
 const { Website, Phone, EmergencyPhone } =
   SocialMediaPlatform;
 
 const LocalContactModal = ({
+  open,
   setOpenContactModal,
-  localContact,
-  setLocalContact,
+  contact = {},
+  onContactChange,
   ...modalProps
 }: ContactModalProps) => {
   const [input, setInput] = useState({
@@ -29,12 +31,21 @@ const LocalContactModal = ({
   });
 
   useEffect(() => {
-    setInput({
-      [Website]: localContact?.[Website] || "",
-      [Phone]: localContact?.[Phone] || "",
-      [EmergencyPhone]: localContact?.[EmergencyPhone] || "",
-    });
-  }, [localContact]);
+    if (contact && Object.keys(contact).length > 0) {
+      setInput({
+        [Website]: contact?.[Website] || "",
+        [Phone]: contact?.[Phone] || "",
+        [EmergencyPhone]: contact?.[EmergencyPhone] || "",
+      });
+    } else {
+
+      setInput({
+        [Website]: "",
+        [Phone]: "",
+        [EmergencyPhone]: "",
+      });
+    }
+  }, [contact]);
 
   const handleClose = () => {
     setInput({
@@ -46,8 +57,9 @@ const LocalContactModal = ({
   };
 
   const handleSubmit = () => {
+    if (!onContactChange) return;
     const cleanedInput = pickBy(input, (value) => Boolean(value));
-    setLocalContact(cleanedInput);
+    onContactChange(cleanedInput);
     handleClose();
   };
 
@@ -56,6 +68,7 @@ const LocalContactModal = ({
 
   return (
     <Modal
+      open={open}
       closeIcon={null}
       footer={null}
       onClose={handleClose}

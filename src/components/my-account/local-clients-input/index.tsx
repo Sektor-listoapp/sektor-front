@@ -3,33 +3,35 @@ import { faPen, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Select } from "antd";
 import { OrganizationClientType } from "@/lib/sektor-api/__generated__/types";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import Image from "next/image";
 import LocalClientModal from "./client-modal";
 
 interface ClientsInputProps {
-  clients: OrganizationClientType[];
+  clients?: OrganizationClientType[];
+  onClientsChange?: (clients: OrganizationClientType[]) => void;
+  onClientLogosChange?: (logos: { [id: string]: File }) => void;
+  clientLogos?: { [id: string]: File };
   disabled?: boolean;
 }
 
-const LocalClientsInput = ({ clients, disabled }: ClientsInputProps) => {
-  const [localClients, setLocalClients] = useLocalStorage(
-    "sektor-local-clients",
-    clients ?? []
-  );
-
-  const [localClientLogos, setLocalClientLogos] = useLocalStorage<{ [id: string]: File }>("sektor-local-client-logo", {});
+const LocalClientsInput = ({
+  clients = [],
+  onClientsChange,
+  onClientLogosChange,
+  clientLogos = {},
+  disabled
+}: ClientsInputProps) => {
 
 
   const localClientsOptions = useMemo(
     () =>
-      localClients.map((client) => ({
+      clients.map((client) => ({
         label: client?.name || "",
         value: client?.id || "",
         image: client?.logoUrl || "",
         data: client,
       })),
-    [localClients]
+    [clients]
   );
 
   const [openAddClientModal, setOpenAddClientModal] = useState(false);
@@ -73,10 +75,12 @@ const LocalClientsInput = ({ clients, disabled }: ClientsInputProps) => {
                 size="lg"
                 title="Eliminar"
                 onClick={() => {
-                  const updatedClients = localClients.filter(
-                    (client) => client.id !== option.data.value
-                  );
-                  setLocalClients(updatedClients);
+                  if (onClientsChange) {
+                    const updatedClients = clients.filter(
+                      (client) => client.id !== option.data.value
+                    );
+                    onClientsChange(updatedClients);
+                  }
                 }}
               />
             </div>
@@ -96,10 +100,10 @@ const LocalClientsInput = ({ clients, disabled }: ClientsInputProps) => {
       <LocalClientModal
         open={openAddClientModal}
         setOpenAddClientModal={setOpenAddClientModal}
-        localClients={localClients}
-        setLocalClients={setLocalClients}
-        localClientLogos={localClientLogos}
-        setLocalClientLogos={setLocalClientLogos}
+        clients={clients}
+        onClientsChange={onClientsChange}
+        clientLogos={clientLogos}
+        onClientLogosChange={onClientLogosChange}
         clientToEdit={clientToEdit}
       />
     </>

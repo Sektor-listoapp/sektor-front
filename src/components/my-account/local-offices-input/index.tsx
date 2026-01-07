@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect, useRef } from "react";
+import React, { useMemo, useState } from "react";
 import { faPen, faPlus, faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Select } from "antd";
@@ -7,7 +7,6 @@ import {
   OrganizationOfficeType,
   Query,
 } from "@/lib/sektor-api/__generated__/types";
-import { useLocalStorage } from "@uidotdev/usehooks";
 import LocalOfficeModal from "./office-modal";
 import { useQuery } from "@apollo/client";
 import { COUNTRY_BY_CODE_QUERY } from "@/lib/sektor-api/queries";
@@ -15,101 +14,23 @@ import clsx from "clsx";
 
 interface LocalOfficesInputProps {
   offices?: OrganizationOfficeInputType[];
+  onOfficesChange?: (offices: OrganizationOfficeInputType[]) => void;
   error?: boolean;
   disabled?: boolean;
 }
 
 const LocalOfficesInput = ({
-  offices,
+  offices = [],
+  onOfficesChange,
   disabled,
   error = false,
 }: LocalOfficesInputProps) => {
-
-  const [localOffices, setLocalOffices] = useLocalStorage<OrganizationOfficeInputType[]>(
-    "sektor-local-offices",
-    []
-  );
-
   const { data: countryDataResponse, loading: isLoadingCountryData } =
     useQuery<Query>(COUNTRY_BY_CODE_QUERY, { variables: { code: "VE" } });
 
-  const prevOfficesRef = useRef<OrganizationOfficeInputType[] | undefined>(undefined);
-
-  useEffect(() => {
-    if (offices === undefined) {
-      return;
-    }
-
-    const normalizeOffice = (office: OrganizationOfficeInputType) => ({
-      id: office?.id || "",
-      phone: office?.phone || "",
-      photoUrl: office?.photoUrl || undefined,
-      schedule: office?.schedule || [],
-      address: {
-        cityId: office?.address?.cityId || 0,
-        countryId: office?.address?.countryId || 1,
-        stateId: office?.address?.stateId || 0,
-        street: office?.address?.street || "",
-      },
-    });
-
-    const normalizeOffices = (officesList: OrganizationOfficeInputType[]) => {
-      return officesList
-        .map(normalizeOffice)
-        .filter((office, index, self) => {
-          return index === self.findIndex((o) => o.id === office.id && o.id !== "");
-        });
-    };
-
-    const propOffices = offices || [];
-    const currentOffices = localOffices || [];
-
-    const prevOffices = prevOfficesRef.current || [];
-    const normalizedPrev = normalizeOffices(prevOffices);
-    const normalizedProp = normalizeOffices(propOffices);
-    const normalizedCurrent = normalizeOffices(currentOffices);
-
-    const propsChanged =
-      normalizedPrev.length !== normalizedProp.length ||
-      normalizedPrev.some((prevOffice) => {
-        return !normalizedProp.some(
-          (propOffice) =>
-            propOffice.id === prevOffice.id &&
-            propOffice.id !== "" &&
-            JSON.stringify(propOffice) === JSON.stringify(prevOffice)
-        );
-      });
-
-    const areDifferent =
-      normalizedProp.length !== normalizedCurrent.length ||
-      normalizedProp.some((propOffice) => {
-        return !normalizedCurrent.some(
-          (currentOffice) =>
-            currentOffice.id === propOffice.id &&
-            currentOffice.id !== "" &&
-            JSON.stringify(currentOffice) === JSON.stringify(propOffice)
-        );
-      });
-
-    if (propsChanged && areDifferent) {
-      if (propOffices.length > 0) {
-        const uniqueOffices = propOffices.filter((office, index, self) => {
-          const officeId = office?.id || "";
-          return officeId === "" || index === self.findIndex((o) => (o?.id || "") === officeId);
-        });
-        setLocalOffices(uniqueOffices);
-      } else {
-        setLocalOffices([]);
-      }
-    }
-
-    prevOfficesRef.current = offices;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [offices, setLocalOffices]);
-
   const localOfficeOptions = useMemo(
     () => {
-      const officesArray = Array.isArray(localOffices) ? localOffices : [];
+      const officesArray = Array.isArray(offices) ? offices : [];
       const countryStates = countryDataResponse?.getCountryByCode?.states || [];
       return officesArray.map((office) => {
         const { stateId = "", street = "" } = office?.address || {};
@@ -124,7 +45,7 @@ const LocalOfficesInput = ({
         };
       });
     },
-    [localOffices, countryDataResponse]
+    [offices, countryDataResponse]
   );
 
   const [openOfficeModal, setOpenOfficeModal] = useState(false);
@@ -168,11 +89,13 @@ const LocalOfficesInput = ({
                   size="lg"
                   title="Eliminar"
                   onClick={() => {
-                    const officesArray = Array.isArray(localOffices) ? localOffices : [];
-                    const updatedOffices = officesArray.filter(
-                      (office) => office?.id !== option?.data?.value
-                    );
-                    setLocalOffices(updatedOffices);
+                    if (onOfficesChange) {
+                      const officesArray = Array.isArray(offices) ? offices : [];
+                      const updatedOffices = officesArray.filter(
+                        (office) => office?.id !== option?.data?.value
+                      );
+                      onOfficesChange(updatedOffices);
+                    }
                   }}
                 />
               </div>
@@ -193,9 +116,9 @@ const LocalOfficesInput = ({
       <LocalOfficeModal
         open={openOfficeModal}
         officeToEdit={officeToEdit}
-        setLocalOffices={setLocalOffices}
+        onOfficesChange={onOfficesChange}
         setOpenOfficeModal={setOpenOfficeModal}
-        localOffices={localOffices as unknown as OrganizationOfficeType[]}
+        offices={offices as unknown as OrganizationOfficeType[]}
       />
     </>
   );

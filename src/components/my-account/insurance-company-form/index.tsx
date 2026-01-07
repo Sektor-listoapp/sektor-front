@@ -25,6 +25,7 @@ import {
   Mutation,
   OrganizationOfficeInputType,
   Query,
+  SocialMediaLinkType,
 } from "@/lib/sektor-api/__generated__/types";
 import {
   ORGANIZATION_BY_ID_QUERY,
@@ -95,6 +96,9 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   const [hasLocalContact, setHasLocalContact] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const [offices, setOffices] = useState<OrganizationOfficeInputType[]>([]);
+  const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLinkType[]>([]);
+  const [contact, setContact] = useState<{ [platform: string]: string }>({});
 
   const company = companyResponse?.publicInsuranceCompanyById;
 
@@ -106,10 +110,6 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       image: logoUrl,
     })),
   ];
-
-  const localContacts = JSON.parse(
-    window?.localStorage?.getItem("sektor-local-contact") || "{}"
-  );
 
   const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
     try {
@@ -129,38 +129,13 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   };
 
   useEffect(() => {
-    if (Object?.keys(localContacts)?.length > 0) {
+    if (Object?.keys(contact)?.length > 0) {
       setHasLocalContact(true);
+    } else {
+      setHasLocalContact(false);
     }
-  }, [localContacts]);
+  }, [contact]);
 
-  const formattedOffices = company?.offices?.map((office: any) => {
-    const {
-      __typename: _,
-      address,
-      schedule = [],
-      ...restOfficeProps
-    } = office;
-
-    const formattedSchedule = schedule.map(
-      ({ __typename, ...restScheduleProps }) => {
-        return {
-          ...restScheduleProps,
-        };
-      }
-    );
-
-    return {
-      ...restOfficeProps,
-      schedule: formattedSchedule,
-      address: {
-        cityId: address?.cityId || address?.city?.id,
-        countryId: address?.countryId || address?.country?.id,
-        stateId: address?.stateId || address?.state?.id,
-        street: address?.street,
-      },
-    };
-  });
 
   const [input, setInput] = useState<InsuranceCompanyInputType>({
     // required
@@ -223,16 +198,44 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       password: "",
     });
 
-    window?.localStorage?.setItem(
-      "social-links",
-      JSON.stringify(formattedSocialMediaLinks)
-    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const formattedOffices = company?.offices?.map((office: any) => {
+      const {
+        __typename: _,
+        address,
+        schedule = [],
+        ...restOfficeProps
+      } = office;
 
-    window?.localStorage?.setItem(
-      "sektor-local-offices",
-      JSON.stringify(company?.offices || [])
-    );
-  }, [company]);
+      const formattedSchedule = schedule.map(
+        ({ __typename, ...restScheduleProps }) => {
+          return {
+            ...restScheduleProps,
+          };
+        }
+      );
+
+      return {
+        ...restOfficeProps,
+        schedule: formattedSchedule,
+        address: {
+          cityId: address?.cityId || address?.city?.id,
+          countryId: address?.countryId || address?.country?.id,
+          stateId: address?.stateId || address?.state?.id,
+          street: address?.street,
+        },
+      };
+    }) || [];
+
+    const contactData: { [platform: string]: string } = {};
+    formattedSocialMediaLinks.forEach((link) => {
+      contactData[link.platform] = link.url;
+    });
+
+    setOffices(formattedOffices);
+    setSocialMediaLinks(formattedSocialMediaLinks);
+    setContact(contactData);
+  }, [company, organizationResponse]);
 
   const requiredFields = {
     name: Boolean(input.name?.trim()?.length),
@@ -252,7 +255,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
   const hasErrors =
     Object.values(requiredFields).some((field) => !field) ||
-    Object.values(localContacts)?.length === 0;
+    Object.values(contact)?.length === 0;
 
   if (companyError) {
     toast.error(
@@ -282,8 +285,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
     setIsUpdatingCompany(true);
 
-    const offices = window.localStorage.getItem("sektor-local-offices") ?? "[]";
-    const formattedOffices = JSON.parse(offices).map((office: any) => {
+    const formattedOffices = offices.map((office: any) => {
       const {
         __typename: _,
         address,
@@ -311,12 +313,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       };
     });
 
-    const contact = window.localStorage.getItem("sektor-local-contact") ?? "{}";
-    const contactData = JSON.parse(contact);
-    console.log("contactData", contactData)
-
-
-    const cleanedLinks = Object.entries(contactData)
+    const cleanedLinks = Object.entries(contact)
       .filter(([key, value]) => typeof value === 'string' && value.trim() !== '')
       .map(([platform, url]) => ({
         platform,
@@ -333,8 +330,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
 
 
-    const socialMediaLinks = window.localStorage.getItem("social-links") ?? "[]";
-    const formattedSocialMediaLinks = JSON.parse(socialMediaLinks).map((link: any) => {
+    const formattedSocialMediaLinks = socialMediaLinks.map((link: any) => {
       const { __typename, ...restLinkProps } = link;
       return {
         platform: restLinkProps.platform,
@@ -342,10 +338,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       };
     });
 
-    console.log("formattedSocialMediaLinks", formattedSocialMediaLinks)
-
-    const formattedFullContactInfo = [...formattedSocialMediaLinks, ...cleanedLinks]
-    console.log("formattedFullContactInfo", formattedFullContactInfo)
+    const formattedFullContactInfo = [...formattedSocialMediaLinks, ...cleanedLinks];
 
 
 
@@ -501,7 +494,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
               </div>
             )}
           </div>
-       
+
         </div>
 
 
@@ -602,12 +595,16 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
         <LocalContactInput
           links={company?.socialMediaLinks || []}
+          contact={contact}
+          onContactChange={setContact}
           setHasLocalContact={setHasLocalContact}
           disabled={loadingCompany || isUpdatingCompany}
         />
 
         <SocialMediaInput
           setHasSocialLinks={() => { }}
+          socialMediaLinks={socialMediaLinks}
+          onSocialLinksChange={setSocialMediaLinks}
           disabled={loadingCompany || isUpdatingCompany}
         />
       </div>
@@ -627,7 +624,8 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
         <LocalOfficesInput
           disabled={loadingCompany || isUpdatingCompany}
-          offices={formattedOffices as unknown as OrganizationOfficeInputType[]}
+          offices={offices}
+          onOfficesChange={setOffices}
         />
 
         <SelectMultiple
