@@ -27,12 +27,20 @@ const Footer = ({ className, ...props }: React.HTMLProps<HTMLDivElement>) => {
             </a>
           </p>
           <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-            <Link
-              href="/terminos-y-condiciones"
-              className="font-century-gothic text-sm text-white hover:text-gray-200 transition-colors duration-200 underline"
-            >
-              Términos y Condiciones
-            </Link>
+            <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+              <Link
+                href="/terminos-y-condiciones"
+                className="font-century-gothic text-sm text-white hover:text-gray-200 transition-colors duration-200 underline"
+              >
+                Términos y Condiciones
+              </Link>
+              <Link
+                href="/politica-de-privacidad"
+                className="font-century-gothic text-sm text-white hover:text-gray-200 transition-colors duration-200 underline"
+              >
+                Política de Privacidad
+              </Link>
+            </div>
             <div className="flex justify-center items-center gap-4">
               <InstagramIcon width={40} height={40} />
               <FacebookIcon width={35} height={35} />
