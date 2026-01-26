@@ -15,11 +15,7 @@ import EditModuleModal from "./edit-module-modal";
 import FolderDetail from "./folder-detail";
 import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { toast } from "react-toastify";
-
-const getModuleIcon = (icon: string | null | undefined): string => {
-  const iconValue = icon && typeof icon === 'string' && icon.trim() ? icon : "icon1";
-  return iconValue;
-};
+import { getModuleIcon, getModuleIconPath } from "@/utils/module-icons";
 
 const HerramientasList = () => {
   const router = useRouter();
@@ -184,14 +180,13 @@ const HerramientasList = () => {
                     <div className="flex items-center gap-4 flex-1">
                       <div className="relative w-6 h-6 flex-shrink-0">
                         <img
-                          src={`/images/modules-icons/${getModuleIcon(module.icon)}.webp`}
+                          src={getModuleIconPath(module.icon)}
                           alt={getModuleIcon(module.icon)}
                           className="w-full h-full object-contain"
                           onError={(e) => {
-                            console.error("Error loading icon:", getModuleIcon(module.icon));
                             const target = e.target as HTMLImageElement;
-                            if (!target.src.includes('icon1.webp')) {
-                              target.src = `/images/modules-icons/icon1.webp`;
+                            if (!target.src.includes("icon1.")) {
+                              target.src = getModuleIconPath("icon1");
                             }
                           }}
                         />

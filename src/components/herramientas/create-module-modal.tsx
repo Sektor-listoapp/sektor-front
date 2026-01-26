@@ -11,6 +11,7 @@ import Button from "@/components/ui/button";
 import Switch from "@/components/ui/switch";
 import { toast } from "react-toastify";
 import IconSelector from "./icon-selector";
+import { MODULE_ICON_OPTIONS } from "@/utils/module-icons";
 
 interface CreateModuleModalProps {
   open: boolean;
@@ -31,20 +32,7 @@ const CreateModuleModal: React.FC<CreateModuleModalProps> = ({
 
   const [createModule, { loading }] = useMutation<Mutation>(CREATE_MODULE);
 
-  const iconOptions = [
-    { label: "Icono 1", value: "icon1", imagePath: "/images/modules-icons/icon1.webp" },
-    { label: "Icono 2", value: "icon2", imagePath: "/images/modules-icons/icon2.webp" },
-    { label: "Icono 3", value: "icon3", imagePath: "/images/modules-icons/icon3.webp" },
-    { label: "Icono 4", value: "icon4", imagePath: "/images/modules-icons/icon4.webp" },
-    { label: "Icono 5", value: "icon5", imagePath: "/images/modules-icons/icon5.webp" },
-    { label: "Icono 6", value: "icon6", imagePath: "/images/modules-icons/icon6.webp" },
-    { label: "Icono 7", value: "icon7", imagePath: "/images/modules-icons/icon7.webp" },
-    { label: "Icono 8", value: "icon8", imagePath: "/images/modules-icons/icon8.webp" },
-    { label: "Icono 9", value: "icon9", imagePath: "/images/modules-icons/icon9.webp" },
-    { label: "Icono 10", value: "icon10", imagePath: "/images/modules-icons/icon10.webp" },
-  ];
-
-  const [icon, setIcon] = useState(iconOptions[0].value);
+  const [icon, setIcon] = useState(MODULE_ICON_OPTIONS[0].value);
 
   const planOptions = [
     { label: "Free", value: SubscriptionPlan.Free },
@@ -102,7 +90,7 @@ const CreateModuleModal: React.FC<CreateModuleModalProps> = ({
       toast.success("Módulo creado correctamente");
 
       setTitle("");
-      setIcon(iconOptions[0].value);
+      setIcon(MODULE_ICON_OPTIONS[0].value);
       setSelectedPlan(SubscriptionPlan.Free);
       setOrder("1");
       setDescription("");
@@ -154,7 +142,7 @@ const CreateModuleModal: React.FC<CreateModuleModalProps> = ({
             <IconSelector
               value={icon}
               onChange={setIcon}
-              options={iconOptions}
+              options={MODULE_ICON_OPTIONS}
             />
           </div>
 

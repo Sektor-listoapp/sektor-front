@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { ROUTES } from "@/constants/router";
 import { quillDeltaToText } from "@/utils/quill-delta-to-text";
+import { getModuleIcon, getModuleIconPath } from "@/utils/module-icons";
 
 interface FolderDetailProps {
   folderId: string;
@@ -72,14 +73,6 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
   const files = module?.files || [];
   const subfolders = module?.children || [];
   const isFinalFolder = module?.latest || false;
-
-  const getModuleIcon = (icon: string | null | undefined): string => {
-    if (icon && typeof icon === 'string' && icon.trim()) {
-      return icon;
-    }
-    return "icon1";
-  };
-
 
   const MAX_FILE_SIZE = 32 * 1024 * 1024; // 32MB
 
@@ -416,14 +409,13 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
                     <div className="flex items-center gap-4 flex-1">
                       <div className="relative w-6 h-6 flex-shrink-0">
                         <img
-                          src={`/images/modules-icons/${getModuleIcon(subfolder.icon)}.webp`}
+                          src={getModuleIconPath(subfolder.icon)}
                           alt={getModuleIcon(subfolder.icon)}
                           className="w-full h-full object-contain"
                           onError={(e) => {
-                            console.error("Error loading icon:", getModuleIcon(subfolder.icon));
                             const target = e.target as HTMLImageElement;
-                            if (!target.src.includes('icon1.webp')) {
-                              target.src = `/images/modules-icons/icon1.webp`;
+                            if (!target.src.includes("icon1.")) {
+                              target.src = getModuleIconPath("icon1");
                             }
                           }}
                         />
@@ -734,14 +726,13 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
                   <div className="flex items-center gap-4 flex-1">
                     <div className="relative w-6 h-6 flex-shrink-0">
                       <img
-                        src={`/images/modules-icons/${getModuleIcon(subfolder.icon)}.webp`}
+                        src={getModuleIconPath(subfolder.icon)}
                         alt={getModuleIcon(subfolder.icon)}
                         className="w-full h-full object-contain"
                         onError={(e) => {
-                          console.error("Error loading icon:", getModuleIcon(subfolder.icon));
                           const target = e.target as HTMLImageElement;
-                          if (!target.src.includes('icon1.webp')) {
-                            target.src = `/images/modules-icons/icon1.webp`;
+                          if (!target.src.includes("icon1.")) {
+                            target.src = getModuleIconPath("icon1");
                           }
                         }}
                       />
