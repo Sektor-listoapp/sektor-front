@@ -10,6 +10,7 @@ import Select from "@/components/ui/select";
 import Button from "@/components/ui/button";
 import IconSelector from "./icon-selector";
 import { toast } from "react-toastify";
+import { MODULE_ICON_OPTIONS } from "@/utils/module-icons";
 
 interface EditModuleModalProps {
   open: boolean;
@@ -56,19 +57,6 @@ const EditModuleModal: React.FC<EditModuleModalProps> = ({
       }
     }
   }, [module]);
-
-  const iconOptions = [
-    { label: "Icono 1", value: "icon1", imagePath: "/images/modules-icons/icon1.webp" },
-    { label: "Icono 2", value: "icon2", imagePath: "/images/modules-icons/icon2.webp" },
-    { label: "Icono 3", value: "icon3", imagePath: "/images/modules-icons/icon3.webp" },
-    { label: "Icono 4", value: "icon4", imagePath: "/images/modules-icons/icon4.webp" },
-    { label: "Icono 5", value: "icon5", imagePath: "/images/modules-icons/icon5.webp" },
-    { label: "Icono 6", value: "icon6", imagePath: "/images/modules-icons/icon6.webp" },
-    { label: "Icono 7", value: "icon7", imagePath: "/images/modules-icons/icon7.webp" },
-    { label: "Icono 8", value: "icon8", imagePath: "/images/modules-icons/icon8.webp" },
-    { label: "Icono 9", value: "icon9", imagePath: "/images/modules-icons/icon9.webp" },
-    { label: "Icono 10", value: "icon10", imagePath: "/images/modules-icons/icon10.webp" },
-  ];
 
   const planOptions = [
     { label: "Todos", value: "all" },
@@ -161,7 +149,7 @@ const EditModuleModal: React.FC<EditModuleModalProps> = ({
             <IconSelector
               value={icon}
               onChange={setIcon}
-              options={iconOptions}
+              options={MODULE_ICON_OPTIONS}
             />
           </div>
 
