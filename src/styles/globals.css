@@ -74,3 +74,12 @@ body {
   display: block !important;
 }
 
+/* Oculta la barra de scroll pero mantiene el scroll */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+

@@ -5,7 +5,7 @@ import closeIcon from './close-icon.svg'
 const CloseIcon = () => {
   return (
     <div className="flex items-center justify-center">
-   <Image src={closeIcon} alt="close-icon" width={24} height={24} />
+   <Image src={closeIcon} alt="" width={24} height={24} aria-hidden />
    </div>
   )
 }

@@ -10,11 +10,19 @@ export const CLINICS_SIMPLE_QUERY = gql`
       items {
         id
         name
+        insuranceCompanies {
+          id
+          name
+        }
         insuranceCompanyRelations {
           insuranceCompanyId
           depositRequired
           fullyContractedClinic
           reasonableExpensesApplicable
+        }
+        socialMediaLinks {
+          platform
+          url
         }
         offices {
           name
