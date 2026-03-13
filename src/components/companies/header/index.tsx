@@ -76,8 +76,8 @@ const CompaniesHeader = ({
         </h1>
         <div className="flex items-center gap-2 xl:hidden">
           <Button
-            className="w-fit"
-            variant="outline"
+            className="w-fit md:px-16"
+            variant="solid-blue"
             disabled={disabled || isExporting}
             loading={isExporting}
             onClick={handleExport}
@@ -123,8 +123,8 @@ const CompaniesHeader = ({
 
       <div className="hidden xl:flex items-center gap-2">
         <Button
-          className="w-fit xl:px-10"
-          variant="outline"
+          className="w-fit xl:px-16"
+          variant="solid-blue"
           disabled={disabled || isExporting}
           loading={isExporting}
           onClick={handleExport}
