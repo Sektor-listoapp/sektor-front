@@ -8,6 +8,8 @@ import { useRouter } from "next/router";
 import { useIsClient } from "@uidotdev/usehooks";
 import OrganizationFilters from "./filters";
 import usePublicOrganizations from "@/hooks/use-public-organizations";
+import Button from "@/components/ui/button";
+import Link from "next/link";
 
 const Searchbar = ({
   className,
@@ -69,11 +71,16 @@ const Searchbar = ({
   return (
     <section
       className={cn(
-        "w-full flex flex-col-reverse items-center justify-between gap-8 max-w-md mb-2 mx-auto md:flex-row md:max-w-full md:mb-4",
+        "w-full flex flex-col items-center justify-between gap-8 max-w-md mb-2 mx-auto md:flex-row md:max-w-full md:mb-4",
         className
       )}
       {...props}
     >
+      <Link href="/clinic-list" className="w-full md:hidden">
+        <Button className="w-full">
+          Ver listado de clínicas y seguros disponibles
+        </Button>
+      </Link>
       <div className="flex gap-4 w-fit">
         {ORGANIZATION_TYPE_OPTIONS.map((option) => {
           return (
