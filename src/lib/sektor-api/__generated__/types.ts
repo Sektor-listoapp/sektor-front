@@ -305,6 +305,15 @@ export type CreateModuleInputType = {
   title: Scalars['String']['input'];
 };
 
+export type CreateSurveyInputType = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  dueDate?: InputMaybe<Scalars['DateTime']['input']>;
+  notificationType?: InputMaybe<SurveyNotificationType>;
+  questions: Array<SurveyQuestionInputType>;
+  target: SurveyTargetConfigInputType;
+  title: Scalars['String']['input'];
+};
+
 /** Supported currencies */
 export enum Currency {
   Usd = 'USD',
@@ -621,6 +630,7 @@ export type InsuranceCompanyFilterType = {
   lineOfBusiness?: InputMaybe<OrganizationLineOfBusiness>;
   modality?: InputMaybe<OrganizationModality>;
   name?: InputMaybe<Scalars['String']['input']>;
+  subtype?: InputMaybe<InsuranceCompanySubtype>;
   type?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -638,6 +648,7 @@ export type InsuranceCompanyInputType = {
   name: Scalars['String']['input'];
   offices: Array<OrganizationOfficeInputType>;
   socialMediaLinks: Array<SocialMediaLinkInputType>;
+  subtype?: InputMaybe<InsuranceCompanySubtype>;
   suppliers?: Array<Scalars['String']['input']>;
   type: OrganizationTypes;
 };
@@ -648,6 +659,13 @@ export type InsuranceCompanyPaginatedType = {
   items?: Maybe<Array<InsuranceCompanyType>>;
   pages: Scalars['Int']['output'];
 };
+
+export enum InsuranceCompanySubtype {
+  Cooperatives = 'Cooperatives',
+  Insurtech = 'Insurtech',
+  PrepaidMedicine = 'PrepaidMedicine',
+  Standard = 'Standard'
+}
 
 export type InsuranceCompanyType = BasePublicOrganizationType & {
   __typename?: 'InsuranceCompanyType';
@@ -669,6 +687,7 @@ export type InsuranceCompanyType = BasePublicOrganizationType & {
   plan: OrganizationPlans;
   rating: Scalars['Float']['output'];
   socialMediaLinks: Array<SocialMediaLinkType>;
+  subtype: InsuranceCompanySubtype;
   suppliers: Array<SupplierType>;
   type: OrganizationTypes;
   updatedAt: Scalars['DateTime']['output'];
@@ -758,13 +777,16 @@ export type Mutation = {
   createCalendarEvent: CalendarEventType;
   createModule: ModuleType;
   createNews: NewsType;
+  createSurvey: SurveyType;
   createTracking: TrackingType;
   deleteFileFromModule: ModuleType;
   deleteModule: Scalars['Boolean']['output'];
   deleteMyAccount: Scalars['Boolean']['output'];
   deleteNews: Scalars['Boolean']['output'];
   deleteOrganization: Scalars['Boolean']['output'];
+  deleteSurvey: Scalars['Boolean']['output'];
   deleteTracking: Scalars['Boolean']['output'];
+  getModuleUploadUrl: UploadFileSignedUrlResponse;
   /** Process direct debit payment with optional auto-renewal. */
   initiateDirectDebit: InitiatePaymentResultType;
   /** Step 1: Initiate immediate debit. Sends OTP to customer phone. */
@@ -795,6 +817,7 @@ export type Mutation = {
   sendVerificationEmail: Scalars['Boolean']['output'];
   submitFeedback: FeedbackType;
   submitNews: NewsType;
+  submitSurveyResponse: SurveyResponseType;
   unregisterDevice: Scalars['Boolean']['output'];
   updateBrokerageSociety: BrokerageSocietyType;
   updateCalendarEvent: CalendarEventType;
@@ -814,8 +837,8 @@ export type Mutation = {
   /** Admin: Update subscription price and details */
   updateSubscriptionPrice: SubscriptionPriceType;
   updateSupplier: SupplierType;
+  updateSurvey: SurveyType;
   updateTracking?: Maybe<TrackingType>;
-  uploadFileToModule: ModuleType;
   uploadOfficesTemplate: Array<UploadFileTemplateResult>;
   uploadOrganizationTemplate: Array<UploadFileTemplateResult>;
   /** Validate an Apple In-App Purchase transaction from StoreKit 2 */
@@ -897,6 +920,11 @@ export type MutationCreateNewsArgs = {
 };
 
 
+export type MutationCreateSurveyArgs = {
+  input: CreateSurveyInputType;
+};
+
+
 export type MutationCreateTrackingArgs = {
   input: TrackingInputType;
 };
@@ -928,8 +956,21 @@ export type MutationDeleteOrganizationArgs = {
 };
 
 
+export type MutationDeleteSurveyArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteTrackingArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type MutationGetModuleUploadUrlArgs = {
+  contentType: Scalars['String']['input'];
+  fileName: Scalars['String']['input'];
+  moduleId: Scalars['ID']['input'];
+  size: Scalars['Int']['input'];
 };
 
 
@@ -1064,6 +1105,12 @@ export type MutationSubmitNewsArgs = {
 };
 
 
+export type MutationSubmitSurveyResponseArgs = {
+  input: SubmitSurveyResponseInputType;
+  surveyId: Scalars['ID']['input'];
+};
+
+
 export type MutationUnregisterDeviceArgs = {
   token: Scalars['String']['input'];
 };
@@ -1163,15 +1210,15 @@ export type MutationUpdateSupplierArgs = {
 };
 
 
-export type MutationUpdateTrackingArgs = {
-  id: Scalars['String']['input'];
-  input: TrackingInputType;
+export type MutationUpdateSurveyArgs = {
+  id: Scalars['ID']['input'];
+  input: UpdateSurveyInputType;
 };
 
 
-export type MutationUploadFileToModuleArgs = {
-  file: Scalars['File']['input'];
-  moduleId: Scalars['ID']['input'];
+export type MutationUpdateTrackingArgs = {
+  id: Scalars['String']['input'];
+  input: TrackingInputType;
 };
 
 
@@ -1249,7 +1296,8 @@ export enum NewsVisibility {
 
 export enum NotificationKind {
   ContactViewed = 'ContactViewed',
-  QuoteReceived = 'QuoteReceived'
+  QuoteReceived = 'QuoteReceived',
+  SurveyPublished = 'SurveyPublished'
 }
 
 export type NotificationPreferencesType = {
@@ -1496,8 +1544,8 @@ export type PropertyQuoteType = {
 };
 
 export type PublicOrganizationFilterAddressType = {
-  city?: InputMaybe<Scalars['Float']['input']>;
-  state?: InputMaybe<Scalars['Float']['input']>;
+  city?: InputMaybe<Scalars['Int']['input']>;
+  state?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type PublicOrganizationFilterType = {
@@ -1560,6 +1608,7 @@ export type Query = {
   myPayments: Array<PaymentType>;
   /** Get subscription details for the current organization */
   mySubscription?: Maybe<SubscriptionDetailsType>;
+  mySurveys: Array<SurveyType>;
   news: Array<NewsType>;
   newsAndInterviewsList: NewsListGroupedType;
   newsById?: Maybe<NewsType>;
@@ -1570,6 +1619,7 @@ export type Query = {
   officesTemplate: FileTemplateType;
   organizationById: OrganizationType;
   organizationTemplate: FileTemplateType;
+  organizationTemplateDownload: FileTemplateType;
   otherQuoteById: OtherQuoteType;
   /** Get payment by ID */
   payment?: Maybe<PaymentType>;
@@ -1593,6 +1643,12 @@ export type Query = {
   subscriptionPrice?: Maybe<SubscriptionPriceType>;
   /** Get subscription prices */
   subscriptionPrices: Array<SubscriptionPriceType>;
+  surveyById?: Maybe<SurveyType>;
+  surveyDetail: SurveyDetailType;
+  surveyResponses: SurveyResponsesPaginatedType;
+  surveyResultsForUser: Array<SurveyQuestionResultType>;
+  surveyTargetCandidates: Array<SurveyTargetCandidateType>;
+  surveys: Array<SurveyType>;
   trackingByEntityId: Array<TrackingType>;
   trackingByEventType: Array<TrackingType>;
   trackingById?: Maybe<TrackingType>;
@@ -1785,6 +1841,32 @@ export type QuerySubscriptionPriceArgs = {
 };
 
 
+export type QuerySurveyByIdArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QuerySurveyDetailArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QuerySurveyResponsesArgs = {
+  pagination?: InputMaybe<PaginationType>;
+  surveyId: Scalars['ID']['input'];
+};
+
+
+export type QuerySurveyResultsForUserArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QuerySurveyTargetCandidatesArgs = {
+  targetTypes: Array<SurveyTarget>;
+};
+
+
 export type QueryTrackingByEntityIdArgs = {
   entityId: Scalars['String']['input'];
 };
@@ -1855,6 +1937,12 @@ export type QuoteType = {
   rating?: Maybe<Scalars['Float']['output']>;
   read: Scalars['Boolean']['output'];
   updatedAt: Scalars['DateTime']['output'];
+};
+
+export type RatingDistributionType = {
+  __typename?: 'RatingDistributionType';
+  count: Scalars['Int']['output'];
+  rating: Scalars['Int']['output'];
 };
 
 export type RecognitionInputType = {
@@ -1940,6 +2028,7 @@ export type RegisterRequestInsuranceCompanyInputType = {
   email: Scalars['String']['input'];
   instagramUrl?: InputMaybe<Scalars['String']['input']>;
   phone?: InputMaybe<Scalars['String']['input']>;
+  subtype?: InputMaybe<InsuranceCompanySubtype>;
 };
 
 export type SearchOrganizationFilterType = {
@@ -2015,6 +2104,10 @@ export type SubmitFeedbackInput = {
   name: Scalars['String']['input'];
 };
 
+export type SubmitSurveyResponseInputType = {
+  answers: Array<SurveyAnswerInputType>;
+};
+
 export type SubscriptionDetailsType = {
   __typename?: 'SubscriptionDetailsType';
   autoRenew: Scalars['Boolean']['output'];
@@ -2055,6 +2148,7 @@ export type SubscriptionPriceType = {
 
 export type SupplierFilterType = {
   address?: InputMaybe<PublicOrganizationFilterAddressType>;
+  insuranceCompanyId?: InputMaybe<Scalars['String']['input']>;
   lineOfBusiness?: InputMaybe<OrganizationLineOfBusiness>;
   modality?: InputMaybe<OrganizationModality>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -2148,6 +2242,146 @@ export type SupplierType = BasePublicOrganizationType & {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type SurveyAnswerInputType = {
+  questionId: Scalars['String']['input'];
+  /** JSON encoded value (string | string[] | number | boolean) */
+  value: Scalars['String']['input'];
+};
+
+export type SurveyAnswerType = {
+  __typename?: 'SurveyAnswerType';
+  questionId: Scalars['String']['output'];
+  /** JSON encoded value (string | string[] | number | boolean) */
+  value: Scalars['String']['output'];
+};
+
+export type SurveyDetailType = {
+  __typename?: 'SurveyDetailType';
+  results: Array<SurveyQuestionResultType>;
+  survey: SurveyType;
+};
+
+/** How to notify users about new surveys */
+export enum SurveyNotificationType {
+  Both = 'Both',
+  Email = 'Email',
+  None = 'None',
+  Push = 'Push'
+}
+
+export type SurveyQuestionInputType = {
+  id?: InputMaybe<Scalars['String']['input']>;
+  options?: InputMaybe<Array<Scalars['String']['input']>>;
+  required?: InputMaybe<Scalars['Boolean']['input']>;
+  title: Scalars['String']['input'];
+  type: SurveyQuestionType;
+  visible?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type SurveyQuestionOptionCountType = {
+  __typename?: 'SurveyQuestionOptionCountType';
+  count: Scalars['Int']['output'];
+  option: Scalars['String']['output'];
+};
+
+export type SurveyQuestionResultType = {
+  __typename?: 'SurveyQuestionResultType';
+  averageRating?: Maybe<Scalars['Float']['output']>;
+  freeTextSamples?: Maybe<Array<Scalars['String']['output']>>;
+  noCount?: Maybe<Scalars['Int']['output']>;
+  optionCounts?: Maybe<Array<SurveyQuestionOptionCountType>>;
+  questionId: Scalars['String']['output'];
+  questionTitle: Scalars['String']['output'];
+  questionType: SurveyQuestionType;
+  ratingDistribution?: Maybe<Array<RatingDistributionType>>;
+  totalAnswers: Scalars['Int']['output'];
+  yesCount?: Maybe<Scalars['Int']['output']>;
+};
+
+/** Type of survey question */
+export enum SurveyQuestionType {
+  FreeText = 'FreeText',
+  MultipleChoice = 'MultipleChoice',
+  Rating = 'Rating',
+  SingleChoice = 'SingleChoice',
+  YesNo = 'YesNo'
+}
+
+export type SurveyQuestionType_Gql = {
+  __typename?: 'SurveyQuestionType_GQL';
+  id: Scalars['String']['output'];
+  options?: Maybe<Array<Scalars['String']['output']>>;
+  required: Scalars['Boolean']['output'];
+  title: Scalars['String']['output'];
+  type: SurveyQuestionType;
+  visible: Scalars['Boolean']['output'];
+};
+
+export type SurveyResponseType = {
+  __typename?: 'SurveyResponseType';
+  answers: Array<SurveyAnswerType>;
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  surveyId: Scalars['ID']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  userId: Scalars['ID']['output'];
+};
+
+export type SurveyResponsesPaginatedType = {
+  __typename?: 'SurveyResponsesPaginatedType';
+  responses: Array<SurveyResponseType>;
+  total: Scalars['Int']['output'];
+};
+
+/** Target audience for surveys */
+export enum SurveyTarget {
+  Admin = 'Admin',
+  BrokerageSociety = 'BrokerageSociety',
+  Customer = 'Customer',
+  ExclusiveAgent = 'ExclusiveAgent',
+  InsuranceBroker = 'InsuranceBroker',
+  InsuranceCompany = 'InsuranceCompany',
+  Member = 'Member',
+  News = 'News',
+  Supplier = 'Supplier'
+}
+
+export type SurveyTargetCandidateType = {
+  __typename?: 'SurveyTargetCandidateType';
+  email: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+};
+
+export type SurveyTargetConfigInputType = {
+  mode: Scalars['String']['input'];
+  targetTypes?: InputMaybe<Array<SurveyTarget>>;
+  userIds?: InputMaybe<Array<Scalars['ID']['input']>>;
+};
+
+export type SurveyTargetConfigType = {
+  __typename?: 'SurveyTargetConfigType';
+  mode: Scalars['String']['output'];
+  targetTypes?: Maybe<Array<SurveyTarget>>;
+  userIds?: Maybe<Array<Scalars['ID']['output']>>;
+};
+
+export type SurveyType = {
+  __typename?: 'SurveyType';
+  createdAt: Scalars['DateTime']['output'];
+  createdBy: Scalars['ID']['output'];
+  description: Scalars['String']['output'];
+  dueDate?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  notificationType: SurveyNotificationType;
+  questions: Array<SurveyQuestionType_Gql>;
+  responsesCount: Scalars['Int']['output'];
+  target: SurveyTargetConfigType;
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type TrackingInputType = {
   entityId: Scalars['String']['input'];
   entityType: EntityType;
@@ -2229,6 +2463,21 @@ export type UpdateSubscriptionPriceInput = {
   monthlyPriceUsd?: InputMaybe<Scalars['Float']['input']>;
   plan: SubscriptionPlan;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateSurveyInputType = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  dueDate?: InputMaybe<Scalars['DateTime']['input']>;
+  notificationType?: InputMaybe<SurveyNotificationType>;
+  questions?: InputMaybe<Array<SurveyQuestionInputType>>;
+  target?: InputMaybe<SurveyTargetConfigInputType>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UploadFileSignedUrlResponse = {
+  __typename?: 'UploadFileSignedUrlResponse';
+  module: ModuleType;
+  signedUrl: Scalars['String']['output'];
 };
 
 export type UploadFileTemplateResult = {
