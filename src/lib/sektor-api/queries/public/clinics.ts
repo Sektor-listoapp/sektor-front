@@ -10,6 +10,7 @@ export const CLINICS_SIMPLE_QUERY = gql`
       items {
         id
         name
+        logoUrl
         insuranceCompanies {
           id
           name

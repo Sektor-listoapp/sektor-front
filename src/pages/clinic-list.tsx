@@ -42,8 +42,6 @@ const ClinicList = () => {
     const [selectedState, setSelectedState] = useState<string>("");
     const [selectedInsurance, setSelectedInsurance] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
-    const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
-    const [modalAddress, setModalAddress] = useState<string>("");
     const [insurancePopup, setInsurancePopup] = useState<{
         name: string;
         depositRequired: boolean;
@@ -161,11 +159,6 @@ const ClinicList = () => {
     );
     const totalPages = Math.ceil(clinics.length / CARDS_PER_PAGE) || 1;
 
-    const showAddressModal = (address: string) => {
-        setModalAddress(address);
-        setIsAddressModalOpen(true);
-    };
-
   const showInsurancePopup = (name: string, rel: { depositRequired: boolean; fullyContractedClinic: boolean; reasonableExpensesApplicable: boolean }) => {
     setInsurancePopup({
       name,
@@ -263,10 +256,14 @@ const ClinicList = () => {
                                             .join(", ")
                                         : "");
                                 const phone = firstOffice?.phone?.trim() ?? "";
-                                const whatsappUrl = phone
-                                    ? `https://wa.me/${phone.replace(/\s/g, "").replace(/^0/, "")}`
+                                const whatsappLink = clinic.socialMediaLinks?.find((l) => l.platform === SocialMediaPlatform.Whatsapp);
+                                const whatsappUrl = whatsappLink?.url
+                                    ? `https://wa.me/${whatsappLink.url.replace(/\D/g, "")}`
                                     : "";
                                 const websiteUrl = clinic.socialMediaLinks?.find((l) => l.platform === SocialMediaPlatform.Website)?.url?.trim() ?? "";
+                                const googleMapsUrl = displayAddress
+                                    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(displayAddress)}`
+                                    : "";
                                 const relations = clinic.insuranceCompanyRelations || [];
     const insuranceCompanies = clinic.insuranceCompanies || [];
     const insuranceListForBadges =
@@ -294,13 +291,23 @@ const ClinicList = () => {
                                             }}
                                         />
                                         <div className="p-4 flex flex-col gap-3 flex-1 min-h-0">
-                                            {/* Header: icon + title + badges compactos */}
+                                            {/* Header: icon/logo + title + badges compactos */}
                                             <div className="flex items-start gap-3 min-w-0">
-                                                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0">
-                                                    <FontAwesomeIcon
-                                                        icon={faHospital}
-                                                        className="text-gray-600 text-lg"
-                                                    />
+                                                <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
+                                                    {clinic.logoUrl ? (
+                                                        <Image
+                                                            src={clinic.logoUrl}
+                                                            alt={clinic.name}
+                                                            width={40}
+                                                            height={40}
+                                                            className="w-full h-full object-contain"
+                                                        />
+                                                    ) : (
+                                                        <FontAwesomeIcon
+                                                            icon={faHospital}
+                                                            className="text-gray-600 text-lg"
+                                                        />
+                                                    )}
                                                 </div>
                                                 <div className="min-w-0 flex-1">
                                                     <h2 className="font-bold text-gray-900 text-base leading-tight line-clamp-2">
@@ -419,11 +426,12 @@ const ClinicList = () => {
                                               );
                                             })()}
 
-                                            {/* Dirección: máximo 2 líneas para no alargar la card */}
+                                            {/* Dirección: abre Google Maps al hacer click */}
                                             {displayAddress ? (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => showAddressModal(displayAddress)}
+                                                <a
+                                                    href={googleMapsUrl}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
                                                     className="flex items-start gap-2 text-xs text-gray-600 hover:text-gray-800 text-left w-full min-h-[2rem]"
                                                 >
                                                     <Image
@@ -434,7 +442,7 @@ const ClinicList = () => {
                                                         className="mt-0.5 flex-shrink-0 opacity-80"
                                                     />
                                                     <span className="break-words line-clamp-2">{displayAddress}</span>
-                                                </button>
+                                                </a>
                                             ) : (
                                                 <div className="min-h-[2rem]" aria-hidden />
                                             )}
@@ -450,7 +458,7 @@ const ClinicList = () => {
                                                         Llamar
                                                     </a>
                                                 )}
-                                                {phone && (
+                                                {whatsappUrl && (
                                                     <a
                                                         href={whatsappUrl}
                                                         target="_blank"
@@ -524,22 +532,6 @@ const ClinicList = () => {
                     )}
                 </div>
             </main>
-
-            <Modal
-                footer={null}
-                open={isAddressModalOpen}
-                onCancel={() => setIsAddressModalOpen(false)}
-                className="!w-fit"
-                centered
-                closeIcon={
-                    <FontAwesomeIcon icon={faCircleXmark} className="text-blue-500" size="lg" />
-                }
-            >
-                <section className="flex flex-col items-center justify-center gap-5 text-blue-500 p-5 font-century-gothic w-full">
-                    <h3 className="text-center font-bold text-lg">Dirección</h3>
-                    <p className="text-center text-base">{modalAddress || "No disponible"}</p>
-                </section>
-            </Modal>
 
             {/* Popup información del seguro */}
             <Modal
