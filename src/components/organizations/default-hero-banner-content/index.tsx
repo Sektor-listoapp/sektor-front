@@ -20,10 +20,13 @@ const DefaultHeroBannerContent = () => {
         </Link>
       </header>
 
-      <div className="md:relative lg:col-span-7">
+      <div
+        className="md:relative lg:col-span-7 bg-no-repeat bg-cover bg-center"
+        style={{ backgroundImage: "url('/images/workers_2.png')" }}
+      >
         <Image
-          className="w-3/4 bottom-0 right-0 absolute sm:max-w-96 md:w-[150%] md:max-w-lg lg:max-w-xl xl:max-w-3xl"
-          src="/images/suppliers.webp"
+          className="absolute inset-0 m-auto object-contain max-w-[160px] md:max-w-[240px] lg:max-w-[350px]"
+          src="/images/workers.png"
           width={1000}
           height={1000}
           alt=""
