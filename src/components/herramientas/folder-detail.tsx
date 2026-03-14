@@ -188,21 +188,45 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
     setSubfolderToDelete(id);
   };
 
-  const handleConfirmDeleteSubfolder = async () => {
+  const handleConfirmDeleteSubfolder = () => {
     if (!subfolderToDelete) return;
 
-    setIsDeletingSubfolder(true);
-    try {
-      await deleteModule({ variables: { id: subfolderToDelete } });
-      toast.success("Subcarpeta eliminada correctamente");
-      refetchModule();
-      setSubfolderToDelete(null);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(error?.message || "No se pudo eliminar la subcarpeta");
-    } finally {
-      setIsDeletingSubfolder(false);
-    }
+    const idToDelete = subfolderToDelete;
+    setSubfolderToDelete(null);
+
+    let undone = false;
+
+    const toastId = toast.info(
+      <div className="flex items-center justify-between w-full gap-4">
+        <span>Subcarpeta eliminada</span>
+        <button
+          onClick={() => {
+            undone = true;
+            toast.dismiss(toastId);
+          }}
+          className="shrink-0 px-3 py-1 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+        >
+          Deshacer
+        </button>
+      </div>,
+      {
+        autoClose: 8000,
+        closeOnClick: false,
+        onClose: async () => {
+          if (undone) return;
+          setIsDeletingSubfolder(true);
+          try {
+            await deleteModule({ variables: { id: idToDelete } });
+            refetchModule();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } catch (error: any) {
+            toast.error(error?.message || "No se pudo eliminar la subcarpeta");
+          } finally {
+            setIsDeletingSubfolder(false);
+          }
+        },
+      }
+    );
   };
 
   const handleEditSubfolder = (subfolder: ModuleType) => {

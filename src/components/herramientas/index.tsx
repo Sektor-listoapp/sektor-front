@@ -26,6 +26,7 @@ const HerramientasList = () => {
   const [editingModule, setEditingModule] = useState<ModuleType | null>(null);
   const [isDeletingModule, setIsDeletingModule] = useState(false);
   const [moduleToDelete, setModuleToDelete] = useState<string | null>(null);
+  const [pendingDeleteIds, setPendingDeleteIds] = useState<Set<string>>(new Set());
 
   const { data: modulesData, loading: isLoadingModules, error: modulesError, refetch: refetchModules } = useQuery<Query>(
     ALL_MODULES_QUERY,
@@ -39,7 +40,8 @@ const HerramientasList = () => {
 
   const modules = modulesData?.allModules || [];
   const filteredModules = modules.filter((module) =>
-    module.title?.toLowerCase().includes(searchTerm.toLowerCase())
+    module.title?.toLowerCase().includes(searchTerm.toLowerCase()) &&
+    !pendingDeleteIds.has(module._id)
   );
 
   const handleCreateModule = () => {
@@ -56,21 +58,56 @@ const HerramientasList = () => {
     setModuleToDelete(id);
   };
 
-  const handleConfirmDeleteModule = async () => {
+  const handleConfirmDeleteModule = () => {
     if (!moduleToDelete) return;
 
-    setIsDeletingModule(true);
-    try {
-      await deleteModule({ variables: { id: moduleToDelete } });
-      toast.success("Módulo eliminado correctamente");
-      refetchModules();
-      setModuleToDelete(null);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(error?.message || "No se pudo eliminar el módulo");
-    } finally {
-      setIsDeletingModule(false);
-    }
+    const idToDelete = moduleToDelete;
+    setModuleToDelete(null);
+    setPendingDeleteIds((prev) => new Set(prev).add(idToDelete));
+
+    let undone = false;
+
+    const toastId = toast.info(
+      <div className="flex items-center justify-between w-full gap-4">
+        <span>Módulo eliminado</span>
+        <button
+          onClick={() => {
+            undone = true;
+            toast.dismiss(toastId);
+            setPendingDeleteIds((prev) => {
+              const next = new Set(prev);
+              next.delete(idToDelete);
+              return next;
+            });
+          }}
+          className="shrink-0 px-3 py-1 rounded-lg bg-blue-500 text-white text-sm font-medium hover:bg-blue-600 transition-colors"
+        >
+          Deshacer
+        </button>
+      </div>,
+      {
+        autoClose: 8000,
+        closeOnClick: false,
+        onClose: async () => {
+          if (undone) return;
+          setIsDeletingModule(true);
+          try {
+            await deleteModule({ variables: { id: idToDelete } });
+            refetchModules();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          } catch (error: any) {
+            setPendingDeleteIds((prev) => {
+              const next = new Set(prev);
+              next.delete(idToDelete);
+              return next;
+            });
+            toast.error(error?.message || "No se pudo eliminar el módulo");
+          } finally {
+            setIsDeletingModule(false);
+          }
+        },
+      }
+    );
   };
 
   const handleBack = () => {
