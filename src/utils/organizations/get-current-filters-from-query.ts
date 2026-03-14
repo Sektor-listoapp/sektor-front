@@ -49,6 +49,7 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
     city,
     state,
     serviceType,
+    insuranceCompanyId,
     minAge,
     maxAge,
     minExperience,
@@ -116,6 +117,10 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
       name: search && search !== "" ? search : undefined,
       lineOfBusiness: segment && segment !== "" ? segment : undefined,
       serviceType: serviceType && serviceType !== "" ? serviceType : undefined,
+      insuranceCompanyId:
+        insuranceCompanyId && insuranceCompanyId !== ""
+          ? (insuranceCompanyId as string)
+          : undefined,
     },
     (value) => value !== undefined && value !== null && value !== ""
   );

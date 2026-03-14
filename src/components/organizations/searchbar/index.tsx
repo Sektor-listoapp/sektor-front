@@ -30,15 +30,16 @@ const Searchbar = ({
     if (!isReady) return;
 
     const filterKeys = [
-      'genre',
-      'segment',
-      'city',
-      'state',
-      'serviceType',
-      'minAge',
-      'maxAge',
-      'minExperience',
-      'maxExperience',
+      "genre",
+      "segment",
+      "city",
+      "state",
+      "serviceType",
+      "insuranceCompanyId",
+      "minAge",
+      "maxAge",
+      "minExperience",
+      "maxExperience",
     ];
 
     const hasFilters = filterKeys.some(

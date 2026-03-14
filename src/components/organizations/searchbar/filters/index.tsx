@@ -20,12 +20,19 @@ import {
 } from "./constants";
 import { useQuery } from "@apollo/client";
 import { COUNTRY_BY_CODE_QUERY } from "@/lib/sektor-api/queries/public/country-by-code";
+import { INSURANCE_COMPANIES_QUERY } from "@/lib/sektor-api/queries/public/insurance-companies";
 import { Query } from "@/lib/sektor-api/__generated__/graphql";
 import Image from "next/image";
 import { pickBy } from "lodash";
 
-const { AGE_RANGE, EXPERIENCE_RANGE, GENRE, SEGMENT, SERVICE_TYPE } =
-  ORGANIZATION_FILTER_FIELD_NAMES;
+const {
+  AGE_RANGE,
+  EXPERIENCE_RANGE,
+  GENRE,
+  SEGMENT,
+  SERVICE_TYPE,
+  INSURANCE_COMPANY_ID,
+} = ORGANIZATION_FILTER_FIELD_NAMES;
 
 const OrganizationFilters = () => {
   const { isMobile } = useDevice();
@@ -40,6 +47,11 @@ const OrganizationFilters = () => {
     COUNTRY_BY_CODE_QUERY,
     { variables: { code: "VE" } }
   );
+
+  const { data: insuranceCompaniesData, loading: isLoadingInsuranceCompanies } =
+    useQuery<Query>(INSURANCE_COMPANIES_QUERY, {
+      variables: { pagination: { offset: 0, limit: 1000 } },
+    });
 
   const countryStates = countryData?.getCountryByCode?.states || [];
 
@@ -64,6 +76,16 @@ const OrganizationFilters = () => {
       .sort((a, b) => a.label.localeCompare(b.label)) || []),
   ];
 
+  const insuranceCompanyOptions = [
+    { label: "Seguros", value: "", disabled: true },
+    ...(insuranceCompaniesData?.publicInsuranceCompanies?.items
+      ?.map((company) => ({
+        label: company?.name || "",
+        value: company?.id || "",
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)) || []),
+  ];
+
   const {
     isLoadingPublicOrganizations,
     handleGetPublicOrganizationsWithNewFilters,
@@ -78,6 +100,7 @@ const OrganizationFilters = () => {
     state = selectedStateId,
     city = selectedCityId,
     serviceType = "",
+    insuranceCompanyId = "",
     minAge = 0,
     maxAge = 50,
     minExperience = 0,
@@ -238,6 +261,18 @@ const OrganizationFilters = () => {
                   handleFilterChange("serviceType", e?.target?.value)
                 }
                 defaultValue={SELECT_SUPPLIER_SERVICE_OPTIONS[0].value}
+              />
+            )}
+
+            {checkAllowedFilter(organizationType, INSURANCE_COMPANY_ID) && (
+              <Select
+                wrapperClassName="w-full"
+                value={insuranceCompanyId || ""}
+                disabled={isLoadingInsuranceCompanies}
+                options={insuranceCompanyOptions}
+                onChange={(e) =>
+                  handleFilterChange("insuranceCompanyId", e?.target?.value)
+                }
               />
             )}
 
