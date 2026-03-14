@@ -4,6 +4,7 @@ import { ORGANIZATION_TYPE_OPTIONS } from "../constants";
 import { cn } from "@/utils/class-name";
 import { Popover } from "antd";
 import { useRouter } from "next/router";
+import Image from "next/image";
 
 interface OrganizationTypeButtonProps
   extends React.HTMLAttributes<HTMLButtonElement> {
@@ -16,7 +17,8 @@ const OrganizationTypeButton = ({
   ...props
 }: OrganizationTypeButtonProps) => {
   const { query, replace } = useRouter();
-  const { icon, name, type, id } = data;
+  const { icon, name, id } = data;
+  const imagePath = "imagePath" in data ? (data as { imagePath: string }).imagePath : undefined;
 
   const handleClick = (type: string) => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
@@ -39,14 +41,24 @@ const OrganizationTypeButton = ({
     >
       <button
         className={cn(
-          "h-10 w-12 mx-auto bg-white border border-blue-500 text-blue-500 flex justify-center items-center rounded-lg transition-all active:bg-blue-100 sm:h-14 sm:w-16",
-          className,
-          { "bg-blue-200": query?.type === type }
+          "h-10 w-10 sm:h-11 sm:w-11 mx-auto bg-white border border-[#0E2944] text-[#0E2944] flex justify-center items-center rounded-2xl transition-all",
+          className
         )}
         onClick={() => handleClick(id)}
         {...props}
       >
-        <FontAwesomeIcon icon={icon} size="2x" />
+        {imagePath ? (
+          <Image
+            src={imagePath}
+            alt={name}
+            width={40}
+            height={40}
+            priority
+            className="object-contain w-6 h-6"
+          />
+        ) : (
+          <FontAwesomeIcon icon={icon} size="2x" />
+        )}
       </button>
       <span className="block mt-1 font-century-gothic text-[8px] text-center text-balance sm:text-sm md:hidden">
         {name}

@@ -6,6 +6,9 @@ const {
   EXCLUSIVE_AGENT,
   SUPPLIER,
   INSURANCE_COMPANY,
+  INSURANCE_COMPANY_COOPERATIVE,
+  INSURANCE_COMPANY_INSURTECH,
+  INSURANCE_COMPANY_PREPAID_MEDICINE,
 } = USER_TYPES;
 
 export const ORGANIZATION_FILTER_KEYS = {
@@ -14,4 +17,7 @@ export const ORGANIZATION_FILTER_KEYS = {
   [EXCLUSIVE_AGENT]: "publicExclusiveAgentFilters",
   [INSURANCE_BROKER]: "publicInsuranceBrokersFilters",
   [INSURANCE_COMPANY]: "publicInsuranceCompanyFilters",
+  [INSURANCE_COMPANY_COOPERATIVE]: "publicInsuranceCompanyFilters",
+  [INSURANCE_COMPANY_INSURTECH]: "publicInsuranceCompanyFilters",
+  [INSURANCE_COMPANY_PREPAID_MEDICINE]: "publicInsuranceCompanyFilters",
 };

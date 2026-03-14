@@ -1,6 +1,7 @@
 import { pickBy } from "lodash";
 import { ParsedUrlQuery } from "querystring";
 import { ORGANIZATION_FILTER_KEYS } from "@/constants/organizations";
+import { USER_TYPES } from "@/constants/shared";
 
 const buildFiltersForType = (
   organizationType: string,
@@ -58,7 +59,7 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
 
   const filterKey =
     ORGANIZATION_FILTER_KEYS[
-    query?.type as keyof typeof ORGANIZATION_FILTER_KEYS
+      query?.type as keyof typeof ORGANIZATION_FILTER_KEYS
     ];
 
   const hasAgeFilter = 'minAge' in query || 'maxAge' in query;
@@ -125,16 +126,36 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
     (value) => value !== undefined && value !== null && value !== ""
   );
 
-  const hasValidFilters = Object.keys(baseFilters).length > 0 || stateNumber !== undefined || cityNumber !== undefined;
+  const hasValidFilters =
+    Object.keys(baseFilters).length > 0 ||
+    stateNumber !== undefined ||
+    cityNumber !== undefined;
 
   if (!hasValidFilters) {
     return {};
   }
 
   if (isOrganizationTypeSelected && filterKey) {
+    const baseFiltersWithSubtype = { ...baseFilters };
+    const {
+      INSURANCE_COMPANY_COOPERATIVE,
+      INSURANCE_COMPANY_INSURTECH,
+      INSURANCE_COMPANY_PREPAID_MEDICINE,
+    } = USER_TYPES;
+
+    if (filterKey === "publicInsuranceCompanyFilters") {
+      if (query.type === INSURANCE_COMPANY_COOPERATIVE) {
+        (baseFiltersWithSubtype as Record<string, unknown>).subtype = "Cooperatives";
+      } else if (query.type === INSURANCE_COMPANY_INSURTECH) {
+        (baseFiltersWithSubtype as Record<string, unknown>).subtype = "Insurtech";
+      } else if (query.type === INSURANCE_COMPANY_PREPAID_MEDICINE) {
+        (baseFiltersWithSubtype as Record<string, unknown>).subtype = "PrepaidMedicine";
+      }
+    }
+
     const filters = buildFiltersForType(
       query?.type as string,
-      baseFilters,
+      baseFiltersWithSubtype,
       stateNumber,
       cityNumber
     );

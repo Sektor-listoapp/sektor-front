@@ -5,7 +5,10 @@ export const USER_TYPES = {
   INSURANCE_BROKER: "InsuranceBroker", // corredor de seguros
   BROKERAGE_SOCIETY: "BrokerageSociety", // sociedad de corretaje
   EXCLUSIVE_AGENT: "ExclusiveAgent", // agente exclusivo
-  INSURANCE_COMPANY: "InsuranceCompany", // compañía de seguros
+  INSURANCE_COMPANY: "InsuranceCompany", // compañía de seguros (todas)
+  INSURANCE_COMPANY_COOPERATIVE: "InsuranceCompanyCooperatives", // cooperativas
+  INSURANCE_COMPANY_INSURTECH: "InsuranceCompanyInsurtech", // insurtech
+  INSURANCE_COMPANY_PREPAID_MEDICINE: "InsuranceCompanyPrepaidMedicine", // medicina prepagada
 } as const;
 
 export const SERVICE_SUPPLIER_TYPES = {

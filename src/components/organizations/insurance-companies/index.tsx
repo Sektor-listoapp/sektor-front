@@ -10,6 +10,7 @@ import CardCarousel from "@/components/ui/card-carousel";
 import { Empty } from "antd";
 import usePublicOrganizations from "@/hooks/use-public-organizations";
 import Pagination from "@/components/ui/pagination";
+import { InsuranceCompanySubtype } from "@/lib/sektor-api/__generated__/types";
 
 interface InsuranceCompaniesProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
@@ -21,7 +22,11 @@ const InsuranceCompanies = ({
 }: InsuranceCompaniesProps) => {
   const { query, replace } = useRouter();
   const orgType = query?.type;
-  const isSelected = orgType === USER_TYPES.INSURANCE_COMPANY;
+  const isSelected =
+    orgType === USER_TYPES.INSURANCE_COMPANY ||
+    orgType === USER_TYPES.INSURANCE_COMPANY_COOPERATIVE ||
+    orgType === USER_TYPES.INSURANCE_COMPANY_INSURTECH ||
+    orgType === USER_TYPES.INSURANCE_COMPANY_PREPAID_MEDICINE;
   const insuranceCompanies =
     usePublicOrganizationsStore(
       useShallow((state) => state.publicOrganizations?.insuranceCompanies)
@@ -30,6 +35,35 @@ const InsuranceCompanies = ({
     useShallow((state) => state.publicOrganizations?.pagination?.insuranceCompanies)
   );
   const { handleChangePage, isLoadingPublicOrganizations } = usePublicOrganizations({});
+
+  const subtypeByOrgType: Record<string, InsuranceCompanySubtype | null> = {
+    [USER_TYPES.INSURANCE_COMPANY]: null,
+    [USER_TYPES.INSURANCE_COMPANY_COOPERATIVE]:
+      InsuranceCompanySubtype.Cooperatives,
+    [USER_TYPES.INSURANCE_COMPANY_INSURTECH]:
+      InsuranceCompanySubtype.Insurtech,
+    [USER_TYPES.INSURANCE_COMPANY_PREPAID_MEDICINE]:
+      InsuranceCompanySubtype.PrepaidMedicine,
+  };
+
+  const currentSubtype =
+    (orgType && subtypeByOrgType[orgType as string]) ?? null;
+
+  const filteredInsuranceCompanies = currentSubtype
+    ? insuranceCompanies.filter(
+        (company) => company.subtype === currentSubtype
+      )
+    : insuranceCompanies;
+
+  const titleByOrgType: Record<string, string> = {
+    [USER_TYPES.INSURANCE_COMPANY]: "Compañías de seguros",
+    [USER_TYPES.INSURANCE_COMPANY_COOPERATIVE]: "Cooperativas",
+    [USER_TYPES.INSURANCE_COMPANY_PREPAID_MEDICINE]: "Medicina prepagada",
+    [USER_TYPES.INSURANCE_COMPANY_INSURTECH]: "Insurtech",
+  };
+
+  const sectionTitle =
+    (orgType && titleByOrgType[orgType as string]) || "Compañías de seguros";
 
   const handleClick = () => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
@@ -53,7 +87,7 @@ const InsuranceCompanies = ({
       {...props}
     >
       <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
-        <h2>Compañías de seguros</h2>
+        <h2>{sectionTitle}</h2>
         {!isSelected && (
           <Button
             variant="link-blue"
@@ -65,10 +99,10 @@ const InsuranceCompanies = ({
         )}
       </header>
 
-      {Boolean(insuranceCompanies?.length) ? (
+      {Boolean(filteredInsuranceCompanies?.length) ? (
         <>
           <CardCarousel className="w-full md:hidden">
-            {insuranceCompanies?.map((item, index) => (
+            {filteredInsuranceCompanies?.map((item, index) => (
               <div
                 className="w-full"
                 key={`insurance-company-card-${item?.id}-${index}`}
@@ -79,7 +113,7 @@ const InsuranceCompanies = ({
           </CardCarousel>
 
           <div className="hidden md:grid w-full grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center 2xl::justify-items-start">
-            {insuranceCompanies?.map((item, index) => (
+            {filteredInsuranceCompanies?.map((item, index) => (
               <InsuranceCompanyCard
                 data={item}
                 key={`insurance-company-card-${item?.id}-${index}`}
