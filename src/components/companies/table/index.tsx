@@ -41,13 +41,16 @@ const CompaniesTable = ({
       title: "Nombre",
       dataIndex: "name",
       key: "name",
+      width: 200,
       render: (name: string, record: OrganizationType) => {
         const { id } = record;
         const organizationSlug = `${id || ""}`;
 
         return (
-          <Link href={`/account/${organizationSlug}`}
-            className="cursor-pointer hover:text-blue-700 transition-all hover:scale-105">
+          <Link
+            href={`/account/${organizationSlug}`}
+            className="cursor-pointer hover:text-blue-700 transition-all leading-snug break-words"
+          >
             {name}
           </Link>
         );
@@ -57,6 +60,7 @@ const CompaniesTable = ({
       title: "Tipo de usuario",
       dataIndex: "type",
       key: "type",
+      width: 160,
       render: (type: OrganizationTypes) => {
         const label = ORGANIZATION_TYPE_SELECT_OPTIONS.find(
           (option) => option.value === type
@@ -68,7 +72,8 @@ const CompaniesTable = ({
       title: "Clicks",
       dataIndex: "clicks",
       key: "clicks",
-      className: "text-center",
+      width: 80,
+      align: "center",
       render: (clicks: number | undefined) => {
         return <p>{clicks ? clicks : 0}</p>;
       },
@@ -77,7 +82,8 @@ const CompaniesTable = ({
       title: "Fecha de creación",
       dataIndex: "createdAt",
       key: "createdAt",
-      className: "text-center",
+      width: 140,
+      align: "center",
       render: (createdAt: string) => (
         <span>
           {createdAt ? dayjs(createdAt)?.format("DD/MM/YYYY") : "No disponible"}
@@ -88,16 +94,24 @@ const CompaniesTable = ({
       title: "Correo electrónico",
       dataIndex: "email",
       key: "email",
-      className: "text-center",
+      width: 200,
+      ellipsis: true,
+      align: "center",
       render: (email: string | undefined) => (
-        <span>{email ? email : "No disponible"}</span>
+        <span
+          className="block overflow-hidden whitespace-nowrap text-ellipsis"
+          title={email ?? "No disponible"}
+        >
+          {email ? email : "No disponible"}
+        </span>
       ),
     },
     {
       title: "Ubicación",
       dataIndex: "coverageStates",
       key: "coverageStates",
-      className: "text-center",
+      width: 130,
+      align: "center",
       render: (coverageStates: number[] | undefined) => {
         const state = countryStates?.find(
           (state) => state?.id === coverageStates?.[0]
@@ -109,6 +123,8 @@ const CompaniesTable = ({
       title: "Activo",
       dataIndex: "isActive",
       key: "isActive",
+      width: 80,
+      align: "center",
       render: (isActive: boolean, record: OrganizationType) => (
         <div className="w-full flex justify-center items-center">
           <Switch
@@ -123,6 +139,8 @@ const CompaniesTable = ({
       title: "Premium",
       dataIndex: "plan",
       key: "plan",
+      width: 90,
+      align: "center",
       render: (plan: OrganizationPlans, record: OrganizationType) => {
         const isPremium = plan === Premium;
         const newPlan = isPremium ? Standard : Premium;
@@ -140,6 +158,8 @@ const CompaniesTable = ({
     {
       title: "",
       key: "action",
+      width: 60,
+      align: "center",
       render: (_, { id }: OrganizationType) => (
         <div className="text-blue-500">
           <button onClick={() => setOpenDeleteModal(id)} disabled={disabled}>
@@ -155,8 +175,11 @@ const CompaniesTable = ({
       dataSource={data}
       className={cn("hidden xl:block w-full !text-blue-500", styles.table)}
       columns={columns}
+      scroll={{ x: 1160 }}
       pagination={{
-        pageSize: 6,
+        defaultPageSize: 6,
+        pageSizeOptions: [6, 10, 20, 50, 100],
+        showSizeChanger: true,
         position: ["bottomCenter"],
         showLessItems: true,
       }}
