@@ -21,6 +21,7 @@ import {
 import { useQuery } from "@apollo/client";
 import { COUNTRY_BY_CODE_QUERY } from "@/lib/sektor-api/queries/public/country-by-code";
 import { Query } from "@/lib/sektor-api/__generated__/graphql";
+import Image from "next/image";
 import { pickBy } from "lodash";
 
 const { AGE_RANGE, EXPERIENCE_RANGE, GENRE, SEGMENT, SERVICE_TYPE } =
@@ -312,13 +313,31 @@ const OrganizationFilters = () => {
 
       <Button
         variant="base"
-        className="shadow-none"
+        className="shadow-none bg-[#182F48] text-white"
         onClick={handleShowDrawer}
       >
-        <div className="flex items-center whitespace-nowrap gap-2">
-          <FontAwesomeIcon icon={faSliders} size="lg" />
-          <span className="text-xs">Todos los filtros {activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}</span>
-        </div>
+        {isMobile ? (
+          <div className="flex items-center gap-1">
+            <Image
+              src="/images/filter.png"
+              alt="Filtros"
+              width={120}
+              height={32}
+              className="h-8 w-auto"
+            />
+            {activeFiltersCount > 0 && (
+              <span className="text-xs">({activeFiltersCount})</span>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center whitespace-nowrap gap-2">
+            <FontAwesomeIcon icon={faSliders} size="lg" />
+            <span className="text-xs">
+              Todos los filtros{" "}
+              {activeFiltersCount > 0 ? `(${activeFiltersCount})` : ""}
+            </span>
+          </div>
+        )}
       </Button>
     </>
   );
