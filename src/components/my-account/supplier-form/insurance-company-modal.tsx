@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Modal } from 'antd';
-import { faEdit, faTrash, faPlus, faCircleXmark, faMoneyBillWave, faHospital, faReceipt } from '@fortawesome/free-solid-svg-icons';
+import { faEdit, faTrash, faPlus, faCircleXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Image from 'next/image';
 import Select from '@/components/ui/select';
-import SwitchInput from '@/components/ui/switch-input';
 import Button from '@/components/ui/button';
 import { SupplierInsuranceCompanyRelationInputType, InsuranceCompanyType } from '@/lib/sektor-api/__generated__/types';
+
+const BOOLEAN_OPTIONS = [
+    { label: "-", value: "none" },
+    { label: "Sí", value: "true" },
+    { label: "No", value: "false" }
+];
+
+function formatBooleanOption(value: boolean | undefined): string {
+    if (value === true) return "Sí";
+    if (value === false) return "No";
+    return "-";
+}
 
 interface InsuranceCompanyRelation extends SupplierInsuranceCompanyRelationInputType {
     id?: string;
@@ -54,9 +65,9 @@ const InsuranceCompanyModal: React.FC<InsuranceCompanyModalProps> = ({
     const handleAddRelation = () => {
         setEditingRelation({
             insuranceCompanyId: '',
-            depositRequired: false,
-            fullyContractedClinic: false,
-            reasonableExpensesApplicable: false
+            depositRequired: undefined,
+            fullyContractedClinic: undefined,
+            reasonableExpensesApplicable: undefined
         });
         setIsEditing(true);
     };
@@ -189,9 +200,9 @@ const InsuranceCompanyModal: React.FC<InsuranceCompanyModalProps> = ({
                                         <div>
                                             <h4 className="font-medium">{getCompanyName(relation.insuranceCompanyId)}</h4>
                                             <div className="text-sm text-gray-600 space-y-1">
-                                                <div>Cobro de depósito: {relation.depositRequired ? 'Sí' : 'No'}</div>
-                                                <div>100% Clínica convenida: {relation.fullyContractedClinic ? 'Sí' : 'No'}</div>
-                                                <div>Aplica gastos razonables: {relation.reasonableExpensesApplicable ? 'Sí' : 'No'}</div>
+                                                <div>Cobro de depósito: {formatBooleanOption(relation.depositRequired)}</div>
+                                                <div>100% Clínica convenida: {formatBooleanOption(relation.fullyContractedClinic)}</div>
+                                                <div>Aplica gastos razonables: {formatBooleanOption(relation.reasonableExpensesApplicable)}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -241,35 +252,45 @@ const InsuranceCompanyModal: React.FC<InsuranceCompanyModalProps> = ({
                                 />
 
                                 <div className="space-y-4">
-                                    <SwitchInput
-                                        icon={faMoneyBillWave}
-                                        label="Cobro de depósito"
-                                        switchProps={{
-                                            checked: editingRelation.depositRequired || false,
-                                            onChange: (checked) => setEditingRelation(prev => ({ ...prev!, depositRequired: checked })),
-                                            disabled: disabled
-                                        }}
-                                    />
-
-                                    <SwitchInput
-                                        icon={faHospital}
-                                        label="100% Clínica convenida"
-                                        switchProps={{
-                                            checked: editingRelation.fullyContractedClinic || false,
-                                            onChange: (checked) => setEditingRelation(prev => ({ ...prev!, fullyContractedClinic: checked })),
-                                            disabled: disabled
-                                        }}
-                                    />
-
-                                    <SwitchInput
-                                        icon={faReceipt}
-                                        label="Aplica gastos razonables"
-                                        switchProps={{
-                                            checked: editingRelation.reasonableExpensesApplicable || false,
-                                            onChange: (checked) => setEditingRelation(prev => ({ ...prev!, reasonableExpensesApplicable: checked })),
-                                            disabled: disabled
-                                        }}
-                                    />
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-blue-800">Cobro de depósito</label>
+                                        <Select
+                                            wrapperClassName="w-full"
+                                            value={editingRelation.depositRequired === true ? "true" : editingRelation.depositRequired === false ? "false" : "none"}
+                                            options={BOOLEAN_OPTIONS}
+                                            onChange={(e) => {
+                                                const v = e.target.value;
+                                                setEditingRelation(prev => ({ ...prev!, depositRequired: v === "true" ? true : v === "false" ? false : undefined }));
+                                            }}
+                                            disabled={disabled}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-blue-800">100% Clínica convenida</label>
+                                        <Select
+                                            wrapperClassName="w-full"
+                                            value={editingRelation.fullyContractedClinic === true ? "true" : editingRelation.fullyContractedClinic === false ? "false" : "none"}
+                                            options={BOOLEAN_OPTIONS}
+                                            onChange={(e) => {
+                                                const v = e.target.value;
+                                                setEditingRelation(prev => ({ ...prev!, fullyContractedClinic: v === "true" ? true : v === "false" ? false : undefined }));
+                                            }}
+                                            disabled={disabled}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label className="text-sm font-medium text-blue-800">Aplica gastos razonables</label>
+                                        <Select
+                                            wrapperClassName="w-full"
+                                            value={editingRelation.reasonableExpensesApplicable === true ? "true" : editingRelation.reasonableExpensesApplicable === false ? "false" : "none"}
+                                            options={BOOLEAN_OPTIONS}
+                                            onChange={(e) => {
+                                                const v = e.target.value;
+                                                setEditingRelation(prev => ({ ...prev!, reasonableExpensesApplicable: v === "true" ? true : v === "false" ? false : undefined }));
+                                            }}
+                                            disabled={disabled}
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="flex justify-end space-x-2">

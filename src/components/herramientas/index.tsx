@@ -222,8 +222,8 @@ const HerramientasList = () => {
                           className="w-full h-full object-contain"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            if (!target.src.includes("icon1.")) {
-                              target.src = getModuleIconPath("icon1");
+                            if (!target.src.includes("module_icon1.")) {
+                              target.src = getModuleIconPath("module_icon1");
                             }
                           }}
                         />

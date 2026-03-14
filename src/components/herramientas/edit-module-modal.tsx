@@ -37,7 +37,7 @@ const EditModuleModal: React.FC<EditModuleModalProps> = ({
   useEffect(() => {
     if (module) {
       setTitle(module.title || "");
-      setIcon(module.icon || "icon1");
+      setIcon(module.icon || "module_icon1");
       setOrder(module.order?.toString() || "");
       setDescription(module.description || "");
 
