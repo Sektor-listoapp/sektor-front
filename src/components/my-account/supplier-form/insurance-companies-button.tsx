@@ -105,7 +105,7 @@ const InsuranceCompaniesButton: React.FC<InsuranceCompaniesButtonProps> = ({
                                                 relation.depositRequired && 'Depósito',
                                                 relation.fullyContractedClinic && '100% Convenida',
                                                 relation.reasonableExpensesApplicable && 'Gastos Razonables'
-                                            ].filter(Boolean).join(' • ') || 'Sin características especiales'}
+                                            ].filter(Boolean).join(' • ') || '-'}
                                         </div>
                                     </div>
                                 </div>

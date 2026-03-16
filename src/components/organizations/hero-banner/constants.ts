@@ -1,10 +1,11 @@
 import { USER_TYPES } from "@/constants/shared";
-import InsuranceCompanyHeroBannerContent from "../insurance-company-hero-banner-content";
 import DefaultHeroBannerContent from "../default-hero-banner-content";
-import SupplierHeroBannerContent from "../suppliers-hero-banner-content";
 
 const {
   INSURANCE_COMPANY,
+  INSURANCE_COMPANY_COOPERATIVE,
+  INSURANCE_COMPANY_INSURTECH,
+  INSURANCE_COMPANY_PREPAID_MEDICINE,
   BROKERAGE_SOCIETY,
   EXCLUSIVE_AGENT,
   INSURANCE_BROKER,
@@ -15,7 +16,10 @@ export const HERO_BANNER_CONTENT = {
   [BROKERAGE_SOCIETY]: DefaultHeroBannerContent,
   [EXCLUSIVE_AGENT]: DefaultHeroBannerContent,
   [INSURANCE_BROKER]: DefaultHeroBannerContent,
-  [INSURANCE_COMPANY]: InsuranceCompanyHeroBannerContent,
-  [SUPPLIER]: SupplierHeroBannerContent,
+  [INSURANCE_COMPANY]: DefaultHeroBannerContent,
+  [INSURANCE_COMPANY_COOPERATIVE]: DefaultHeroBannerContent,
+  [INSURANCE_COMPANY_INSURTECH]: DefaultHeroBannerContent,
+  [INSURANCE_COMPANY_PREPAID_MEDICINE]: DefaultHeroBannerContent,
+  [SUPPLIER]: DefaultHeroBannerContent,
   DEFAULT: DefaultHeroBannerContent,
 } as const;

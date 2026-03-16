@@ -42,7 +42,7 @@ const InsuranceCompaniesInput = ({
                 relation.depositRequired && 'Depósito',
                 relation.fullyContractedClinic && '100% Convenida',
                 relation.reasonableExpensesApplicable && 'Gastos Razonables'
-            ].filter(Boolean).join(' • ') || 'Sin características especiales';
+            ].filter(Boolean).join(' • ') || '-';
 
             return {
                 label: `${companyName}: ${features}`,
@@ -85,7 +85,7 @@ const InsuranceCompaniesInput = ({
                                     option?.data?.data?.depositRequired && 'Depósito',
                                     option?.data?.data?.fullyContractedClinic && '100% Convenida',
                                     option?.data?.data?.reasonableExpensesApplicable && 'Gastos Razonables'
-                                ].filter(Boolean).join(' • ') || 'Sin características especiales'}
+                                ].filter(Boolean).join(' • ') || '-'}
                             </div>
                             <FontAwesomeIcon
                                 className="ml-auto cursor-pointer"

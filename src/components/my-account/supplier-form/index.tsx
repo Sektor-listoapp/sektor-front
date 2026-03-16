@@ -256,11 +256,13 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     const formattedInsuranceCompanyRelations = insuranceCompanyRelations.map((relation: any) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { __typename, ...restRelationProps } = relation;
+      const toBoolOrNull = (v: boolean | undefined | null) =>
+        v === true ? true : v === false ? false : null;
       return {
         insuranceCompanyId: restRelationProps.insuranceCompanyId,
-        depositRequired: restRelationProps.depositRequired || false,
-        fullyContractedClinic: restRelationProps.fullyContractedClinic || false,
-        reasonableExpensesApplicable: restRelationProps.reasonableExpensesApplicable || false,
+        depositRequired: toBoolOrNull(restRelationProps.depositRequired),
+        fullyContractedClinic: toBoolOrNull(restRelationProps.fullyContractedClinic),
+        reasonableExpensesApplicable: toBoolOrNull(restRelationProps.reasonableExpensesApplicable),
       };
     });
 

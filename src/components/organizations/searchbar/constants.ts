@@ -6,6 +6,9 @@ import {
   faPersonBurst,
   faTruckFieldUn,
   faUserTie,
+  faHospitalUser,
+  faHeartbeat,
+  faLaptopCode,
 } from "@fortawesome/free-solid-svg-icons";
 
 const {
@@ -14,6 +17,9 @@ const {
   EXCLUSIVE_AGENT,
   SUPPLIER,
   INSURANCE_COMPANY,
+  INSURANCE_COMPANY_COOPERATIVE,
+  INSURANCE_COMPANY_INSURTECH,
+  INSURANCE_COMPANY_PREPAID_MEDICINE,
 } = USER_TYPES;
 
 export const ORGANIZATION_TYPE_OPTIONS = [
@@ -40,6 +46,27 @@ export const ORGANIZATION_TYPE_OPTIONS = [
     name: "Compañías de Seguros",
     icon: faLandmark,
     type: INSURANCE_COMPANY,
+  },
+  {
+    id: INSURANCE_COMPANY_COOPERATIVE,
+    name: "Cooperativas",
+    icon: faHospitalUser,
+    imagePath: "/images/cooperativa.png",
+    type: INSURANCE_COMPANY_COOPERATIVE,
+  },
+  {
+    id: INSURANCE_COMPANY_PREPAID_MEDICINE,
+    name: "Medicina Prepagada",
+    icon: faHeartbeat,
+    imagePath: "/images/prepagada.png",
+    type: INSURANCE_COMPANY_PREPAID_MEDICINE,
+  },
+  {
+    id: INSURANCE_COMPANY_INSURTECH,
+    name: "Insurtech",
+    icon: faLaptopCode,
+    imagePath: "/images/insurtech.png",
+    type: INSURANCE_COMPANY_INSURTECH,
   },
   {
     id: SUPPLIER,

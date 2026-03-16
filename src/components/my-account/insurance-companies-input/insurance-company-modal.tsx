@@ -48,6 +48,7 @@ const InsuranceCompanyModal = ({
     ];
 
     const booleanOptions = [
+        { label: "-", value: "none" },
         { label: "Sí", value: "true" },
         { label: "No", value: "false" }
     ];
@@ -57,9 +58,15 @@ const InsuranceCompanyModal = ({
             const existingRelation = relations.find(relation => relation.insuranceCompanyId === relationToEdit);
             if (existingRelation) {
                 setSelectedCompanyId(existingRelation.insuranceCompanyId);
-                setDepositRequired(existingRelation.depositRequired ? "true" : "false");
-                setFullyContractedClinic(existingRelation.fullyContractedClinic ? "true" : "false");
-                setReasonableExpensesApplicable(existingRelation.reasonableExpensesApplicable ? "true" : "false");
+                setDepositRequired(
+                    existingRelation.depositRequired === true ? "true" : existingRelation.depositRequired === false ? "false" : "none"
+                );
+                setFullyContractedClinic(
+                    existingRelation.fullyContractedClinic === true ? "true" : existingRelation.fullyContractedClinic === false ? "false" : "none"
+                );
+                setReasonableExpensesApplicable(
+                    existingRelation.reasonableExpensesApplicable === true ? "true" : existingRelation.reasonableExpensesApplicable === false ? "false" : "none"
+                );
             }
         } else {
             setSelectedCompanyId("");
@@ -82,9 +89,9 @@ const InsuranceCompanyModal = ({
 
         const newRelation: SupplierInsuranceCompanyRelationInputType = {
             insuranceCompanyId: selectedCompanyId,
-            depositRequired: depositRequired === "true",
-            fullyContractedClinic: fullyContractedClinic === "true",
-            reasonableExpensesApplicable: reasonableExpensesApplicable === "true",
+            depositRequired: depositRequired === "true" ? true : depositRequired === "false" ? false : undefined,
+            fullyContractedClinic: fullyContractedClinic === "true" ? true : fullyContractedClinic === "false" ? false : undefined,
+            reasonableExpensesApplicable: reasonableExpensesApplicable === "true" ? true : reasonableExpensesApplicable === "false" ? false : undefined,
         };
 
         if (relationToEdit) {
@@ -163,26 +170,22 @@ const InsuranceCompanyModal = ({
                     <div className="grid grid-cols-2 gap-4">
                         {/* Cobro deposito */}
                         <div className="space-y-2">
+                            <label className="text-xs text-gray-500">Cobro deposito</label>
                             <Select
                                 wrapperClassName="w-full"
-                                value={depositRequired}
-                                options={[
-                                    { label: "Cobro deposito", value: "", disabled: true },
-                                    ...booleanOptions
-                                ]}
+                                value={depositRequired || "none"}
+                                options={booleanOptions}
                                 onChange={(e) => setDepositRequired(e.target.value)}
                             />
                         </div>
 
                         {/* 100% clinica convenida */}
                         <div className="space-y-2">
+                            <label className="text-xs text-gray-500">100% clinica convenida</label>
                             <Select
                                 wrapperClassName="w-full"
-                                value={fullyContractedClinic}
-                                options={[
-                                    { label: "100% clinica convenida", value: "", disabled: true },
-                                    ...booleanOptions
-                                ]}
+                                value={fullyContractedClinic || "none"}
+                                options={booleanOptions}
                                 onChange={(e) => setFullyContractedClinic(e.target.value)}
                             />
                         </div>
@@ -190,13 +193,11 @@ const InsuranceCompanyModal = ({
 
                     {/* Aplica gastos razonables */}
                     <div className="space-y-2">
+                        <label className="text-xs text-gray-500">Aplica gastos razonables</label>
                         <Select
                             wrapperClassName="w-full"
-                            value={reasonableExpensesApplicable}
-                            options={[
-                                { label: "Aplica gastos razonables", value: "", disabled: true },
-                                ...booleanOptions
-                            ]}
+                            value={reasonableExpensesApplicable || "none"}
+                            options={booleanOptions}
                             onChange={(e) => setReasonableExpensesApplicable(e.target.value)}
                         />
                     </div>

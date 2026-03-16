@@ -20,11 +20,19 @@ import {
 } from "./constants";
 import { useQuery } from "@apollo/client";
 import { COUNTRY_BY_CODE_QUERY } from "@/lib/sektor-api/queries/public/country-by-code";
+import { INSURANCE_COMPANIES_QUERY } from "@/lib/sektor-api/queries/public/insurance-companies";
 import { Query } from "@/lib/sektor-api/__generated__/graphql";
+import Image from "next/image";
 import { pickBy } from "lodash";
 
-const { AGE_RANGE, EXPERIENCE_RANGE, GENRE, SEGMENT, SERVICE_TYPE } =
-  ORGANIZATION_FILTER_FIELD_NAMES;
+const {
+  AGE_RANGE,
+  EXPERIENCE_RANGE,
+  GENRE,
+  SEGMENT,
+  SERVICE_TYPE,
+  INSURANCE_COMPANY_ID,
+} = ORGANIZATION_FILTER_FIELD_NAMES;
 
 const OrganizationFilters = () => {
   const { isMobile } = useDevice();
@@ -39,6 +47,11 @@ const OrganizationFilters = () => {
     COUNTRY_BY_CODE_QUERY,
     { variables: { code: "VE" } }
   );
+
+  const { data: insuranceCompaniesData, loading: isLoadingInsuranceCompanies } =
+    useQuery<Query>(INSURANCE_COMPANIES_QUERY, {
+      variables: { pagination: { offset: 0, limit: 1000 } },
+    });
 
   const countryStates = countryData?.getCountryByCode?.states || [];
 
@@ -63,6 +76,16 @@ const OrganizationFilters = () => {
       .sort((a, b) => a.label.localeCompare(b.label)) || []),
   ];
 
+  const insuranceCompanyOptions = [
+    { label: "Seguros", value: "", disabled: true },
+    ...(insuranceCompaniesData?.publicInsuranceCompanies?.items
+      ?.map((company) => ({
+        label: company?.name || "",
+        value: company?.id || "",
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label)) || []),
+  ];
+
   const {
     isLoadingPublicOrganizations,
     handleGetPublicOrganizationsWithNewFilters,
@@ -77,6 +100,7 @@ const OrganizationFilters = () => {
     state = selectedStateId,
     city = selectedCityId,
     serviceType = "",
+    insuranceCompanyId = "",
     minAge = 0,
     maxAge = 50,
     minExperience = 0,
@@ -240,6 +264,18 @@ const OrganizationFilters = () => {
               />
             )}
 
+            {checkAllowedFilter(organizationType, INSURANCE_COMPANY_ID) && (
+              <Select
+                wrapperClassName="w-full"
+                value={insuranceCompanyId || ""}
+                disabled={isLoadingInsuranceCompanies}
+                options={insuranceCompanyOptions}
+                onChange={(e) =>
+                  handleFilterChange("insuranceCompanyId", e?.target?.value)
+                }
+              />
+            )}
+
             {checkAllowedFilter(organizationType, EXPERIENCE_RANGE) && (
               <Range
                 label="Experiencia"
@@ -312,13 +348,31 @@ const OrganizationFilters = () => {
 
       <Button
         variant="base"
-        className="shadow-none"
+        className="shadow-none bg-[#182F48] text-white"
         onClick={handleShowDrawer}
       >
-        <div className="flex items-center whitespace-nowrap gap-2">
-          <FontAwesomeIcon icon={faSliders} size="lg" />
-          <span className="text-xs">Todos los filtros {activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}</span>
-        </div>
+        {isMobile ? (
+          <div className="flex items-center gap-1">
+            <Image
+              src="/images/filter.png"
+              alt="Filtros"
+              width={120}
+              height={32}
+              className="h-8 w-auto"
+            />
+            {activeFiltersCount > 0 && (
+              <span className="text-xs">({activeFiltersCount})</span>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center whitespace-nowrap gap-2">
+            <FontAwesomeIcon icon={faSliders} size="lg" />
+            <span className="text-xs">
+              Todos los filtros{" "}
+              {activeFiltersCount > 0 ? `(${activeFiltersCount})` : ""}
+            </span>
+          </div>
+        )}
       </Button>
     </>
   );

@@ -30,15 +30,16 @@ const Searchbar = ({
     if (!isReady) return;
 
     const filterKeys = [
-      'genre',
-      'segment',
-      'city',
-      'state',
-      'serviceType',
-      'minAge',
-      'maxAge',
-      'minExperience',
-      'maxExperience',
+      "genre",
+      "segment",
+      "city",
+      "state",
+      "serviceType",
+      "insuranceCompanyId",
+      "minAge",
+      "maxAge",
+      "minExperience",
+      "maxExperience",
     ];
 
     const hasFilters = filterKeys.some(
@@ -71,7 +72,7 @@ const Searchbar = ({
   return (
     <section
       className={cn(
-        "w-full flex flex-col items-center justify-between gap-8 max-w-md mb-2 mx-auto md:flex-row md:max-w-full md:mb-4",
+        "w-full flex flex-col items-center justify-between gap-6 mb-2 mx-auto md:flex-row md:mb-4",
         className
       )}
       {...props}
@@ -81,18 +82,18 @@ const Searchbar = ({
           Ver listado de clínicas y seguros disponibles
         </Button>
       </Link>
-      <div className="flex gap-4 w-fit">
-        {ORGANIZATION_TYPE_OPTIONS.map((option) => {
-          return (
+      <div className="w-full flex justify-center md:justify-start md:w-auto">
+        <div className="grid grid-cols-4 gap-2">
+          {ORGANIZATION_TYPE_OPTIONS.map((option) => (
             <OrganizationTypeButton
               data={option}
               key={`organization-type-button-${option.id}`}
             />
-          );
-        })}
+          ))}
+        </div>
       </div>
 
-      <div className="w-full flex items-center justify-between gap-4 lg:gap-8">
+      <div className="w-full flex items-center justify-between gap-4 lg:gap-8 md:flex-1">
         <form
           className="w-full flex items-center gap-3"
           onSubmit={(e) => {

@@ -68,7 +68,7 @@ export default function App({ Component, pageProps, router }: AppProps) {
           theme="light"
           transition={Flip}
           toastStyle={{
-            width: "80%",
+            width: "95%",
             fontFamily: "Century Gothic",
             fontSize: "0.9rem",
             paddingTop: "2rem",

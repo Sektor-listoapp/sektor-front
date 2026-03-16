@@ -35,6 +35,20 @@ import Image from 'next/image';
 const CARDS_PER_PAGE = 6;
 const SEGUROS_VISIBLE_SIN_EXPANDIR = 3;
 
+type InsuranceRelationFlag = boolean | null | undefined;
+
+function formatInsuranceFlag(value: InsuranceRelationFlag): "Sí" | "No" | "-" {
+    if (value === true) return "Sí";
+    if (value === false) return "No";
+    return "-";
+}
+
+function getInsuranceFlagStyles(value: InsuranceRelationFlag): { bg: string; text: string } {
+    if (value === true) return { bg: "bg-green-50 text-green-700", text: "text-green-700" };
+    if (value === false) return { bg: "bg-red-50 text-red-600", text: "text-red-600" };
+    return { bg: "bg-gray-100 text-gray-600", text: "text-gray-600" };
+}
+
 const ClinicList = () => {
     const userId = useAuthStore(useShallow((state) => state.user?.id));
 
@@ -44,12 +58,12 @@ const ClinicList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [insurancePopup, setInsurancePopup] = useState<{
         name: string;
-        depositRequired: boolean;
-        fullyContractedClinic: boolean;
-        reasonableExpensesApplicable: boolean;
+        depositRequired: InsuranceRelationFlag;
+        fullyContractedClinic: InsuranceRelationFlag;
+        reasonableExpensesApplicable: InsuranceRelationFlag;
     } | null>(null);
     const [segurosAsociadosModalList, setSegurosAsociadosModalList] = useState<
-        Array<{ id: string; name: string; depositRequired: boolean; fullyContractedClinic: boolean; reasonableExpensesApplicable: boolean }>
+        Array<{ id: string; name: string; depositRequired: InsuranceRelationFlag; fullyContractedClinic: InsuranceRelationFlag; reasonableExpensesApplicable: InsuranceRelationFlag }>
     | null>(null);
     const [segurosAccordionOpenIds, setSegurosAccordionOpenIds] = useState<Set<string>>(new Set());
     const [contactModalClinic, setContactModalClinic] = useState<SupplierType | null>(null);
@@ -159,7 +173,7 @@ const ClinicList = () => {
     );
     const totalPages = Math.ceil(clinics.length / CARDS_PER_PAGE) || 1;
 
-  const showInsurancePopup = (name: string, rel: { depositRequired: boolean; fullyContractedClinic: boolean; reasonableExpensesApplicable: boolean }) => {
+  const showInsurancePopup = (name: string, rel: { depositRequired: InsuranceRelationFlag; fullyContractedClinic: InsuranceRelationFlag; reasonableExpensesApplicable: InsuranceRelationFlag }) => {
     setInsurancePopup({
       name,
       depositRequired: rel.depositRequired,
@@ -169,7 +183,7 @@ const ClinicList = () => {
   };
 
   const openSegurosAsociadosModal = (
-    list: Array<{ id: string; name: string; relation: { depositRequired: boolean; fullyContractedClinic: boolean; reasonableExpensesApplicable: boolean } }>
+    list: Array<{ id: string; name: string; relation: { depositRequired: InsuranceRelationFlag; fullyContractedClinic: InsuranceRelationFlag; reasonableExpensesApplicable: InsuranceRelationFlag } }>
   ) => {
     setSegurosAsociadosModalList(
       list.map(({ id, name, relation }) => ({
@@ -387,27 +401,21 @@ const ClinicList = () => {
                                                       </button>
                                                       <div className="flex flex-wrap gap-1 mt-1">
                                                         <span
-                                                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                                                            first.relation.depositRequired ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"
-                                                          }`}
+                                                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${getInsuranceFlagStyles(first.relation.depositRequired).bg}`}
                                                         >
-                                                          {first.relation.depositRequired ? <CheckIcon /> : <CloseIcon />}
+                                                          {first.relation.depositRequired === true ? <CheckIcon /> : first.relation.depositRequired === false ? <CloseIcon /> : <span>-</span>}
                                                           Depósito
                                                         </span>
                                                         <span
-                                                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                                                            first.relation.fullyContractedClinic ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"
-                                                          }`}
+                                                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${getInsuranceFlagStyles(first.relation.fullyContractedClinic).bg}`}
                                                         >
-                                                          {first.relation.fullyContractedClinic ? <CheckIcon /> : <CloseIcon />}
+                                                          {first.relation.fullyContractedClinic === true ? <CheckIcon /> : first.relation.fullyContractedClinic === false ? <CloseIcon /> : <span>-</span>}
                                                           100% Convenida
                                                         </span>
                                                         <span
-                                                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${
-                                                            first.relation.reasonableExpensesApplicable ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"
-                                                          }`}
+                                                          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ${getInsuranceFlagStyles(first.relation.reasonableExpensesApplicable).bg}`}
                                                         >
-                                                          {first.relation.reasonableExpensesApplicable ? <CheckIcon /> : <CloseIcon />}
+                                                          {first.relation.reasonableExpensesApplicable === true ? <CheckIcon /> : first.relation.reasonableExpensesApplicable === false ? <CloseIcon /> : <span>-</span>}
                                                           Gastos razonables
                                                         </span>
                                                       </div>
@@ -553,59 +561,56 @@ const ClinicList = () => {
                         <ul className="flex flex-col gap-3">
                             <li className="flex items-center gap-3">
                                 <span
-                                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${insurancePopup.depositRequired ? "bg-green-100" : "bg-red-100"
-                                        }`}
+                                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                                        insurancePopup.depositRequired === true ? "bg-green-100" : insurancePopup.depositRequired === false ? "bg-red-100" : "bg-gray-100"
+                                    }`}
                                 >
-                                    {insurancePopup.depositRequired ? (
+                                    {insurancePopup.depositRequired === true ? (
                                         <CheckIcon />
-                                    ) : (
+                                    ) : insurancePopup.depositRequired === false ? (
                                         <CloseIcon />
+                                    ) : (
+                                        <span className="text-gray-500 font-medium">-</span>
                                     )}
                                 </span>
-                                <span
-                                    className={
-                                        insurancePopup.depositRequired ? "text-green-700 font-medium" : "text-red-600 font-medium"
-                                    }
-                                >
-                                    Depósito
+                                <span className={insurancePopup.depositRequired === true ? "text-green-700 font-medium" : insurancePopup.depositRequired === false ? "text-red-600 font-medium" : "text-gray-600 font-medium"}>
+                                    Depósito: {formatInsuranceFlag(insurancePopup.depositRequired)}
                                 </span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <span
-                                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${insurancePopup.fullyContractedClinic ? "bg-green-100" : "bg-red-100"
-                                        }`}
+                                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                                        insurancePopup.fullyContractedClinic === true ? "bg-green-100" : insurancePopup.fullyContractedClinic === false ? "bg-red-100" : "bg-gray-100"
+                                    }`}
                                 >
-                                    {insurancePopup.fullyContractedClinic ? (
+                                    {insurancePopup.fullyContractedClinic === true ? (
                                         <CheckIcon />
-                                    ) : (
+                                    ) : insurancePopup.fullyContractedClinic === false ? (
                                         <CloseIcon />
+                                    ) : (
+                                        <span className="text-gray-500 font-medium">-</span>
                                     )}
                                 </span>
-                                <span
-                                    className={
-                                        insurancePopup.fullyContractedClinic ? "text-green-700 font-medium" : "text-red-600 font-medium"
-                                    }
-                                >
-                                    100% Convenida
+                                <span className={insurancePopup.fullyContractedClinic === true ? "text-green-700 font-medium" : insurancePopup.fullyContractedClinic === false ? "text-red-600 font-medium" : "text-gray-600 font-medium"}>
+                                    100% Convenida: {formatInsuranceFlag(insurancePopup.fullyContractedClinic)}
                                 </span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <span
-                                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${insurancePopup.reasonableExpensesApplicable ? "bg-green-100" : "bg-red-100"
-                                        }`}
+                                    className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
+                                        insurancePopup.reasonableExpensesApplicable === true ? "bg-green-100" : insurancePopup.reasonableExpensesApplicable === false ? "bg-red-100" : "bg-gray-100"
+                                    }`}
                                 >
-                                    {insurancePopup.reasonableExpensesApplicable ? (
+                                    {insurancePopup.reasonableExpensesApplicable === true ? (
                                         <CheckIcon />
-                                    ) : (
+                                    ) : insurancePopup.reasonableExpensesApplicable === false ? (
                                         <CloseIcon />
+                                    ) : (
+                                        <span className="text-gray-500 font-medium">-</span>
                                     )}
                                 </span>
-                                <span
-                                    className={
-                                        insurancePopup.reasonableExpensesApplicable ? "text-green-700 font-medium" : "text-red-600 font-medium"
-                                    }
-                                >
-                                    Gastos razonables
+                                <span className={insurancePopup.reasonableExpensesApplicable === true ? "text-green-700 font-medium" : insurancePopup.reasonableExpensesApplicable === false ? "text-red-600 font-medium" : "text-gray-600 font-medium"}>
+                                    Gastos razonables: {formatInsuranceFlag(insurancePopup.reasonableExpensesApplicable)}
                                 </span>
                             </li>
                         </ul>
@@ -640,27 +645,21 @@ const ClinicList = () => {
                                     <h3 className="text-gray-900 font-bold text-base mb-3">{item.name}</h3>
                                     <div className="flex flex-wrap gap-2">
                                         <span
-                                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
-                                                item.depositRequired ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"
-                                            }`}
+                                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${getInsuranceFlagStyles(item.depositRequired).bg}`}
                                         >
-                                            {item.depositRequired ? <CheckIcon /> : <CloseIcon />}
+                                            {item.depositRequired === true ? <CheckIcon /> : item.depositRequired === false ? <CloseIcon /> : <span>-</span>}
                                             Depósito
                                         </span>
                                         <span
-                                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
-                                                item.fullyContractedClinic ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"
-                                            }`}
+                                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${getInsuranceFlagStyles(item.fullyContractedClinic).bg}`}
                                         >
-                                            {item.fullyContractedClinic ? <CheckIcon /> : <CloseIcon />}
+                                            {item.fullyContractedClinic === true ? <CheckIcon /> : item.fullyContractedClinic === false ? <CloseIcon /> : <span>-</span>}
                                             100% Convenida
                                         </span>
                                         <span
-                                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${
-                                                item.reasonableExpensesApplicable ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"
-                                            }`}
+                                            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium ${getInsuranceFlagStyles(item.reasonableExpensesApplicable).bg}`}
                                         >
-                                            {item.reasonableExpensesApplicable ? <CheckIcon /> : <CloseIcon />}
+                                            {item.reasonableExpensesApplicable === true ? <CheckIcon /> : item.reasonableExpensesApplicable === false ? <CloseIcon /> : <span>-</span>}
                                             Gastos razonables
                                         </span>
                                     </div>
