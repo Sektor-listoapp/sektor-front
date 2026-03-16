@@ -19,6 +19,7 @@ const OrganizationTypeButton = ({
   const { query, replace } = useRouter();
   const { icon, name, id } = data;
   const imagePath = "imagePath" in data ? (data as { imagePath: string }).imagePath : undefined;
+  const isSelected = query?.type === id;
 
   const handleClick = (type: string) => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
@@ -41,7 +42,8 @@ const OrganizationTypeButton = ({
     >
       <button
         className={cn(
-          "h-10 w-10 sm:h-11 sm:w-11 mx-auto bg-white border border-[#0E2944] text-[#0E2944] flex justify-center items-center rounded-2xl transition-all",
+          "h-10 w-10 sm:h-11 sm:w-11 mx-auto border border-[#0E2944] text-[#0E2944] flex justify-center items-center rounded-2xl transition-all",
+          isSelected ? "bg-gray-200" : "bg-white",
           className
         )}
         onClick={() => handleClick(id)}
