@@ -5,6 +5,7 @@ import OrganizationDetailsModal from "@/components/shared/organization-details-m
 import Spinner from "@/components/ui/spinner";
 import { usePublicOrganizationsStore } from "@/store/public-organizations";
 import { useRouter } from "next/router";
+import { USER_TYPES } from "@/constants/shared";
 
 const Organizations = () => {
   const { query, isReady } = useRouter();
@@ -13,12 +14,25 @@ const Organizations = () => {
     (state) => state.isLoadingPublicOrganizations
   );
 
-  const filteredOrganizationTypes = ORGANIZATION_COMPONENTS.filter(
-    (organization) => {
-      const isSelected = organizationType === organization.type;
-      return !organizationType || isSelected;
-    }
-  );
+  const insuranceCompanyTypes = [
+    USER_TYPES.INSURANCE_COMPANY,
+    USER_TYPES.INSURANCE_COMPANY_COOPERATIVE,
+    USER_TYPES.INSURANCE_COMPANY_INSURTECH,
+    USER_TYPES.INSURANCE_COMPANY_PREPAID_MEDICINE,
+  ] as const;
+
+  const effectiveOrganizationType =
+    typeof organizationType === "string" &&
+    insuranceCompanyTypes.includes(
+      organizationType as (typeof insuranceCompanyTypes)[number]
+    )
+      ? USER_TYPES.INSURANCE_COMPANY
+      : organizationType;
+
+  const filteredOrganizationTypes = ORGANIZATION_COMPONENTS.filter((organization) => {
+    const isSelected = effectiveOrganizationType === organization.type;
+    return !effectiveOrganizationType || isSelected;
+  });
 
   return (
     <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start overflow-hidden">

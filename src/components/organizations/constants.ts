@@ -10,9 +10,6 @@ const {
   BROKERAGE_SOCIETY,
   EXCLUSIVE_AGENT,
   INSURANCE_COMPANY,
-  INSURANCE_COMPANY_COOPERATIVE,
-  INSURANCE_COMPANY_INSURTECH,
-  INSURANCE_COMPANY_PREPAID_MEDICINE,
   SUPPLIER,
 } = USER_TYPES;
 
@@ -31,18 +28,6 @@ export const ORGANIZATION_COMPONENTS = [
   },
   {
     type: INSURANCE_COMPANY,
-    component: InsuranceCompanies,
-  },
-  {
-    type: INSURANCE_COMPANY_COOPERATIVE,
-    component: InsuranceCompanies,
-  },
-  {
-    type: INSURANCE_COMPANY_PREPAID_MEDICINE,
-    component: InsuranceCompanies,
-  },
-  {
-    type: INSURANCE_COMPANY_INSURTECH,
     component: InsuranceCompanies,
   },
   {
