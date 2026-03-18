@@ -173,7 +173,14 @@ const ClinicList = () => {
     );
     const totalPages = Math.ceil(clinics.length / CARDS_PER_PAGE) || 1;
 
-  const showInsurancePopup = (name: string, rel: { depositRequired: InsuranceRelationFlag; fullyContractedClinic: InsuranceRelationFlag; reasonableExpensesApplicable: InsuranceRelationFlag }) => {
+  const showInsurancePopup = (
+    name: string,
+    rel: {
+      depositRequired?: InsuranceRelationFlag;
+      fullyContractedClinic?: InsuranceRelationFlag;
+      reasonableExpensesApplicable?: InsuranceRelationFlag;
+    }
+  ) => {
     setInsurancePopup({
       name,
       depositRequired: rel.depositRequired,
@@ -183,7 +190,15 @@ const ClinicList = () => {
   };
 
   const openSegurosAsociadosModal = (
-    list: Array<{ id: string; name: string; relation: { depositRequired: InsuranceRelationFlag; fullyContractedClinic: InsuranceRelationFlag; reasonableExpensesApplicable: InsuranceRelationFlag } }>
+    list: Array<{
+      id: string;
+      name: string;
+      relation: {
+        depositRequired?: InsuranceRelationFlag;
+        fullyContractedClinic?: InsuranceRelationFlag;
+        reasonableExpensesApplicable?: InsuranceRelationFlag;
+      };
+    }>
   ) => {
     setSegurosAsociadosModalList(
       list.map(({ id, name, relation }) => ({

@@ -22,7 +22,9 @@ import {
 } from "@/constants/forms";
 import {
   InsuranceCompanyContactInputType,
+  InsuranceCompanySubtype,
   Mutation,
+  OrganizationTypes,
   OrganizationOfficeInputType,
   Query,
   SocialMediaLinkType,
@@ -44,6 +46,7 @@ type InsuranceCompanyIdProps = FormProps;
 interface InsuranceCompanyInputType {
   name: string;
   email: string;
+  subtype: InsuranceCompanySubtype | "";
   segment: string[];
   license: string;
   licenseType: string;
@@ -57,6 +60,14 @@ interface InsuranceCompanyInputType {
   socialMediaLinks: never[];
   password: string;
 }
+
+const isValidSubtypeValue = (
+  value: string | InsuranceCompanySubtype | ""
+): value is InsuranceCompanySubtype => {
+  return Object.values(InsuranceCompanySubtype).includes(
+    value as InsuranceCompanySubtype
+  );
+};
 
 const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   const loggedUserId = useAuthStore(useShallow((state) => state.user?.id));
@@ -95,6 +106,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   const [logoHasError, setLogoHasError] = useState(false);
   const [hasLocalContact, setHasLocalContact] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [subtypeError, setSubtypeError] = useState<string | null>(null);
 
   const [offices, setOffices] = useState<OrganizationOfficeInputType[]>([]);
   const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLinkType[]>([]);
@@ -141,6 +153,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     // required
     name: "",
     email: "",
+    subtype: "",
     segment: [],
     license: "",
     licenseType: "",
@@ -170,6 +183,17 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     const supplierIds = (company?.suppliers?.map(({ id }) => id) ||
       []) as never[];
 
+    const rawSubtype = (company?.subtype as string | undefined) || "";
+    const isSubtypeValid = rawSubtype ? isValidSubtypeValue(rawSubtype) : false;
+
+    if (rawSubtype && !isSubtypeValid) {
+      setSubtypeError(
+        "Valor inválido. Opciones permitidas: Compañia de seguro, Cooperativas, Medicina prepagada, Insurtech"
+      );
+    } else {
+      setSubtypeError(null);
+    }
+
     const formattedSocialMediaLinks = company?.socialMediaLinks?.map((link: any) => {
       const { __typename, ...restLinkProps } = link;
       return {
@@ -181,6 +205,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     setInput({
       name: company?.name || "",
       email: organizationResponse?.organizationById?.email || "",
+      subtype: isSubtypeValid ? (rawSubtype as InsuranceCompanySubtype) : "",
       suppliers: supplierIds || [],
       license: license || "",
       licenseType: licenseType
@@ -198,7 +223,6 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       password: "",
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const formattedOffices = company?.offices?.map((office: any) => {
       const {
         __typename: _,
@@ -240,6 +264,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
   const requiredFields = {
     name: Boolean(input.name?.trim()?.length),
     email: Boolean(input.email?.trim()?.length),
+    subtype: Boolean(input.subtype && isValidSubtypeValue(input.subtype)),
     license: Boolean(input.license?.trim()?.length),
     segment: Boolean(input.segment?.length),
     identification: Boolean(input.identification?.trim()?.length),
@@ -273,11 +298,24 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
         ...prev,
         [field]: value || "",
       }));
+
+      if (field === "subtype") {
+        // Siempre que el usuario cambie el tipo, limpiamos el error personalizado
+        setSubtypeError(null);
+      }
     }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!input?.subtype || !isValidSubtypeValue(input.subtype)) {
+      setSubtypeError(
+        "Valor inválido. Opciones permitidas: Compañia de seguro, Cooperativas, Medicina prepagada, Insurtech"
+      );
+      toast.error("Debes seleccionar un tipo de compañía válido");
+      return;
+    }
 
 
 
@@ -349,7 +387,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     const mutationVariables = {
       input: {
         id: targetUserId,
-        type: company?.type,
+        type: OrganizationTypes.InsuranceCompany,
         name: input?.name,
         suppliers: input?.suppliers || [],
         lineOfBusiness: input?.segment,
@@ -362,10 +400,12 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
         modality: company?.modality,
         contact: formattedContact,
         socialMediaLinks: formattedFullContactInfo || [],
+        subtype: input.subtype,
       },
     };
 
-    console.log("mutationVariables", mutationVariables)
+    console.log("[updateInsuranceCompany] subtype to send:", input.subtype);
+    console.log("[updateInsuranceCompany] mutationVariables", mutationVariables);
 
 
 
@@ -408,6 +448,44 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       return;
     }
 
+    const getMutationErrorMessage = (error: any) => {
+      const gqlErrors = error?.graphQLErrors || [];
+      const firstGqlError = gqlErrors?.[0];
+      const extensionErrors = firstGqlError?.extensions?.errors;
+
+      const pickFirstString = (value: unknown): string | null => {
+        if (!value) return null;
+        if (typeof value === "string") return value;
+        if (Array.isArray(value)) {
+          for (const item of value) {
+            const found = pickFirstString(item);
+            if (found) return found;
+          }
+          return null;
+        }
+        if (typeof value === "object") {
+          const obj = value as Record<string, unknown>;
+          // Common shapes: { field: ["msg"] } or { field: [{ message: "msg" }] }
+          if (typeof (obj as any).message === "string") return (obj as any).message;
+          for (const key of Object.keys(obj)) {
+            const found = pickFirstString(obj[key]);
+            if (found) return found;
+          }
+        }
+        return null;
+      };
+
+      const validationMessage = pickFirstString(extensionErrors);
+      if (validationMessage) return validationMessage;
+
+      return (
+        firstGqlError?.message ||
+        error?.networkError?.message ||
+        error?.message ||
+        GENERIC_TOAST_ERROR_MESSAGE
+      );
+    };
+
     updateCompany({
       variables: mutationVariables,
     })
@@ -419,13 +497,27 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
       .catch((error) => {
         console.error('Insurance company update error:', error);
         console.error('Error details:', error.graphQLErrors);
+        try {
+          console.error(
+            "GraphQL error (stringified):",
+            JSON.stringify(error?.graphQLErrors?.[0], null, 2)
+          );
+        } catch { }
         console.error('Network error:', error.networkError);
-        toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
+        toast.error(getMutationErrorMessage(error));
       })
       .finally(() => setIsUpdatingCompany(false));
   };
 
   const showLoading = loadingCompany;
+
+  const insuranceCompanyTypeOptions = [
+    { label: "Tipo de compañía", value: "", disabled: true },
+    { label: "Compañía de seguro", value: InsuranceCompanySubtype.Standard },
+    { label: "Cooperativa", value: InsuranceCompanySubtype.Cooperatives },
+    { label: "Medicina prepagada", value: InsuranceCompanySubtype.PrepaidMedicine },
+    { label: "Insurtech", value: InsuranceCompanySubtype.Insurtech },
+  ];
 
   return (
     <form
@@ -495,6 +587,41 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
             )}
           </div>
 
+        </div>
+
+        <div className="col-span-1 flex flex-col gap-2">
+          <label className="text-xs text-blue-500 font-century-gothic">
+            Tipo de compañía
+          </label>
+          <select
+            className={`w-full bg-white border rounded-xl py-3 px-5 text-sm font-century-gothic ${
+              !requiredFields.subtype || subtypeError
+                ? "border-red-500 text-red-500"
+                : "border-blue-500 text-blue-500"
+            }`}
+            value={input?.subtype || ""}
+            disabled={loadingCompany || isUpdatingCompany}
+            onChange={(e) => {
+              const value = e.target.value as string;
+              console.log("[InsuranceCompanyForm] subtype selected:", value);
+              handleInputChange("subtype", value);
+            }}
+          >
+            {insuranceCompanyTypeOptions.map((option) => (
+              <option
+                key={option.value || "placeholder"}
+                value={option.value}
+                disabled={option.disabled}
+              >
+                {option.label}
+              </option>
+            ))}
+          </select>
+          {subtypeError && (
+            <p className="text-red-500 text-xs font-century-gothic">
+              {subtypeError}
+            </p>
+          )}
         </div>
 
 

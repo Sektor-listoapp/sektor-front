@@ -15,6 +15,7 @@ export const INSURANCE_COMPANY_FIELDS_FRAGMENT = gql`
     id
     name
     type
+    subtype
     logoUrl
     lineOfBusiness
     modality
