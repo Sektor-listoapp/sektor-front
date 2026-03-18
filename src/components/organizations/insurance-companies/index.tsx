@@ -65,6 +65,22 @@ const InsuranceCompanies = ({
   const sectionTitle =
     (orgType && titleByOrgType[orgType as string]) || "Compañías de seguros";
 
+  const showGroupedBySubtype =
+    !orgType || orgType === USER_TYPES.INSURANCE_COMPANY;
+
+  const standardCompanies = insuranceCompanies.filter(
+    (company) => company.subtype === InsuranceCompanySubtype.Standard
+  );
+  const cooperativeCompanies = insuranceCompanies.filter(
+    (company) => company.subtype === InsuranceCompanySubtype.Cooperatives
+  );
+  const prepaidMedicineCompanies = insuranceCompanies.filter(
+    (company) => company.subtype === InsuranceCompanySubtype.PrepaidMedicine
+  );
+  const insurtechCompanies = insuranceCompanies.filter(
+    (company) => company.subtype === InsuranceCompanySubtype.Insurtech
+  );
+
   const handleClick = () => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
     replace(
@@ -86,52 +102,184 @@ const InsuranceCompanies = ({
       )}
       {...props}
     >
-      <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
-        <h2>{sectionTitle}</h2>
-        {!isSelected && (
-          <Button
-            variant="link-blue"
-            onClick={handleClick}
-            className="text-xs text-blue-400"
-          >
-            Ver más
-          </Button>
-        )}
-      </header>
-
-      {Boolean(filteredInsuranceCompanies?.length) ? (
+      {!showGroupedBySubtype && (
         <>
-          <CardCarousel className="w-full md:hidden">
-            {filteredInsuranceCompanies?.map((item, index) => (
-              <div
-                className="w-full"
-                key={`insurance-company-card-${item?.id}-${index}`}
+          <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
+            <h2>{sectionTitle}</h2>
+            {!isSelected && (
+              <Button
+                variant="link-blue"
+                onClick={handleClick}
+                className="text-xs text-blue-400"
               >
-                <InsuranceCompanyCard data={item} />
+                Ver más
+              </Button>
+            )}
+          </header>
+
+          {Boolean(filteredInsuranceCompanies?.length) ? (
+            <>
+              <CardCarousel className="w-full md:hidden">
+                {filteredInsuranceCompanies?.map((item, index) => (
+                  <div
+                    className="w-full"
+                    key={`insurance-company-card-${item?.id}-${index}`}
+                  >
+                    <InsuranceCompanyCard data={item} />
+                  </div>
+                ))}
+              </CardCarousel>
+
+              <div className="hidden md:grid w-full grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center 2xl::justify-items-start">
+                {filteredInsuranceCompanies?.map((item, index) => (
+                  <InsuranceCompanyCard
+                    data={item}
+                    key={`insurance-company-card-${item?.id}-${index}`}
+                  />
+                ))}
               </div>
-            ))}
-          </CardCarousel>
 
-          <div className="hidden md:grid w-full grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center 2xl::justify-items-start">
-            {filteredInsuranceCompanies?.map((item, index) => (
-              <InsuranceCompanyCard
-                data={item}
-                key={`insurance-company-card-${item?.id}-${index}`}
-              />
-            ))}
-          </div>
-
-          {isSelected && paginationInfo && paginationInfo.pages > 1 && (
-            <Pagination
-              currentPage={paginationInfo.currentPage}
-              totalPages={paginationInfo.pages}
-              onPageChange={handlePageChange}
-              disabled={isLoadingPublicOrganizations}
-            />
+              {isSelected && paginationInfo && paginationInfo.pages > 1 && (
+                <Pagination
+                  currentPage={paginationInfo.currentPage}
+                  totalPages={paginationInfo.pages}
+                  onPageChange={handlePageChange}
+                  disabled={isLoadingPublicOrganizations}
+                />
+              )}
+            </>
+          ) : (
+            <Empty description="No hay compañías de seguros disponibles" />
           )}
         </>
-      ) : (
-        <Empty description="No hay compañías de seguros disponibles" />
+      )}
+
+      {showGroupedBySubtype && (
+        <div className="w-full flex flex-col gap-10">
+          {/* Compañías de seguros (Standard) */}
+          <section className="w-full flex flex-col gap-4">
+            <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
+              <h2>Compañías de seguros</h2>
+            </header>
+            {standardCompanies.length ? (
+              <>
+                <CardCarousel className="w-full md:hidden">
+                  {standardCompanies.map((item, index) => (
+                    <div
+                      className="w-full"
+                      key={`insurance-company-standard-${item?.id}-${index}`}
+                    >
+                      <InsuranceCompanyCard data={item} />
+                    </div>
+                  ))}
+                </CardCarousel>
+                <div className="hidden md:grid w-full grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center 2xl::justify-items-start">
+                  {standardCompanies.map((item, index) => (
+                    <InsuranceCompanyCard
+                      data={item}
+                      key={`insurance-company-standard-${item?.id}-${index}`}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <Empty description="No hay compañías de seguros disponibles" />
+            )}
+          </section>
+
+          {/* Cooperativas */}
+          <section className="w-full flex flex-col gap-4">
+            <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
+              <h2>Cooperativas</h2>
+            </header>
+            {cooperativeCompanies.length ? (
+              <>
+                <CardCarousel className="w-full md:hidden">
+                  {cooperativeCompanies.map((item, index) => (
+                    <div
+                      className="w-full"
+                      key={`insurance-company-coop-${item?.id}-${index}`}
+                    >
+                      <InsuranceCompanyCard data={item} />
+                    </div>
+                  ))}
+                </CardCarousel>
+                <div className="hidden md:grid w-full grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center 2xl::justify-items-start">
+                  {cooperativeCompanies.map((item, index) => (
+                    <InsuranceCompanyCard
+                      data={item}
+                      key={`insurance-company-coop-${item?.id}-${index}`}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <Empty description="No hay cooperativas disponibles" />
+            )}
+          </section>
+
+          {/* Medicina prepagada */}
+          <section className="w-full flex flex-col gap-4">
+            <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
+              <h2>Medicina prepagada</h2>
+            </header>
+            {prepaidMedicineCompanies.length ? (
+              <>
+                <CardCarousel className="w-full md:hidden">
+                  {prepaidMedicineCompanies.map((item, index) => (
+                    <div
+                      className="w-full"
+                      key={`insurance-company-prepaid-${item?.id}-${index}`}
+                    >
+                      <InsuranceCompanyCard data={item} />
+                    </div>
+                  ))}
+                </CardCarousel>
+                <div className="hidden md:grid w-full grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center 2xl::justify-items-start">
+                  {prepaidMedicineCompanies.map((item, index) => (
+                    <InsuranceCompanyCard
+                      data={item}
+                      key={`insurance-company-prepaid-${item?.id}-${index}`}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <Empty description="No hay compañías de medicina prepagada disponibles" />
+            )}
+          </section>
+
+          {/* Insurtech */}
+          <section className="w-full flex flex-col gap-4">
+            <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
+              <h2>Insurtech</h2>
+            </header>
+            {insurtechCompanies.length ? (
+              <>
+                <CardCarousel className="w-full md:hidden">
+                  {insurtechCompanies.map((item, index) => (
+                    <div
+                      className="w-full"
+                      key={`insurance-company-insurtech-${item?.id}-${index}`}
+                    >
+                      <InsuranceCompanyCard data={item} />
+                    </div>
+                  ))}
+                </CardCarousel>
+                <div className="hidden md:grid w-full grid-cols-2 lg:grid-cols-3 gap-10 justify-items-center 2xl::justify-items-start">
+                  {insurtechCompanies.map((item, index) => (
+                    <InsuranceCompanyCard
+                      data={item}
+                      key={`insurance-company-insurtech-${item?.id}-${index}`}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <Empty description="No hay compañías Insurtech disponibles" />
+            )}
+          </section>
+        </div>
       )}
     </section>
   );

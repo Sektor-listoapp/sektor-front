@@ -5,12 +5,24 @@ import { useEffect, useRef, useState } from "react";
 
 
 
-export const CustomDropdown = ({ options, placeholder, value, onChange, className = "" }) => {
+export const CustomDropdown = ({
+    options,
+    placeholder,
+    value,
+    onChange,
+    className = "",
+    triggerClassName = "",
+    error = false,
+}) => {
     const [isOpen, setIsOpen] = useState(false);
     const [selectedValue, setSelectedValue] = useState(value || "");
     const [dropdownPosition, setDropdownPosition] = useState('bottom-left');
     const [focusedIndex, setFocusedIndex] = useState(-1);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        setSelectedValue(value || "");
+    }, [value]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -105,10 +117,12 @@ export const CustomDropdown = ({ options, placeholder, value, onChange, classNam
     return (
         <div className={`relative w-full ${className}`} ref={dropdownRef}>
             <div
-                className={`w-full bg-white border rounded-[30px] p-2 cursor-pointer flex items-center justify-between transition-all duration-200 min-h-[46px] ${isOpen
-                    ? 'border-blue-400 shadow-md'
-                    : 'border-[#00000033] hover:border-[#00000066] hover:shadow-sm'
-                    }`}
+                className={`w-full bg-white border rounded-xl py-3 px-5 cursor-pointer flex items-center justify-between transition-all duration-200 min-h-[46px] font-century-gothic text-sm ${error
+                    ? 'border-red-500 text-red-500'
+                    : isOpen
+                        ? 'border-blue-500 shadow-md'
+                        : 'border-blue-500 hover:shadow-sm'
+                    } ${triggerClassName}`}
                 onClick={() => setIsOpen(!isOpen)}
                 role="button"
                 tabIndex={0}
@@ -121,14 +135,14 @@ export const CustomDropdown = ({ options, placeholder, value, onChange, classNam
                     }
                 }}
             >
-                <span className={`text-[10px] md:text-xs ${selectedValue ? 'text-gray-800' : 'text-gray-500'} break-words flex-1 min-w-0 leading-tight pr-2`}>
+                <span className={`text-sm ${selectedValue ? 'text-blue-500' : 'text-gray-400'} break-words flex-1 min-w-0 leading-tight pr-2`}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </span>
 
                 <div className="flex-shrink-0 ml-2">
                     <FontAwesomeIcon
                         icon={faCaretDown}
-                        className={`text-[#182F48] transition-transform duration-200 text-sm md:text-lg ${isOpen ? 'rotate-180' : ''}`}
+                        className={`text-blue-500 transition-transform duration-200 text-base ${isOpen ? 'rotate-180' : ''}`}
                     />
                 </div>
             </div>

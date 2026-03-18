@@ -26,6 +26,7 @@ const usePublicOrganizations = ({
     {
       skip: true,
       fetchPolicy: "no-cache",
+      errorPolicy: "all",
       ...options,
       variables: {
         pagination: { offset: 0, limit: 6 },
@@ -108,8 +109,11 @@ const usePublicOrganizations = ({
     };
 
     try {
-      const { data } = await getPublicOrganizations(variablesToSend);
-      setPublicOrganizations(data);
+      const { data, errors } = await getPublicOrganizations(variablesToSend);
+      if (data) setPublicOrganizations(data);
+      if (errors?.length) {
+        console.error("GraphQL errors fetching public organizations:", errors);
+      }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
       console.error('Error fetching public organizations:', error);
@@ -134,7 +138,7 @@ const usePublicOrganizations = ({
     };
 
     try {
-      const { data } = await getPublicOrganizations(variablesToSend);
+      const { data, errors } = await getPublicOrganizations(variablesToSend);
       if (data) {
         setPublicSuppliers([], null);
         setPublicExclusiveAgents([], null);
@@ -142,6 +146,9 @@ const usePublicOrganizations = ({
         setPublicBrokerageSocieties([], null);
         setPublicInsuranceCompanies([], null);
         setPublicOrganizations(data, page);
+      }
+      if (errors?.length) {
+        console.error("GraphQL errors fetching public organizations:", errors);
       }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
@@ -165,7 +172,7 @@ const usePublicOrganizations = ({
     };
 
     try {
-      const { data } = await getPublicOrganizations(variablesToSend);
+      const { data, errors } = await getPublicOrganizations(variablesToSend);
 
       const getPaginationInfo = (
         paginatedData: { count?: number; pages?: number } | null | undefined
@@ -212,6 +219,9 @@ const usePublicOrganizations = ({
           );
           break;
       }
+      if (errors?.length) {
+        console.error("GraphQL errors fetching public organizations:", errors);
+      }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
@@ -226,8 +236,11 @@ const usePublicOrganizations = ({
       const variablesToSend = {
         pagination: { offset: 0, limit: 6 },
       };
-      const { data } = await getPublicOrganizations(variablesToSend);
-      setPublicOrganizations(data);
+      const { data, errors } = await getPublicOrganizations(variablesToSend);
+      if (data) setPublicOrganizations(data);
+      if (errors?.length) {
+        console.error("GraphQL errors fetching public organizations:", errors);
+      }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);

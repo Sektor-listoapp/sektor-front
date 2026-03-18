@@ -275,6 +275,10 @@ export type ClientLogoUpdateInputType = {
   logoUrl?: InputMaybe<Scalars['String']['input']>;
 };
 
+export enum ClinicOrder {
+  Current = 'Current'
+}
+
 export type ConfirmImmediateDebitInputType = {
   holderName: Scalars['String']['input'];
   otp: Scalars['String']['input'];
@@ -2148,6 +2152,7 @@ export type SubscriptionPriceType = {
 
 export type SupplierFilterType = {
   address?: InputMaybe<PublicOrganizationFilterAddressType>;
+  clinicOrder?: InputMaybe<ClinicOrder>;
   insuranceCompanyId?: InputMaybe<Scalars['String']['input']>;
   lineOfBusiness?: InputMaybe<OrganizationLineOfBusiness>;
   modality?: InputMaybe<OrganizationModality>;
@@ -2165,7 +2170,7 @@ export type SupplierInputType = {
   id?: InputMaybe<Scalars['String']['input']>;
   identification?: InputMaybe<Scalars['String']['input']>;
   insuranceCompanies: Array<Scalars['String']['input']>;
-  insuranceCompanyRelations?: InputMaybe<Array<SupplierInsuranceCompanyRelationInputType>>;
+  insuranceCompanyRelations?: InputMaybe<Array<InputMaybe<SupplierInsuranceCompanyRelationInputType>>>;
   license?: InputMaybe<Scalars['String']['input']>;
   lineOfBusiness: Array<OrganizationLineOfBusiness>;
   logoUrl?: InputMaybe<Scalars['String']['input']>;
@@ -2180,18 +2185,18 @@ export type SupplierInputType = {
 };
 
 export type SupplierInsuranceCompanyRelationInputType = {
-  depositRequired?: Scalars['Boolean']['input'];
-  fullyContractedClinic?: Scalars['Boolean']['input'];
+  depositRequired?: InputMaybe<Scalars['Boolean']['input']>;
+  fullyContractedClinic?: InputMaybe<Scalars['Boolean']['input']>;
   insuranceCompanyId: Scalars['String']['input'];
-  reasonableExpensesApplicable?: Scalars['Boolean']['input'];
+  reasonableExpensesApplicable?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type SupplierInsuranceCompanyRelationType = {
   __typename?: 'SupplierInsuranceCompanyRelationType';
-  depositRequired: Scalars['Boolean']['output'];
-  fullyContractedClinic: Scalars['Boolean']['output'];
+  depositRequired?: Maybe<Scalars['Boolean']['output']>;
+  fullyContractedClinic?: Maybe<Scalars['Boolean']['output']>;
   insuranceCompanyId: Scalars['String']['output'];
-  reasonableExpensesApplicable: Scalars['Boolean']['output'];
+  reasonableExpensesApplicable?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type SupplierPaginatedType = {

@@ -13,7 +13,7 @@ const BOOLEAN_OPTIONS = [
     { label: "No", value: "false" }
 ];
 
-function formatBooleanOption(value: boolean | undefined): string {
+function formatBooleanOption(value: boolean | null | undefined): string {
     if (value === true) return "Sí";
     if (value === false) return "No";
     return "-";
