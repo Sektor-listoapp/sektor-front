@@ -54,7 +54,7 @@ const BrokerageSocieties = ({
     >
       <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
         <h2>Sociedades de corretaje</h2>
-        {!isSelected && (
+        {!isSelected && Boolean(brokerageSocieties?.length) && (
           <Button
             variant="link-blue"
             onClick={handleClick}
