@@ -37,7 +37,7 @@ const InsuranceCompanies = ({
   const { handleChangePage, isLoadingPublicOrganizations } = usePublicOrganizations({});
 
   const subtypeByOrgType: Record<string, InsuranceCompanySubtype | null> = {
-    [USER_TYPES.INSURANCE_COMPANY]: null,
+    [USER_TYPES.INSURANCE_COMPANY]: InsuranceCompanySubtype.Standard,
     [USER_TYPES.INSURANCE_COMPANY_COOPERATIVE]:
       InsuranceCompanySubtype.Cooperatives,
     [USER_TYPES.INSURANCE_COMPANY_INSURTECH]:
@@ -65,8 +65,9 @@ const InsuranceCompanies = ({
   const sectionTitle =
     (orgType && titleByOrgType[orgType as string]) || "Compañías de seguros";
 
-  const showGroupedBySubtype =
-    !orgType || orgType === USER_TYPES.INSURANCE_COMPANY;
+  // Vista agrupada solo sin filtro de tipo; al elegir "Compañías de seguros" se muestra
+  // una sola sección con paginación (no cooperativas / medicina prepagada / insurtech).
+  const showGroupedBySubtype = !orgType;
 
   const standardCompanies = insuranceCompanies.filter(
     (company) => company.subtype === InsuranceCompanySubtype.Standard
@@ -81,13 +82,17 @@ const InsuranceCompanies = ({
     (company) => company.subtype === InsuranceCompanySubtype.Insurtech
   );
 
-  const handleClick = () => {
+  const navigateToInsuranceSubtype = (type: string) => {
     const newQueryParams = query?.search ? { search: query?.search } : {};
     replace(
-      { query: { ...newQueryParams, type: USER_TYPES.INSURANCE_COMPANY } },
+      { query: { ...newQueryParams, type } },
       undefined,
       { scroll: false }
     );
+  };
+
+  const handleClick = () => {
+    navigateToInsuranceSubtype(USER_TYPES.INSURANCE_COMPANY);
   };
 
   const handlePageChange = (page: number) => {
@@ -106,7 +111,7 @@ const InsuranceCompanies = ({
         <>
           <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
             <h2>{sectionTitle}</h2>
-            {!isSelected && (
+            {!isSelected && Boolean(filteredInsuranceCompanies?.length) && (
               <Button
                 variant="link-blue"
                 onClick={handleClick}
@@ -160,6 +165,17 @@ const InsuranceCompanies = ({
           <section className="w-full flex flex-col gap-4">
             <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
               <h2>Compañías de seguros</h2>
+              {standardCompanies.length > 0 && (
+                <Button
+                  variant="link-blue"
+                  onClick={() =>
+                    navigateToInsuranceSubtype(USER_TYPES.INSURANCE_COMPANY)
+                  }
+                  className="text-xs text-blue-400"
+                >
+                  Ver más
+                </Button>
+              )}
             </header>
             {standardCompanies.length ? (
               <>
@@ -191,6 +207,19 @@ const InsuranceCompanies = ({
           <section className="w-full flex flex-col gap-4">
             <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
               <h2>Cooperativas</h2>
+              {cooperativeCompanies.length > 0 && (
+                <Button
+                  variant="link-blue"
+                  onClick={() =>
+                    navigateToInsuranceSubtype(
+                      USER_TYPES.INSURANCE_COMPANY_COOPERATIVE
+                    )
+                  }
+                  className="text-xs text-blue-400"
+                >
+                  Ver más
+                </Button>
+              )}
             </header>
             {cooperativeCompanies.length ? (
               <>
@@ -222,6 +251,19 @@ const InsuranceCompanies = ({
           <section className="w-full flex flex-col gap-4">
             <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
               <h2>Medicina prepagada</h2>
+              {prepaidMedicineCompanies.length > 0 && (
+                <Button
+                  variant="link-blue"
+                  onClick={() =>
+                    navigateToInsuranceSubtype(
+                      USER_TYPES.INSURANCE_COMPANY_PREPAID_MEDICINE
+                    )
+                  }
+                  className="text-xs text-blue-400"
+                >
+                  Ver más
+                </Button>
+              )}
             </header>
             {prepaidMedicineCompanies.length ? (
               <>
@@ -253,6 +295,19 @@ const InsuranceCompanies = ({
           <section className="w-full flex flex-col gap-4">
             <header className="w-full pb-2 border-b border-b-blue-200 font-century-gothic text-blue-500 text-lg flex items-center justify-start gap-3">
               <h2>Insurtech</h2>
+              {insurtechCompanies.length > 0 && (
+                <Button
+                  variant="link-blue"
+                  onClick={() =>
+                    navigateToInsuranceSubtype(
+                      USER_TYPES.INSURANCE_COMPANY_INSURTECH
+                    )
+                  }
+                  className="text-xs text-blue-400"
+                >
+                  Ver más
+                </Button>
+              )}
             </header>
             {insurtechCompanies.length ? (
               <>

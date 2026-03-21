@@ -131,13 +131,18 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
     stateNumber !== undefined ||
     cityNumber !== undefined;
 
+  // Si solo hay tipo de organización en la URL (sin búsqueda/ubicación/etc.),
+  // igual debemos enviar filtros (p. ej. subtype Standard para compañías de seguros).
   if (!hasValidFilters) {
-    return {};
+    if (!(isOrganizationTypeSelected && filterKey)) {
+      return {};
+    }
   }
 
   if (isOrganizationTypeSelected && filterKey) {
     const baseFiltersWithSubtype = { ...baseFilters };
     const {
+      INSURANCE_COMPANY,
       INSURANCE_COMPANY_COOPERATIVE,
       INSURANCE_COMPANY_INSURTECH,
       INSURANCE_COMPANY_PREPAID_MEDICINE,
@@ -150,6 +155,8 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
         (baseFiltersWithSubtype as Record<string, unknown>).subtype = "Insurtech";
       } else if (query.type === INSURANCE_COMPANY_PREPAID_MEDICINE) {
         (baseFiltersWithSubtype as Record<string, unknown>).subtype = "PrepaidMedicine";
+      } else if (query.type === INSURANCE_COMPANY) {
+        (baseFiltersWithSubtype as Record<string, unknown>).subtype = "Standard";
       }
     }
 
