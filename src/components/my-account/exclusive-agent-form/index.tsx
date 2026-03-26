@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import SelectMultiple from "@/components/ui/select-multiple";
 import TextInput from "@/components/ui/text-input";
-import { Mutation, OrganizationOfficeInputType, Query, StudyInputType, OrganizationClientType, SocialMediaLinkType } from "@/lib/sektor-api/__generated__/types";
+import { Mutation, OrganizationOfficeInputType, Query, StudyInputType, OrganizationClientType, SocialMediaLinkType, RecognitionType } from "@/lib/sektor-api/__generated__/types";
 import { useMutation, useQuery } from "@apollo/client";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
 import Select from "@/components/ui/select";
@@ -47,6 +47,7 @@ import { FormProps } from "@/types/forms";
 import SocialMediaInput from "../social-media-input";
 import LocalOfficesInput from "../local-offices-input";
 import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/update-organization-logo";
+import LocalRecognitionsInput from "../local-recognitions-input";
 
 type ExclusiveAgentIdProps = FormProps;
 
@@ -86,6 +87,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
   const [socialMediaLinks, setSocialMediaLinks] = useState<SocialMediaLinkType[]>([]);
   const [clients, setClients] = useState<OrganizationClientType[]>([]);
   const [studies, setStudies] = useState<StudyInputType[]>([]);
+  const [recognitions, setRecognitions] = useState<RecognitionType[]>([]);
 
   const {
     error: exclusiveAgentError,
@@ -189,7 +191,33 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     phoneCodes.find((code) => userPhone.startsWith(code)) || DEFAULT_PHONE_CODE;
   const userPhoneWithoutCode = userPhoneCode ? userPhone.substring(userPhoneCode.length) : userPhone;
 
-  const [licenseType, license] = exclusiveAgent?.license?.split("-") || [];
+  const parseLicense = (raw: string | null | undefined) => {
+    const cleaned = (raw ?? "").trim();
+    if (!cleaned) {
+      return {
+        licenseType: LICENSE_TYPE_OPTIONS[0].value,
+        license: "",
+      };
+    }
+
+    // Accept formats like "AAA-123456", "AAA123456", or "AAA-123-456"
+    const match = cleaned.match(/^([A-Za-z]{3})-?(.*)$/);
+    if (!match) {
+      return {
+        licenseType: LICENSE_TYPE_OPTIONS[0].value,
+        license: cleaned,
+      };
+    }
+
+    const prefix = match[1]?.toUpperCase();
+    const rest = (match[2] ?? "").replace(/^-/, "").trim();
+    return {
+      licenseType: `${prefix}-`,
+      license: rest,
+    };
+  };
+
+  const parsedLicense = parseLicense(exclusiveAgent?.license);
   const [identificationType, identification] =
     exclusiveAgent?.identification?.split("-") || [];
 
@@ -198,8 +226,8 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     name: exclusiveAgent?.name || "",
     email: organizationResponse?.organizationById?.email || "",
     insuranceCompanies: [],
-    license: license || "",
-    licenseType: licenseType || LICENSE_TYPE_OPTIONS[0].value,
+    license: parsedLicense.license,
+    licenseType: parsedLicense.licenseType,
     segment: exclusiveAgent?.lineOfBusiness || [],
     identification: identification || "",
     identificationType: identificationType
@@ -233,6 +261,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
   };
 
   useEffect(() => {
+    const parsedLicense = parseLicense(exclusiveAgent?.license);
     const currentYear = new Date().getFullYear();
     const foundationYear = Number(exclusiveAgent?.foundationYear || 0);
     const yearsOfExperience =
@@ -244,6 +273,10 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
         }
       )
       : [];
+    const formattedRecognitions =
+      exclusiveAgent?.recognitions?.map(({ id, title, date, giver, description }) => {
+        return { id, title, date, giver, description };
+      }) || [];
     const formattedClients = exclusiveAgent?.clients
       ? exclusiveAgent?.clients.map(({ id, name, logoUrl }) => {
         return { id, name, logoUrl };
@@ -272,8 +305,8 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
       name: exclusiveAgent?.name || "",
       email: organizationResponse?.organizationById?.email || "",
       insuranceCompanies: insuranceCompanies || [],
-      license: license || "",
-      licenseType: licenseType || LICENSE_TYPE_OPTIONS[0].value,
+      license: parsedLicense.license,
+      licenseType: parsedLicense.licenseType,
       segment: exclusiveAgent?.lineOfBusiness || [],
       identification: identification || "",
       identificationType: identificationType
@@ -296,6 +329,7 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
     setSocialMediaLinks(exclusiveAgent?.socialMediaLinks || []);
     setClients(formattedClients);
     setStudies(formattedStudies);
+    setRecognitions(formattedRecognitions);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [exclusiveAgent, organizationResponse]);
 
@@ -451,11 +485,12 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
         phone: input?.phone?.startsWith('+') ? input?.phone : `${input?.phoneCode || DEFAULT_PHONE_CODE}${input?.phone}`,
         insuranceCompanies: input?.insuranceCompanies,
         license: `${input?.licenseType}${input?.license}`,
-        recognitions: (exclusiveAgent?.recognitions || []).map((recognition) => ({
-          title: recognition.title,
-          description: recognition.description,
-          date: recognition.date ? new Date(recognition.date) : new Date(),
-          giver: recognition.giver,
+        recognitions: recognitions.map((rec) => ({
+          id: rec.id,
+          title: rec.title,
+          giver: rec.giver,
+          date: rec.date,
+          description: rec.description,
         })),
         identification: `${input?.identificationType}${input?.identification}`,
         socialMediaLinks: formattedSocialMediaLinks || [],
@@ -884,6 +919,12 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
               </Space>
             ),
           }}
+        />
+
+        <LocalRecognitionsInput
+          recognitions={recognitions}
+          onRecognitionsChange={setRecognitions}
+          disabled={loadingExclusiveAgent || isUpdatingExclusiveAgent}
         />
 
         <StudiesInput
