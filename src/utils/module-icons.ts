@@ -5,6 +5,7 @@ export interface ModuleIconOption {
 }
 
 const MODULE_ICON_NAMES = [
+  // Existing icons
   "module_icon1",
   "module_icon2",
   "module_icon3",
@@ -44,6 +45,49 @@ const MODULE_ICON_NAMES = [
   "module_icon37",
   "module_icon38",
   "module_icon39",
+
+  // New icons
+  "module_icon_new_01",
+  "module_icon_new_02",
+  "module_icon_new_03",
+  "module_icon_new_04",
+  "module_icon_new_05",
+  "module_icon_new_06",
+  "module_icon_new_07",
+  "module_icon_new_08",
+  "module_icon_new_09",
+  "module_icon_new_10",
+  "module_icon_new_11",
+  "module_icon_new_12",
+  "module_icon_new_13",
+  "module_icon_new_14",
+  "module_icon_new_15",
+  "module_icon_new_16",
+  "module_icon_new_17",
+  "module_icon_new_18",
+  "module_icon_new_19",
+  "module_icon_new_20",
+  "module_icon_new_21",
+  "module_icon_new_22",
+  "module_icon_new_23",
+  "module_icon_new_24",
+  "module_icon_new_25",
+  "module_icon_new_26",
+  "module_icon_new_27",
+  "module_icon_new_28",
+  "module_icon_new_29",
+  "module_icon_new_30",
+  "module_icon_new_31",
+  "module_icon_new_32",
+  "module_icon_new_33",
+  "module_icon_new_34",
+  "module_icon_new_35",
+  "module_icon_new_36",
+  "module_icon_new_37",
+  "module_icon_new_38",
+  "module_icon_new_39",
+  "module_icon_new_40",
+  "module_icon_new_41",
 ];
 
 export const MODULE_ICON_OPTIONS: ModuleIconOption[] = MODULE_ICON_NAMES.map((name, index) => ({
