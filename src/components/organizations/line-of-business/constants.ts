@@ -15,7 +15,7 @@ const { AUTO, AVIATION, FINANCIAL, HEALTH, LIFE, PROPERTY, TRAVEL } =
 export const LINE_OF_BUSINESS_LABEL = {
   [AUTO]: "Automoviles",
   [AVIATION]: "Aviación",
-  [FINANCIAL]: "Finanzas",
+  [FINANCIAL]: "Fianzas",
   [HEALTH]: "Salud",
   [LIFE]: "Vida",
   [PROPERTY]: "Patrimoniales",

@@ -28,6 +28,7 @@ const SupplierCard = ({ data, className, ...props }: SupplierCardProps) => {
     ];
 
   const allies = data?.allies?.slice(0, 3) || [];
+  const credential = data?.license || "";
 
   return (
     <article
@@ -41,13 +42,20 @@ const SupplierCard = ({ data, className, ...props }: SupplierCardProps) => {
       <div className="w-fit rounded-2xl px-2 sm:px-4 rounded-e-none absolute top-0 right-0 bg-blue-500 text-white text-[10px] md:text-xs font-bold p-1 rounded-t-2xl lg:text-xs">
         {supplierServiceType}
       </div>
-      <Image
-        className="w-full h-full object-cover object-center rounded-l-2xl min-h-48"
-        src={data?.logoUrl || "/images/placeholder.webp"}
-        alt={name}
-        width={500}
-        height={400}
-      />
+      <div className="relative">
+        <Image
+          className="w-full h-full object-cover object-center rounded-l-2xl min-h-48"
+          src={data?.logoUrl || "/images/placeholder.webp"}
+          alt={name}
+          width={500}
+          height={400}
+        />
+        {Boolean(credential) && (
+          <div className="w-fit rounded-2xl px-2 sm:px-4 rounded-s-none absolute bottom-0 left-0 bg-blue-500 text-white text-[10px] md:text-xs font-bold p-1 rounded-b-2xl lg:text-xs">
+            {credential}
+          </div>
+        )}
+      </div>
       <div className="w-full h-full col-span-2 p-2 text-xs rounded-r-2xl border-l-0 border border-blue-500 border-opacity-10 md:text-sm flex flex-col justify-between gap-2 lg:p-4">
         <h3
           className="w-full mt-2 text-base sm:text-lg font-semibold pb-1 border-b border-b-blue-500"

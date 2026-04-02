@@ -24,6 +24,7 @@ const BrokerageSocietyCard = ({
   const yearsOfExperience = Boolean(foundationYear)
     ? getFormattedYearsOfExperience(foundationYear as number)
     : null;
+  const credential = data?.license || "";
 
   const allies = data?.allies?.slice(0, 3) || [];
 
@@ -41,13 +42,20 @@ const BrokerageSocietyCard = ({
           {yearsOfExperience}
         </div>
       )}
-      <Image
-        className="w-full h-full rounded-l-2xl min-h-48"
-        src={data?.logoUrl || "/images/placeholder.webp"}
-        alt={name}
-        width={350}
-        height={350}
-      />
+      <div className="relative">
+        <Image
+          className="w-full h-full rounded-l-2xl min-h-48"
+          src={data?.logoUrl || "/images/placeholder.webp"}
+          alt={name}
+          width={350}
+          height={350}
+        />
+        {Boolean(credential) && (
+          <div className="w-fit rounded-2xl px-2 sm:px-4 rounded-s-none absolute bottom-0 left-0 bg-blue-500 text-white text-[10px] md:text-xs font-bold p-1 rounded-b-2xl lg:text-xs">
+            {credential}
+          </div>
+        )}
+      </div>
       <div className="w-full col-span-2 p-2 text-xs rounded-r-2xl border-l-0 border border-blue-500 border-opacity-10 md:text-sm flex flex-col justify-between gap-2 lg:p-4">
         <h3
           className="w-full mt-2 text-base sm:text-lg font-semibold pb-1 border-b border-b-blue-500"

@@ -26,7 +26,7 @@ export const LINE_OF_BUSINESS_CONTENT_MAP = {
   },
   [Financial]: {
     icon: faMoneyBill1Wave,
-    label: "Finanzas",
+    label: "Fianzas",
     content: "Este ramo se enfoca en la protección de activos financieros",
   },
   [Health]: {

@@ -10,7 +10,12 @@ import CardCarousel from "@/components/ui/card-carousel";
 import { Empty } from "antd";
 import usePublicOrganizations from "@/hooks/use-public-organizations";
 import Pagination from "@/components/ui/pagination";
-import { InsuranceCompanySubtype } from "@/lib/sektor-api/__generated__/types";
+import {
+  InsuranceCompanySubtype,
+  Query,
+} from "@/lib/sektor-api/__generated__/types";
+import { useQuery } from "@apollo/client";
+import { PUBLIC_INSURANCE_COMPANIES_QUERY } from "@/lib/sektor-api/queries";
 
 interface InsuranceCompaniesProps extends React.HTMLAttributes<HTMLDivElement> {
   isLoading?: boolean;
@@ -22,6 +27,9 @@ const InsuranceCompanies = ({
 }: InsuranceCompaniesProps) => {
   const { query, replace } = useRouter();
   const orgType = query?.type;
+  // Vista agrupada solo sin filtro de tipo; al elegir "Compañías de seguros" se muestra
+  // una sola sección con paginación (no cooperativas / medicina prepagada / insurtech).
+  const showGroupedBySubtype = !orgType;
   const isSelected =
     orgType === USER_TYPES.INSURANCE_COMPANY ||
     orgType === USER_TYPES.INSURANCE_COMPANY_COOPERATIVE ||
@@ -35,6 +43,14 @@ const InsuranceCompanies = ({
     useShallow((state) => state.publicOrganizations?.pagination?.insuranceCompanies)
   );
   const { handleChangePage, isLoadingPublicOrganizations } = usePublicOrganizations({});
+  const { data: allInsuranceCompaniesResponse } = useQuery<Query>(
+    PUBLIC_INSURANCE_COMPANIES_QUERY,
+    {
+      variables: { pagination: { offset: 0, limit: 200 } },
+      skip: !showGroupedBySubtype,
+      fetchPolicy: "no-cache",
+    }
+  );
 
   const subtypeByOrgType: Record<string, InsuranceCompanySubtype | null> = {
     [USER_TYPES.INSURANCE_COMPANY]: InsuranceCompanySubtype.Standard,
@@ -65,20 +81,20 @@ const InsuranceCompanies = ({
   const sectionTitle =
     (orgType && titleByOrgType[orgType as string]) || "Compañías de seguros";
 
-  // Vista agrupada solo sin filtro de tipo; al elegir "Compañías de seguros" se muestra
-  // una sola sección con paginación (no cooperativas / medicina prepagada / insurtech).
-  const showGroupedBySubtype = !orgType;
+  const insuranceCompaniesForGroupedSections = showGroupedBySubtype
+    ? allInsuranceCompaniesResponse?.publicInsuranceCompanies?.items || []
+    : insuranceCompanies;
 
-  const standardCompanies = insuranceCompanies.filter(
+  const standardCompanies = insuranceCompaniesForGroupedSections.filter(
     (company) => company.subtype === InsuranceCompanySubtype.Standard
   );
-  const cooperativeCompanies = insuranceCompanies.filter(
+  const cooperativeCompanies = insuranceCompaniesForGroupedSections.filter(
     (company) => company.subtype === InsuranceCompanySubtype.Cooperatives
   );
-  const prepaidMedicineCompanies = insuranceCompanies.filter(
+  const prepaidMedicineCompanies = insuranceCompaniesForGroupedSections.filter(
     (company) => company.subtype === InsuranceCompanySubtype.PrepaidMedicine
   );
-  const insurtechCompanies = insuranceCompanies.filter(
+  const insurtechCompanies = insuranceCompaniesForGroupedSections.filter(
     (company) => company.subtype === InsuranceCompanySubtype.Insurtech
   );
 

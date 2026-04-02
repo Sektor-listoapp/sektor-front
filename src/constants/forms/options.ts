@@ -88,7 +88,7 @@ export const SELECT_LINE_OF_BUSINESS_OPTIONS = [
   { label: "Viaje", value: TRAVEL },
   { label: "Automóvil", value: AUTO },
   { label: "Aviación", value: AVIATION },
-  { label: "Finanzas", value: FINANCIAL },
+  { label: "Fianzas", value: FINANCIAL },
   { label: "Patrimoniales", value: PROPERTY },
 ];
 

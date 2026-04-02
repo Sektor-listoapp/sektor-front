@@ -50,6 +50,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
   const [uploadingFilesCount, setUploadingFilesCount] = useState(0);
   const totalFilesToUploadRef = useRef(0);
   const filesStartedUploadingRef = useRef(0);
+  const uploadQueueRef = useRef<Promise<void>>(Promise.resolve());
 
 
   const moduleId = subfolderId || folderId;
@@ -152,6 +153,25 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
       toast.error(error?.message || "No se pudo subir el archivo");
       throw error;
     }
+  };
+
+  const enqueueFileUpload = (
+    fileObj: File,
+    onSuccess?: (body: string) => void,
+    onError?: (error: Error) => void
+  ) => {
+    uploadQueueRef.current = uploadQueueRef.current
+      .then(async () => {
+        try {
+          await handleFileUpload(fileObj);
+          onSuccess?.("ok");
+        } catch (error) {
+          onError?.(error as Error);
+        }
+      })
+      .catch(() => {
+        // Evita romper la cola si un archivo falla.
+      });
   };
 
   const handleDeleteFileClick = (fileId: string) => {
@@ -497,12 +517,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
             }}
             customRequest={({ file, onSuccess, onError }) => {
               const fileObj = file as File;
-
-              handleFileUpload(fileObj)
-                .then(() => {
-                  onSuccess?.("ok");
-                })
-                .catch((error) => onError?.(error));
+              enqueueFileUpload(fileObj, (body) => onSuccess?.(body), (error) => onError?.(error));
             }}
           >
             <Button
@@ -713,12 +728,7 @@ const FolderDetail: React.FC<FolderDetailProps> = ({
           }}
           customRequest={({ file, onSuccess, onError }) => {
             const fileObj = file as File;
-
-            handleFileUpload(fileObj)
-              .then(() => {
-                onSuccess?.("ok");
-              })
-              .catch((error) => onError?.(error));
+            enqueueFileUpload(fileObj, (body) => onSuccess?.(body), (error) => onError?.(error));
           }}
         >
           <Button

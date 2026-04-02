@@ -23,6 +23,7 @@ const ExclusiveAgentCard = ({
   const yearsOfExperience = Boolean(foundationYear)
     ? getFormattedYearsOfExperience(foundationYear as number)
     : null;
+  const credential = data?.license || "";
 
   const organizationLogoUrl = data?.allies?.[0]?.logoUrl;
 
@@ -40,13 +41,20 @@ const ExclusiveAgentCard = ({
           {yearsOfExperience}
         </div>
       )}
-      <Image
-        className="w-full min-h-72 h-72 object-cover object-center rounded-t-2x"
-        src={data?.logoUrl || "/images/placeholder.webp"}
-        alt={name}
-        width={500}
-        height={400}
-      />
+      <div className="relative">
+        <Image
+          className="w-full min-h-72 h-72 object-cover object-center rounded-t-2x"
+          src={data?.logoUrl || "/images/placeholder.webp"}
+          alt={name}
+          width={500}
+          height={400}
+        />
+        {Boolean(credential) && (
+          <div className="w-fit rounded-2xl px-4 rounded-s-none absolute bottom-0 left-0 bg-blue-500 text-white text-xs font-bold p-1 rounded-b-2xl">
+            {credential}
+          </div>
+        )}
+      </div>
       <div className="w-full p-2 text-xs rounded-b-2xl border border-blue-500 border-opacity-20 h-full grid grid-cols-6 gap-1 md:text-sm md:gap-2 md:p-4">
         <div className="w-full flex flex-col justify-evenly gap-2 col-span-4">
           <h3 className="w-full truncate md:text-balance" title={name}>

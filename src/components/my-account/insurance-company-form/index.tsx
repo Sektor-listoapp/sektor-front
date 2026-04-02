@@ -61,6 +61,11 @@ interface InsuranceCompanyInputType {
   password: string;
 }
 
+const COOPERATIVE_LICENSE_TYPE_OPTIONS = [
+  { label: "ACS -", value: "ACS-" },
+  { label: "AC -", value: "AC-" },
+];
+
 const isValidSubtypeValue = (
   value: string | InsuranceCompanySubtype | ""
 ): value is InsuranceCompanySubtype => {
@@ -185,6 +190,21 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
 
     const rawSubtype = (company?.subtype as string | undefined) || "";
     const isSubtypeValid = rawSubtype ? isValidSubtypeValue(rawSubtype) : false;
+    const parsedSubtype = isSubtypeValid
+      ? (rawSubtype as InsuranceCompanySubtype)
+      : "";
+    const defaultLicenseType =
+      parsedSubtype === InsuranceCompanySubtype.Cooperatives
+        ? COOPERATIVE_LICENSE_TYPE_OPTIONS[0].value
+        : INSURANCE_COMPANY_LICENSE_TYPE_OPTIONS[0].value;
+    const parsedLicenseType = licenseType ? `${licenseType}-` : defaultLicenseType;
+    const validLicenseTypes = [
+      ...INSURANCE_COMPANY_LICENSE_TYPE_OPTIONS.map((option) => option.value),
+      ...COOPERATIVE_LICENSE_TYPE_OPTIONS.map((option) => option.value),
+    ];
+    const normalizedLicenseType = validLicenseTypes.includes(parsedLicenseType)
+      ? parsedLicenseType
+      : defaultLicenseType;
 
     if (rawSubtype && !isSubtypeValid) {
       setSubtypeError(
@@ -205,12 +225,10 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     setInput({
       name: company?.name || "",
       email: organizationResponse?.organizationById?.email || "",
-      subtype: isSubtypeValid ? (rawSubtype as InsuranceCompanySubtype) : "",
+      subtype: parsedSubtype,
       suppliers: supplierIds || [],
       license: license || "",
-      licenseType: licenseType
-        ? `${'ES-'}`
-        : INSURANCE_COMPANY_LICENSE_TYPE_OPTIONS[0].value,
+      licenseType: normalizedLicenseType,
       segment: (company?.lineOfBusiness || []) as never[],
       identification: identification || "",
       identificationType:
@@ -294,15 +312,33 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     value: string | string[] | React.ChangeEvent<HTMLSelectElement>
   ) => {
     if (field in input) {
+      if (field === "subtype") {
+        const nextSubtype = value as InsuranceCompanySubtype | "";
+        const isCooperative = nextSubtype === InsuranceCompanySubtype.Cooperatives;
+        const nextLicenseOptions = isCooperative
+          ? COOPERATIVE_LICENSE_TYPE_OPTIONS
+          : INSURANCE_COMPANY_LICENSE_TYPE_OPTIONS;
+        const currentLicenseType = input.licenseType;
+        const currentIsValid = nextLicenseOptions.some(
+          (option) => option.value === currentLicenseType
+        );
+
+        setInput((prev) => ({
+          ...prev,
+          [field]: nextSubtype || "",
+          licenseType: currentIsValid
+            ? prev.licenseType
+            : nextLicenseOptions[0].value,
+        }));
+        setSubtypeError(null);
+        return;
+      }
+
       setInput((prev) => ({
         ...prev,
         [field]: value || "",
       }));
 
-      if (field === "subtype") {
-        // Siempre que el usuario cambie el tipo, limpiamos el error personalizado
-        setSubtypeError(null);
-      }
     }
   };
 
@@ -518,6 +554,10 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
     { label: "Medicina prepagada", value: InsuranceCompanySubtype.PrepaidMedicine },
     { label: "Insurtech", value: InsuranceCompanySubtype.Insurtech },
   ];
+  const currentLicenseTypeOptions =
+    input.subtype === InsuranceCompanySubtype.Cooperatives
+      ? COOPERATIVE_LICENSE_TYPE_OPTIONS
+      : INSURANCE_COMPANY_LICENSE_TYPE_OPTIONS;
 
   return (
     <form
@@ -647,7 +687,7 @@ const InsuranceCompanyForm = ({ userId }: InsuranceCompanyIdProps) => {
             value: input?.licenseType,
             wrapperClassName: "w-56",
             className: "border-r-0",
-            options: INSURANCE_COMPANY_LICENSE_TYPE_OPTIONS,
+            options: currentLicenseTypeOptions,
             disabled: loadingCompany || isUpdatingCompany,
             onChange: (e) => handleInputChange("licenseType", e?.target?.value),
           }}
