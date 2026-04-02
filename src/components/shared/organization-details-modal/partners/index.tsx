@@ -26,8 +26,14 @@ const OrganizationPartners = ({
   return (
     <section className={cn("flex flex-col gap-6 mt-5", className)} {...props}>
       {partners.map(({ id, name = "", type = "", ...props }: any, index) => {
-        const organizationQuery = `${type || ""}-${id || ""}`;
-        const hasOrganizationQuery = Boolean(type) && Boolean(id);
+        const nestedOrganization =
+          "organization" in props && props.organization
+            ? props.organization
+            : null;
+        const targetType = type || nestedOrganization?.type || "";
+        const targetId = id || nestedOrganization?.id || "";
+        const organizationQuery = `${targetType}-${targetId}`;
+        const hasOrganizationQuery = Boolean(targetType) && Boolean(targetId);
 
         return (
           <article

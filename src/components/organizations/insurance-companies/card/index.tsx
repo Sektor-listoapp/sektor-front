@@ -24,6 +24,7 @@ const InsuranceCompanyCard = ({
   const yearsOfExperience = Boolean(foundationYear)
     ? getFormattedYearsOfExperience(foundationYear as number)
     : null;
+  const credential = data?.license || "";
 
   return (
     <article
@@ -39,13 +40,20 @@ const InsuranceCompanyCard = ({
           {yearsOfExperience}
         </div>
       )}
-      <Image
-        className="w-full min-h-72 h-72 object-cover object-center 2xl:h-72 rounded-t-2xl"
-        src={data?.logoUrl || "/images/placeholder.webp"}
-        alt={name}
-        width={500}
-        height={400}
-      />
+      <div className="relative">
+        <Image
+          className="w-full min-h-72 h-72 object-cover object-center 2xl:h-72 rounded-t-2xl"
+          src={data?.logoUrl || "/images/placeholder.webp"}
+          alt={name}
+          width={500}
+          height={400}
+        />
+        {Boolean(credential) && (
+          <div className="w-fit rounded-2xl px-4 rounded-s-none absolute bottom-0 left-0 bg-blue-500 text-white text-xs font-bold p-1 rounded-b-2xl">
+            {credential}
+          </div>
+        )}
+      </div>
       <div className="w-full shadow-lg p-2 text-xs rounded-b-2xl border border-blue-500 border-opacity-20 h-full flex flex-col justify-between gap-1 md:text-sm md:gap-2 md:p-4 2xl:text-base">
         <h3 className="w-full">{name}</h3>
         <div className="w-full flex justify-between items-center">
