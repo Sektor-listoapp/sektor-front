@@ -4,11 +4,12 @@ import SelectMultiple from "@/components/ui/select-multiple";
 import TextInput from "@/components/ui/text-input";
 import {
   Mutation,
+  InsuranceCompanyType,
   OrganizationOfficeInputType,
   Query,
   SocialMediaLinkType,
 } from "@/lib/sektor-api/__generated__/types";
-import { useMutation, useQuery } from "@apollo/client";
+import { useApolloClient, useMutation, useQuery } from "@apollo/client";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
 import { useShallow } from "zustand/shallow";
 import { useAuthStore } from "@/store/auth";
@@ -57,11 +58,66 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
   const [adminUpdateUserEmailMutation] = useMutation<Mutation>(ADMIN_UPDATE_USER_EMAIL);
 
   const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
+  const apolloClient = useApolloClient();
+  const [insuranceCompanies, setInsuranceCompanies] = useState<InsuranceCompanyType[]>([]);
+  const [loadingInsuranceCompanies, setLoadingInsuranceCompanies] = useState(false);
 
-  const {
-    data: insuranceCompaniesResponse,
-    loading: loadingInsuranceCompanies,
-  } = useQuery<Query>(PUBLIC_INSURANCE_COMPANIES_QUERY);
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchAllInsuranceCompanies = async () => {
+      setLoadingInsuranceCompanies(true);
+
+      try {
+        const pageSize = 200;
+        let offset = 0;
+        let total = Infinity;
+        const companiesMap = new Map<string, InsuranceCompanyType>();
+
+        while (offset < total) {
+          const { data } = await apolloClient.query<Query>({
+            query: PUBLIC_INSURANCE_COMPANIES_QUERY,
+            variables: {
+              pagination: { offset, limit: pageSize },
+            },
+            fetchPolicy: "network-only",
+          });
+
+          const response = data?.publicInsuranceCompanies;
+          const items = response?.items || [];
+          total = response?.count ?? total;
+
+          items.forEach((company) => {
+            if (company?.id) {
+              companiesMap.set(company.id, company as InsuranceCompanyType);
+            }
+          });
+
+          if (items.length < pageSize) break;
+          offset += pageSize;
+        }
+
+        if (isMounted) {
+          setInsuranceCompanies(Array.from(companiesMap.values()));
+        }
+      } catch (error) {
+        console.error("Error fetching all insurance companies:", error);
+        if (isMounted) {
+          setInsuranceCompanies([]);
+        }
+      } finally {
+        if (isMounted) {
+          setLoadingInsuranceCompanies(false);
+        }
+      }
+    };
+
+    fetchAllInsuranceCompanies();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [apolloClient]);
 
   const {
     error: supplierError,
@@ -84,25 +140,6 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     skip: !targetUserId,
   });
   const originalEmail = organizationResponse?.organizationById?.email || "";
-
-
-  const insuranceCompanies =
-    insuranceCompaniesResponse?.publicInsuranceCompanies?.items || [];
-
-  const formattedOffices = supplier?.offices?.map((office: any) => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { __typename: _, address, ...restOfficeProps } = office;
-    return {
-      ...restOfficeProps,
-      address: {
-        cityId: address?.cityId || address?.city?.id,
-        countryId: address?.countryId || address?.country?.id,
-        stateId: address?.stateId || address?.state?.id,
-        street: address?.street,
-      },
-    };
-  });
-
 
 
   const [input, setInput] = useState({
@@ -137,6 +174,19 @@ const SupplierForm = ({ userId }: supplierIdProps) => {
     const insuranceCompaniesIds = (supplier?.insuranceCompanies?.map(
       ({ id }) => id
     ) || []) as never[];
+    const formattedOffices = supplier?.offices?.map((office: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { __typename: _, address, ...restOfficeProps } = office;
+      return {
+        ...restOfficeProps,
+        address: {
+          cityId: address?.cityId || address?.city?.id,
+          countryId: address?.countryId || address?.country?.id,
+          stateId: address?.stateId || address?.state?.id,
+          street: address?.street,
+        },
+      };
+    });
 
     const formattedInsuranceCompanyRelations = supplier?.insuranceCompanyRelations?.map(relation => ({
       insuranceCompanyId: relation.insuranceCompanyId,
