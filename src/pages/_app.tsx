@@ -19,6 +19,7 @@ import weekday from "dayjs/plugin/weekday";
 import weekOfYear from "dayjs/plugin/weekOfYear";
 import weekYear from "dayjs/plugin/weekYear";
 import { IStaticMethods } from "preline/preline";
+import GoogleAnalytics from "@/components/shared/google-analytics";
 
 dayjs.locale("es");
 dayjs.extend(customParseFormat);
@@ -38,6 +39,7 @@ declare global {
 export default function App({ Component, pageProps, router }: AppProps) {
   return (
     <ApolloProvider client={sektorApiClient}>
+      <GoogleAnalytics />
       <ConfigProvider
         locale={es}
         theme={{
