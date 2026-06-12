@@ -82,8 +82,8 @@ const Searchbar = ({
           Ver listado de clínicas y seguros disponibles
         </Button>
       </Link>
-      <div className="w-full flex justify-center md:justify-start md:w-auto">
-        <div className="grid grid-cols-4 gap-2">
+      <div className="w-full flex justify-center md:justify-start md:w-auto overflow-x-auto md:overflow-visible">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-2 w-full max-w-full min-w-0 md:w-auto">
           {ORGANIZATION_TYPE_OPTIONS.map((option) => (
             <OrganizationTypeButton
               data={option}

@@ -9,7 +9,7 @@ import QuickFilterOptions from "@/components/home/quick-filter-options";
 
 const Home = () => {
   return (
-    <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start overflow-hidden">
+    <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start overflow-x-hidden">
       <HeroBanner />
       <main className="text-blue-500 w-full max-w-screen-xl flex flex-col items-center justify-center py-10 px-7 2xl:px-0">
         <QuickFilterOptions/>

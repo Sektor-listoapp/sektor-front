@@ -62,7 +62,7 @@ const OrganizationTypeButton = ({
           <FontAwesomeIcon icon={icon} size="2x" />
         )}
       </button>
-      <span className="block mt-1 font-century-gothic text-[8px] text-center text-balance sm:text-sm md:hidden">
+      <span className="block mt-1 font-century-gothic text-[10px] leading-tight text-center text-balance px-0.5 sm:text-sm md:hidden">
         {name}
       </span>
     </Popover>

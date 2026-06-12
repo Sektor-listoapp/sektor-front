@@ -212,7 +212,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                 onClick={() => setIsMobileToolsOpen(!isMobileToolsOpen)}
                 className={cn(
                   "w-full flex items-center justify-between hover:text-blue-400 focus:outline-none text-blue-500 text-lg",
-                  
+
                 )}
               >
                 Herramientas
@@ -273,7 +273,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
         >
           {renderDrawerContent()}
         </Drawer>
-        
+
         {/* Mobile/Tablet version */}
         <div className="flex items-center justify-between lg:hidden">
           <div />
@@ -480,7 +480,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                   onClick={() => setIsMobileToolsOpen(!isMobileToolsOpen)}
                   className={cn(
                     "w-full flex items-center justify-between hover:text-blue-400 focus:outline-none text-blue-500 text-lg",
-                  
+
                   )}
                 >
                   Herramientas
@@ -644,7 +644,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                   variant === "light"
                     ? "hover:text-blue-400"
                     : "hover:text-gray-200",
-               
+
                 )}
               >
                 Herramientas
