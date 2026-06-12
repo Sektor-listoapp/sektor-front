@@ -42,7 +42,14 @@ const Footer = ({ className, ...props }: React.HTMLProps<HTMLDivElement>) => {
               </Link>
             </div>
             <div className="flex justify-center items-center gap-4">
-              <InstagramIcon width={40} height={40} />
+              <a
+                href="https://www.instagram.com/sektor.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram de Sektor"
+              >
+                <InstagramIcon width={40} height={40} />
+              </a>
               <FacebookIcon width={35} height={35} />
               <TwitterIcon width={24} height={24} />
             </div>
