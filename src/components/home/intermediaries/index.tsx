@@ -2,18 +2,72 @@ import IphoneDesktop from "@/components/icons/iphone-desktop";
 import IphoneMobile from "@/components/icons/iphone-mobile";
 import Button from "@/components/ui/button";
 import { ROUTES } from "@/constants/router";
+import { HOME_INTERMEDIARIES_STATS_QUERY } from "@/lib/sektor-api/queries";
+import { Query } from "@/lib/sektor-api/__generated__/types";
 import { cn } from "@/utils/class-name";
+import { useQuery } from "@apollo/client";
 import { Carousel } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useMemo } from "react";
 import { INTERMEDIARIES_LIST } from "./constants";
+import {
+  calculateSatisfactionPercentage,
+  formatCompactNumber,
+  formatPlusNumber,
+  formatSatisfactionPercentage,
+} from "./helpers";
+
+type StatCardProps = {
+  value: string;
+  label: string;
+  className?: string;
+};
+
+const StatCard = ({ value, label, className }: StatCardProps) => (
+  <div
+    className={cn(
+      "w-full bg-blue-200 text-blue-500 text-center flex flex-col justify-center items-center gap-1 min-h-32 rounded-3xl",
+      className
+    )}
+  >
+    <b className="text-4xl">{value}</b>
+    <span className="font-century-gothic text-sm">{label}</span>
+  </div>
+);
 
 const Intermediaries = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const { push } = useRouter();
+  const { data, loading } = useQuery<Query>(HOME_INTERMEDIARIES_STATS_QUERY, {
+    fetchPolicy: "cache-first",
+  });
+
+  const stats = useMemo(() => {
+    const brokersCount = data?.publicInsuranceBrokers?.count ?? 0;
+    const exclusiveAgentsCount = data?.publicExclusiveAgents?.count ?? 0;
+    const brokerageSocietiesCount = data?.publicBrokerageSocieties?.count ?? 0;
+    const quotesCount = data?.quotes?.count ?? 0;
+    const satisfaction = calculateSatisfactionPercentage(
+      data?.ratedQuotes?.items?.map((quote) => quote?.rating) ?? []
+    );
+
+    return {
+      brokersCount: brokersCount + exclusiveAgentsCount + brokerageSocietiesCount,
+      quotesCount,
+      satisfaction,
+    };
+  }, [data]);
+
+  const brokersValue = loading ? "..." : formatCompactNumber(stats.brokersCount);
+  const quotesValue = loading ? "..." : formatPlusNumber(stats.quotesCount);
+  const satisfactionValue = loading
+    ? "..."
+    : stats.satisfaction === null
+      ? "—"
+      : formatSatisfactionPercentage(stats.satisfaction);
 
   return (
     <section
@@ -44,24 +98,13 @@ const Intermediaries = ({
         </header>
 
         <div className="grid grid-cols-2 gap-x-4 gap-y-6">
-          <div className="w-full bg-blue-200 text-blue-500 text-center flex flex-col justify-center items-center gap-1 min-h-32 rounded-3xl">
-            <b className="text-4xl">1k</b>
-            <span className="font-century-gothic text-sm">
-              corredores a elegir
-            </span>
-          </div>
-          <div className="w-full bg-blue-200 text-blue-500 text-center flex flex-col justify-center items-center gap-1 min-h-32 rounded-3xl">
-            <b className="text-4xl">+100</b>
-            <span className="font-century-gothic text-sm">
-              cotizaciones realizadas
-            </span>
-          </div>
-          <div className="w-full bg-blue-200 text-blue-500 text-center flex flex-col justify-center items-center gap-1 h-32 rounded-3xl">
-            <b className="text-4xl">+90%</b>
-            <span className="font-century-gothic text-sm">
-              satifacción de nuestro clientes
-            </span>
-          </div>
+          <StatCard value={brokersValue} label="corredores a elegir" />
+          <StatCard value={quotesValue} label="cotizaciones realizadas" />
+          <StatCard
+            value={satisfactionValue}
+            label="satifacción de nuestro clientes"
+            className="h-32 min-h-0"
+          />
           <div className="relative">
             <div className="absolute left-0 top-0 h-16 w-16 sm:h-28 sm:w-28 z-10 rounded-3xl">
               <Carousel
@@ -121,24 +164,13 @@ const Intermediaries = ({
           </header>
 
           <div className="flex justify-around items-center gap-4">
-            <div className="w-full bg-blue-200 text-blue-500 text-center flex flex-col justify-center items-center gap-1 min-h-32 rounded-3xl">
-              <b className="text-4xl">1k</b>
-              <span className="font-century-gothic text-sm">
-                potenciales corredores
-              </span>
-            </div>
-            <div className="w-full bg-blue-200 text-blue-500 text-center flex flex-col justify-center items-center gap-1 min-h-32 rounded-3xl">
-              <b className="text-4xl">+100</b>
-              <span className="font-century-gothic text-sm">
-                cotizaciones realizadas
-              </span>
-            </div>
-            <div className="w-full bg-blue-200 text-blue-500 text-center flex flex-col justify-center items-center gap-1 h-32 rounded-3xl">
-              <b className="text-4xl">+90%</b>
-              <span className="font-century-gothic text-sm">
-                satifacción de nuestro clientes
-              </span>
-            </div>
+            <StatCard value={brokersValue} label="potenciales corredores" />
+            <StatCard value={quotesValue} label="cotizaciones realizadas" />
+            <StatCard
+              value={satisfactionValue}
+              label="satifacción de nuestro clientes"
+              className="h-32 min-h-0"
+            />
           </div>
           <Button
             className="mt-6"

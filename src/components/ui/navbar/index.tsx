@@ -12,6 +12,7 @@ import { ROUTES } from "@/constants/router";
 import { useShallow } from "zustand/shallow";
 import { OrganizationTypes, UserGroups } from "@/lib/sektor-api/__generated__/types";
 import { useOrganizationData } from "@/hooks/use-organization-data";
+import AppDownloadDropdown from "@/components/shared/app-download-dropdown";
 
 
 interface NavbarProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -78,6 +79,11 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
     : [
       { label: "Noticias", href: ROUTES.ADMIN_NEWS },
     ];
+
+  const appDownloadLinks = [
+    { label: "Android", href: "https://play.google.com/store/apps/details?id=com.sektor.sektor_app" },
+    { label: "iOS", href: "https://apps.apple.com/us/app/sektor/id6751517136" },
+  ];
 
 
   const { BrokerageSociety, InsuranceBroker, ExclusiveAgent } = OrganizationTypes;
@@ -173,6 +179,22 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
           >
             Noticias
           </Link>
+          <div className="border-b border-b-gray-300 pb-2">
+            <span className="text-blue-500 text-lg">Descarga la app mobile</span>
+            <div className="mt-2 pl-4 flex flex-col gap-2">
+              {appDownloadLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-500 hover:text-blue-400 text-base py-1"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          </div>
           {isAdmin && (
             <Link
               className={cn(
@@ -190,7 +212,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                 onClick={() => setIsMobileToolsOpen(!isMobileToolsOpen)}
                 className={cn(
                   "w-full flex items-center justify-between hover:text-blue-400 focus:outline-none text-blue-500 text-lg",
-                  
+
                 )}
               >
                 Herramientas
@@ -251,7 +273,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
         >
           {renderDrawerContent()}
         </Drawer>
-        
+
         {/* Mobile/Tablet version */}
         <div className="flex items-center justify-between lg:hidden">
           <div />
@@ -327,22 +349,21 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
             >
               Seguros
             </Link>
-            {isAuthenticated && (
-              <Link
-                className={cn(
-                  "focus:outline-none",
-                  variant === "light"
-                    ? "hover:text-blue-400"
-                    : "hover:text-gray-200",
-                  {
-                    "font-bold": pathname.startsWith(ROUTES.NOTICIAS),
-                  }
-                )}
-                href={ROUTES.NOTICIAS}
-              >
-                Noticias
-              </Link>
-            )}
+            <Link
+              className={cn(
+                "focus:outline-none",
+                variant === "light"
+                  ? "hover:text-blue-400"
+                  : "hover:text-gray-200",
+                {
+                  "font-bold": pathname.startsWith(ROUTES.NOTICIAS),
+                }
+              )}
+              href={ROUTES.NOTICIAS}
+            >
+              Noticias
+            </Link>
+            <AppDownloadDropdown variant={variant} />
           </div>
 
 
@@ -426,6 +447,22 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
             >
               Noticias
             </Link>
+            <div className="border-b border-b-gray-300 pb-2">
+              <span className="text-blue-500 text-lg">Descarga la app mobile</span>
+              <div className="mt-2 pl-4 flex flex-col gap-2">
+                {appDownloadLinks.map((link) => (
+                  <a
+                    key={link.label}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-500 hover:text-blue-400 text-base py-1"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            </div>
             {isAdmin && (
               <Link
                 className={cn(
@@ -443,7 +480,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                   onClick={() => setIsMobileToolsOpen(!isMobileToolsOpen)}
                   className={cn(
                     "w-full flex items-center justify-between hover:text-blue-400 focus:outline-none text-blue-500 text-lg",
-                  
+
                   )}
                 >
                   Herramientas
@@ -565,22 +602,21 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
           >
             Seguros
           </Link>
-          {isAuthenticated && (
-            <Link
-              className={cn(
-                "focus:outline-none",
-                variant === "light"
-                  ? "hover:text-blue-400"
-                  : "hover:text-gray-200",
-                {
-                  "font-bold": pathname.startsWith(ROUTES.NOTICIAS),
-                }
-              )}
-              href={ROUTES.NOTICIAS}
-            >
-              Noticias
-            </Link>
-          )}
+          <Link
+            className={cn(
+              "focus:outline-none",
+              variant === "light"
+                ? "hover:text-blue-400"
+                : "hover:text-gray-200",
+              {
+                "font-bold": pathname.startsWith(ROUTES.NOTICIAS),
+              }
+            )}
+            href={ROUTES.NOTICIAS}
+          >
+            Noticias
+          </Link>
+          <AppDownloadDropdown variant={variant} />
           {isAdmin && (
             <>
               <Link
@@ -608,7 +644,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
                   variant === "light"
                     ? "hover:text-blue-400"
                     : "hover:text-gray-200",
-               
+
                 )}
               >
                 Herramientas

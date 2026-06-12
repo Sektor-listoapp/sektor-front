@@ -1,7 +1,5 @@
-import FacebookIcon from "@/components/icons/facebook";
 import InstagramIcon from "@/components/icons/instagram";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
-import TwitterIcon from "@/components/icons/twitter";
 import { cn } from "@/utils/class-name";
 import Image from "next/image";
 import Link from "next/link";
@@ -42,9 +40,14 @@ const Footer = ({ className, ...props }: React.HTMLProps<HTMLDivElement>) => {
               </Link>
             </div>
             <div className="flex justify-center items-center gap-4">
-              <InstagramIcon width={40} height={40} />
-              <FacebookIcon width={35} height={35} />
-              <TwitterIcon width={24} height={24} />
+              <a
+                href="https://www.instagram.com/sektor.app/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram de Sektor"
+              >
+                <InstagramIcon width={40} height={40} />
+              </a>
             </div>
           </div>
         </div>

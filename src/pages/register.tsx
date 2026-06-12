@@ -14,10 +14,13 @@ import { useRouter } from "next/router";
 import { ROUTES } from "@/constants/router";
 
 const Register = () => {
-  const { replace } = useRouter();
+  const { replace, query, isReady } = useRouter();
   const [isSubmittingForm, setIsSubmittingForm] = React.useState(false);
   const userType = useRegistrationStore((state) => state.userType);
   const setUserType = useRegistrationStore((state) => state.setUserType);
+  const setInsuranceCompanySubtype = useRegistrationStore(
+    (state) => state.setInsuranceCompanySubtype
+  );
   const currentStep = useRegistrationStore(
     useShallow((state) => state.currentStep)
   );
@@ -28,19 +31,35 @@ const Register = () => {
     (state) => state.resetRegistrationStore
   );
 
+  React.useEffect(() => {
+    if (!isReady) return;
+
+    const registrationType = query.type as string | undefined;
+
+    if (registrationType === USER_TYPES.CUSTOMER) {
+      setUserType(USER_TYPES.CUSTOMER);
+      setInsuranceCompanySubtype(null);
+      setCurrentRegistrationStep(REGISTER_STEPS.CustomerForm);
+      return;
+    }
+
+    resetRegistrationStore();
+  }, [
+    isReady,
+    query.type,
+    resetRegistrationStore,
+    setCurrentRegistrationStep,
+    setInsuranceCompanySubtype,
+    setUserType,
+  ]);
+
   const isFormStep = currentStep.isForm;
   const formRef = React.useRef<HTMLFormElement>(null);
   const RegisterStep = REGISTER_COMPONENTS_MAP[currentStep.component];
-  const isIntermediary = userType === USER_TYPES.INTERMEDIARY;
   const isFinalStep = Boolean(currentStep?.isFinalStep);
-  const isCompanySegmentsStep =
-    currentStep.component === REGISTER_STEPS.CompanySegments.component;
   const isSentVerificationEmailStep =
     currentStep.component === REGISTER_STEPS.SentEmailVerification.component;
-  const disableNextStepButton =
-    !userType ||
-    (isIntermediary && isCompanySegmentsStep) ||
-    isSentVerificationEmailStep;
+  const disableNextStepButton = !userType || isSentVerificationEmailStep;
 
   const goToHome = () => {
     replace(ROUTES.HOME);
@@ -77,6 +96,7 @@ const Register = () => {
 
     setCurrentRegistrationStep(REGISTER_STEPS[prevStep]);
     setUserType(null);
+    setInsuranceCompanySubtype(null);
   };
 
   return (

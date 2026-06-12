@@ -22,6 +22,7 @@ import { useRouter } from "next/router";
 import Image from "next/image";
 import { ROUTES } from "@/constants/router";
 import ContactDetailsModal from "../contact-details-modal";
+import { navigateToQuote } from "@/utils/quotes/navigate-to-quote";
 
 const ExclusiveAgentDetails = () => {
   const router = useRouter();
@@ -164,7 +165,9 @@ const ExclusiveAgentDetails = () => {
           <Button
             variant="solid-blue"
             className="w-full max-w-xs"
-            onClick={() => router.push(`${ROUTES.QUOTES}/${detailsQuery}`)}
+            onClick={() =>
+              navigateToQuote(router, `${ROUTES.QUOTES}/${detailsQuery}`)
+            }
           >
             Solicitar Cotización
           </Button>
