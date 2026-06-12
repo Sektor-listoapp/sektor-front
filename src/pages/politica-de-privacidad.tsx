@@ -15,7 +15,7 @@ const PoliticaDePrivacidad = () => {
                     </h1>
 
                     <p className="font-century-gothic text-base text-center mb-8">
-                        Última actualización: 18 de enero de 2026
+                        Última actualización: 21 de mayo de 2026
                     </p>
 
                     <div className="space-y-6 font-century-gothic text-base leading-relaxed">
@@ -52,6 +52,16 @@ const PoliticaDePrivacidad = () => {
                             </p>
                             <p className="mt-3">
                                 Apple gestiona estos datos de acuerdo con su propia política de privacidad.
+                            </p>
+                        </section>
+
+                        <section>
+                            <h2 className="text-xl font-semibold mb-3">Facturación digital</h2>
+                            <p>
+                                Sektor APP cumple cabalmente con todos los requisitos y obligaciones establecidos por la legislación de la República Bolivariana de Venezuela en materia comercial y tributaria. La emisión, validación y envío de la facturación digital se realiza de forma automatizada a través de empresas proveedoras de sistemas de facturación debidamente autorizadas y registradas por el Servicio Integrado de Administración Aduanera y Tributaria (SENIAT).
+                            </p>
+                            <p className="mt-3">
+                                El sistema tecnológico de Sektor APP opera bajo las condiciones de Homologación exigidas por el ente regulador tributario, garantizando el estricto cumplimiento de la normativa de venta digital nacional. Al efectuar cualquier pago, compra o suscripción dentro de la aplicación, el usuario acepta y reconoce que su soporte fiscal será emitido y transmitido exclusivamente de manera electrónica a su dirección de correo registrado, contando con plena validez legal y fiscal en todo el territorio nacional.
                             </p>
                         </section>
 
