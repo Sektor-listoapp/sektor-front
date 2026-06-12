@@ -13,6 +13,7 @@ export * from "./public/get-organization-template";
 export * from "./public/clinics";
 export * from "./public/states";
 export * from "./public/insurance-companies";
+export * from "./public/home-stats";
 export * from "./herramientas/all-modules";
 export * from "./herramientas/module-by-id";
 export * from "./herramientas/modules";
