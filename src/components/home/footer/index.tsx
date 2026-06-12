@@ -1,7 +1,5 @@
-import FacebookIcon from "@/components/icons/facebook";
 import InstagramIcon from "@/components/icons/instagram";
 import SektorFullVerticalLogo from "@/components/icons/sektor-full-vertical-logo";
-import TwitterIcon from "@/components/icons/twitter";
 import { cn } from "@/utils/class-name";
 import Image from "next/image";
 import Link from "next/link";
@@ -50,8 +48,6 @@ const Footer = ({ className, ...props }: React.HTMLProps<HTMLDivElement>) => {
               >
                 <InstagramIcon width={40} height={40} />
               </a>
-              <FacebookIcon width={35} height={35} />
-              <TwitterIcon width={24} height={24} />
             </div>
           </div>
         </div>
