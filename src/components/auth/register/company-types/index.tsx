@@ -1,4 +1,5 @@
 import { REGISTRATION_COMPANY_OPTIONS } from "@/constants/register/company-options";
+import { InsuranceCompanySubtype } from "@/lib/sektor-api/__generated__/types";
 import { useRegistrationStore } from "@/store/registration";
 import Image from "next/image";
 import { cn } from "@/utils/class-name";
@@ -12,7 +13,7 @@ const CompanyTypes = () => {
 
   const handleSelect = (
     selectedUserType: (typeof REGISTRATION_COMPANY_OPTIONS)[number]["userType"],
-    insuranceCompanySubtype?: (typeof REGISTRATION_COMPANY_OPTIONS)[number]["insuranceCompanySubtype"]
+    insuranceCompanySubtype?: InsuranceCompanySubtype
   ) => {
     const isSameSelection = userType === selectedUserType;
 

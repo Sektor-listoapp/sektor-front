@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import Button from "@/components/ui/button";
 import Select from "@/components/ui/select";
 import TextInput from "@/components/ui/text-input";
-import { ORGANIZATION_TYPE_SELECT_OPTIONS } from "@/constants/forms";
+import { ADMIN_USER_TYPE_SELECT_OPTIONS } from "@/constants/forms";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { pickBy } from "lodash";
 import ImportCompaniesModal from "../import-modal";
@@ -113,7 +113,7 @@ const CompaniesHeader = ({
           options={[
             { label: "Buscar por", value: "", disabled: true, hidden: true },
             { label: "Todos", value: "" },
-            ...ORGANIZATION_TYPE_SELECT_OPTIONS,
+            ...ADMIN_USER_TYPE_SELECT_OPTIONS,
           ]}
           value={input.type}
           disabled={disabled}

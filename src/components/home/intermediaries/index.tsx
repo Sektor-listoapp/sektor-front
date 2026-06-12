@@ -3,7 +3,6 @@ import IphoneMobile from "@/components/icons/iphone-mobile";
 import Button from "@/components/ui/button";
 import { ROUTES } from "@/constants/router";
 import { HOME_INTERMEDIARIES_STATS_QUERY } from "@/lib/sektor-api/queries";
-import { Query } from "@/lib/sektor-api/__generated__/types";
 import { cn } from "@/utils/class-name";
 import { useQuery } from "@apollo/client";
 import { Carousel } from "antd";
@@ -17,6 +16,14 @@ import {
   formatPlusNumber,
   formatSatisfactionPercentage,
 } from "./helpers";
+
+type HomeIntermediariesStatsData = {
+  publicInsuranceBrokers?: { count?: number };
+  publicExclusiveAgents?: { count?: number };
+  publicBrokerageSocieties?: { count?: number };
+  quotes?: { count?: number };
+  ratedQuotes?: { items?: Array<{ rating?: number | null } | null> };
+};
 
 type StatCardProps = {
   value: string;
@@ -41,9 +48,12 @@ const Intermediaries = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const { push } = useRouter();
-  const { data, loading } = useQuery<Query>(HOME_INTERMEDIARIES_STATS_QUERY, {
-    fetchPolicy: "cache-first",
-  });
+  const { data, loading } = useQuery<HomeIntermediariesStatsData>(
+    HOME_INTERMEDIARIES_STATS_QUERY,
+    {
+      fetchPolicy: "cache-first",
+    }
+  );
 
   const stats = useMemo(() => {
     const brokersCount = data?.publicInsuranceBrokers?.count ?? 0;

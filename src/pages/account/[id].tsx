@@ -3,8 +3,16 @@ import Header from "@/components/my-account/header";
 import Navbar from "@/components/my-account/navbar";
 
 import { ROUTES } from "@/constants/router";
-import { OrganizationType, Query, UserGroups } from "@/lib/sektor-api/__generated__/types";
-import { ORGANIZATION_BY_ID_QUERY } from "@/lib/sektor-api/queries";
+import {
+  CustomerType,
+  OrganizationType,
+  Query,
+  UserGroups,
+} from "@/lib/sektor-api/__generated__/types";
+import {
+  CUSTOMER_BY_ID_QUERY,
+  ORGANIZATION_BY_ID_QUERY,
+} from "@/lib/sektor-api/queries";
 import { useAuthStore } from "@/store/auth";
 import { getUserForm } from "@/utils/form/get-user-form";
 import { useQuery } from "@apollo/client";
@@ -21,25 +29,41 @@ export default function AccountPage() {
   const userId = Array.isArray(id) ? id[0] : id;
   const [checkingAccess, setCheckingAccess] = useState(true);
 
-
-
   const userGroup = useAuthStore(useShallow((state) => state.user?.group));
   const isAdmin = userGroup === Admin;
 
-  const { data: organizationDataResponse, error, loading } = useQuery<Query>(
-    ORGANIZATION_BY_ID_QUERY,
-    {
-      variables: { id: userId },
-      skip: !userId,
-    }
-  );
+  const {
+    data: organizationDataResponse,
+    loading: organizationLoading,
+  } = useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
+    variables: { id: userId },
+    skip: !userId,
+    errorPolicy: "all",
+  });
 
   const organizationData = organizationDataResponse?.organizationById;
+  const shouldLoadCustomer =
+    Boolean(userId) && !organizationLoading && !organizationData;
 
-  const FormComponent = getUserForm(organizationData);
+  const {
+    data: customerDataResponse,
+    loading: customerLoading,
+    error: customerError,
+  } = useQuery<Query>(CUSTOMER_BY_ID_QUERY, {
+    variables: { id: userId },
+    skip: !shouldLoadCustomer,
+  });
 
+  const customerData = customerDataResponse?.customerById;
+  const isCustomer = Boolean(customerData && !organizationData);
+  const accountEntity = (organizationData ?? customerData) as
+    | OrganizationType
+    | CustomerType
+    | undefined;
+  const loading = organizationLoading || (shouldLoadCustomer && customerLoading);
+  const hasError = !loading && !accountEntity && Boolean(customerError);
 
-
+  const FormComponent = getUserForm(accountEntity);
 
   useEffect(() => {
     if (!userGroup) return;
@@ -59,8 +83,12 @@ export default function AccountPage() {
     <div className="min-h-svh bg-white text-white w-full flex flex-col items-center justify-start gap-8  overflow-hidden">
       <Navbar />
 
-      <Header data={organizationData as OrganizationType} accountEdit />
-      {error && !loading ? (
+      <Header
+        data={accountEntity}
+        accountEdit
+        isCustomer={isCustomer}
+      />
+      {hasError ? (
         <section className="w-full flex flex-col items-center justify-center gap-4 font-century-gothic py-20">
           <Empty
             description="No se pudo cargar la información de la cuenta, por favor intenta de nuevo más tarde."
@@ -86,10 +114,14 @@ export default function AccountPage() {
               </p>
             </header>
           )}
-          {FormComponent && <FormComponent data={organizationData} userId={userId} />}
+          {FormComponent &&
+            (isCustomer ? (
+              <FormComponent userId={userId} />
+            ) : (
+              <FormComponent data={accountEntity} userId={userId} />
+            ))}
         </main>
       )}
-
     </div>
   );
 }
