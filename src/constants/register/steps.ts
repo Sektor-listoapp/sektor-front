@@ -8,14 +8,13 @@ const {
   EXCLUSIVE_AGENT,
   BROKERAGE_SOCIETY,
   INSURANCE_COMPANY,
+  INSURANCE_COMPANY_COOPERATIVE,
   SUPPLIER,
-  INTERMEDIARY,
 } = USER_TYPES;
 
 const {
   CUSTOMER_FORM,
   COMPANY_TYPES,
-  COMPANY_SEGMENTS,
   INSURANCE_BROKER_FORM,
   INSURANCE_COMPANY_FORM,
   SUPPLIER_FORM,
@@ -43,15 +42,18 @@ export const REGISTER_STEPS: Record<
     index: 0,
     component: COMPANY_TYPES,
     nextStep: {
-      [INTERMEDIARY]: COMPANY_SEGMENTS,
+      [INSURANCE_BROKER]: INSURANCE_BROKER_FORM,
+      [EXCLUSIVE_AGENT]: EXCLUSIVE_AGENT_FORM,
+      [BROKERAGE_SOCIETY]: BROKERAGE_SOCIETY_FORM,
       [INSURANCE_COMPANY]: INSURANCE_COMPANY_FORM,
+      [INSURANCE_COMPANY_COOPERATIVE]: INSURANCE_COMPANY_FORM,
       [SUPPLIER]: SUPPLIER_FORM,
     },
-    prevStep: { default: REGISTER_COMPONENTS.USER_TYPES },
+    prevStep: {},
   },
   CompanySegments: {
     index: 0,
-    component: COMPANY_SEGMENTS,
+    component: REGISTER_COMPONENTS.COMPANY_SEGMENTS,
     nextStep: {
       [INSURANCE_BROKER]: INSURANCE_BROKER_FORM,
       [BROKERAGE_SOCIETY]: BROKERAGE_SOCIETY_FORM,
@@ -66,7 +68,7 @@ export const REGISTER_STEPS: Record<
     nextStep: {
       [CUSTOMER]: SENT_EMAIL_VERIFICATION,
     },
-    prevStep: { default: REGISTER_COMPONENTS.USER_TYPES },
+    prevStep: {},
   },
   InsuranceBrokerForm: {
     index: 1,
@@ -75,7 +77,7 @@ export const REGISTER_STEPS: Record<
     nextStep: {
       [INSURANCE_BROKER]: SENT_EMAIL_VERIFICATION,
     },
-    prevStep: { default: COMPANY_SEGMENTS },
+    prevStep: { default: COMPANY_TYPES },
   },
   InsuranceCompanyForm: {
     index: 1,
@@ -83,6 +85,7 @@ export const REGISTER_STEPS: Record<
     isForm: true,
     nextStep: {
       [INSURANCE_COMPANY]: DATA_SENT_TO_CONFIRM,
+      [INSURANCE_COMPANY_COOPERATIVE]: DATA_SENT_TO_CONFIRM,
     },
     prevStep: { default: COMPANY_TYPES },
   },
@@ -93,7 +96,7 @@ export const REGISTER_STEPS: Record<
     nextStep: {
       [EXCLUSIVE_AGENT]: SENT_EMAIL_VERIFICATION,
     },
-    prevStep: { default: COMPANY_SEGMENTS },
+    prevStep: { default: COMPANY_TYPES },
   },
   SupplierForm: {
     index: 1,
@@ -107,26 +110,26 @@ export const REGISTER_STEPS: Record<
     component: BROKERAGE_SOCIETY_FORM,
     isForm: true,
     nextStep: { [BROKERAGE_SOCIETY]: SENT_EMAIL_VERIFICATION },
-    prevStep: { default: COMPANY_SEGMENTS },
+    prevStep: { default: COMPANY_TYPES },
   },
   DataSentToConfirm: {
     index: 2,
     isFinalStep: true,
     component: DATA_SENT_TO_CONFIRM,
     nextStep: {},
-    prevStep: { default: REGISTER_COMPONENTS.USER_TYPES },
+    prevStep: { default: COMPANY_TYPES },
   },
   SentEmailVerification: {
     index: 2,
     component: SENT_EMAIL_VERIFICATION,
     nextStep: {},
-    prevStep: { default: REGISTER_COMPONENTS.USER_TYPES },
+    prevStep: { default: CUSTOMER_FORM },
   },
   EmailVerificationSuccess: {
     index: 3,
     isFinalStep: true,
     component: EMAIL_VERIFICATION_SUCCESS,
     nextStep: {},
-    prevStep: { default: REGISTER_COMPONENTS.USER_TYPES },
+    prevStep: { default: CUSTOMER_FORM },
   },
 } as const;

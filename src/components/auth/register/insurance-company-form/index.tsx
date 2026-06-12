@@ -23,6 +23,7 @@ import {
 import { faInstagram } from "@fortawesome/free-brands-svg-icons";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
 import { DEFAULT_PHONE_CODE, PHONE_CODE_OPTIONS } from "@/constants/forms";
+import { InsuranceCompanySubtype } from "@/lib/sektor-api/__generated__/types";
 
 interface InsuranceCompanyFormProps {
   formRef: React.RefObject<HTMLFormElement | null>;
@@ -42,6 +43,9 @@ const InsuranceCompanyForm = ({
   );
 
   const setNewUser = useRegistrationStore((state) => state.setNewUser);
+  const insuranceCompanySubtype = useRegistrationStore(
+    (state) => state.insuranceCompanySubtype
+  );
 
   const [input, setInput] = useState<InsuranceCompanyFormInput>({
     companyName: "",
@@ -89,6 +93,8 @@ const InsuranceCompanyForm = ({
           email,
           phone: phoneWithCode,
           instagramUrl,
+          subtype:
+            insuranceCompanySubtype ?? InsuranceCompanySubtype.Standard,
         },
       },
     })

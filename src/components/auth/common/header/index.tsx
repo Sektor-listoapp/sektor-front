@@ -22,6 +22,9 @@ const Header = () => {
   );
   const userType = useRegistrationStore((state) => state.userType);
   const setUserType = useRegistrationStore((state) => state.setUserType);
+  const setInsuranceCompanySubtype = useRegistrationStore(
+    (state) => state.setInsuranceCompanySubtype
+  );
   const setCurrentRegistrationStep = useRegistrationStore(
     (state) => state.setCurrentRegistrationStep
   );
@@ -41,6 +44,7 @@ const Header = () => {
 
     setCurrentRegistrationStep(REGISTER_STEPS[prevStep]);
     setUserType(null);
+    setInsuranceCompanySubtype(null);
   };
 
   return (

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useAuthStore } from "@/store/auth";
 import { useShallow } from "zustand/shallow";
 import { useRouter } from "next/router";
@@ -10,6 +10,8 @@ import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { ROUTES } from "@/constants/router";
 import Header from "@/components/auth/common/header";
 import Stepper from "@/components/quotes/stepper";
+import { canQuoteAsCustomer } from "@/utils/quotes/navigate-to-quote";
+import { USER_TYPES } from "@/constants/shared";
 
 const QuotesPage = () => {
   const router = useRouter();
@@ -17,6 +19,18 @@ const QuotesPage = () => {
   const QuoteForm = QUOTE_FORM_MAP?.[segmentQuery] || QUOTE_FORM_MAP.default;
   const user = useAuthStore(useShallow((state) => state.user));
   const userName = user?.name || "!";
+
+  useEffect(() => {
+    if (!router.isReady || canQuoteAsCustomer()) return;
+
+    router.replace({
+      pathname: ROUTES.REGISTER,
+      query: {
+        type: USER_TYPES.CUSTOMER,
+        returnUrl: router.asPath,
+      },
+    });
+  }, [router.isReady, router.asPath, router]);
 
   const goToHome = () => router.replace(ROUTES.HOME);
   const goBack = () => router.back();

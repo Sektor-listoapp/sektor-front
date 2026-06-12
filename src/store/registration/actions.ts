@@ -14,6 +14,9 @@ export const registrationStoreActions = (
   setUserType: (userType) => {
     return set({ userType }, false, "setUserType");
   },
+  setInsuranceCompanySubtype: (insuranceCompanySubtype) => {
+    return set({ insuranceCompanySubtype }, false, "setInsuranceCompanySubtype");
+  },
   setCurrentRegistrationStep: (currentStep) => {
     return set({ currentStep }, false, "setCurrentRegistrationStep");
   },

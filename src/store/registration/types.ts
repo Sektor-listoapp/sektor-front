@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { InsuranceCompanySubtype } from "@/lib/sektor-api/__generated__/types";
 import { RegisterStep } from "@/types/register";
 import { REGISTER_STEPS } from "../../constants/register/steps";
 
@@ -9,6 +10,7 @@ type NewUser = {
 
 export interface RegistrationStoreState {
   userType: string | any;
+  insuranceCompanySubtype: InsuranceCompanySubtype | null;
   currentStep: (typeof REGISTER_STEPS)[keyof typeof REGISTER_STEPS];
   nextStep: RegisterStep | null;
   newUser: NewUser;
@@ -16,6 +18,9 @@ export interface RegistrationStoreState {
 
 export interface RegistrationStoreActions {
   setUserType: (userType: string | any) => void;
+  setInsuranceCompanySubtype: (
+    insuranceCompanySubtype: InsuranceCompanySubtype | null
+  ) => void;
   setCurrentRegistrationStep: (currentStep: RegisterStep) => void;
   setNewUser: (newUser: NewUser) => void;
   resetRegistrationStore: () => void;
