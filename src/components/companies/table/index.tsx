@@ -1,28 +1,31 @@
 import React from "react";
 import {
   OrganizationPlans,
-  OrganizationType,
   OrganizationTypes,
   StateType,
+  UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Table } from "antd";
-import { ORGANIZATION_TYPE_SELECT_OPTIONS } from "@/constants/forms";
+import { ADMIN_USER_TYPE_SELECT_OPTIONS } from "@/constants/forms";
 import Switch from "@/components/ui/switch";
 import styles from "./index.module.css";
 import { cn } from "@/utils/class-name";
 import { ColumnProps } from "antd/es/table";
 import dayjs from "dayjs";
 import Link from "next/link";
+import { AdminCompanyListItem, DeleteCompanyTarget } from "../types";
 
 interface CompaniesTableProps {
-  data: OrganizationType[];
+  data: AdminCompanyListItem[];
   disabled: boolean;
   changeOrgVisibility: (id: string, isACtive: boolean) => void;
   changeOrgPlan: (id: string, plan: OrganizationPlans) => void;
   countryStates: StateType[];
-  setOpenDeleteModal: React.Dispatch<React.SetStateAction<string | null>>;
+  setOpenDeleteModal: React.Dispatch<
+    React.SetStateAction<DeleteCompanyTarget | null>
+  >;
 }
 
 const { Premium, Standard } = OrganizationPlans;
@@ -35,20 +38,18 @@ const CompaniesTable = ({
   countryStates,
   setOpenDeleteModal,
 }: CompaniesTableProps) => {
-
-  const columns: ColumnProps<OrganizationType>[] = [
+  const columns: ColumnProps<AdminCompanyListItem>[] = [
     {
       title: "Nombre",
       dataIndex: "name",
       key: "name",
       width: 200,
-      render: (name: string, record: OrganizationType) => {
+      render: (name: string, record: AdminCompanyListItem) => {
         const { id } = record;
-        const organizationSlug = `${id || ""}`;
 
         return (
           <Link
-            href={`/account/${organizationSlug}`}
+            href={`/account/${id}`}
             className="cursor-pointer hover:text-blue-700 transition-all leading-snug break-words"
           >
             {name}
@@ -61,8 +62,8 @@ const CompaniesTable = ({
       dataIndex: "type",
       key: "type",
       width: 160,
-      render: (type: OrganizationTypes) => {
-        const label = ORGANIZATION_TYPE_SELECT_OPTIONS.find(
+      render: (type: OrganizationTypes | UserGroups.Customer) => {
+        const label = ADMIN_USER_TYPE_SELECT_OPTIONS.find(
           (option) => option.value === type
         )?.label;
         return <p>{label}</p>;
@@ -74,7 +75,11 @@ const CompaniesTable = ({
       key: "clicks",
       width: 80,
       align: "center",
-      render: (clicks: number | undefined) => {
+      render: (clicks: number | undefined, record: AdminCompanyListItem) => {
+        if (record.isCustomer) {
+          return <p>—</p>;
+        }
+
         return <p>{clicks ? clicks : 0}</p>;
       },
     },
@@ -112,7 +117,14 @@ const CompaniesTable = ({
       key: "coverageStates",
       width: 130,
       align: "center",
-      render: (coverageStates: number[] | undefined) => {
+      render: (
+        coverageStates: number[] | undefined,
+        record: AdminCompanyListItem
+      ) => {
+        if (record.isCustomer) {
+          return <span>—</span>;
+        }
+
         const state = countryStates?.find(
           (state) => state?.id === coverageStates?.[0]
         )?.name;
@@ -125,13 +137,17 @@ const CompaniesTable = ({
       key: "isActive",
       width: 80,
       align: "center",
-      render: (isActive: boolean, record: OrganizationType) => (
+      render: (isActive: boolean, record: AdminCompanyListItem) => (
         <div className="w-full flex justify-center items-center">
-          <Switch
-            disabled={disabled}
-            checked={isActive}
-            onChange={() => changeOrgVisibility(record?.id, !isActive)}
-          />
+          {record.isCustomer ? (
+            <span>{isActive ? "Sí" : "No"}</span>
+          ) : (
+            <Switch
+              disabled={disabled}
+              checked={isActive}
+              onChange={() => changeOrgVisibility(record?.id, !isActive)}
+            />
+          )}
         </div>
       ),
     },
@@ -141,7 +157,11 @@ const CompaniesTable = ({
       key: "plan",
       width: 90,
       align: "center",
-      render: (plan: OrganizationPlans, record: OrganizationType) => {
+      render: (plan: OrganizationPlans, record: AdminCompanyListItem) => {
+        if (record.isCustomer) {
+          return <span>—</span>;
+        }
+
         const isPremium = plan === Premium;
         const newPlan = isPremium ? Standard : Premium;
         return (
@@ -160,9 +180,17 @@ const CompaniesTable = ({
       key: "action",
       width: 60,
       align: "center",
-      render: (_, { id }: OrganizationType) => (
+      render: (_, record: AdminCompanyListItem) => (
         <div className="text-blue-500">
-          <button onClick={() => setOpenDeleteModal(id)} disabled={disabled}>
+          <button
+            onClick={() =>
+              setOpenDeleteModal({
+                id: record.id,
+                isCustomer: record.isCustomer,
+              })
+            }
+            disabled={disabled}
+          >
             <FontAwesomeIcon icon={faTrashCan} size="xl" />
           </button>
         </div>

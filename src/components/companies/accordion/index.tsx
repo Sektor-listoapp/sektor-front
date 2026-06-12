@@ -1,7 +1,6 @@
 import React from "react";
 import {
   OrganizationPlans,
-  OrganizationType,
   StateType,
 } from "@/lib/sektor-api/__generated__/types";
 import { Collapse } from "antd";
@@ -14,19 +13,22 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Switch from "@/components/ui/switch";
-import { ORGANIZATION_TYPE_SELECT_OPTIONS } from "@/constants/forms";
+import { ADMIN_USER_TYPE_SELECT_OPTIONS } from "@/constants/forms";
 import dayjs from "dayjs";
 import Link from "next/link";
+import { AdminCompanyListItem, DeleteCompanyTarget } from "../types";
 
 const { Panel } = Collapse;
 
 interface CompaniesAccordionProps {
-  data: OrganizationType[];
+  data: AdminCompanyListItem[];
   disabled: boolean;
   countryStates: StateType[];
   changeOrgVisibility: (id: string, isACtive: boolean) => void;
   changeOrgPlan: (id: string, plan: OrganizationPlans) => void;
-  setOpenDeleteModal: React.Dispatch<React.SetStateAction<string | null>>;
+  setOpenDeleteModal: React.Dispatch<
+    React.SetStateAction<DeleteCompanyTarget | null>
+  >;
 }
 
 const { Premium, Standard } = OrganizationPlans;
@@ -39,8 +41,6 @@ const CompaniesAccordion = ({
   changeOrgVisibility,
   setOpenDeleteModal,
 }: CompaniesAccordionProps) => {
-
-
   return (
     <Collapse
       expandIconPosition="right"
@@ -70,10 +70,11 @@ const CompaniesAccordion = ({
             type,
             clicks,
             email,
+            isCustomer,
           },
           index
         ) => {
-          const label = ORGANIZATION_TYPE_SELECT_OPTIONS?.find(
+          const label = ADMIN_USER_TYPE_SELECT_OPTIONS?.find(
             (option) => option.value === type
           )?.label;
           const isPremium = plan === Premium;
@@ -81,8 +82,6 @@ const CompaniesAccordion = ({
           const state = countryStates?.find(
             (state) => state?.id === coverageStates?.[0]
           )?.name;
-          const organizationSlug = `${id || ""}`;
-       
 
           const listItems = [
             { title: "Tipo de usuario:", value: label ?? "No disponible" },
@@ -93,8 +92,11 @@ const CompaniesAccordion = ({
                 : "No disponible",
             },
             { title: "Email:", value: email ?? "No disponible" },
-            { title: "Ubicaciòn:", value: state ?? "No disponible" },
-            { title: "Clicks:", value: clicks ? clicks : 0 },
+            {
+              title: "Ubicaciòn:",
+              value: isCustomer ? "—" : (state ?? "No disponible"),
+            },
+            { title: "Clicks:", value: isCustomer ? "—" : clicks ? clicks : 0 },
           ];
 
           return (
@@ -113,26 +115,32 @@ const CompaniesAccordion = ({
                 </ul>
 
                 <footer className="w-full flex items-center gap-1 justify-evenly font-bold">
-                  <button
-                    className="w-fit flex flex-col items-center justify-center gap-3"
-                    onClick={() => changeOrgVisibility(id, !isActive)}
-                    disabled={disabled}
-                  >
-                    <span className="text-xs">Activo</span>
-                    <Switch checked={isActive} />
-                  </button>
+                  {!isCustomer && (
+                    <>
+                      <button
+                        className="w-fit flex flex-col items-center justify-center gap-3"
+                        onClick={() => changeOrgVisibility(id, !isActive)}
+                        disabled={disabled}
+                      >
+                        <span className="text-xs">Activo</span>
+                        <Switch checked={isActive} />
+                      </button>
 
-                  <button
-                    className="w-fit flex flex-col items-center justify-center gap-3"
-                    onClick={() => changeOrgPlan(id, newPlan)}
-                    disabled={disabled}
+                      <button
+                        className="w-fit flex flex-col items-center justify-center gap-3"
+                        onClick={() => changeOrgPlan(id, newPlan)}
+                        disabled={disabled}
+                      >
+                        <span className="text-xs">Premiun</span>
+                        <Switch checked={isPremium} />
+                      </button>
+                    </>
+                  )}
+
+                  <Link
+                    href={`/account/${id}`}
+                    className="cursor-pointer hover:text-blue-700 transition-all hover:scale-105"
                   >
-                    <span className="text-xs">Premiun</span>
-                    <Switch checked={isPremium} />
-                  </button>
-              
-                  <Link href={`/account/${organizationSlug}`}
-                    className="cursor-pointer hover:text-blue-700 transition-all hover:scale-105">
                     <span className="text-xs">Detalles</span>
                     <FontAwesomeIcon
                       icon={faEye}
@@ -141,10 +149,11 @@ const CompaniesAccordion = ({
                     />
                   </Link>
 
-              
                   <button
                     className="w-fit flex flex-col items-center justify-center gap-3"
-                    onClick={() => setOpenDeleteModal(id)}
+                    onClick={() =>
+                      setOpenDeleteModal({ id, isCustomer })
+                    }
                   >
                     <span className="text-xs">Eliminar</span>
                     <FontAwesomeIcon

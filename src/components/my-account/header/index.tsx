@@ -7,20 +7,29 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Popover } from "antd";
-import { OrganizationType } from "@/lib/sektor-api/__generated__/types";
+import {
+  CustomerType,
+  OrganizationType,
+} from "@/lib/sektor-api/__generated__/types";
 import { ORGANIZATION_TYPE_LABEL } from "@/constants/content";
 import { useAuthStore } from "@/store/auth";
 
 interface HeaderProps {
-  data: OrganizationType;
+  data?: OrganizationType | CustomerType | null;
   accountEdit?: boolean;
+  isCustomer?: boolean;
 }
 
-const Header = ({ data, accountEdit = false }: HeaderProps) => {
+const Header = ({ data, accountEdit = false, isCustomer = false }: HeaderProps) => {
   const userName = useAuthStore((state) => state.user?.name);
-  const isAccountVerified = data?.isActive;
-  const userTypeLabel =
-    ORGANIZATION_TYPE_LABEL.SINGULAR[data?.type] || "Sektor";
+  const isAccountVerified = isCustomer
+    ? Boolean((data as CustomerType | undefined)?.verifiedAt)
+    : (data as OrganizationType | undefined)?.isActive;
+  const userTypeLabel = isCustomer
+    ? "Persona natural"
+    : ORGANIZATION_TYPE_LABEL.SINGULAR[
+        (data as OrganizationType | undefined)?.type || ""
+      ] || "Sektor";
 
 
   const editUserName = data?.name || ''

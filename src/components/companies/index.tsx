@@ -1,18 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from "react";
-import { useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import {
   COUNTRY_BY_CODE_QUERY,
+  SEARCH_CUSTOMERS,
   SEARCH_ORGANIZATIONS,
 } from "@/lib/sektor-api/queries";
 import {
+  CustomerType,
   Mutation,
   OrganizationPlans,
   OrganizationType,
   Query,
+  UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
 import CompaniesTable from "./table";
 import {
+  ADMIN_DELETE_USER,
   CHANGE_ORGANIZATION_PLAN,
   CHANGE_ORGANIZATION_VISIBILITY,
   DELETE_ORGANIZATION,
@@ -23,26 +27,37 @@ import CompaniesHeader from "./header";
 import NoCompanies from "./no-companies";
 import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import DeleteOrgModal from "./delete-org-modal";
+import {
+  AdminCompanyListItem,
+  DeleteCompanyTarget,
+  mapCustomerToListItem,
+  mapOrganizationToListItem,
+} from "./types";
 
 const CompanyList = () => {
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
-  const [companies, setCompanies] = useState<OrganizationType[]>([]);
+  const [companies, setCompanies] = useState<AdminCompanyListItem[]>([]);
   const [isChangingVisibility, setIsChangingVisibility] = useState(false);
   const [isChangingPlan, setIsChangingPlan] = useState(false);
   const [isDeletingOrganization, setIsDeletingOrganization] = useState(false);
-  const [openDeleteModal, setOpenDeleteModal] = useState<string | null>(null);
+  const [openDeleteModal, setOpenDeleteModal] =
+    useState<DeleteCompanyTarget | null>(null);
 
   const [changeOrgVisibility] = useMutation<Mutation>(
     CHANGE_ORGANIZATION_VISIBILITY
   );
   const [changeOrgPlan] = useMutation<Mutation>(CHANGE_ORGANIZATION_PLAN);
   const [deleteOrganization] = useMutation<Mutation>(DELETE_ORGANIZATION);
+  const [deleteUser] = useMutation<Mutation>(ADMIN_DELETE_USER);
 
-  const defaultVariables = { pagination: { offset: 0, limit: 10000 } };
-  const { error: companiesError, refetch: getCompanies } = useQuery<Query>(
+  const [getOrganizations, { error: companiesError }] = useLazyQuery<Query>(
     SEARCH_ORGANIZATIONS,
-    { variables: defaultVariables, fetchPolicy: "no-cache" }
+    { fetchPolicy: "no-cache" }
   );
+
+  const [getCustomers] = useLazyQuery<Query>(SEARCH_CUSTOMERS, {
+    fetchPolicy: "no-cache",
+  });
 
   const { data: countryDataResponse, loading: isLoadingCountryData } =
     useQuery<Query>(COUNTRY_BY_CODE_QUERY, { variables: { code: "VE" } });
@@ -54,14 +69,79 @@ const CompanyList = () => {
     isChangingPlan ||
     isLoadingCountryData;
 
-  const handleGetCompanies = (variables = {}) => {
+  const fetchCustomers = async (name?: string) => {
+    try {
+      const { data } = await getCustomers({
+        variables: {
+          pagination: { offset: 0, limit: 10000 },
+          filter: name ? { name } : undefined,
+        },
+      });
+
+      const customerItems = (
+        data as { searchCustomers?: { items?: CustomerType[] } } | undefined
+      )?.searchCustomers?.items;
+
+      return customerItems ?? [];
+    } catch {
+      return [];
+    }
+  };
+
+  const handleGetCompanies = async (variables: Record<string, unknown> = {}) => {
     setIsLoadingCompanies(true);
-    const hasVariables = Object.keys(variables).length > 0;
-    const queryVariables = hasVariables ? variables : defaultVariables;
-    getCompanies(queryVariables)
-      .then((res) => setCompanies(res?.data?.searchOrganizations?.items || []))
-      .catch((e) => console.log(e))
-      .finally(() => setIsLoadingCompanies(false));
+
+    const filter = (variables.filter ?? {}) as {
+      name?: string;
+      type?: string;
+    };
+    const selectedType = filter.type;
+    const nameFilter = filter.name?.trim();
+    const isCustomerFilter = selectedType === UserGroups.Customer;
+    const shouldFetchOrganizations =
+      !selectedType || (!isCustomerFilter && Boolean(selectedType));
+    const shouldFetchCustomers = !selectedType || isCustomerFilter;
+
+    try {
+      let organizations: OrganizationType[] = [];
+      let customers: CustomerType[] = [];
+
+      if (shouldFetchOrganizations) {
+        const organizationVariables = {
+          pagination: { offset: 0, limit: 10000 },
+          ...(Object.keys(filter).length
+            ? {
+                filter: {
+                  ...(nameFilter ? { name: nameFilter } : {}),
+                  ...(selectedType && !isCustomerFilter
+                    ? { type: selectedType }
+                    : {}),
+                },
+              }
+            : {}),
+        };
+
+        const response = await getOrganizations({
+          variables: organizationVariables,
+        });
+        organizations = response?.data?.searchOrganizations?.items || [];
+      }
+
+      if (shouldFetchCustomers) {
+        customers = await fetchCustomers(nameFilter);
+      }
+
+      const mergedCompanies = [
+        ...organizations.map(mapOrganizationToListItem),
+        ...customers.map(mapCustomerToListItem),
+      ].sort((a, b) => a.name.localeCompare(b.name, "es"));
+
+      setCompanies(mergedCompanies);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoadingCompanies(false);
+    }
   };
 
   const handleChangeOrgPlan = (id: string, plan: OrganizationPlans) => {
@@ -76,17 +156,28 @@ const CompanyList = () => {
       .finally(() => setIsChangingPlan(false));
   };
 
-  const handleDeleteCompany = (id: string) => {
+  const handleDeleteCompany = ({ id, isCustomer }: DeleteCompanyTarget) => {
     setIsDeletingOrganization(true);
-    deleteOrganization({ variables: { id } })
+
+    const deletePromise = isCustomer
+      ? deleteUser({ variables: { userId: id } })
+      : deleteOrganization({ variables: { id } });
+
+    deletePromise
       .then(() => {
         setOpenDeleteModal(null);
-        toast.success("Empresa eliminada correctamente.");
+        toast.success(
+          isCustomer
+            ? "Persona natural eliminada correctamente."
+            : "Empresa eliminada correctamente."
+        );
         handleGetCompanies();
       })
       .catch(() => {
         toast.error(
-          "No se pudo eliminar la empresa, por favor intenta de nuevo más tarde."
+          isCustomer
+            ? "No se pudo eliminar la persona natural, por favor intenta de nuevo más tarde."
+            : "No se pudo eliminar la empresa, por favor intenta de nuevo más tarde."
         );
       })
       .finally(() => setIsDeletingOrganization(false));
@@ -152,7 +243,7 @@ const CompanyList = () => {
         )}
       </section>
       <DeleteOrgModal
-        id={openDeleteModal}
+        target={openDeleteModal}
         setOpen={setOpenDeleteModal}
         open={Boolean(openDeleteModal)}
         handleDeleteCompany={handleDeleteCompany}

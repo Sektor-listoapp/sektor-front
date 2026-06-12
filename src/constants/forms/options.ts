@@ -3,6 +3,7 @@ import {
   OrganizationTypes,
   QuoteLineOfBusiness,
   SocialMediaPlatform,
+  UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
 import {
   GENRES,
@@ -118,6 +119,16 @@ export const ORGANIZATION_TYPE_SELECT_OPTIONS = [
   { label: "Compañía de seguros", value: InsuranceCompany },
   { label: "Proveedores", value: Supplier },
   { label: "Corredor de seguros", value: InsuranceBroker },
+];
+
+export const CUSTOMER_TYPE_SELECT_OPTION = {
+  label: "Persona natural",
+  value: UserGroups.Customer,
+};
+
+export const ADMIN_USER_TYPE_SELECT_OPTIONS = [
+  ...ORGANIZATION_TYPE_SELECT_OPTIONS,
+  CUSTOMER_TYPE_SELECT_OPTION,
 ];
 
 export const MODALITY_OPTIONS = [

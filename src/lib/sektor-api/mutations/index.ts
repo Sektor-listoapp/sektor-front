@@ -24,6 +24,7 @@ export * from "./register/register-as-insurance-company";
 export * from "./companies/change-organization-plan";
 export * from "./companies/change-organization-visibility";
 export * from "./companies/delete-organization";
+export * from "./companies/admin-delete-user";
 export * from "./tracking/create-tracking";
 export * from "./herramientas/create-module";
 export * from "./herramientas/update-module";
