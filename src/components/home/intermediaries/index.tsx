@@ -11,10 +11,8 @@ import { useRouter } from "next/router";
 import React, { useMemo } from "react";
 import { INTERMEDIARIES_LIST } from "./constants";
 import {
-  calculateSatisfactionPercentage,
   formatCompactNumber,
   formatPlusNumber,
-  formatSatisfactionPercentage,
 } from "./helpers";
 
 type HomeIntermediariesStatsData = {
@@ -22,7 +20,6 @@ type HomeIntermediariesStatsData = {
   publicExclusiveAgents?: { count?: number };
   publicBrokerageSocieties?: { count?: number };
   quotes?: { count?: number };
-  ratedQuotes?: { items?: Array<{ rating?: number | null } | null> };
 };
 
 type StatCardProps = {
@@ -60,24 +57,15 @@ const Intermediaries = ({
     const exclusiveAgentsCount = data?.publicExclusiveAgents?.count ?? 0;
     const brokerageSocietiesCount = data?.publicBrokerageSocieties?.count ?? 0;
     const quotesCount = data?.quotes?.count ?? 0;
-    const satisfaction = calculateSatisfactionPercentage(
-      data?.ratedQuotes?.items?.map((quote) => quote?.rating) ?? []
-    );
 
     return {
       brokersCount: brokersCount + exclusiveAgentsCount + brokerageSocietiesCount,
       quotesCount,
-      satisfaction,
     };
   }, [data]);
 
   const brokersValue = loading ? "..." : formatCompactNumber(stats.brokersCount);
   const quotesValue = loading ? "..." : formatPlusNumber(stats.quotesCount);
-  const satisfactionValue = loading
-    ? "..."
-    : stats.satisfaction === null
-      ? "—"
-      : formatSatisfactionPercentage(stats.satisfaction);
 
   return (
     <section
@@ -110,12 +98,7 @@ const Intermediaries = ({
         <div className="grid grid-cols-2 gap-x-4 gap-y-6">
           <StatCard value={brokersValue} label="corredores a elegir" />
           <StatCard value={quotesValue} label="cotizaciones realizadas" />
-          <StatCard
-            value={satisfactionValue}
-            label="satifacción de nuestro clientes"
-            className="h-32 min-h-0"
-          />
-          <div className="relative">
+          <div className="relative col-span-2 max-w-xs mx-auto w-full">
             <div className="absolute left-0 top-0 h-16 w-16 sm:h-28 sm:w-28 z-10 rounded-3xl">
               <Carousel
                 autoplay
@@ -176,11 +159,6 @@ const Intermediaries = ({
           <div className="flex justify-around items-center gap-4">
             <StatCard value={brokersValue} label="potenciales corredores" />
             <StatCard value={quotesValue} label="cotizaciones realizadas" />
-            <StatCard
-              value={satisfactionValue}
-              label="satifacción de nuestro clientes"
-              className="h-32 min-h-0"
-            />
           </div>
           <Button
             className="mt-6"
