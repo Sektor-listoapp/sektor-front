@@ -2,16 +2,13 @@ import IphoneDesktop from "@/components/icons/iphone-desktop";
 import IphoneMobile from "@/components/icons/iphone-mobile";
 import Button from "@/components/ui/button";
 import { ROUTES } from "@/constants/router";
-import {
-  HOME_INTERMEDIARIES_STATS_QUERY,
-  HOME_QUOTES_COUNT_QUERY,
-} from "@/lib/sektor-api/queries";
+import { HOME_INTERMEDIARIES_STATS_QUERY } from "@/lib/sektor-api/queries";
 import { cn } from "@/utils/class-name";
 import { useQuery } from "@apollo/client";
 import { Carousel } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo } from "react";
 import { INTERMEDIARIES_LIST } from "./constants";
 import { formatCompactNumber, formatPlusNumber } from "./helpers";
 
@@ -19,10 +16,7 @@ type HomeIntermediariesStatsData = {
   publicInsuranceBrokers?: { count?: number };
   publicExclusiveAgents?: { count?: number };
   publicBrokerageSocieties?: { count?: number };
-};
-
-type HomeQuotesCountData = {
-  quotes?: { count?: number };
+  totalQuotesCount?: number;
 };
 
 type StatCardProps = {
@@ -48,74 +42,27 @@ const Intermediaries = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const { push } = useRouter();
-  const [publicQuotesCount, setPublicQuotesCount] = useState<number | null>(
-    null
+  const { data, loading } = useQuery<HomeIntermediariesStatsData>(
+    HOME_INTERMEDIARIES_STATS_QUERY,
+    {
+      fetchPolicy: "cache-first",
+    }
   );
-  const [isLoadingPublicQuotesCount, setIsLoadingPublicQuotesCount] =
-    useState(true);
-
-  const { data, loading: isLoadingBrokersStats } =
-    useQuery<HomeIntermediariesStatsData>(HOME_INTERMEDIARIES_STATS_QUERY, {
-      fetchPolicy: "cache-first",
-    });
-
-  const { data: quotesData, loading: isLoadingQuotesCount } =
-    useQuery<HomeQuotesCountData>(HOME_QUOTES_COUNT_QUERY, {
-      fetchPolicy: "cache-first",
-      errorPolicy: "all",
-    });
-
-  useEffect(() => {
-    let isMounted = true;
-
-    fetch("/api/home-quotes-count")
-      .then((response) => response.json())
-      .then((payload: { count?: number | null }) => {
-        if (!isMounted) return;
-        if (typeof payload.count === "number") {
-          setPublicQuotesCount(payload.count);
-        }
-      })
-      .catch(() => undefined)
-      .finally(() => {
-        if (isMounted) {
-          setIsLoadingPublicQuotesCount(false);
-        }
-      });
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   const stats = useMemo(() => {
     const brokersCount = data?.publicInsuranceBrokers?.count ?? 0;
     const exclusiveAgentsCount = data?.publicExclusiveAgents?.count ?? 0;
     const brokerageSocietiesCount = data?.publicBrokerageSocieties?.count ?? 0;
-    const authenticatedQuotesCount = quotesData?.quotes?.count;
-    const quotesCount =
-      publicQuotesCount ??
-      (typeof authenticatedQuotesCount === "number"
-        ? authenticatedQuotesCount
-        : null);
+    const quotesCount = data?.totalQuotesCount ?? 0;
 
     return {
       brokersCount: brokersCount + exclusiveAgentsCount + brokerageSocietiesCount,
       quotesCount,
     };
-  }, [data, publicQuotesCount, quotesData?.quotes?.count]);
+  }, [data]);
 
-  const isLoadingQuotes =
-    isLoadingPublicQuotesCount && isLoadingQuotesCount && stats.quotesCount === null;
-
-  const brokersValue = isLoadingBrokersStats
-    ? "..."
-    : formatCompactNumber(stats.brokersCount);
-  const quotesValue = isLoadingQuotes
-    ? "..."
-    : stats.quotesCount === null
-      ? "—"
-      : formatPlusNumber(stats.quotesCount);
+  const brokersValue = loading ? "..." : formatCompactNumber(stats.brokersCount);
+  const quotesValue = loading ? "..." : formatPlusNumber(stats.quotesCount);
 
   return (
     <section

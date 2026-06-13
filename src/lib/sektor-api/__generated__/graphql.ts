@@ -1676,6 +1676,7 @@ export type Query = {
   surveyResultsForUser: Array<SurveyQuestionResultType>;
   surveyTargetCandidates: Array<SurveyTargetCandidateType>;
   surveys: Array<SurveyType>;
+  totalQuotesCount: Scalars['Int']['output'];
   trackingByEntityId: Array<TrackingType>;
   trackingByEventType: Array<TrackingType>;
   trackingById?: Maybe<TrackingType>;
