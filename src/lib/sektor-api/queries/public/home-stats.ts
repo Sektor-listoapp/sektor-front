@@ -11,13 +11,13 @@ export const HOME_INTERMEDIARIES_STATS_QUERY = gql`
     publicBrokerageSocieties(pagination: { offset: 0, limit: 1 }) {
       count
     }
+  }
+`;
+
+export const HOME_QUOTES_COUNT_QUERY = gql`
+  query getHomeQuotesCount {
     quotes(pagination: { offset: 0, limit: 1 }) {
       count
-    }
-    ratedQuotes: quotes(pagination: { offset: 0, limit: 10000 }) {
-      items {
-        rating
-      }
     }
   }
 `;

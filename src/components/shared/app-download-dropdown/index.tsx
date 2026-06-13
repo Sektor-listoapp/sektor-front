@@ -3,7 +3,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/utils/class-name";
 
-const ANDROID_DOWNLOAD_URL = "#";
+const ANDROID_DOWNLOAD_URL =
+  "https://play.google.com/store/apps/details?id=com.sektor.sektor_app&pli=1";
 const IOS_DOWNLOAD_URL = "https://apps.apple.com/us/app/sektor/id6751517136";
 
 interface AppDownloadDropdownProps {

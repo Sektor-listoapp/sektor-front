@@ -26,6 +26,7 @@ import {
     ORGANIZATION_BY_ID_QUERY,
 } from "@/lib/sektor-api/queries";
 import { Query, SupplierType, StateType, InsuranceCompanyType, SocialMediaPlatform } from "@/lib/sektor-api/__generated__/types";
+import { buildSocialMediaHref } from "@/utils/social-media/build-social-media-url";
 import { faWhatsapp, faFacebookF, faInstagram } from "@fortawesome/free-brands-svg-icons";
 import { CustomDropdown } from '@/components/ui/custom-dropdown';
 import CloseIcon from '@/components/icons/close-icon';
@@ -289,7 +290,10 @@ const ClinicList = () => {
                                 const whatsappUrl = whatsappLink?.url
                                     ? `https://wa.me/${whatsappLink.url.replace(/\D/g, "")}`
                                     : "";
-                                const websiteUrl = clinic.socialMediaLinks?.find((l) => l.platform === SocialMediaPlatform.Website)?.url?.trim() ?? "";
+                                const websiteRaw = clinic.socialMediaLinks?.find((l) => l.platform === SocialMediaPlatform.Website)?.url?.trim() ?? "";
+                                const websiteUrl = websiteRaw
+                                    ? buildSocialMediaHref(SocialMediaPlatform.Website, websiteRaw)
+                                    : "";
                                 const googleMapsUrl = displayAddress
                                     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(displayAddress)}`
                                     : "";
@@ -710,7 +714,10 @@ const ClinicList = () => {
                     const email = (contactModalClinic as SupplierType & { email?: string | null }).email ?? undefined;
                     const socialLinks = contactModalClinic.socialMediaLinks ?? [];
                     const websiteLink = socialLinks.find((l) => l.platform === SocialMediaPlatform.Website);
-                    const websiteUrl = websiteLink?.url ?? undefined;
+                    const websiteRaw = websiteLink?.url ?? undefined;
+                    const websiteUrl = websiteRaw
+                        ? buildSocialMediaHref(SocialMediaPlatform.Website, websiteRaw)
+                        : undefined;
                     const whatsappLink = socialLinks.find((l) => l.platform === SocialMediaPlatform.Whatsapp);
                     const whatsappNumber = whatsappLink?.url ?? (phone ? phone.replace(/\D/g, "") : undefined);
                     const whatsappUrl = whatsappNumber
@@ -815,7 +822,10 @@ const ClinicList = () => {
                                     <div className="flex justify-center gap-4">
                                         {facebookLink?.url && (
                                             <a
-                                                href={facebookLink.url}
+                                                href={buildSocialMediaHref(
+                                                    SocialMediaPlatform.Facebook,
+                                                    facebookLink.url
+                                                )}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="w-10 h-10 rounded-full bg-[#1877F2] flex items-center justify-center text-white hover:opacity-90 transition-opacity"
@@ -826,7 +836,10 @@ const ClinicList = () => {
                                         )}
                                         {instagramLink?.url && (
                                             <a
-                                                href={instagramLink.url}
+                                                href={buildSocialMediaHref(
+                                                    SocialMediaPlatform.Instagram,
+                                                    instagramLink.url
+                                                )}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="w-10 h-10 rounded-full bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#dc2743] flex items-center justify-center text-white hover:opacity-90 transition-opacity"

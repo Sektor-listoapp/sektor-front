@@ -2,27 +2,27 @@ import IphoneDesktop from "@/components/icons/iphone-desktop";
 import IphoneMobile from "@/components/icons/iphone-mobile";
 import Button from "@/components/ui/button";
 import { ROUTES } from "@/constants/router";
-import { HOME_INTERMEDIARIES_STATS_QUERY } from "@/lib/sektor-api/queries";
+import {
+  HOME_INTERMEDIARIES_STATS_QUERY,
+  HOME_QUOTES_COUNT_QUERY,
+} from "@/lib/sektor-api/queries";
 import { cn } from "@/utils/class-name";
 import { useQuery } from "@apollo/client";
 import { Carousel } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { INTERMEDIARIES_LIST } from "./constants";
-import {
-  calculateSatisfactionPercentage,
-  formatCompactNumber,
-  formatPlusNumber,
-  formatSatisfactionPercentage,
-} from "./helpers";
+import { formatCompactNumber, formatPlusNumber } from "./helpers";
 
 type HomeIntermediariesStatsData = {
   publicInsuranceBrokers?: { count?: number };
   publicExclusiveAgents?: { count?: number };
   publicBrokerageSocieties?: { count?: number };
+};
+
+type HomeQuotesCountData = {
   quotes?: { count?: number };
-  ratedQuotes?: { items?: Array<{ rating?: number | null } | null> };
 };
 
 type StatCardProps = {
@@ -48,36 +48,74 @@ const Intermediaries = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const { push } = useRouter();
-  const { data, loading } = useQuery<HomeIntermediariesStatsData>(
-    HOME_INTERMEDIARIES_STATS_QUERY,
-    {
-      fetchPolicy: "cache-first",
-    }
+  const [publicQuotesCount, setPublicQuotesCount] = useState<number | null>(
+    null
   );
+  const [isLoadingPublicQuotesCount, setIsLoadingPublicQuotesCount] =
+    useState(true);
+
+  const { data, loading: isLoadingBrokersStats } =
+    useQuery<HomeIntermediariesStatsData>(HOME_INTERMEDIARIES_STATS_QUERY, {
+      fetchPolicy: "cache-first",
+    });
+
+  const { data: quotesData, loading: isLoadingQuotesCount } =
+    useQuery<HomeQuotesCountData>(HOME_QUOTES_COUNT_QUERY, {
+      fetchPolicy: "cache-first",
+      errorPolicy: "all",
+    });
+
+  useEffect(() => {
+    let isMounted = true;
+
+    fetch("/api/home-quotes-count")
+      .then((response) => response.json())
+      .then((payload: { count?: number | null }) => {
+        if (!isMounted) return;
+        if (typeof payload.count === "number") {
+          setPublicQuotesCount(payload.count);
+        }
+      })
+      .catch(() => undefined)
+      .finally(() => {
+        if (isMounted) {
+          setIsLoadingPublicQuotesCount(false);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const stats = useMemo(() => {
     const brokersCount = data?.publicInsuranceBrokers?.count ?? 0;
     const exclusiveAgentsCount = data?.publicExclusiveAgents?.count ?? 0;
     const brokerageSocietiesCount = data?.publicBrokerageSocieties?.count ?? 0;
-    const quotesCount = data?.quotes?.count ?? 0;
-    const satisfaction = calculateSatisfactionPercentage(
-      data?.ratedQuotes?.items?.map((quote) => quote?.rating) ?? []
-    );
+    const authenticatedQuotesCount = quotesData?.quotes?.count;
+    const quotesCount =
+      publicQuotesCount ??
+      (typeof authenticatedQuotesCount === "number"
+        ? authenticatedQuotesCount
+        : null);
 
     return {
       brokersCount: brokersCount + exclusiveAgentsCount + brokerageSocietiesCount,
       quotesCount,
-      satisfaction,
     };
-  }, [data]);
+  }, [data, publicQuotesCount, quotesData?.quotes?.count]);
 
-  const brokersValue = loading ? "..." : formatCompactNumber(stats.brokersCount);
-  const quotesValue = loading ? "..." : formatPlusNumber(stats.quotesCount);
-  const satisfactionValue = loading
+  const isLoadingQuotes =
+    isLoadingPublicQuotesCount && isLoadingQuotesCount && stats.quotesCount === null;
+
+  const brokersValue = isLoadingBrokersStats
     ? "..."
-    : stats.satisfaction === null
+    : formatCompactNumber(stats.brokersCount);
+  const quotesValue = isLoadingQuotes
+    ? "..."
+    : stats.quotesCount === null
       ? "—"
-      : formatSatisfactionPercentage(stats.satisfaction);
+      : formatPlusNumber(stats.quotesCount);
 
   return (
     <section
@@ -110,12 +148,7 @@ const Intermediaries = ({
         <div className="grid grid-cols-2 gap-x-4 gap-y-6">
           <StatCard value={brokersValue} label="corredores a elegir" />
           <StatCard value={quotesValue} label="cotizaciones realizadas" />
-          <StatCard
-            value={satisfactionValue}
-            label="satifacción de nuestro clientes"
-            className="h-32 min-h-0"
-          />
-          <div className="relative">
+          <div className="relative col-span-2 max-w-xs mx-auto w-full">
             <div className="absolute left-0 top-0 h-16 w-16 sm:h-28 sm:w-28 z-10 rounded-3xl">
               <Carousel
                 autoplay
@@ -176,11 +209,6 @@ const Intermediaries = ({
           <div className="flex justify-around items-center gap-4">
             <StatCard value={brokersValue} label="potenciales corredores" />
             <StatCard value={quotesValue} label="cotizaciones realizadas" />
-            <StatCard
-              value={satisfactionValue}
-              label="satifacción de nuestro clientes"
-              className="h-32 min-h-0"
-            />
           </div>
           <Button
             className="mt-6"

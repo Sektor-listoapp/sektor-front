@@ -5,6 +5,7 @@ import TextInput from "@/components/ui/text-input";
 import Select from "@/components/ui/select";
 import { SocialMediaPlatform, SocialMediaLinkType } from "@/lib/sektor-api/__generated__/types";
 import { PLATFORM_LABELS_MAP } from "@/constants/forms";
+import { buildSocialMediaUrl } from "@/utils/social-media/build-social-media-url";
 
 interface SocialMediaModalProps extends ModalProps {
   open: boolean;
@@ -42,73 +43,32 @@ const SocialMediaModal = ({
     setOpen(false);
   };
 
-  const buildSocialMediaUrl = (platform: string, inputUrl: string): string => {
-    const trimmedUrl = inputUrl.trim();
-
-
-    const phonePlatforms = [
-      SocialMediaPlatform.Phone,
-      SocialMediaPlatform.EmergencyPhone,
-      SocialMediaPlatform.Whatsapp,
-    ];
-
-    if (phonePlatforms.includes(platform as SocialMediaPlatform)) {
-      return trimmedUrl;
-    }
-
-
-    if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://')) {
-      return trimmedUrl;
-    }
-
-    const platformUrls: Record<string, string> = {
-      [SocialMediaPlatform.Facebook]: 'https://www.facebook.com/',
-      [SocialMediaPlatform.Instagram]: 'https://www.instagram.com/',
-      [SocialMediaPlatform.Twitter]: 'https://www.twitter.com/',
-      [SocialMediaPlatform.Website]: 'https://',
-    };
-
-    const baseUrl = platformUrls[platform] || 'https://';
-
-
-    if (trimmedUrl.includes('.com/') || trimmedUrl.includes('.com') || trimmedUrl.includes('.')) {
-      return trimmedUrl.startsWith('http') ? trimmedUrl : `https://${trimmedUrl}`;
-    }
-
-    return `${baseUrl}${trimmedUrl}`;
-  };
-
   const handleSubmit = () => {
     if (!selectedPlatform || !url.trim()) return;
 
     const newLink = {
       platform: selectedPlatform,
-      url: buildSocialMediaUrl(selectedPlatform, url),
+      url: buildSocialMediaUrl(selectedPlatform as SocialMediaPlatform, url),
     };
 
     let updatedLinks;
     if (platform) {
-
-      updatedLinks = socialLinks.map(link =>
-        link.platform === platform
-          ? newLink
-          : link
+      updatedLinks = socialLinks.map((link) =>
+        link.platform === platform ? newLink : link
       );
     } else {
-
       const normalizedNewUrl = newLink.url.toLowerCase().trim();
-      const existingIndex = socialLinks.findIndex(link =>
-        link.platform === selectedPlatform &&
-        link.url.toLowerCase().trim() === normalizedNewUrl
+      const existingIndex = socialLinks.findIndex(
+        (link) =>
+          link.platform === selectedPlatform &&
+          link.url.toLowerCase().trim() === normalizedNewUrl
       );
 
       if (existingIndex !== -1) {
-
         updatedLinks = socialLinks.map((link, index) =>
           index === existingIndex ? newLink : link
         );
       } else {
-
         updatedLinks = [...socialLinks, newLink];
       }
     }
