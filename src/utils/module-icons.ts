@@ -5,7 +5,6 @@ export interface ModuleIconOption {
 }
 
 const MODULE_ICON_NAMES = [
-  // Existing icons
   "module_icon1",
   "module_icon2",
   "module_icon3",
@@ -45,8 +44,6 @@ const MODULE_ICON_NAMES = [
   "module_icon37",
   "module_icon38",
   "module_icon39",
-
-  // New icons
   "module_icon_new_01",
   "module_icon_new_02",
   "module_icon_new_03",
@@ -88,13 +85,62 @@ const MODULE_ICON_NAMES = [
   "module_icon_new_39",
   "module_icon_new_40",
   "module_icon_new_41",
+  "module_icon2_42",
+  "module_icon2_43",
+  "module_icon2_44",
+  "module_icon2_45",
+  "module_icon2_46",
+  "module_icon2_47",
+  "logos vector-01",
+  "logos vector-02",
+  "logos vector-03",
+  "logos vector-04",
+  "logos vector-05 MAPFRE",
+  "logos vector-06",
+  "logos vector-07",
+  "logos vector-08",
+  "logos vector-09",
+  "logos vector-10",
+  "logos vector-11",
+  "logos vector-12",
+  "logos vector-13",
+  "logos vector-14",
+  "logos vector-15",
+  "logos vector-16",
+  "logos vector-17",
+  "logos vector-18",
+  "logos vector-19",
+  "logos vector-20",
+  "logos vector-21",
+  "logos vector-22",
+  "logos vector-23",
+  "logos vector-24",
+  "logos vector-25",
+  "logos vector-26",
+  "logos vector-27",
+  "logos vector-28",
+  "logos vector-29",
+  "logos vector-30",
+  "logos vector-31",
+  "logos vector-32",
+  "logos vector-33",
+  "logos vector-34",
+  "logos vector-35",
+  "logos vector-36",
+  "logos vector-37",
+  "logos vector-38",
+  "logos vector-39",
+  "logos vector-40",
+  "logos vector-41",
 ];
 
-export const MODULE_ICON_OPTIONS: ModuleIconOption[] = MODULE_ICON_NAMES.map((name, index) => ({
-  label: `Icono ${index + 1}`,
-  value: name,
-  imagePath: `/module_icons/${name}.svg`,
-}));
+export const MODULE_ICON_OPTIONS: ModuleIconOption[] = MODULE_ICON_NAMES.map(
+  (name, index) => ({
+    label: `Icono ${index + 1}`,
+    value: name,
+    imagePath: `/module_icons/${name}.svg`,
+  })
+);
 
 export function getModuleIcon(icon: string | null | undefined): string {
   const v = icon && typeof icon === "string" && icon.trim() ? icon : "module_icon1";

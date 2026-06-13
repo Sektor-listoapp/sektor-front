@@ -81,7 +81,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
     ];
 
   const appDownloadLinks = [
-    { label: "Android", href: "https://play.google.com/store/apps/details?id=com.sektor.sektor_app" },
+    { label: "Android", href: "https://play.google.com/store/apps/details?id=com.sektor.sektor_app&pli=1" },
     { label: "iOS", href: "https://apps.apple.com/us/app/sektor/id6751517136" },
   ];
 
