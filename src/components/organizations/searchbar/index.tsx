@@ -1,15 +1,34 @@
-import React, { useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef } from "react";
 import { cn } from "@/utils/class-name";
 import { ORGANIZATION_TYPE_OPTIONS } from "./constants";
 import OrganizationTypeButton from "./organization-type-button";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
-import TextInput from "@/components/ui/text-input";
 import { useRouter } from "next/router";
 import { useIsClient } from "@uidotdev/usehooks";
 import OrganizationFilters from "./filters";
 import usePublicOrganizations from "@/hooks/use-public-organizations";
 import Button from "@/components/ui/button";
 import Link from "next/link";
+import { ParsedUrlQuery } from "querystring";
+import OrganizationSearchField from "./organization-search-field";
+
+const FILTER_QUERY_KEYS = [
+  "genre",
+  "segment",
+  "city",
+  "state",
+  "serviceType",
+  "insuranceCompanyId",
+  "minAge",
+  "maxAge",
+  "minExperience",
+  "maxExperience",
+] as const;
+
+const hasActiveFilters = (query: ParsedUrlQuery) =>
+  FILTER_QUERY_KEYS.some(
+    (key) =>
+      query[key] !== undefined && query[key] !== null && query[key] !== ""
+  );
 
 const Searchbar = ({
   className,
@@ -19,32 +38,59 @@ const Searchbar = ({
   const { replace, query, isReady } = useRouter();
   const {
     handleGetPublicOrganizations,
-    isLoadingPublicOrganizations,
     handleGetPublicOrganizationsWithNewFilters,
+    handleGetPublicOrganizationsWithoutFilters,
   } = usePublicOrganizations({});
   const isInitialMount = useRef(true);
   const lastTypeRef = useRef(query?.type);
   const hasLoadedInitialData = useRef(false);
+  const queryRef = useRef(query);
+
+  queryRef.current = query;
+
+  const runSearch = useCallback(
+    (searchTerm: string) => {
+      const currentQuery = queryRef.current;
+      const trimmedSearch = searchTerm.trim();
+      const nextQuery: ParsedUrlQuery = { ...currentQuery };
+
+      if (trimmedSearch) {
+        nextQuery.search = trimmedSearch;
+      } else {
+        delete nextQuery.search;
+      }
+
+      replace({ query: nextQuery }, undefined, { scroll: false });
+
+      if (nextQuery.type || hasActiveFilters(nextQuery) || trimmedSearch) {
+        handleGetPublicOrganizationsWithNewFilters(nextQuery, 12, 1);
+        return;
+      }
+
+      handleGetPublicOrganizationsWithoutFilters();
+    },
+    [
+      replace,
+      handleGetPublicOrganizationsWithNewFilters,
+      handleGetPublicOrganizationsWithoutFilters,
+    ]
+  );
+
+  const handleSearch = useCallback(
+    (value: string) => {
+      runSearch(value);
+    },
+    [runSearch]
+  );
+
+  const handleClearSearch = useCallback(() => {
+    runSearch("");
+  }, [runSearch]);
 
   useEffect(() => {
     if (!isReady) return;
 
-    const filterKeys = [
-      "genre",
-      "segment",
-      "city",
-      "state",
-      "serviceType",
-      "insuranceCompanyId",
-      "minAge",
-      "maxAge",
-      "minExperience",
-      "maxExperience",
-    ];
-
-    const hasFilters = filterKeys.some(
-      (key) => query[key] !== undefined && query[key] !== null && query[key] !== ''
-    );
+    const hasFilters = hasActiveFilters(query);
 
     if (isInitialMount.current && !hasLoadedInitialData.current) {
       isInitialMount.current = false;
@@ -68,6 +114,8 @@ const Searchbar = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query?.type, isReady]);
+
+  const urlSearch = (query?.search as string) || "";
 
   return (
     <section
@@ -94,31 +142,11 @@ const Searchbar = ({
       </div>
 
       <div className="w-full flex items-center justify-between gap-4 lg:gap-8 md:flex-1">
-        <form
-          className="w-full flex items-center gap-3"
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleGetPublicOrganizations();
-          }}
-        >
-          <TextInput
-            iconPosition="end"
-            icon={faMagnifyingGlass}
-            disabled={isLoadingPublicOrganizations}
-            iconProps={{ className: "opacity-40" }}
-            wrapperClassName="w-full relative"
-            className="rounded-3xl border-opacity-50 md:text-lg shadow-xl placeholder:text-gray-400"
-            placeholder="Busca intermediario, seguros o ramos"
-            value={(query?.search as string) || ""}
-            onChange={(e) => {
-              replace(
-                { query: { ...query, search: e?.target?.value } },
-                undefined,
-                { scroll: false }
-              );
-            }}
-          />
-        </form>
+        <OrganizationSearchField
+          urlSearch={urlSearch}
+          onSearch={handleSearch}
+          onClear={handleClearSearch}
+        />
         {isClient && <OrganizationFilters />}
       </div>
     </section>

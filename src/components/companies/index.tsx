@@ -3,15 +3,16 @@ import React, { useState, useEffect } from "react";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import {
   COUNTRY_BY_CODE_QUERY,
-  SEARCH_CUSTOMERS,
+  LIST_CUSTOMERS_FOR_ADMIN,
   SEARCH_ORGANIZATIONS,
 } from "@/lib/sektor-api/queries";
 import {
-  CustomerType,
   Mutation,
   OrganizationPlans,
   OrganizationType,
   Query,
+  SurveyTarget,
+  SurveyTargetCandidateType,
   UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
 import CompaniesTable from "./table";
@@ -30,9 +31,11 @@ import DeleteOrgModal from "./delete-org-modal";
 import {
   AdminCompanyListItem,
   DeleteCompanyTarget,
-  mapCustomerToListItem,
   mapOrganizationToListItem,
+  mapSurveyTargetCandidateToListItem,
 } from "./types";
+
+const CUSTOMER_FILTER_TYPE = UserGroups.Customer;
 
 const CompanyList = () => {
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
@@ -55,9 +58,9 @@ const CompanyList = () => {
     { fetchPolicy: "no-cache" }
   );
 
-  const [getCustomers] = useLazyQuery<Query>(SEARCH_CUSTOMERS, {
-    fetchPolicy: "no-cache",
-  });
+  const [getCustomers] = useLazyQuery<{
+    surveyTargetCandidates: SurveyTargetCandidateType[];
+  }>(LIST_CUSTOMERS_FOR_ADMIN, { fetchPolicy: "no-cache" });
 
   const { data: countryDataResponse, loading: isLoadingCountryData } =
     useQuery<Query>(COUNTRY_BY_CODE_QUERY, { variables: { code: "VE" } });
@@ -71,19 +74,31 @@ const CompanyList = () => {
 
   const fetchCustomers = async (name?: string) => {
     try {
-      const { data } = await getCustomers({
-        variables: {
-          pagination: { offset: 0, limit: 10000 },
-          filter: name ? { name } : undefined,
-        },
+      const { data, error } = await getCustomers({
+        variables: { targetTypes: [SurveyTarget.Customer] },
       });
 
-      const customerItems = (
-        data as { searchCustomers?: { items?: CustomerType[] } } | undefined
-      )?.searchCustomers?.items;
+      if (error) {
+        throw error;
+      }
 
-      return customerItems ?? [];
-    } catch {
+      const normalizedName = name?.trim().toLowerCase();
+
+      return (data?.surveyTargetCandidates ?? []).filter((candidate) => {
+        if (!normalizedName) {
+          return true;
+        }
+
+        return (
+          candidate.name.toLowerCase().includes(normalizedName) ||
+          candidate.email.toLowerCase().includes(normalizedName)
+        );
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        "No se pudo cargar el listado de personas naturales, por favor intenta de nuevo más tarde."
+      );
       return [];
     }
   };
@@ -95,34 +110,34 @@ const CompanyList = () => {
       name?: string;
       type?: string;
     };
-    const selectedType = filter.type;
+    const selectedType = filter.type?.trim();
     const nameFilter = filter.name?.trim();
-    const isCustomerFilter = selectedType === UserGroups.Customer;
-    const shouldFetchOrganizations =
-      !selectedType || (!isCustomerFilter && Boolean(selectedType));
+    const isCustomerFilter = selectedType === CUSTOMER_FILTER_TYPE;
+    const shouldFetchOrganizations = !isCustomerFilter;
     const shouldFetchCustomers = !selectedType || isCustomerFilter;
 
     try {
       let organizations: OrganizationType[] = [];
-      let customers: CustomerType[] = [];
+      let customers: SurveyTargetCandidateType[] = [];
 
       if (shouldFetchOrganizations) {
-        const organizationVariables = {
-          pagination: { offset: 0, limit: 10000 },
-          ...(Object.keys(filter).length
-            ? {
-                filter: {
-                  ...(nameFilter ? { name: nameFilter } : {}),
-                  ...(selectedType && !isCustomerFilter
-                    ? { type: selectedType }
-                    : {}),
-                },
-              }
-            : {}),
-        };
+        const organizationFilter: Record<string, string> = {};
+
+        if (nameFilter) {
+          organizationFilter.name = nameFilter;
+        }
+
+        if (selectedType) {
+          organizationFilter.type = selectedType;
+        }
 
         const response = await getOrganizations({
-          variables: organizationVariables,
+          variables: {
+            pagination: { offset: 0, limit: 10000 },
+            ...(Object.keys(organizationFilter).length
+              ? { filter: organizationFilter }
+              : {}),
+          },
         });
         organizations = response?.data?.searchOrganizations?.items || [];
       }
@@ -133,12 +148,12 @@ const CompanyList = () => {
 
       const mergedCompanies = [
         ...organizations.map(mapOrganizationToListItem),
-        ...customers.map(mapCustomerToListItem),
+        ...customers.map(mapSurveyTargetCandidateToListItem),
       ].sort((a, b) => a.name.localeCompare(b.name, "es"));
 
       setCompanies(mergedCompanies);
     } catch (error) {
-      console.log(error);
+      console.error(error);
     } finally {
       setIsLoadingCompanies(false);
     }

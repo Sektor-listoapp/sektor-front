@@ -1,16 +1,12 @@
 import { gql } from "@apollo/client";
-import { CUSTOMER_FIELDS_FRAGMENT } from "../../fragments";
 
-export const SEARCH_CUSTOMERS = gql`
-  query searchCustomers(
-    $pagination: PaginationType!
-    $filter: SearchCustomerFilterType
-  ) {
-    searchCustomers(pagination: $pagination, filter: $filter) {
-      items {
-        ...CustomerFields
-      }
+export const LIST_CUSTOMERS_FOR_ADMIN = gql`
+  query listCustomersForAdmin($targetTypes: [SurveyTarget!]!) {
+    surveyTargetCandidates(targetTypes: $targetTypes) {
+      id
+      name
+      email
+      type
     }
   }
-  ${CUSTOMER_FIELDS_FRAGMENT}
 `;

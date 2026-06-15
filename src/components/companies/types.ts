@@ -3,6 +3,7 @@ import {
   OrganizationType,
   OrganizationTypes,
   CustomerType,
+  SurveyTargetCandidateType,
   UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
 
@@ -49,4 +50,14 @@ export const mapCustomerToListItem = (
   isCustomer: true,
   isActive: Boolean(customer.verifiedAt),
   createdAt: customer.verifiedAt ?? undefined,
+});
+
+export const mapSurveyTargetCandidateToListItem = (
+  candidate: SurveyTargetCandidateType
+): AdminCompanyListItem => ({
+  id: candidate.id,
+  name: candidate.name,
+  email: candidate.email,
+  type: UserGroups.Customer,
+  isCustomer: true,
 });

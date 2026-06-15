@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
-import { getCurrentFiltersFromQuery } from "@/utils/organizations";
+import { buildOrganizationQueryVariables } from "@/utils/organizations";
 import { GENERIC_TOAST_ERROR_MESSAGE } from "@/constants/validations";
 import { OperationVariables, QueryHookOptions, useQuery } from "@apollo/client";
 import { ALL_ORGANIZATION_TYPES_QUERY } from "@/lib/sektor-api/queries/public/all-organization-types";
@@ -19,7 +19,6 @@ const usePublicOrganizations = ({
   variables,
 }: UsePublicOrganizationsProps) => {
   const { query } = useRouter();
-  const currentFilters = getCurrentFiltersFromQuery(query);
 
   const { refetch: getPublicOrganizations } = useQuery<Query>(
     ALL_ORGANIZATION_TYPES_QUERY,
@@ -28,11 +27,10 @@ const usePublicOrganizations = ({
       fetchPolicy: "no-cache",
       errorPolicy: "all",
       ...options,
-      variables: {
-        pagination: { offset: 0, limit: 6 },
-        ...currentFilters,
-        ...variables,
-      },
+      variables: buildOrganizationQueryVariables(query, {
+        offset: 0,
+        limit: 6,
+      }, variables),
     }
   );
 
@@ -100,13 +98,10 @@ const usePublicOrganizations = ({
   const handleGetPublicOrganizations = async () => {
     setIsLoadingPublicOrganizations(true);
 
-    const updatedFilters = getCurrentFiltersFromQuery(query);
-
-    const variablesToSend = {
-      pagination: { offset: 0, limit: 6 },
-      ...updatedFilters,
-      ...variables,
-    };
+    const variablesToSend = buildOrganizationQueryVariables(query, {
+      offset: 0,
+      limit: 6,
+    }, variables);
 
     try {
       const { data, errors } = await getPublicOrganizations(variablesToSend);
@@ -114,7 +109,7 @@ const usePublicOrganizations = ({
       if (errors?.length) {
         console.error("GraphQL errors fetching public organizations:", errors);
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
       console.error('Error fetching public organizations:', error);
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
@@ -128,14 +123,13 @@ const usePublicOrganizations = ({
     limit = 6,
     page = 1
   ) => {
-    const currentFilters = getCurrentFiltersFromQuery(query ?? {});
     setIsLoadingPublicOrganizations(true);
 
     const offset = (page - 1) * limit;
-    const variablesToSend = {
-      pagination: { offset, limit },
-      ...currentFilters,
-    };
+    const variablesToSend = buildOrganizationQueryVariables(query ?? {}, {
+      offset,
+      limit,
+    });
 
     try {
       const { data, errors } = await getPublicOrganizations(variablesToSend);
@@ -150,7 +144,7 @@ const usePublicOrganizations = ({
       if (errors?.length) {
         console.error("GraphQL errors fetching public organizations:", errors);
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
     } finally {
@@ -163,13 +157,12 @@ const usePublicOrganizations = ({
     page: number,
     limit = 12
   ) => {
-    const currentFilters = getCurrentFiltersFromQuery(query);
     setIsLoadingPublicOrganizations(true);
     const offset = (page - 1) * limit;
-    const variablesToSend = {
-      pagination: { offset, limit },
-      ...currentFilters,
-    };
+    const variablesToSend = buildOrganizationQueryVariables(query, {
+      offset,
+      limit,
+    });
 
     try {
       const { data, errors } = await getPublicOrganizations(variablesToSend);
@@ -222,7 +215,7 @@ const usePublicOrganizations = ({
       if (errors?.length) {
         console.error("GraphQL errors fetching public organizations:", errors);
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
     } finally {
@@ -233,15 +226,23 @@ const usePublicOrganizations = ({
   const handleGetPublicOrganizationsWithoutFilters = async () => {
     setIsLoadingPublicOrganizations(true);
     try {
-      const variablesToSend = {
-        pagination: { offset: 0, limit: 6 },
-      };
+      const variablesToSend = buildOrganizationQueryVariables({}, {
+        offset: 0,
+        limit: 6,
+      });
       const { data, errors } = await getPublicOrganizations(variablesToSend);
-      if (data) setPublicOrganizations(data);
+      if (data) {
+        setPublicSuppliers([], null);
+        setPublicExclusiveAgents([], null);
+        setPublicInsuranceBrokers([], null);
+        setPublicBrokerageSocieties([], null);
+        setPublicInsuranceCompanies([], null);
+        setPublicOrganizations(data);
+      }
       if (errors?.length) {
         console.error("GraphQL errors fetching public organizations:", errors);
       }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: unknown | any) {
       toast.error(error?.message || GENERIC_TOAST_ERROR_MESSAGE);
     } finally {

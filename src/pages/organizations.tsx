@@ -23,9 +23,9 @@ const Organizations = () => {
 
   const effectiveOrganizationType =
     typeof organizationType === "string" &&
-    insuranceCompanyTypes.includes(
-      organizationType as (typeof insuranceCompanyTypes)[number]
-    )
+      insuranceCompanyTypes.includes(
+        organizationType as (typeof insuranceCompanyTypes)[number]
+      )
       ? USER_TYPES.INSURANCE_COMPANY
       : organizationType;
 
