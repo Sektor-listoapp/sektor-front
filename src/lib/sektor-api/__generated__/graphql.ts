@@ -2068,8 +2068,16 @@ export type SearchOrganizationFilterType = {
   createdAfter?: InputMaybe<Scalars['String']['input']>;
   createdBefore?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  nameTarget?: InputMaybe<SearchOrganizationNameTarget>;
   type?: InputMaybe<OrganizationTypes>;
 };
+
+/** Where to search the name filter: All (both), Organization only, or Customer only */
+export enum SearchOrganizationNameTarget {
+  All = 'All',
+  Customer = 'Customer',
+  Organization = 'Organization'
+}
 
 export enum ServiceSupplierTypes {
   Clinic = 'Clinic',

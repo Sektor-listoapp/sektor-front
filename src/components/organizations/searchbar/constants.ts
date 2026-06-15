@@ -27,24 +27,28 @@ export const ORGANIZATION_TYPE_OPTIONS = [
     id: INSURANCE_BROKER,
     name: "Corredores de Seguros",
     icon: faBuilding,
+    imagePath: "/images/corredor-de-seguros.png",
     type: INSURANCE_BROKER,
   },
   {
     id: BROKERAGE_SOCIETY,
     name: "Sociedades de Corretaje",
     icon: faUserTie,
+    imagePath: "/images/sociedad-corretaje.png",
     type: BROKERAGE_SOCIETY,
   },
   {
     id: EXCLUSIVE_AGENT,
     name: "Agentes Exclusivos",
     icon: faPersonBurst,
+    imagePath: "/images/agente-exclusivo.png",
     type: EXCLUSIVE_AGENT,
   },
   {
     id: INSURANCE_COMPANY,
     name: "Compañías de Seguros",
     icon: faLandmark,
+    imagePath: "/images/compania-de-seguros.png",
     type: INSURANCE_COMPANY,
   },
   {
@@ -72,6 +76,7 @@ export const ORGANIZATION_TYPE_OPTIONS = [
     id: SUPPLIER,
     name: "Proveedores",
     icon: faTruckFieldUn,
+    imagePath: "/images/proveedores.png",
     type: SUPPLIER,
   },
 ] as const;
