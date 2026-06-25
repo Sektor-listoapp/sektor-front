@@ -9,6 +9,10 @@ import { Query } from "@/lib/sektor-api/__generated__/types";
 import { ParsedUrlQuery } from "querystring";
 import { OrganizationPaginationInfo } from "@/types/public";
 
+type AllOrganizationsQueryResult = Query & {
+  workshops?: Query["publicSuppliers"];
+};
+
 interface UsePublicOrganizationsProps {
   variables?: OperationVariables;
   options?: Omit<QueryHookOptions, "variables">;
@@ -49,6 +53,9 @@ const usePublicOrganizations = ({
   const setPublicSuppliers = usePublicOrganizationsStore(
     (state) => state.setPublicSuppliers
   );
+  const setPublicWorkshops = usePublicOrganizationsStore(
+    (state) => state.setPublicWorkshops
+  );
   const setIsLoadingPublicOrganizations = usePublicOrganizationsStore(
     (state) => state.setIsLoadingPublicOrganizations
   );
@@ -59,7 +66,7 @@ const usePublicOrganizations = ({
     (state) => state.publicOrganizations
   );
 
-  const setPublicOrganizations = (data: Query, currentPage = 1) => {
+  const setPublicOrganizations = (data: AllOrganizationsQueryResult, currentPage = 1) => {
     const getPaginationInfo = (
       paginatedData: { count?: number; pages?: number } | null | undefined
     ): OrganizationPaginationInfo | null => {
@@ -76,6 +83,10 @@ const usePublicOrganizations = ({
     setPublicSuppliers(
       data?.publicSuppliers?.items || [],
       getPaginationInfo(data?.publicSuppliers)
+    );
+    setPublicWorkshops(
+      data?.workshops?.items || [],
+      getPaginationInfo(data?.workshops)
     );
     setPublicExclusiveAgents(
       data?.publicExclusiveAgents?.items || [],
@@ -135,6 +146,7 @@ const usePublicOrganizations = ({
       const { data, errors } = await getPublicOrganizations(variablesToSend);
       if (data) {
         setPublicSuppliers([], null);
+        setPublicWorkshops([], null);
         setPublicExclusiveAgents([], null);
         setPublicInsuranceBrokers([], null);
         setPublicBrokerageSocieties([], null);
@@ -166,6 +178,7 @@ const usePublicOrganizations = ({
 
     try {
       const { data, errors } = await getPublicOrganizations(variablesToSend);
+      const queryData = data as AllOrganizationsQueryResult | undefined;
 
       const getPaginationInfo = (
         paginatedData: { count?: number; pages?: number } | null | undefined
@@ -183,8 +196,14 @@ const usePublicOrganizations = ({
       switch (organizationType) {
         case "supplier":
           setPublicSuppliers(
-            data?.publicSuppliers?.items || [],
-            getPaginationInfo(data?.publicSuppliers)
+            queryData?.publicSuppliers?.items || [],
+            getPaginationInfo(queryData?.publicSuppliers)
+          );
+          break;
+        case "workshop":
+          setPublicWorkshops(
+            queryData?.workshops?.items || [],
+            getPaginationInfo(queryData?.workshops)
           );
           break;
         case "exclusiveAgent":
@@ -233,6 +252,7 @@ const usePublicOrganizations = ({
       const { data, errors } = await getPublicOrganizations(variablesToSend);
       if (data) {
         setPublicSuppliers([], null);
+        setPublicWorkshops([], null);
         setPublicExclusiveAgents([], null);
         setPublicInsuranceBrokers([], null);
         setPublicBrokerageSocieties([], null);

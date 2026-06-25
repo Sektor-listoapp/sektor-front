@@ -11,12 +11,20 @@ export const ALL_ORGANIZATION_TYPES_QUERY = gql`
   query getAllOrganizations(
     $pagination: PaginationType!
     $publicSupplierFilters: SupplierFilterType
+    $publicWorkshopFilters: SupplierFilterType
     $publicExclusiveAgentFilters: ExclusiveAgentFilterType
     $publicInsuranceBrokersFilters: InsuranceBrokerFilterType
     $publicInsuranceCompanyFilters: InsuranceCompanyFilterType
     $publicBrokerageSocietyFilters: BrokerageSocietyFilterType
   ) {
     publicSuppliers(pagination: $pagination, filter: $publicSupplierFilters) {
+      items {
+        ...SupplierFields
+      }
+      count
+      pages
+    }
+    workshops: publicSuppliers(pagination: $pagination, filter: $publicWorkshopFilters) {
       items {
         ...SupplierFields
       }

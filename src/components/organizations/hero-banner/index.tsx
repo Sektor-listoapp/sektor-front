@@ -9,7 +9,8 @@ const HeroBanner = () => {
   const organizationType = query?.type || "DEFAULT";
 
   const Content =
-    HERO_BANNER_CONTENT[organizationType as keyof typeof HERO_BANNER_CONTENT];
+    HERO_BANNER_CONTENT[organizationType as keyof typeof HERO_BANNER_CONTENT] ??
+    HERO_BANNER_CONTENT.DEFAULT;
 
   return (
     <header className="bg-blue-500 w-full sm:gap-8 md:bg-white">

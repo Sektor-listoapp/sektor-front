@@ -1,7 +1,9 @@
 import { pickBy } from "lodash";
 import { ParsedUrlQuery } from "querystring";
 import { ORGANIZATION_FILTER_KEYS } from "@/constants/organizations";
-import { USER_TYPES } from "@/constants/shared";
+import { SERVICE_SUPPLIER_TYPES, USER_TYPES } from "@/constants/shared";
+
+const { WORKSHOP } = SERVICE_SUPPLIER_TYPES;
 
 const buildFiltersForType = (
   organizationType: string,
@@ -10,8 +12,11 @@ const buildFiltersForType = (
   cityNumber: number | undefined
 ) => {
   const filters = { ...baseFilters };
+  const isSupplierType =
+    organizationType === USER_TYPES.SUPPLIER ||
+    organizationType === USER_TYPES.SUPPLIER_WORKSHOP;
 
-  if (organizationType === "Supplier") {
+  if (isSupplierType) {
     if (stateNumber !== undefined) {
       filters.stateId = stateNumber;
     }
@@ -146,6 +151,7 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
       INSURANCE_COMPANY_COOPERATIVE,
       INSURANCE_COMPANY_INSURTECH,
       INSURANCE_COMPANY_PREPAID_MEDICINE,
+      SUPPLIER_WORKSHOP,
     } = USER_TYPES;
 
     if (filterKey === "publicInsuranceCompanyFilters") {
@@ -158,6 +164,10 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
       } else if (query.type === INSURANCE_COMPANY) {
         (baseFiltersWithSubtype as Record<string, unknown>).subtype = "Standard";
       }
+    }
+
+    if (filterKey === "publicWorkshopFilters" && query.type === SUPPLIER_WORKSHOP) {
+      (baseFiltersWithSubtype as Record<string, unknown>).serviceType = WORKSHOP;
     }
 
     const filters = buildFiltersForType(
@@ -175,7 +185,12 @@ export const getCurrentFiltersFromQuery = (query: ParsedUrlQuery) => {
     (acc, key) => {
       const filterKey =
         ORGANIZATION_FILTER_KEYS[key as keyof typeof ORGANIZATION_FILTER_KEYS];
-      const filters = buildFiltersForType(key, baseFilters, stateNumber, cityNumber);
+      let filters = buildFiltersForType(key, baseFilters, stateNumber, cityNumber);
+
+      if (key === USER_TYPES.SUPPLIER_WORKSHOP) {
+        filters = { ...filters, serviceType: WORKSHOP };
+      }
+
       return {
         ...acc,
         [filterKey]: filters,

@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import {
   COUNTRY_BY_CODE_QUERY,
+  CUSTOMER_BY_ID_QUERY,
   LIST_CUSTOMERS_FOR_ADMIN,
   SEARCH_ORGANIZATIONS,
 } from "@/lib/sektor-api/queries";
@@ -33,13 +34,28 @@ import {
   DeleteCompanyTarget,
   mapOrganizationToListItem,
   mapSurveyTargetCandidateToListItem,
+  sortCustomerListItems,
 } from "./types";
+import {
+  CUSTOMER_SORT_OPTIONS,
+  CustomerSortOption,
+} from "./constants";
+import CustomerSortControls from "./customer-sort-controls";
 
 const CUSTOMER_FILTER_TYPE = UserGroups.Customer;
+
+type CompaniesSearchFilter = {
+  name?: string;
+  type?: string;
+};
 
 const CompanyList = () => {
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
   const [companies, setCompanies] = useState<AdminCompanyListItem[]>([]);
+  const [searchFilters, setSearchFilters] = useState<CompaniesSearchFilter>({});
+  const [customerSort, setCustomerSort] = useState<CustomerSortOption>(
+    CUSTOMER_SORT_OPTIONS.name
+  );
   const [isChangingVisibility, setIsChangingVisibility] = useState(false);
   const [isChangingPlan, setIsChangingPlan] = useState(false);
   const [isDeletingOrganization, setIsDeletingOrganization] = useState(false);
@@ -62,6 +78,10 @@ const CompanyList = () => {
     surveyTargetCandidates: SurveyTargetCandidateType[];
   }>(LIST_CUSTOMERS_FOR_ADMIN, { fetchPolicy: "no-cache" });
 
+  const [getCustomerById] = useLazyQuery<Query>(CUSTOMER_BY_ID_QUERY, {
+    fetchPolicy: "no-cache",
+  });
+
   const { data: countryDataResponse, loading: isLoadingCountryData } =
     useQuery<Query>(COUNTRY_BY_CODE_QUERY, { variables: { code: "VE" } });
   const countryStates = countryDataResponse?.getCountryByCode?.states || [];
@@ -71,6 +91,27 @@ const CompanyList = () => {
     isChangingVisibility ||
     isChangingPlan ||
     isLoadingCountryData;
+
+  const enrichCustomerCandidates = async (
+    candidates: SurveyTargetCandidateType[]
+  ) => {
+    return Promise.all(
+      candidates.map(async (candidate) => {
+        try {
+          const { data } = await getCustomerById({
+            variables: { id: candidate.id },
+          });
+
+          return mapSurveyTargetCandidateToListItem(
+            candidate,
+            data?.customerById
+          );
+        } catch {
+          return mapSurveyTargetCandidateToListItem(candidate);
+        }
+      })
+    );
+  };
 
   const fetchCustomers = async (name?: string) => {
     try {
@@ -89,10 +130,7 @@ const CompanyList = () => {
           return true;
         }
 
-        return (
-          candidate.name.toLowerCase().includes(normalizedName) ||
-          candidate.email.toLowerCase().includes(normalizedName)
-        );
+        return candidate.name.toLowerCase().includes(normalizedName);
       });
     } catch (error) {
       console.error(error);
@@ -103,18 +141,28 @@ const CompanyList = () => {
     }
   };
 
-  const handleGetCompanies = async (variables: Record<string, unknown> = {}) => {
+  const handleGetCompanies = async (
+    variables: { filter?: CompaniesSearchFilter } = {}
+  ) => {
     setIsLoadingCompanies(true);
 
-    const filter = (variables.filter ?? {}) as {
-      name?: string;
-      type?: string;
-    };
-    const selectedType = filter.type?.trim();
-    const nameFilter = filter.name?.trim();
+    const nextFilters =
+      variables.filter !== undefined ? variables.filter : searchFilters;
+
+    if (variables.filter !== undefined) {
+      setSearchFilters(variables.filter);
+    }
+
+    const nameFilter = nextFilters.name?.trim();
+    const selectedType = nextFilters.type?.trim();
     const isCustomerFilter = selectedType === CUSTOMER_FILTER_TYPE;
     const shouldFetchOrganizations = !isCustomerFilter;
     const shouldFetchCustomers = !selectedType || isCustomerFilter;
+    const activeCustomerSort = isCustomerFilter ? customerSort : CUSTOMER_SORT_OPTIONS.name;
+
+    if (variables.filter !== undefined && !isCustomerFilter) {
+      setCustomerSort(CUSTOMER_SORT_OPTIONS.name);
+    }
 
     try {
       let organizations: OrganizationType[] = [];
@@ -127,36 +175,58 @@ const CompanyList = () => {
           organizationFilter.name = nameFilter;
         }
 
-        if (selectedType) {
+        if (selectedType && !isCustomerFilter) {
           organizationFilter.type = selectedType;
         }
 
         const response = await getOrganizations({
           variables: {
             pagination: { offset: 0, limit: 10000 },
-            ...(Object.keys(organizationFilter).length
-              ? { filter: organizationFilter }
-              : {}),
+            filter:
+              Object.keys(organizationFilter).length > 0
+                ? organizationFilter
+                : null,
           },
         });
         organizations = response?.data?.searchOrganizations?.items || [];
       }
 
       if (shouldFetchCustomers) {
-        customers = await fetchCustomers(nameFilter);
+        const candidates = await fetchCustomers(nameFilter);
+
+        if (isCustomerFilter) {
+          const enrichedCustomers = await enrichCustomerCandidates(candidates);
+          setCompanies(sortCustomerListItems(enrichedCustomers, activeCustomerSort));
+          return;
+        }
+
+        customers = candidates;
       }
 
       const mergedCompanies = [
         ...organizations.map(mapOrganizationToListItem),
-        ...customers.map(mapSurveyTargetCandidateToListItem),
+        ...customers.map((candidate) => mapSurveyTargetCandidateToListItem(candidate)),
       ].sort((a, b) => a.name.localeCompare(b.name, "es"));
 
       setCompanies(mergedCompanies);
     } catch (error) {
       console.error(error);
+      toast.error(
+        "No se pudo cargar el listado de usuarios, por favor intenta de nuevo más tarde."
+      );
     } finally {
       setIsLoadingCompanies(false);
     }
+  };
+
+  const handleCustomerSortChange = (sort: CustomerSortOption) => {
+    setCustomerSort(sort);
+
+    if (searchFilters.type !== CUSTOMER_FILTER_TYPE) {
+      return;
+    }
+
+    setCompanies((currentCompanies) => sortCustomerListItems(currentCompanies, sort));
   };
 
   const handleChangeOrgPlan = (id: string, plan: OrganizationPlans) => {
@@ -223,10 +293,19 @@ const CompanyList = () => {
       <section className="bg-white w-full py-5 md:py-10 flex flex-col items-center justify-center gap-10 xl:shadow-2xl rounded-xl xl:px-10">
         <CompaniesHeader
           handleGetCompanies={handleGetCompanies}
+          searchFilters={searchFilters}
           disabled={
             isLoadingCompanies || isChangingVisibility || isChangingPlan
           }
         />
+
+        {searchFilters.type === CUSTOMER_FILTER_TYPE && (
+          <CustomerSortControls
+            value={customerSort}
+            onChange={handleCustomerSortChange}
+            disabled={isLoadingCompanies}
+          />
+        )}
 
         {isLoadingCompanies && (
           <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-white bg-opacity-40 z-50">

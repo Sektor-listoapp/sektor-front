@@ -5,6 +5,7 @@ const {
   BROKERAGE_SOCIETY,
   EXCLUSIVE_AGENT,
   SUPPLIER,
+  SUPPLIER_WORKSHOP,
   INSURANCE_COMPANY,
   INSURANCE_COMPANY_COOPERATIVE,
   INSURANCE_COMPANY_INSURTECH,
@@ -13,6 +14,7 @@ const {
 
 export const ORGANIZATION_FILTER_KEYS = {
   [SUPPLIER]: "publicSupplierFilters",
+  [SUPPLIER_WORKSHOP]: "publicWorkshopFilters",
   [BROKERAGE_SOCIETY]: "publicBrokerageSocietyFilters",
   [EXCLUSIVE_AGENT]: "publicExclusiveAgentFilters",
   [INSURANCE_BROKER]: "publicInsuranceBrokersFilters",

@@ -9,6 +9,7 @@ import {
   faHospitalUser,
   faHeartbeat,
   faLaptopCode,
+  faWrench,
 } from "@fortawesome/free-solid-svg-icons";
 
 const {
@@ -16,6 +17,7 @@ const {
   BROKERAGE_SOCIETY,
   EXCLUSIVE_AGENT,
   SUPPLIER,
+  SUPPLIER_WORKSHOP,
   INSURANCE_COMPANY,
   INSURANCE_COMPANY_COOPERATIVE,
   INSURANCE_COMPANY_INSURTECH,
@@ -79,6 +81,12 @@ export const ORGANIZATION_TYPE_OPTIONS = [
     imagePath: "/images/proveedores.png",
     type: SUPPLIER,
   },
+  {
+    id: SUPPLIER_WORKSHOP,
+    name: "Talleres",
+    icon: faWrench,
+    type: SUPPLIER_WORKSHOP,
+  },
 ] as const;
 
 export const ORGANIZATION_FILTER_COMPONENTS = {
@@ -87,4 +95,5 @@ export const ORGANIZATION_FILTER_COMPONENTS = {
   [EXCLUSIVE_AGENT]: dynamic(() => import("./default-filters")),
   [INSURANCE_COMPANY]: dynamic(() => import("./insurance-company-filters")),
   [SUPPLIER]: dynamic(() => import("./supplier-filters")),
+  [SUPPLIER_WORKSHOP]: dynamic(() => import("./supplier-filters")),
 } as const;
