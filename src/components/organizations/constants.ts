@@ -4,6 +4,7 @@ import BrokerageSocieties from "./brokerage-societies";
 import ExclusiveAgents from "./exclusive-agents";
 import InsuranceCompanies from "./insurance-companies";
 import Suppliers from "./suppliers";
+import Workshops from "./workshops";
 
 const {
   INSURANCE_BROKER,
@@ -11,6 +12,7 @@ const {
   EXCLUSIVE_AGENT,
   INSURANCE_COMPANY,
   SUPPLIER,
+  SUPPLIER_WORKSHOP,
 } = USER_TYPES;
 
 export const ORGANIZATION_COMPONENTS = [
@@ -33,5 +35,9 @@ export const ORGANIZATION_COMPONENTS = [
   {
     type: SUPPLIER,
     component: Suppliers,
+  },
+  {
+    type: SUPPLIER_WORKSHOP,
+    component: Workshops,
   },
 ] as const;

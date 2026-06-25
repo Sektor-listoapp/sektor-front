@@ -24,6 +24,7 @@ export const publicRegistrationsStoreActions = (
           ...state,
           publicOrganizations: {
             suppliers: publicSuppliers,
+            workshops: state.publicOrganizations?.workshops,
             exclusiveAgents: state.publicOrganizations?.exclusiveAgents,
             insuranceBrokers: state.publicOrganizations?.insuranceBrokers,
             brokerageSocieties: state.publicOrganizations?.brokerageSocieties,
@@ -39,6 +40,29 @@ export const publicRegistrationsStoreActions = (
       "setPublicSuppliers"
     );
   },
+  setPublicWorkshops: (publicWorkshops, paginationInfo) => {
+    return set(
+      (state) => {
+        return {
+          ...state,
+          publicOrganizations: {
+            suppliers: state.publicOrganizations?.suppliers,
+            workshops: publicWorkshops,
+            exclusiveAgents: state.publicOrganizations?.exclusiveAgents,
+            insuranceBrokers: state.publicOrganizations?.insuranceBrokers,
+            brokerageSocieties: state.publicOrganizations?.brokerageSocieties,
+            insuranceCompanies: state.publicOrganizations?.insuranceCompanies,
+            pagination: {
+              ...state.publicOrganizations?.pagination,
+              workshops: paginationInfo,
+            },
+          },
+        };
+      },
+      false,
+      "setPublicWorkshops"
+    );
+  },
   setPublicExclusiveAgents: (publicExclusiveAgents, paginationInfo) => {
     return set(
       (state) => {
@@ -46,6 +70,7 @@ export const publicRegistrationsStoreActions = (
           ...state,
           publicOrganizations: {
             suppliers: state.publicOrganizations?.suppliers,
+            workshops: state.publicOrganizations?.workshops,
             exclusiveAgents: publicExclusiveAgents,
             insuranceBrokers: state.publicOrganizations?.insuranceBrokers,
             brokerageSocieties: state.publicOrganizations?.brokerageSocieties,
@@ -68,6 +93,7 @@ export const publicRegistrationsStoreActions = (
           ...state,
           publicOrganizations: {
             suppliers: state.publicOrganizations?.suppliers,
+            workshops: state.publicOrganizations?.workshops,
             exclusiveAgents: state.publicOrganizations?.exclusiveAgents,
             insuranceBrokers: state.publicOrganizations?.insuranceBrokers,
             brokerageSocieties: state.publicOrganizations?.brokerageSocieties,
@@ -90,6 +116,7 @@ export const publicRegistrationsStoreActions = (
           ...state,
           publicOrganizations: {
             suppliers: state.publicOrganizations?.suppliers,
+            workshops: state.publicOrganizations?.workshops,
             exclusiveAgents: state.publicOrganizations?.exclusiveAgents,
             insuranceBrokers: state.publicOrganizations?.insuranceBrokers,
             brokerageSocieties: publicBrokerageSocieties,
@@ -112,6 +139,7 @@ export const publicRegistrationsStoreActions = (
           ...state,
           publicOrganizations: {
             suppliers: state.publicOrganizations?.suppliers,
+            workshops: state.publicOrganizations?.workshops,
             exclusiveAgents: state.publicOrganizations?.exclusiveAgents,
             insuranceBrokers: publicInsuranceBrokers,
             brokerageSocieties: state.publicOrganizations?.brokerageSocieties,

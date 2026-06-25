@@ -53,11 +53,31 @@ export const mapCustomerToListItem = (
 });
 
 export const mapSurveyTargetCandidateToListItem = (
-  candidate: SurveyTargetCandidateType
+  candidate: SurveyTargetCandidateType,
+  customer?: CustomerType | null
 ): AdminCompanyListItem => ({
   id: candidate.id,
   name: candidate.name,
   email: candidate.email,
   type: UserGroups.Customer,
   isCustomer: true,
+  isActive: Boolean(customer?.verifiedAt),
+  createdAt: customer?.verifiedAt ?? undefined,
 });
+
+export const sortCustomerListItems = (
+  items: AdminCompanyListItem[],
+  sort: "name" | "createdAt"
+): AdminCompanyListItem[] => {
+  const sorted = [...items];
+
+  if (sort === "name") {
+    return sorted.sort((a, b) => a.name.localeCompare(b.name, "es"));
+  }
+
+  return sorted.sort((a, b) => {
+    const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return dateB - dateA;
+  });
+};

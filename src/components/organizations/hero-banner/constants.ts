@@ -10,6 +10,7 @@ const {
   EXCLUSIVE_AGENT,
   INSURANCE_BROKER,
   SUPPLIER,
+  SUPPLIER_WORKSHOP,
 } = USER_TYPES;
 
 export const HERO_BANNER_CONTENT = {
@@ -21,5 +22,6 @@ export const HERO_BANNER_CONTENT = {
   [INSURANCE_COMPANY_INSURTECH]: DefaultHeroBannerContent,
   [INSURANCE_COMPANY_PREPAID_MEDICINE]: DefaultHeroBannerContent,
   [SUPPLIER]: DefaultHeroBannerContent,
+  [SUPPLIER_WORKSHOP]: DefaultHeroBannerContent,
   DEFAULT: DefaultHeroBannerContent,
 } as const;

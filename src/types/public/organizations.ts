@@ -21,12 +21,14 @@ export interface OrganizationPaginationInfo {
 
 export interface PublicOrganizations {
   suppliers?: SupplierType[] | null;
+  workshops?: SupplierType[] | null;
   exclusiveAgents?: ExclusiveAgentType[] | null;
   insuranceBrokers?: InsuranceBrokerType[] | null;
   brokerageSocieties?: BrokerageSocietyType[] | null;
   insuranceCompanies?: InsuranceCompanyType[] | null;
   pagination?: {
     suppliers?: OrganizationPaginationInfo | null;
+    workshops?: OrganizationPaginationInfo | null;
     exclusiveAgents?: OrganizationPaginationInfo | null;
     insuranceBrokers?: OrganizationPaginationInfo | null;
     brokerageSocieties?: OrganizationPaginationInfo | null;

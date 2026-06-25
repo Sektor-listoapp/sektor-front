@@ -19,6 +19,10 @@ export interface PublicOrganizationsStoreActions {
     suppliers: SupplierType[],
     paginationInfo?: OrganizationPaginationInfo | null
   ) => void;
+  setPublicWorkshops: (
+    workshops: SupplierType[],
+    paginationInfo?: OrganizationPaginationInfo | null
+  ) => void;
   setPublicExclusiveAgents: (
     exclusiveAgents: ExclusiveAgentType[],
     paginationInfo?: OrganizationPaginationInfo | null

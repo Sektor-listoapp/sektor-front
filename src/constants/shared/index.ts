@@ -9,6 +9,7 @@ export const USER_TYPES = {
   INSURANCE_COMPANY_COOPERATIVE: "InsuranceCompanyCooperatives", // cooperativas
   INSURANCE_COMPANY_INSURTECH: "InsuranceCompanyInsurtech", // insurtech
   INSURANCE_COMPANY_PREPAID_MEDICINE: "InsuranceCompanyPrepaidMedicine", // medicina prepagada
+  SUPPLIER_WORKSHOP: "SupplierWorkshop", // talleres
 } as const;
 
 export const SERVICE_SUPPLIER_TYPES = {

@@ -11,20 +11,27 @@ import { useLazyQuery } from "@apollo/client";
 import { GET_ORGANIZATION_TEMPLATE_DOWNLOAD_QUERY } from "@/lib/sektor-api/queries";
 import { toast } from "react-toastify";
 
+type CompaniesSearchFilter = {
+  name?: string;
+  type?: string;
+};
+
 interface CompaniesHeaderProps {
-  handleGetCompanies: (variables?) => void;
+  handleGetCompanies: (variables?: { filter?: CompaniesSearchFilter }) => void;
+  searchFilters?: CompaniesSearchFilter;
   disabled?: boolean;
 }
 
 const CompaniesHeader = ({
   handleGetCompanies,
+  searchFilters = {},
   disabled = false,
 }: CompaniesHeaderProps) => {
   const [openImportModal, setOpenImportModal] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   const [input, setInput] = useState({
-    name: "",
-    type: "",
+    name: searchFilters.name ?? "",
+    type: searchFilters.type ?? "",
   });
 
   const [fetchOrganizationTemplateDownload] = useLazyQuery(
@@ -32,12 +39,29 @@ const CompaniesHeader = ({
     { fetchPolicy: "no-cache" }
   );
 
+  useEffect(() => {
+    setInput({
+      name: searchFilters.name ?? "",
+      type: searchFilters.type ?? "",
+    });
+  }, [searchFilters.name, searchFilters.type]);
+
+  const buildFilter = () =>
+    pickBy(
+      {
+        name: input.name.trim(),
+        type: input.type.trim(),
+      },
+      (value) => Boolean(value)
+    ) as CompaniesSearchFilter;
+
   const handleSearchCompanies = () => {
-    const cleanedInput = pickBy(input, (value) => Boolean(value?.trim()));
-    handleGetCompanies({ filter: cleanedInput });
+    handleGetCompanies({ filter: buildFilter() });
   };
 
-  useEffect(() => handleSearchCompanies(), [input?.type]);
+  useEffect(() => {
+    handleSearchCompanies();
+  }, [input.type]);
 
   const handleExport = async () => {
     setIsExporting(true);
@@ -49,7 +73,9 @@ const CompaniesHeader = ({
       const file = data?.organizationTemplateDownload;
 
       if (file?.data && file?.name) {
-        const mimeType = file.type || "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        const mimeType =
+          file.type ||
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
         const link = document.createElement("a");
         link.href = `data:${mimeType};base64,${file.data}`;
         link.download = file.name;
@@ -57,7 +83,10 @@ const CompaniesHeader = ({
         link.click();
         document.body.removeChild(link);
       } else {
-        console.error("Respuesta inesperada de organizationTemplateDownload:", data);
+        console.error(
+          "Respuesta inesperada de organizationTemplateDownload:",
+          data
+        );
         throw new Error("No se pudo obtener el archivo.");
       }
     } catch (error) {
@@ -105,8 +134,8 @@ const CompaniesHeader = ({
           placeholder="Buscar por nombre"
           icon={faSearch}
           iconPosition="end"
-          value={input?.name}
-          onChange={(e) => setInput({ ...input, name: e.target?.value })}
+          value={input.name}
+          onChange={(e) => setInput({ ...input, name: e.target.value })}
           disabled={disabled}
         />
         <Select
@@ -117,8 +146,11 @@ const CompaniesHeader = ({
           ]}
           value={input.type}
           disabled={disabled}
-          onChange={(e) => setInput({ ...input, type: e.target?.value })}
+          onChange={(e) => setInput({ ...input, type: e.target.value })}
         />
+        <button type="submit" className="sr-only">
+          Buscar
+        </button>
       </form>
 
       <div className="hidden xl:flex items-center gap-2">
