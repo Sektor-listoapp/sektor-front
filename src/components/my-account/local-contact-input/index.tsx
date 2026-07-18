@@ -79,30 +79,35 @@ const LocalContactInput = ({
           notFoundContent="No hay formas de contacto"
           optionRender={(option) => {
             return (
-              <div className="flex items-center gap-3 justify-between p-2 bg-transparent">
-                <div>
+              <div className="flex w-full max-w-full min-w-0 items-center gap-3 justify-between overflow-hidden p-2 bg-transparent">
+                <div
+                  className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
+                  title={option?.data?.data?.url || ""}
+                >
                   <b>{option?.data?.data?.label}: </b>
                   {option?.data?.data?.url || ""}
                 </div>
-                <FontAwesomeIcon
-                  className="ml-auto cursor-pointer"
-                  icon={faPen}
-                  size="lg"
-                  title="Editar"
-                />
-                <FontAwesomeIcon
-                  className="ml-2 cursor-pointer text-red-500"
-                  icon={faTrashCan}
-                  size="lg"
-                  title="Eliminar"
-                  onClick={() => {
-                    if (onContactChange) {
-                      const newContact = { ...contactData };
-                      delete newContact[option?.data?.data?.value];
-                      onContactChange(newContact);
-                    }
-                  }}
-                />
+                <div className="flex shrink-0 items-center gap-2">
+                  <FontAwesomeIcon
+                    className="cursor-pointer"
+                    icon={faPen}
+                    size="lg"
+                    title="Editar"
+                  />
+                  <FontAwesomeIcon
+                    className="cursor-pointer text-red-500"
+                    icon={faTrashCan}
+                    size="lg"
+                    title="Eliminar"
+                    onClick={() => {
+                      if (onContactChange) {
+                        const newContact = { ...contactData };
+                        delete newContact[option?.data?.data?.value];
+                        onContactChange(newContact);
+                      }
+                    }}
+                  />
+                </div>
               </div>
             );
           }}

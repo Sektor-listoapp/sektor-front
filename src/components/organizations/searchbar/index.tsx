@@ -125,11 +125,14 @@ const Searchbar = ({
       )}
       {...props}
     >
-      <Link href="/clinic-list" className="w-full md:hidden">
-        <Button className="w-full">
-          Ver listado de clínicas y seguros disponibles
-        </Button>
-      </Link>
+      <div className="w-full flex flex-col gap-2 md:hidden">
+        <Link href="/clinic-list" className="w-full">
+          <Button className="w-full">Ver listado de clínicas</Button>
+        </Link>
+        <Link href="/workshop-list" className="w-full">
+          <Button className="w-full">Ver listado de talleres</Button>
+        </Link>
+      </div>
       <div className="w-full flex justify-center md:justify-start md:w-auto overflow-x-auto md:overflow-visible">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-2 w-full max-w-full min-w-0 md:w-auto">
           {ORGANIZATION_TYPE_OPTIONS.map((option) => (

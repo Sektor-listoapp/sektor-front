@@ -65,7 +65,7 @@ export const mapSurveyTargetCandidateToListItem = (
   createdAt: customer?.verifiedAt ?? undefined,
 });
 
-export const sortCustomerListItems = (
+export const sortCompanyListItems = (
   items: AdminCompanyListItem[],
   sort: "name" | "createdAt"
 ): AdminCompanyListItem[] => {

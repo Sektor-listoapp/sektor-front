@@ -13,6 +13,7 @@ export * from "./public/country-by-code";
 export * from "./public/quotes";
 export * from "./public/get-organization-template";
 export * from "./public/clinics";
+export * from "./public/workshops";
 export * from "./public/states";
 export * from "./public/insurance-companies";
 export * from "./public/home-stats";

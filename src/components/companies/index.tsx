@@ -34,13 +34,13 @@ import {
   DeleteCompanyTarget,
   mapOrganizationToListItem,
   mapSurveyTargetCandidateToListItem,
-  sortCustomerListItems,
+  sortCompanyListItems,
 } from "./types";
 import {
-  CUSTOMER_SORT_OPTIONS,
-  CustomerSortOption,
+  COMPANY_SORT_OPTIONS,
+  CompanySortOption,
 } from "./constants";
-import CustomerSortControls from "./customer-sort-controls";
+import CompanySortControls from "./company-sort-controls";
 
 const CUSTOMER_FILTER_TYPE = UserGroups.Customer;
 
@@ -53,8 +53,8 @@ const CompanyList = () => {
   const [isLoadingCompanies, setIsLoadingCompanies] = useState(false);
   const [companies, setCompanies] = useState<AdminCompanyListItem[]>([]);
   const [searchFilters, setSearchFilters] = useState<CompaniesSearchFilter>({});
-  const [customerSort, setCustomerSort] = useState<CustomerSortOption>(
-    CUSTOMER_SORT_OPTIONS.name
+  const [companySort, setCompanySort] = useState<CompanySortOption>(
+    COMPANY_SORT_OPTIONS.name
   );
   const [isChangingVisibility, setIsChangingVisibility] = useState(false);
   const [isChangingPlan, setIsChangingPlan] = useState(false);
@@ -158,11 +158,6 @@ const CompanyList = () => {
     const isCustomerFilter = selectedType === CUSTOMER_FILTER_TYPE;
     const shouldFetchOrganizations = !isCustomerFilter;
     const shouldFetchCustomers = !selectedType || isCustomerFilter;
-    const activeCustomerSort = isCustomerFilter ? customerSort : CUSTOMER_SORT_OPTIONS.name;
-
-    if (variables.filter !== undefined && !isCustomerFilter) {
-      setCustomerSort(CUSTOMER_SORT_OPTIONS.name);
-    }
 
     try {
       let organizations: OrganizationType[] = [];
@@ -196,17 +191,22 @@ const CompanyList = () => {
 
         if (isCustomerFilter) {
           const enrichedCustomers = await enrichCustomerCandidates(candidates);
-          setCompanies(sortCustomerListItems(enrichedCustomers, activeCustomerSort));
+          setCompanies(sortCompanyListItems(enrichedCustomers, companySort));
           return;
         }
 
         customers = candidates;
       }
 
-      const mergedCompanies = [
-        ...organizations.map(mapOrganizationToListItem),
-        ...customers.map((candidate) => mapSurveyTargetCandidateToListItem(candidate)),
-      ].sort((a, b) => a.name.localeCompare(b.name, "es"));
+      const mergedCompanies = sortCompanyListItems(
+        [
+          ...organizations.map(mapOrganizationToListItem),
+          ...customers.map((candidate) =>
+            mapSurveyTargetCandidateToListItem(candidate)
+          ),
+        ],
+        companySort
+      );
 
       setCompanies(mergedCompanies);
     } catch (error) {
@@ -219,14 +219,11 @@ const CompanyList = () => {
     }
   };
 
-  const handleCustomerSortChange = (sort: CustomerSortOption) => {
-    setCustomerSort(sort);
-
-    if (searchFilters.type !== CUSTOMER_FILTER_TYPE) {
-      return;
-    }
-
-    setCompanies((currentCompanies) => sortCustomerListItems(currentCompanies, sort));
+  const handleCompanySortChange = (sort: CompanySortOption) => {
+    setCompanySort(sort);
+    setCompanies((currentCompanies) =>
+      sortCompanyListItems(currentCompanies, sort)
+    );
   };
 
   const handleChangeOrgPlan = (id: string, plan: OrganizationPlans) => {
@@ -299,13 +296,11 @@ const CompanyList = () => {
           }
         />
 
-        {searchFilters.type === CUSTOMER_FILTER_TYPE && (
-          <CustomerSortControls
-            value={customerSort}
-            onChange={handleCustomerSortChange}
-            disabled={isLoadingCompanies}
-          />
-        )}
+        <CompanySortControls
+          value={companySort}
+          onChange={handleCompanySortChange}
+          disabled={isLoadingCompanies}
+        />
 
         {isLoadingCompanies && (
           <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-white bg-opacity-40 z-50">
