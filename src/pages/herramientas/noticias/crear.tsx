@@ -14,9 +14,13 @@ import {
   UserGroups,
   NewsUploadedBy,
   NewsEntryType,
+  NewsVisibility,
 } from "@/lib/sektor-api/__generated__/types";
 import { CREATE_NEWS } from "@/lib/sektor-api/mutations";
-import { ALL_NEWS_QUERY, HOME_NEWS_QUERY } from "@/lib/sektor-api/queries";
+import {
+  ALL_NEWS_QUERY,
+  HOME_NEWS_QUERY,
+} from "@/lib/sektor-api/queries";
 import { ROUTES } from "@/constants/router";
 import { toast } from "react-toastify";
 import { cn } from "@/utils/class-name";
@@ -79,10 +83,18 @@ const CrearNoticia = () => {
             uploadedBy: NewsUploadedBy.Sektor,
             videoUrl: mediaType === "video" ? videoUrl : undefined,
             allowedRoles: allowedRoles.length > 0 ? allowedRoles : undefined,
+            visibility:
+              allowedRoles.length > 0
+                ? NewsVisibility.RoleBased
+                : NewsVisibility.Public,
+            ...(isAdmin ? { pendingApproval: false } : {}),
           },
           photo: mediaType === "photo" ? photo : undefined,
         },
-        refetchQueries: [{ query: ALL_NEWS_QUERY }, { query: HOME_NEWS_QUERY }],
+        refetchQueries: [
+          { query: ALL_NEWS_QUERY },
+          { query: HOME_NEWS_QUERY },
+        ],
         awaitRefetchQueries: true,
       });
 
