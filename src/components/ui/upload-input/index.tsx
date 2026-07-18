@@ -1,14 +1,12 @@
 import React, { useState, useCallback } from "react";
 import Image from "next/image";
 import { Upload } from "antd";
-import { UploadChangeParam, UploadFile } from "antd/lib/upload";
-import { getBase64 } from "./utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpFromBracket, faTimes, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { cn } from "@/utils/class-name";
-import { Dialog } from '@headlessui/react';
-import Cropper from 'react-easy-crop';
-import { cropImage, fileToBase64, CropArea } from '@/lib/cropImage';
+import { Dialog } from "@headlessui/react";
+import Cropper from "react-easy-crop";
+import { cropImage, fileToBase64, CropArea } from "@/lib/cropImage";
 
 interface UploadInputProps {
   className?: string;
@@ -23,6 +21,14 @@ interface UploadInputProps {
   enableCrop?: boolean;
 }
 
+const ALLOWED_FILE_TYPES = [
+  "image/jpeg",
+  "image/png",
+  "image/jpg",
+  "image/webp",
+];
+const MAX_SIZE_BYTES = 15 * 1024 * 1024; // 15MB
+
 const UploadInput: React.FC<UploadInputProps> = ({
   className,
   imageUrl,
@@ -36,61 +42,85 @@ const UploadInput: React.FC<UploadInputProps> = ({
   enableCrop = true,
 }) => {
   const [loadingLocalImage, setLoadingLocalImage] = useState(false);
-  const [localImageFile, setLocalImageFile] =
-    useState<UploadFile<unknown> | null>(null);
-
+  const [localFileName, setLocalFileName] = useState<string | null>(null);
   const [showError, setShowError] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<CropArea | null>(null);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<CropArea | null>(
+    null
+  );
   const [isCropping, setIsCropping] = useState(false);
 
-  const handleChange = (info: UploadChangeParam<UploadFile<unknown>>) => {
-    const { type, status, size } = info?.file;
-    const allowedFileTypes = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
-    const maxSizeInBytes = 15 * 1024 * 1024; // 15MB
+  const markInvalid = useCallback(() => {
+    setShowError(true);
+    if (setError) setError(true);
+  }, [setError]);
 
-    if (!allowedFileTypes.includes(type || "") || (size || 0) > maxSizeInBytes) {
-      setShowError(true);
-      if (setError) setError(true);
-      return;
-    }
-
+  const markValid = useCallback(() => {
     setShowError(false);
     if (setError) setError(false);
+  }, [setError]);
 
-    if (status === "uploading") {
+  const openCropper = useCallback(
+    async (file: File) => {
       setLoadingLocalImage(true);
       setIsUploadingLogo(true);
-      return;
-    }
-    if (status === "done") {
-      setLocalImageFile(info.file);
-
-      if (enableCrop && info.file.originFileObj) {
-        fileToBase64(info.file.originFileObj).then((base64) => {
-          setImageSrc(base64);
-          setIsModalOpen(true);
-          setLoadingLocalImage(false);
-          setIsUploadingLogo(false);
-        });
-      } else {
-        getBase64(info.file.originFileObj, (imageUrl) => {
-          setLoadingLocalImage(false);
-          setIsUploadingLogo(false);
-          onImageChange(imageUrl, info.file.originFileObj);
-        });
+      setLocalFileName(file.name);
+      try {
+        const base64 = await fileToBase64(file);
+        setImageSrc(base64);
+        setIsModalOpen(true);
+        markValid();
+      } catch {
+        markInvalid();
+        setLocalFileName(null);
+      } finally {
+        setLoadingLocalImage(false);
+        setIsUploadingLogo(false);
       }
-    }
-  };
+    },
+    [markInvalid, markValid, setIsUploadingLogo]
+  );
+
+  const processFile = useCallback(
+    (file: File) => {
+      if (
+        !ALLOWED_FILE_TYPES.includes(file.type) ||
+        file.size > MAX_SIZE_BYTES
+      ) {
+        markInvalid();
+        return Upload.LIST_IGNORE;
+      }
+
+      markValid();
+
+      if (enableCrop) {
+        void openCropper(file);
+      } else {
+        setLocalFileName(file.name);
+        const reader = new FileReader();
+        reader.onload = () => {
+          onImageChange(String(reader.result || ""), file);
+        };
+        reader.readAsDataURL(file);
+      }
+
+      // Keep file local — Apollo upload happens on form save
+      return false;
+    },
+    [enableCrop, markInvalid, markValid, onImageChange, openCropper]
+  );
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onCropComplete = useCallback((croppedArea: any, croppedAreaPixels: CropArea) => {
-    setCroppedAreaPixels(croppedAreaPixels);
-  }, []);
+  const onCropComplete = useCallback(
+    (_croppedArea: any, croppedAreaPixels: CropArea) => {
+      setCroppedAreaPixels(croppedAreaPixels);
+    },
+    []
+  );
 
   const handleCropConfirm = useCallback(async () => {
     if (!imageSrc || !croppedAreaPixels) return;
@@ -98,25 +128,25 @@ const UploadInput: React.FC<UploadInputProps> = ({
     try {
       setIsCropping(true);
       const result = await cropImage(imageSrc, croppedAreaPixels, aspect);
-      if (result.blob) {
-        const file = new File([result.blob], 'cropped-image.webp', { type: 'image/webp' });
-        onImageChange(result.url, file);
-      } else {
-      onImageChange(result.url);
+      if (!result.blob) {
+        throw new Error("No se pudo generar la imagen recortada");
       }
+      const file = new File([result.blob], "cropped-image.webp", {
+        type: "image/webp",
+      });
+      setLocalFileName(file.name);
+      onImageChange(result.url, file);
       setIsModalOpen(false);
       setImageSrc(null);
       setCrop({ x: 0, y: 0 });
       setZoom(1);
       setCroppedAreaPixels(null);
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (err) {
-      setShowError(true);
-      if (setError) setError(true);
+    } catch {
+      markInvalid();
     } finally {
       setIsCropping(false);
     }
-  }, [imageSrc, croppedAreaPixels, aspect, onImageChange, setError]);
+  }, [imageSrc, croppedAreaPixels, aspect, onImageChange, markInvalid]);
 
   const handleCropCancel = useCallback(() => {
     setIsModalOpen(false);
@@ -124,7 +154,7 @@ const UploadInput: React.FC<UploadInputProps> = ({
     setCrop({ x: 0, y: 0 });
     setZoom(1);
     setCroppedAreaPixels(null);
-    setLocalImageFile(null);
+    setLocalFileName(null);
     setLoadingLocalImage(false);
     setIsUploadingLogo(false);
   }, [setIsUploadingLogo]);
@@ -140,12 +170,13 @@ const UploadInput: React.FC<UploadInputProps> = ({
         name="localLogo"
         listType="picture"
         showUploadList={false}
-        onChange={handleChange}
+        accept="image/jpeg,image/png,image/jpg,image/webp"
+        beforeUpload={processFile}
         disabled={disabled}
       >
         <div
           className="flex items-center justify-between gap-2 absolute w-full h-full top-0 left-0 p-4 text-base"
-          title={localImageFile?.name || placeholder}
+          title={localFileName || placeholder}
         >
           {Boolean(imageUrl?.trim()) && (
             <Image
@@ -154,6 +185,7 @@ const UploadInput: React.FC<UploadInputProps> = ({
               width={50}
               height={50}
               className="max-h-10"
+              unoptimized={imageUrl?.startsWith("blob:")}
             />
           )}
 
@@ -161,12 +193,11 @@ const UploadInput: React.FC<UploadInputProps> = ({
             <span className="block w-full">Cargando imagen...</span>
           ) : (
             <span className="block w-full truncate">
-              {(!localImageFile?.name && !imageUrl?.trim()) ||
-                (localImageFile?.name && !imageUrl?.trim())
-                ? placeholder
-                : ""}
-              {localImageFile?.name && imageUrl?.trim() && localImageFile?.name}
-              {!localImageFile?.name && imageUrl?.trim() && "Imagen cargada"}
+              {localFileName
+                ? localFileName
+                : imageUrl?.trim()
+                  ? "Imagen cargada"
+                  : placeholder}
             </span>
           )}
 
@@ -175,8 +206,8 @@ const UploadInput: React.FC<UploadInputProps> = ({
       </Upload>
       {(showError || error) && (
         <span className="text-red-500 text-xs">
-          Debe subir una imagen tipo JPG, PNG, JPEG o WebP con un máximo de 15 MB de
-          peso
+          Debe subir una imagen tipo JPG, PNG, JPEG o WebP con un máximo de 15 MB
+          de peso
         </span>
       )}
 
@@ -216,13 +247,13 @@ const UploadInput: React.FC<UploadInputProps> = ({
                     objectFit="contain"
                     style={{
                       containerStyle: {
-                        width: '100%',
-                        height: '100%',
-                        backgroundColor: '#f3f4f6',
+                        width: "100%",
+                        height: "100%",
+                        backgroundColor: "#f3f4f6",
                       },
                       cropAreaStyle: {
-                        border: '2px solid #3b82f6',
-                        borderRadius: '12px',
+                        border: "2px solid #3b82f6",
+                        borderRadius: "12px",
                       },
                     }}
                   />
