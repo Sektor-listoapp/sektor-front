@@ -223,17 +223,14 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
   });
 
   const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
-    try {
-      const { data } = await updateOrganizationLogo({
-        variables: {
-          id: organizationId,
-          logo: logoFile
-        }
-      });
-      console.log(data);
-      console.log("Logo actualizado:", data?.updateOrganizationLogo);
-    } catch (error) {
-      console.error("Error al actualizar logo:", error);
+    const { data } = await updateOrganizationLogo({
+      variables: {
+        id: organizationId,
+        logo: logoFile,
+      },
+    });
+    if (!data?.updateOrganizationLogo?.id) {
+      throw new Error("No se pudo actualizar el logo");
     }
   };
 
@@ -447,7 +444,15 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
         foundationYear,
         name: input?.name,
         allies: input?.allies,
-        logoUrl: input?.logoUrl,
+        // Never send blob: preview URLs — they overwrite the real logo on the server.
+        // When a new file is uploaded, updateOrganizationLogo owns the logo update.
+        ...(input?.logoFile
+          ? {}
+          : {
+              logoUrl: input?.logoUrl?.startsWith("blob:")
+                ? brokerageSociety?.logoUrl
+                : input?.logoUrl,
+            }),
         modality: input?.modality,
         workTeam: formattedWorkTeam,
         type: brokerageSociety?.type,
@@ -466,10 +471,17 @@ const BrokerageSocietyForm = ({ userId }: BrokerageSocietyIdProps) => {
     if (input?.logoFile) {
       if (!targetUserId) {
         toast.error("No se pudo actualizar el logo, intenta de nuevo más tarde");
+        setIsUpdatingBrokerageSociety(false);
         return;
       }
-      console.log('input.logoFile', input.logoFile);
-      handleUpdateLogo(targetUserId, input.logoFile);
+      try {
+        await handleUpdateLogo(targetUserId, input.logoFile);
+      } catch (error) {
+        console.error("Error al actualizar logo:", error);
+        toast.error("No se pudo actualizar la foto de perfil");
+        setIsUpdatingBrokerageSociety(false);
+        return;
+      }
     }
 
     try {

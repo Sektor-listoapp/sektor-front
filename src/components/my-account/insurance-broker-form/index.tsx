@@ -46,7 +46,7 @@ import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { FormProps } from "@/types/forms";
 import LocalOfficesInput from "../local-offices-input";
 import SocialMediaInput from "../social-media-input";
-// import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/update-organization-logo";
+import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/update-organization-logo";
 import { UPDATE_INSURANCE_BROKER_CLIENT_LOGO } from "@/lib/sektor-api/mutations/my-account/update-insurance-broker-client-logo";
 
 type InsuranceBrokerIdProps = FormProps;
@@ -104,7 +104,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
   const [updateEmailMutation] = useMutation<Mutation>(UPDATE_EMAIL);
   const [adminUpdateUserEmailMutation] = useMutation<Mutation>(ADMIN_UPDATE_USER_EMAIL);
 
-  // const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
+  const [updateOrganizationLogo] = useMutation<Mutation>(UPDATE_ORGANIZATION_LOGO);
   const [updateInsuranceBrokerClientLogo] = useMutation<Mutation>(UPDATE_INSURANCE_BROKER_CLIENT_LOGO);
 
   const {
@@ -238,20 +238,17 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     birthDate: insuranceBroker?.birthDate || null,
   });
 
-  // const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
-  //   try {
-  //     const { data } = await updateOrganizationLogo({
-  //       variables: {
-  //         id: organizationId,
-  //         logo: logoFile
-  //       }
-  //     });
-  //     console.log(data);
-  //     console.log("Logo actualizado:", data?.updateOrganizationLogo);
-  //   } catch (error) {
-  //     console.error("Error al actualizar logo:", error);
-  //   }
-  // };
+  const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
+    const { data } = await updateOrganizationLogo({
+      variables: {
+        id: organizationId,
+        logo: logoFile,
+      },
+    });
+    if (!data?.updateOrganizationLogo?.id) {
+      throw new Error("No se pudo actualizar el logo");
+    }
+  };
 
   const handleUpdateClientLogo = async (clientId: string, logoFile: File, organizationId: string) => {
     try {
@@ -474,7 +471,13 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
         foundationYear,
         name: input?.name,
         allies: input?.allies,
-        logoUrl: input?.logoUrl,
+        ...(input?.logoFile
+          ? {}
+          : {
+              logoUrl: input?.logoUrl?.startsWith("blob:")
+                ? insuranceBroker?.logoUrl
+                : input?.logoUrl,
+            }),
         modality: input?.modality,
         sex: input?.sex,
         type: insuranceBroker?.type,
@@ -499,6 +502,15 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
     };
 
     try {
+      if (input?.logoFile) {
+        if (!targetUserId) {
+          toast.error("No se pudo actualizar el logo, intenta de nuevo más tarde");
+          setIsUpdatingInsuranceBroker(false);
+          return;
+        }
+        await handleUpdateLogo(targetUserId, input.logoFile);
+      }
+
       await updateInsuranceBroker({
         variables: mutationVariables,
       });

@@ -2,34 +2,23 @@ import React from "react";
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash, faPencil } from "@fortawesome/free-solid-svg-icons";
-import {
-  NewsType,
-  NewsUploadedBy,
-  NewsVisibility,
-} from "@/lib/sektor-api/__generated__/types";
+import { NewsType, NewsUploadedBy } from "@/lib/sektor-api/__generated__/types";
 import Button from "@/components/ui/button";
 
 interface NewsAdminCardProps {
   news: NewsType;
-  /** True when this news id is present in the public homeNews feed */
-  isOnPublicFeed?: boolean;
   showAuthorize?: boolean;
   onEdit: () => void;
   onDelete: () => void;
   onAuthorize?: () => void;
-  onPublish?: () => void;
-  publishing?: boolean;
 }
 
 const NewsAdminCard: React.FC<NewsAdminCardProps> = ({
   news,
-  isOnPublicFeed = false,
   showAuthorize = false,
   onEdit,
   onDelete,
   onAuthorize,
-  onPublish,
-  publishing = false,
 }) => {
   const getUploadedByText = (uploadedBy: NewsUploadedBy) => {
     switch (uploadedBy) {
@@ -42,11 +31,9 @@ const NewsAdminCard: React.FC<NewsAdminCardProps> = ({
     }
   };
 
-  const showPublish =
-    !news.pendingApproval && !isOnPublicFeed && Boolean(onPublish);
-
   return (
     <div className="flex items-center gap-4 py-4 border-b border-gray-200 last:border-b-0">
+      {/* Image */}
       <div className="relative w-[80px] h-[60px] rounded-lg overflow-hidden flex-shrink-0">
         <Image
           src={news.photoUrl || "/images/placeholder.webp"}
@@ -56,6 +43,7 @@ const NewsAdminCard: React.FC<NewsAdminCardProps> = ({
         />
       </div>
 
+      {/* Content */}
       <div className="flex-1 min-w-0">
         <h3 className="text-blue-500 font-bold text-sm line-clamp-2">
           {news.title}
@@ -63,31 +51,15 @@ const NewsAdminCard: React.FC<NewsAdminCardProps> = ({
         <p className="text-gray-500 text-xs mt-1">
           Subida por: {getUploadedByText(news.uploadedBy)}
         </p>
-        {!news.pendingApproval && (
-          <p
-            className={`text-xs mt-1 ${
-              isOnPublicFeed ? "text-green-600" : "text-amber-600"
-            }`}
-          >
-            {isOnPublicFeed
-              ? "Visible en /noticias"
-              : "No visible en /noticias"}
-          </p>
-        )}
-        {!news.pendingApproval &&
-          news.visibility === NewsVisibility.Public &&
-          !isOnPublicFeed && (
-            <p className="text-xs text-gray-400 mt-0.5">
-              Marcada como pública, pero aún no aparece en el listado público
-            </p>
-          )}
       </div>
 
+      {/* Date and Time */}
       <div className="text-xs text-gray-400 flex-shrink-0 text-right">
         <p>{news.date}</p>
         <p>{news.time}</p>
       </div>
 
+      {/* Actions */}
       <div className="flex items-center gap-2 flex-shrink-0">
         <button
           onClick={onDelete}
@@ -112,19 +84,10 @@ const NewsAdminCard: React.FC<NewsAdminCardProps> = ({
             Autorizar
           </Button>
         )}
-        {showPublish && (
-          <Button
-            variant="solid-blue"
-            className="!text-xs !py-1 !px-3"
-            onClick={onPublish}
-            loading={publishing}
-          >
-            Publicar
-          </Button>
-        )}
       </div>
     </div>
   );
 };
 
 export default NewsAdminCard;
+

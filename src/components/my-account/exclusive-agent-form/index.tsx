@@ -248,15 +248,14 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
   });
 
   const handleUpdateLogo = async (organizationId: string, logoFile: File) => {
-    try {
-      await updateOrganizationLogo({
-        variables: {
-          id: organizationId,
-          logo: logoFile
-        }
-      });
-    } catch (error) {
-      console.error("Error al actualizar logo:", error);
+    const { data } = await updateOrganizationLogo({
+      variables: {
+        id: organizationId,
+        logo: logoFile,
+      },
+    });
+    if (!data?.updateOrganizationLogo?.id) {
+      throw new Error("No se pudo actualizar el logo");
     }
   };
 
@@ -474,7 +473,13 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
         foundationYear,
         name: input?.name,
         allies: input?.allies,
-        logoUrl: input?.logoUrl,
+        ...(input?.logoFile
+          ? {}
+          : {
+              logoUrl: input?.logoUrl?.startsWith("blob:")
+                ? exclusiveAgent?.logoUrl
+                : input?.logoUrl,
+            }),
         modality: input?.modality,
         sex: input?.sex,
         type: exclusiveAgent?.type,
@@ -504,7 +509,14 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
         toast.error("No se pudo actualizar el logo, intenta de nuevo más tarde");
         return;
       }
-      handleUpdateLogo(targetUserId, input.logoFile);
+      try {
+        await handleUpdateLogo(targetUserId, input.logoFile);
+      } catch (error) {
+        console.error("Error al actualizar logo:", error);
+        toast.error("No se pudo actualizar la foto de perfil");
+        setIsUpdatingExclusiveAgent(false);
+        return;
+      }
     }
 
     updateExclusiveAgent({

@@ -129,18 +129,9 @@ const EditarNoticia = () => {
             type: news.type,
             videoUrl: mediaType === "video" ? videoUrl : undefined,
             allowedRoles: allowedRoles.length > 0 ? allowedRoles : undefined,
-            visibility:
-              allowedRoles.length > 0
-                ? NewsVisibility.RoleBased
-                : NewsVisibility.Public,
           },
           photo: mediaType === "photo" ? photo : undefined,
         },
-        refetchQueries: [
-          { query: ALL_NEWS_QUERY },
-          { query: HOME_NEWS_QUERY },
-        ],
-        awaitRefetchQueries: true,
       });
       toast.success("Noticia actualizada correctamente");
       router.push(ROUTES.ADMIN_NEWS);
@@ -240,7 +231,7 @@ const EditarNoticia = () => {
             </h1>
           </div>
 
-          {news.pendingApproval ? (
+          {news.pendingApproval && (
             <Button
               variant="solid-blue"
               onClick={handleAuthorize}
@@ -249,16 +240,7 @@ const EditarNoticia = () => {
             >
               Autorizar
             </Button>
-          ) : news.visibility !== NewsVisibility.Public ? (
-            <Button
-              variant="solid-blue"
-              onClick={handleAuthorize}
-              loading={updating}
-              className="!rounded-full"
-            >
-              Publicar
-            </Button>
-          ) : null}
+          )}
         </div>
 
         {/* Author Info */}
