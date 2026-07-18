@@ -44,18 +44,8 @@ const HerramientasNoticias = () => {
     fetchPolicy: "no-cache",
   });
 
-  const { data: homeNewsData, refetch: refetchHomeNews } = useQuery<Query>(
-    HOME_NEWS_QUERY,
-    { fetchPolicy: "network-only" }
-  );
-
-  const publicFeedIds = new Set(
-    ((homeNewsData?.homeNews || []) as NewsType[]).map((news) => news.id)
-  );
-
   const [deleteNews, { loading: deletingNews }] = useMutation(DELETE_NEWS);
   const [updateNews] = useMutation(UPDATE_NEWS);
-  const [publishingId, setPublishingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!userGroup) return;
@@ -139,40 +129,10 @@ const HerramientasNoticias = () => {
         awaitRefetchQueries: true,
       });
       toast.success("Noticia autorizada correctamente");
-      await Promise.all([refetch(), refetchHomeNews()]);
+      await refetch();
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(error?.message || "Error al autorizar la noticia");
-    }
-  };
-
-  const handlePublish = async (news: NewsType) => {
-    try {
-      setPublishingId(news.id);
-      // Same path as Autorizar: updateNews is what actually exposes items in homeNews
-      await updateNews({
-        variables: {
-          id: news.id,
-          input: {
-            title: news.title,
-            description: news.description,
-            type: news.type,
-            videoUrl: news.videoUrl || undefined,
-            allowedRoles: (news.allowedRoles as UserGroups[]) || undefined,
-            pendingApproval: false,
-            visibility: NewsVisibility.Public,
-          },
-        },
-        refetchQueries: [{ query: HOME_NEWS_QUERY }, { query: ALL_NEWS_QUERY }],
-        awaitRefetchQueries: true,
-      });
-      toast.success("Noticia publicada en /noticias");
-      await Promise.all([refetch(), refetchHomeNews()]);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      toast.error(error?.message || "Error al publicar la noticia");
-    } finally {
-      setPublishingId(null);
     }
   };
 
@@ -310,13 +270,11 @@ const HerramientasNoticias = () => {
                 <NewsAdminCard
                   key={news.id}
                   news={news}
-                  isOnPublicFeed={publicFeedIds.has(news.id)}
                   onEdit={() => {
+                    console.log("Editing approved news, ID:", news.id, "Type:", typeof news.id);
                     router.push(`${ROUTES.ADMIN_NEWS}/${String(news.id)}`);
                   }}
                   onDelete={() => setNewsToDelete(news)}
-                  onPublish={() => handlePublish(news)}
-                  publishing={publishingId === news.id}
                 />
               ))
             )}
