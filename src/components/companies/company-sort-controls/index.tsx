@@ -1,20 +1,20 @@
 import Button from "@/components/ui/button";
 import {
-  CUSTOMER_SORT_OPTIONS,
-  CustomerSortOption,
+  COMPANY_SORT_OPTIONS,
+  CompanySortOption,
 } from "../constants";
 
-interface CustomerSortControlsProps {
-  value: CustomerSortOption;
-  onChange: (sort: CustomerSortOption) => void;
+interface CompanySortControlsProps {
+  value: CompanySortOption;
+  onChange: (sort: CompanySortOption) => void;
   disabled?: boolean;
 }
 
-const CustomerSortControls = ({
+const CompanySortControls = ({
   value,
   onChange,
   disabled = false,
-}: CustomerSortControlsProps) => (
+}: CompanySortControlsProps) => (
   <div className="w-full flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
     <span className="text-sm font-century-gothic text-blue-500 shrink-0">
       Ordenar:
@@ -22,21 +22,21 @@ const CustomerSortControls = ({
     <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
       <Button
         type="button"
-        variant={value === CUSTOMER_SORT_OPTIONS.name ? "solid-blue" : "outline"}
+        variant={value === COMPANY_SORT_OPTIONS.name ? "solid-blue" : "outline"}
         className="w-full sm:w-auto text-sm px-4 py-2"
         disabled={disabled}
-        onClick={() => onChange(CUSTOMER_SORT_OPTIONS.name)}
+        onClick={() => onChange(COMPANY_SORT_OPTIONS.name)}
       >
         Ordenar de forma alfabética
       </Button>
       <Button
         type="button"
         variant={
-          value === CUSTOMER_SORT_OPTIONS.createdAt ? "solid-blue" : "outline"
+          value === COMPANY_SORT_OPTIONS.createdAt ? "solid-blue" : "outline"
         }
         className="w-full sm:w-auto text-sm px-4 py-2"
         disabled={disabled}
-        onClick={() => onChange(CUSTOMER_SORT_OPTIONS.createdAt)}
+        onClick={() => onChange(COMPANY_SORT_OPTIONS.createdAt)}
       >
         Ordenar por fecha de creación
       </Button>
@@ -44,4 +44,4 @@ const CustomerSortControls = ({
   </div>
 );
 
-export default CustomerSortControls;
+export default CompanySortControls;
