@@ -15,6 +15,7 @@ import {
   UserGroups,
   NewsUploadedBy,
   NewsVisibility,
+  OrganizationTypes,
   Query,
   NewsType,
 } from "@/lib/sektor-api/__generated__/types";
@@ -41,7 +42,9 @@ const EditarNoticia = () => {
   const [videoUrl, setVideoUrl] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [allowedRoles, setAllowedRoles] = useState<UserGroups[]>([]);
+  const [allowedOrganizationTypes, setAllowedOrganizationTypes] = useState<
+    OrganizationTypes[]
+  >([]);
 
   const { data, loading, error: queryError } = useQuery<Query>(ALL_NEWS_QUERY, {
     fetchPolicy: "network-only",
@@ -64,7 +67,9 @@ const EditarNoticia = () => {
       setDescription(quillDeltaToText(news.description));
       setVideoUrl(news.videoUrl || "");
       setPhotoPreview(news.photoUrl || null);
-      setAllowedRoles((news.allowedRoles as UserGroups[]) || []);
+      setAllowedOrganizationTypes(
+        (news.allowedOrganizationTypes as OrganizationTypes[]) || []
+      );
 
       if (news.videoUrl) {
         setMediaType("video");
@@ -120,6 +125,8 @@ const EditarNoticia = () => {
     }
 
     try {
+      const hasOrganizationTypes = allowedOrganizationTypes.length > 0;
+
       await updateNews({
         variables: {
           id: id as string,
@@ -128,7 +135,12 @@ const EditarNoticia = () => {
             description,
             type: news.type,
             videoUrl: mediaType === "video" ? videoUrl : undefined,
-            allowedRoles: allowedRoles.length > 0 ? allowedRoles : undefined,
+            allowedOrganizationTypes: hasOrganizationTypes
+              ? allowedOrganizationTypes
+              : undefined,
+            visibility: hasOrganizationTypes
+              ? NewsVisibility.RoleBased
+              : NewsVisibility.Public,
           },
           photo: mediaType === "photo" ? photo : undefined,
         },
@@ -148,6 +160,10 @@ const EditarNoticia = () => {
     }
 
     try {
+      const organizationTypes =
+        (news.allowedOrganizationTypes as OrganizationTypes[]) || [];
+      const hasOrganizationTypes = organizationTypes.length > 0;
+
       await updateNews({
         variables: {
           id: id as string,
@@ -156,9 +172,13 @@ const EditarNoticia = () => {
             description: news.description,
             type: news.type,
             videoUrl: news.videoUrl || undefined,
-            allowedRoles: (news.allowedRoles as UserGroups[]) || undefined,
+            allowedOrganizationTypes: hasOrganizationTypes
+              ? organizationTypes
+              : undefined,
             pendingApproval: false,
-            visibility: NewsVisibility.Public,
+            visibility: hasOrganizationTypes
+              ? NewsVisibility.RoleBased
+              : NewsVisibility.Public,
           },
         },
         refetchQueries: [{ query: HOME_NEWS_QUERY }, { query: ALL_NEWS_QUERY }],
@@ -377,8 +397,8 @@ const EditarNoticia = () => {
         <div className="mb-10">
           <p className="text-blue-500 text-sm mb-4">¿Quién puede ver tu noticia?</p>
           <RoleSelector
-            selectedRoles={allowedRoles as UserGroups[]}
-            onChange={setAllowedRoles}
+            selectedRoles={allowedOrganizationTypes}
+            onChange={setAllowedOrganizationTypes}
           />
         </div>
 

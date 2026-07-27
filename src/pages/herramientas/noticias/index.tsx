@@ -17,6 +17,7 @@ import {
   NewsType,
   NewsUploadedBy,
   NewsVisibility,
+  OrganizationTypes,
 } from "@/lib/sektor-api/__generated__/types";
 import { ALL_NEWS_QUERY, HOME_NEWS_QUERY } from "@/lib/sektor-api/queries";
 import { DELETE_NEWS, UPDATE_NEWS } from "@/lib/sektor-api/mutations";
@@ -112,6 +113,10 @@ const HerramientasNoticias = () => {
 
   const handleAuthorize = async (news: NewsType) => {
     try {
+      const organizationTypes =
+        (news.allowedOrganizationTypes as OrganizationTypes[]) || [];
+      const hasOrganizationTypes = organizationTypes.length > 0;
+
       await updateNews({
         variables: {
           id: news.id,
@@ -120,9 +125,13 @@ const HerramientasNoticias = () => {
             description: news.description,
             type: news.type,
             videoUrl: news.videoUrl || undefined,
-            allowedRoles: (news.allowedRoles as UserGroups[]) || undefined,
+            allowedOrganizationTypes: hasOrganizationTypes
+              ? organizationTypes
+              : undefined,
             pendingApproval: false,
-            visibility: NewsVisibility.Public,
+            visibility: hasOrganizationTypes
+              ? NewsVisibility.RoleBased
+              : NewsVisibility.Public,
           },
         },
         refetchQueries: [{ query: HOME_NEWS_QUERY }, { query: ALL_NEWS_QUERY }],

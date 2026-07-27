@@ -14,6 +14,8 @@ import {
   UserGroups,
   NewsUploadedBy,
   NewsEntryType,
+  NewsVisibility,
+  OrganizationTypes,
 } from "@/lib/sektor-api/__generated__/types";
 import { CREATE_NEWS } from "@/lib/sektor-api/mutations";
 import { ALL_NEWS_QUERY, HOME_NEWS_QUERY } from "@/lib/sektor-api/queries";
@@ -36,8 +38,9 @@ const CrearNoticia = () => {
   const [videoUrl, setVideoUrl] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [allowedRoles, setAllowedRoles] = useState<UserGroups[]>([]);
-
+  const [allowedOrganizationTypes, setAllowedOrganizationTypes] = useState<
+    OrganizationTypes[]
+  >([]);
 
   const [createNews, { loading }] = useMutation(CREATE_NEWS);
 
@@ -70,6 +73,8 @@ const CrearNoticia = () => {
     }
 
     try {
+      const hasOrganizationTypes = allowedOrganizationTypes.length > 0;
+
       await createNews({
         variables: {
           input: {
@@ -78,7 +83,12 @@ const CrearNoticia = () => {
             type: NewsEntryType.News,
             uploadedBy: NewsUploadedBy.Sektor,
             videoUrl: mediaType === "video" ? videoUrl : undefined,
-            allowedRoles: allowedRoles.length > 0 ? allowedRoles : undefined,
+            allowedOrganizationTypes: hasOrganizationTypes
+              ? allowedOrganizationTypes
+              : undefined,
+            visibility: hasOrganizationTypes
+              ? NewsVisibility.RoleBased
+              : NewsVisibility.Public,
           },
           photo: mediaType === "photo" ? photo : undefined,
         },
@@ -243,8 +253,8 @@ const CrearNoticia = () => {
         <div className="mb-10">
           <p className="text-blue-500 text-sm mb-4">¿Quién puede ver tu noticia?</p>
           <RoleSelector
-            selectedRoles={allowedRoles}
-            onChange={setAllowedRoles}
+            selectedRoles={allowedOrganizationTypes}
+            onChange={setAllowedOrganizationTypes}
           />
         </div>
 

@@ -3,7 +3,7 @@ import { useQuery, useMutation } from "@apollo/client";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faTrash, faPencil } from "@fortawesome/free-solid-svg-icons";
 import Image from "next/image";
-import { Query, Mutation, NewsType, NewsUploadedBy, NewsVisibility } from "@/lib/sektor-api/__generated__/types";
+import { Query, Mutation, NewsType, NewsUploadedBy, NewsVisibility, OrganizationTypes } from "@/lib/sektor-api/__generated__/types";
 import { ALL_NEWS_QUERY, HOME_NEWS_QUERY } from "@/lib/sektor-api/queries";
 import { DELETE_NEWS, UPDATE_NEWS } from "@/lib/sektor-api/mutations";
 import TextInput from "@/components/ui/text-input";
@@ -77,6 +77,10 @@ const NewsAdminList: React.FC<NewsAdminListProps> = ({ onEdit, onCreate }) => {
 
     const handleAuthorize = async (news: NewsType) => {
         try {
+            const organizationTypes =
+                (news.allowedOrganizationTypes as OrganizationTypes[]) || [];
+            const hasOrganizationTypes = organizationTypes.length > 0;
+
             await updateNews({
                 variables: {
                     id: news.id,
@@ -85,9 +89,13 @@ const NewsAdminList: React.FC<NewsAdminListProps> = ({ onEdit, onCreate }) => {
                         description: news.description,
                         type: news.type,
                         videoUrl: news.videoUrl || undefined,
-                        allowedRoles: (news.allowedRoles as any) || undefined,
+                        allowedOrganizationTypes: hasOrganizationTypes
+                            ? organizationTypes
+                            : undefined,
                         pendingApproval: false,
-                        visibility: NewsVisibility.Public,
+                        visibility: hasOrganizationTypes
+                            ? NewsVisibility.RoleBased
+                            : NewsVisibility.Public,
                     },
                 },
                 refetchQueries: [{ query: HOME_NEWS_QUERY }, { query: ALL_NEWS_QUERY }],

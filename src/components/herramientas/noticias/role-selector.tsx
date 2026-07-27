@@ -1,36 +1,36 @@
 import React from "react";
-import { UserGroups } from "@/lib/sektor-api/__generated__/types";
+import { OrganizationTypes } from "@/lib/sektor-api/__generated__/types";
 import { cn } from "@/utils/class-name";
 
 interface RoleSelectorProps {
-  selectedRoles: UserGroups[];
-  onChange: (roles: UserGroups[]) => void;
+  selectedRoles: OrganizationTypes[];
+  onChange: (roles: OrganizationTypes[]) => void;
   disabled?: boolean;
 }
 
 const roleOptions = [
   {
-    value: UserGroups.Member,
+    value: OrganizationTypes.InsuranceBroker,
     label: "Corredor de seguros",
     icon: "/images/entities-icons/corredor-de-seguros.svg",
   },
   {
-    value: UserGroups.Member,
+    value: OrganizationTypes.ExclusiveAgent,
     label: "Agente exclusivo",
     icon: "/images/entities-icons/agente-exclusivo.svg",
   },
   {
-    value: UserGroups.Member,
+    value: OrganizationTypes.BrokerageSociety,
     label: "Sociedad de corretaje",
     icon: "/images/entities-icons/sociedad-de-corretaje.svg",
   },
   {
-    value: UserGroups.Member,
+    value: OrganizationTypes.InsuranceCompany,
     label: "Compañía de seguros",
     icon: "/images/entities-icons/compania-de-seguros.svg",
   },
   {
-    value: UserGroups.Member,
+    value: OrganizationTypes.Supplier,
     label: "Proveedores",
     icon: "/images/entities-icons/proovedores.svg",
   },
@@ -41,9 +41,9 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({
   onChange,
   disabled = false,
 }) => {
-  const toggleRole = (role: UserGroups) => {
+  const toggleRole = (role: OrganizationTypes) => {
     if (disabled) return;
-    
+
     if (selectedRoles.includes(role)) {
       onChange(selectedRoles.filter((r) => r !== role));
     } else {
@@ -53,11 +53,11 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({
 
   return (
     <div className="flex flex-wrap gap-4 sm:gap-6">
-      {roleOptions.map((option, index) => {
+      {roleOptions.map((option) => {
         const isSelected = selectedRoles.includes(option.value);
         return (
           <button
-            key={`${option.value}-${index}`}
+            key={option.value}
             type="button"
             onClick={() => toggleRole(option.value)}
             disabled={disabled}
@@ -79,7 +79,7 @@ const RoleSelector: React.FC<RoleSelectorProps> = ({
                 src={option.icon}
                 alt={option.label}
                 className="w-full h-full object-contain"
-            />
+              />
             </div>
             <span
               className={cn(
