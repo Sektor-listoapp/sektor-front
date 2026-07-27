@@ -16,6 +16,7 @@ export const CREATE_NEWS = gql`
       visibility
       pendingApproval
       allowedRoles
+      allowedOrganizationTypes
     }
   }
 `;

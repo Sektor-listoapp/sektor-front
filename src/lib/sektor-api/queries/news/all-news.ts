@@ -16,6 +16,7 @@ export const ALL_NEWS_QUERY = gql`
       visibility
       pendingApproval
       allowedRoles
+      allowedOrganizationTypes
     }
   }
 `;

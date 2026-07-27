@@ -16,6 +16,7 @@ export const NEWS_BY_ID_QUERY = gql`
       visibility
       pendingApproval
       allowedRoles
+      allowedOrganizationTypes
     }
   }
 `;

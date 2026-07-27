@@ -16,6 +16,7 @@ export const SUBMIT_NEWS = gql`
       visibility
       pendingApproval
       allowedRoles
+      allowedOrganizationTypes
     }
   }
 `;
