@@ -7,6 +7,7 @@ export const CHANGE_ORGANIZATION_VISIBILITY = gql`
     changeOrganizationVisibility(input: $input) {
       id
       name
+      isActive
     }
   }
 `;

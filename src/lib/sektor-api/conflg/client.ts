@@ -26,6 +26,14 @@ const createSektorApiClient = () => {
     link: authLink.concat(httpLink as unknown as ApolloLink),
   });
 
+  // Drop cached data from the previous session when the user logs out or
+  // another account logs in, so pages like "Mi cuenta" never show stale data.
+  useAuthStore.subscribe((state, prevState) => {
+    if (state.user?.id !== prevState.user?.id) {
+      client.clearStore().catch(() => undefined);
+    }
+  });
+
   return client;
 };
 
