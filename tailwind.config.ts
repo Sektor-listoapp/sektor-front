@@ -34,6 +34,15 @@ export default {
           900: "#060F13",
         },
       },
+      keyframes: {
+        "ad-in": {
+          from: { opacity: "0", transform: "translateY(6px)" },
+          to: { opacity: "1", transform: "none" },
+        },
+      },
+      animation: {
+        "ad-in": "ad-in 600ms cubic-bezier(.2,.7,.2,1) both",
+      },
       background: {
         "primary-gradient":
           "linear-gradient(250deg,rgba(255, 255, 255, 0.5) -20%,rgba(183, 217, 226, 0.7) -6%,#182f48 60%)",

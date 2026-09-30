@@ -21,3 +21,4 @@ export * from "./herramientas/all-modules";
 export * from "./herramientas/module-by-id";
 export * from "./herramientas/modules";
 export * from "./news";
+export * from "./advertisements";
