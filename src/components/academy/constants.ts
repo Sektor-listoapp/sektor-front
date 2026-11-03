@@ -48,9 +48,9 @@ export const ACADEMY_ADMIN_GROUPS: UserGroups[] = [
 export const isAcademyAdmin = (group?: UserGroups | null) =>
   !!group && ACADEMY_ADMIN_GROUPS.includes(group);
 
-/** Any signed-in end user can take courses; only academy admins can't. */
-export const isAcademyStudent = (group?: UserGroups | null) =>
-  !isAcademyAdmin(group);
+/** Any signed-in user can take courses, admins included (backend matches). */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const isAcademyStudent = (_group?: UserGroups | null) => true;
 
 export const formatUsd = (value?: number | null) =>
   !value ? "Gratis" : `$${value.toLocaleString("es-VE", { maximumFractionDigits: 2 })}`;
