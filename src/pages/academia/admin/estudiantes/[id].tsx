@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 import { useQuery } from "@apollo/client";
-import { Empty, Tag } from "antd";
+import { Empty } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faCertificate } from "@fortawesome/free-solid-svg-icons";
 import withAuth from "@/components/shared/with-auth";
@@ -15,6 +15,7 @@ import { friendlyError, isAcademyAdmin } from "@/components/academy/constants";
 import { ROUTES } from "@/constants/router";
 import { ACADEMY_STUDENT_QUERY } from "@/lib/sektor-api/queries";
 import { Query } from "@/lib/sektor-api/__generated__/types";
+import { Pill } from "@/components/academy/ui";
 
 const Stat = ({ label, value }: { label: string; value: React.ReactNode }) => (
   <div className="bg-white rounded-xl shadow-sm p-4 flex flex-col">
@@ -77,7 +78,7 @@ const StudentDetailPage = () => {
                   <div key={c.courseId} className="bg-white rounded-xl shadow-sm p-3 flex items-center gap-3">
                     <span className="flex-1 font-bold">{c.title}</span>
                     {c.score != null && <span className="text-sm">{Math.round(c.score)} pts</span>}
-                    <Tag>{c.status}</Tag>
+                    <Pill>{c.status}</Pill>
                   </div>
                 ))}
               </div>

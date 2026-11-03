@@ -11,22 +11,19 @@ import {
   ACADEMY_COURSE_PAYMENT_QUOTE_QUERY,
   BANKS_QUERY,
   COUNTRY_BY_CODE_QUERY,
-  CUSTOMER_BY_ID_QUERY,
   PROFILE_FISCAL_ADDRESS_QUERY,
 } from "@/lib/sektor-api/queries";
 import {
   CONFIRM_ACADEMY_COURSE_IMMEDIATE_DEBIT,
   CONFIRM_ACADEMY_COURSE_MOBILE_PAYMENT,
   INITIATE_ACADEMY_COURSE_IMMEDIATE_DEBIT,
-  UPDATE_CUSTOMER,
-  UPDATE_ORGANIZATION_FISCAL_ADDRESS,
+  UPDATE_MY_FISCAL_ADDRESS,
 } from "@/lib/sektor-api/mutations";
 import {
   AcademyCoursePaymentQuote,
   Mutation,
   PaymentStatus,
   Query,
-  UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
 import {
   SEKTOR_MOBILE_PAYMENT_ACCOUNT,
@@ -114,17 +111,10 @@ const CheckoutModal = ({
     variables: { code: "VE" },
     skip: stage !== "fiscal",
   });
-  const isCustomer = user?.group === UserGroups.Customer;
-  const { data: customerData } = useQuery<Query>(CUSTOMER_BY_ID_QUERY, {
-    variables: { id: user?.id },
-    skip: stage !== "fiscal" || !isCustomer || !user?.id,
-  });
-
   const [initiateDebit] = useMutation<Mutation>(INITIATE_ACADEMY_COURSE_IMMEDIATE_DEBIT);
   const [confirmDebit] = useMutation<Mutation>(CONFIRM_ACADEMY_COURSE_IMMEDIATE_DEBIT);
   const [confirmMobile] = useMutation<Mutation>(CONFIRM_ACADEMY_COURSE_MOBILE_PAYMENT);
-  const [updateOrgFiscal] = useMutation(UPDATE_ORGANIZATION_FISCAL_ADDRESS);
-  const [updateCustomer] = useMutation(UPDATE_CUSTOMER);
+  const [updateMyFiscalAddress] = useMutation(UPDATE_MY_FISCAL_ADDRESS);
 
   const payerDocument = `${docPrefix}${docNumber.replace(/\D/g, "")}`;
 
@@ -164,7 +154,7 @@ const CheckoutModal = ({
         if (cancelled) return;
         // Old records can hold location ids that no longer exist; the backend
         // then fails the whole profile query. Ask for the address again.
-        if (/Fiscal address location not found/i.test((e as Error).message)) {
+        if (/Fiscal address location not found|Forbidden resource/i.test((e as Error).message)) {
           setStage("fiscal");
           return;
         }
@@ -200,29 +190,7 @@ const CheckoutModal = ({
       reference: addressRef.trim() || undefined,
     };
     try {
-      if (isCustomer) {
-        const customer = customerData?.customerById;
-        if (!customer?.sex) {
-          throw new Error(
-            "Completa tu perfil (sexo) en Mi cuenta antes de comprar."
-          );
-        }
-        await updateCustomer({
-          variables: {
-            input: {
-              id: user!.id,
-              name: customer.name,
-              sex: customer.sex,
-              birthdate: customer.birthdate,
-              fiscalAddress,
-            },
-          },
-        });
-      } else {
-        await updateOrgFiscal({
-          variables: { input: { id: user!.id, fiscalAddress } },
-        });
-      }
+      await updateMyFiscalAddress({ variables: { input: fiscalAddress } });
       setStage("method");
     } catch (e) {
       setError(friendlyError(e));

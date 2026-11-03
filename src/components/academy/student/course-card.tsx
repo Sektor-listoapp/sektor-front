@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import dayjs from "dayjs";
-import { Tag } from "antd";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarDays, faUsers } from "@fortawesome/free-solid-svg-icons";
 import { ROUTES } from "@/constants/router";
@@ -10,6 +10,7 @@ import {
   PublicAcademyCourse,
 } from "@/lib/sektor-api/__generated__/types";
 import { CATEGORY_LABEL, LEVEL_LABEL, MODALITY_LABEL, formatUsd } from "../constants";
+import { Pill } from "../ui";
 
 export const courseHref = (course: Pick<PublicAcademyCourse, "id" | "slug">) =>
   `${ROUTES.ACADEMY}/${course.slug || course.id}`;
@@ -31,9 +32,9 @@ const CourseCard = ({ course }: { course: PublicAcademyCourse }) => {
       )}
       <div className="p-4 flex flex-col gap-2 flex-1">
         <div className="flex gap-1 flex-wrap">
-          {course.modality && <Tag color="blue">{MODALITY_LABEL[course.modality]}</Tag>}
-          {course.courseType && <Tag>{CATEGORY_LABEL[course.courseType]}</Tag>}
-          {course.level && <Tag>{LEVEL_LABEL[course.level]}</Tag>}
+          {course.modality && <Pill solid>{MODALITY_LABEL[course.modality]}</Pill>}
+          {course.courseType && <Pill>{CATEGORY_LABEL[course.courseType]}</Pill>}
+          {course.level && <Pill>{LEVEL_LABEL[course.level]}</Pill>}
         </div>
         <h2 className="font-bold text-lg leading-snug">{course.title}</h2>
         <p className="text-sm text-gray-600 line-clamp-3">{course.description}</p>

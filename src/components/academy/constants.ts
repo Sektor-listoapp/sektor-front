@@ -81,6 +81,8 @@ const FRIENDLY_ERRORS: Record<string, string> = {
     "No se puede eliminar un curso que tiene alumnos inscritos",
   "This course requires payment": "Este curso requiere pago",
   "Course is not available": "El curso no está disponible",
+  "Invalid country/state/city fiscal address codes.":
+    "El estado o la ciudad no son válidos. Selecciónalos de nuevo.",
   "Academy asset must be uploaded first":
     "Uno de los archivos no terminó de subirse. Intenta de nuevo.",
 };
