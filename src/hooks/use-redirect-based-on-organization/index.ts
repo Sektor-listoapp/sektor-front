@@ -30,6 +30,12 @@ export const useRedirectBasedOnOrganization = (redirectTo?: string) => {
     if (loading) return;
 
 
+    if (userGroup === UserGroups.AcademyAdmin) {
+      replace(redirectTo || ROUTES.ACADEMY_ADMIN);
+      return;
+    }
+
+
     if (userGroup === UserGroups.News) {
       replace(redirectTo || ROUTES.HOME);
       return;
