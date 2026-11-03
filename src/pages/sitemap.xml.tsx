@@ -1,5 +1,6 @@
 import type { GetServerSideProps } from "next";
 import { ROUTES } from "@/constants/router";
+import { ACADEMY_PUBLIC } from "@/constants/features";
 import { PUBLIC_ACADEMY_COURSES_QUERY } from "@/lib/sektor-api/queries";
 import { getSiteUrl, serverQuery } from "@/lib/sektor-api/conflg/server-query";
 import { Query } from "@/lib/sektor-api/__generated__/types";
@@ -8,7 +9,7 @@ const STATIC_PATHS = [
   ROUTES.HOME,
   ROUTES.ORGANIZATIONS,
   ROUTES.NOTICIAS,
-  ROUTES.ACADEMY,
+  ...(ACADEMY_PUBLIC ? [ROUTES.ACADEMY] : []),
 ];
 
 const escape = (value: string) =>
@@ -18,13 +19,15 @@ const escape = (value: string) =>
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   const siteUrl = getSiteUrl(req.headers.host);
   let coursePaths: string[] = [];
-  try {
-    const data = await serverQuery<Query>(PUBLIC_ACADEMY_COURSES_QUERY);
-    coursePaths = data.publicAcademyCourses.map(
-      (c) => `${ROUTES.ACADEMY}/${c.slug || c.id}`
-    );
-  } catch {
-    // Still serve the static part if the API is down.
+  if (ACADEMY_PUBLIC) {
+    try {
+      const data = await serverQuery<Query>(PUBLIC_ACADEMY_COURSES_QUERY);
+      coursePaths = data.publicAcademyCourses.map(
+        (c) => `${ROUTES.ACADEMY}/${c.slug || c.id}`
+      );
+    } catch {
+      // Still serve the static part if the API is down.
+    }
   }
 
   const urls = [...STATIC_PATHS, ...coursePaths]
