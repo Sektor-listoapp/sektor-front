@@ -6,6 +6,7 @@ import { useShallow } from "zustand/shallow";
 import Navbar from "@/components/my-account/navbar";
 import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { ROUTES } from "@/constants/router";
+import { ACADEMY_PUBLIC } from "@/constants/features";
 import { useAuthStore } from "@/store/auth";
 import { cn } from "@/utils/class-name";
 import { BUTTON_VARIANTS } from "@/components/ui/button/constants";
@@ -54,6 +55,7 @@ const AcademyLayout = ({
     <div className="min-h-svh bg-white w-full flex flex-col items-center">
       <Head>
         <title>{pageTitle}</title>
+        {!ACADEMY_PUBLIC && <meta name="robots" content="noindex, nofollow" />}
         {description && <meta name="description" content={description} />}
         <meta property="og:title" content={pageTitle} />
         {description && <meta property="og:description" content={description} />}

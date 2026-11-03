@@ -10,3 +10,8 @@
   CI = "false"
   NPM_FLAGS = "--legacy-peer-deps"
 
+
+# Academia: visible (header link, sitemap, indexing) only on the develop
+# branch deploy. In production it is reachable by direct URL only.
+[context.develop.environment]
+  NEXT_PUBLIC_ACADEMY_PUBLIC = "true"
