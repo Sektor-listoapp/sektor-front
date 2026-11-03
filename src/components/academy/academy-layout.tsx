@@ -113,15 +113,16 @@ export const useAcademyRoleGuard = (
   allowed: (group?: Parameters<typeof isAcademyAdmin>[0]) => boolean
 ) => {
   const { replace } = useRouter();
-  const group = useAuthStore(useShallow((state) => state.user?.group));
+  const user = useAuthStore((state) => state.user);
+  const group = user?.group;
   const [ok, setOk] = useState(false);
 
   useEffect(() => {
-    if (!group) return;
+    if (!user) return;
     if (allowed(group)) setOk(true);
     else replace(ROUTES.ACADEMY);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [group]);
+  }, [user, group]);
 
   return ok;
 };

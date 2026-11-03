@@ -45,16 +45,12 @@ export const ACADEMY_ADMIN_GROUPS: UserGroups[] = [
   UserGroups.AcademyAdmin,
 ];
 
-export const ACADEMY_STUDENT_GROUPS: UserGroups[] = [
-  UserGroups.Member,
-  UserGroups.Customer,
-];
-
 export const isAcademyAdmin = (group?: UserGroups | null) =>
   !!group && ACADEMY_ADMIN_GROUPS.includes(group);
 
-export const isAcademyStudent = (group?: UserGroups | null) =>
-  !!group && ACADEMY_STUDENT_GROUPS.includes(group);
+/** Any signed-in user can take courses, admins included (backend matches). */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const isAcademyStudent = (_group?: UserGroups | null) => true;
 
 export const formatUsd = (value?: number | null) =>
   !value ? "Gratis" : `$${value.toLocaleString("es-VE", { maximumFractionDigits: 2 })}`;

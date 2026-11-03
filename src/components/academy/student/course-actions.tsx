@@ -58,6 +58,14 @@ const CourseActions = ({ course }: { course: PublicAcademyCourse }) => {
       )}
     </div>
   );
+  const adminButton = isAcademyAdmin(group) ? (
+    <Button
+      variant="outline"
+      onClick={() => router.push(`${ROUTES.ACADEMY_ADMIN_COURSE}/${course.id}`)}
+    >
+      <FontAwesomeIcon icon={faPen} /> Administrar curso
+    </Button>
+  ) : null;
   const full = !!course.maxCapacity && course.enrolledCount >= course.maxCapacity;
   const scheduled = course.modality !== AcademyCourseModality.Online;
 
@@ -87,32 +95,6 @@ const CourseActions = ({ course }: { course: PublicAcademyCourse }) => {
             crea tu cuenta
           </Link>{" "}
           para inscribirte.
-        </p>
-      </Box>
-    );
-  }
-
-  if (isAcademyAdmin(group)) {
-    return (
-      <Box>
-        {price}
-        <Button
-          variant="solid-blue"
-          onClick={() => router.push(`${ROUTES.ACADEMY_ADMIN_COURSE}/${course.id}`)}
-        >
-          <FontAwesomeIcon icon={faPen} /> Administrar curso
-        </Button>
-      </Box>
-    );
-  }
-
-  if (!student) {
-    return (
-      <Box>
-        {price}
-        <p className="text-sm text-gray-500">
-          Los cursos están disponibles para cuentas de corredores, organizaciones y
-          asegurados. Inicia sesión con una de esas cuentas para inscribirte.
         </p>
       </Box>
     );
@@ -168,6 +150,7 @@ const CourseActions = ({ course }: { course: PublicAcademyCourse }) => {
           onClose={() => setCheckoutOpen(false)}
           onPaid={() => refetch()}
         />
+        {adminButton}
       </Box>
     );
   }
@@ -250,6 +233,8 @@ const CourseActions = ({ course }: { course: PublicAcademyCourse }) => {
           </span>
         </Link>
       )}
+
+      {adminButton}
     </Box>
   );
 };
