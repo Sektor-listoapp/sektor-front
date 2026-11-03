@@ -21,6 +21,8 @@ export type Scalars = {
 
 export type AcademyAttendanceQr = {
   __typename?: 'AcademyAttendanceQr';
+  /** Short attendance code (8 chars) that validateAcademyQr also accepts as qrPayload for manual entry */
+  code: Scalars['String']['output'];
   courseId: Scalars['String']['output'];
   qrPayload: Scalars['String']['output'];
   studentId: Scalars['String']['output'];
@@ -37,21 +39,48 @@ export type AcademyCalendarItem = {
   title: Scalars['String']['output'];
 };
 
+export type AcademyCertificateVerification = {
+  __typename?: 'AcademyCertificateVerification';
+  certificateCode: Scalars['String']['output'];
+  courseId: Scalars['String']['output'];
+  courseTitle: Scalars['String']['output'];
+  issuedAt: Scalars['DateTime']['output'];
+  /** Public web URL of the verification page (FRONTEND_URL based) */
+  shareUrl?: Maybe<Scalars['String']['output']>;
+  studentName: Scalars['String']['output'];
+};
+
 export type AcademyCourse = {
   __typename?: 'AcademyCourse';
+  /** Whether the caller can edit or delete the course (Admin: all; AcademyAdmin: only courses they created) */
+  canEdit: Scalars['Boolean']['output'];
+  certificate?: Maybe<AcademyStudentCertificate>;
+  completedModuleIndexes: Array<Scalars['Int']['output']>;
+  courseType?: Maybe<AcademyCourseCategory>;
+  createdBy?: Maybe<Scalars['ID']['output']>;
+  createdByEmail?: Maybe<Scalars['String']['output']>;
+  createdByName?: Maybe<Scalars['String']['output']>;
   description: Scalars['String']['output'];
+  durationMinutes?: Maybe<Scalars['Int']['output']>;
+  enrolledCount: Scalars['Int']['output'];
   finalQuizQuestions?: Maybe<Array<AcademyQuizQuestion>>;
   id: Scalars['String']['output'];
   imageUrl?: Maybe<Scalars['String']['output']>;
+  instructorName?: Maybe<Scalars['String']['output']>;
   level?: Maybe<AcademyCourseLevel>;
   location?: Maybe<Scalars['String']['output']>;
+  maxCapacity?: Maybe<Scalars['Int']['output']>;
   modality?: Maybe<AcademyCourseModality>;
   modules?: Maybe<Array<AcademyCourseModule>>;
+  passingScore?: Maybe<Scalars['Int']['output']>;
   priceUsd: Scalars['Float']['output'];
   scheduledAt?: Maybe<Scalars['DateTime']['output']>;
+  slug?: Maybe<Scalars['String']['output']>;
   status: AcademyCourseStatus;
   streamingUrl?: Maybe<Scalars['String']['output']>;
   title: Scalars['String']['output'];
+  /** Server-tracked watched seconds per Video module for the calling student (empty for admins) */
+  videoProgress: Array<AcademyVideoProgress>;
 };
 
 export type AcademyCourseAsset = {
@@ -82,6 +111,21 @@ export type AcademyCourseAssetUpload = {
   status: AcademyCourseAssetStatus;
 };
 
+export enum AcademyCourseCategory {
+  Information = 'Information',
+  Training = 'Training',
+  Workshop = 'Workshop'
+}
+
+export type AcademyCourseEnrollment = {
+  __typename?: 'AcademyCourseEnrollment';
+  courseId: Scalars['ID']['output'];
+  enrolledAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  status: AcademyEnrollmentStatus;
+  userId: Scalars['ID']['output'];
+};
+
 export enum AcademyCourseLevel {
   Advanced = 'Advanced',
   Basic = 'Basic',
@@ -90,10 +134,17 @@ export enum AcademyCourseLevel {
 
 export type AcademyCourseListItem = {
   __typename?: 'AcademyCourseListItem';
+  /** Whether the caller can edit or delete the course (Admin: all; AcademyAdmin: only courses they created) */
+  canEdit: Scalars['Boolean']['output'];
+  courseType?: Maybe<AcademyCourseCategory>;
+  createdBy?: Maybe<Scalars['ID']['output']>;
   enrolledCount: Scalars['Int']['output'];
   id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  maxCapacity?: Maybe<Scalars['Int']['output']>;
   modality?: Maybe<AcademyCourseModality>;
   priceUsd: Scalars['Float']['output'];
+  slug?: Maybe<Scalars['String']['output']>;
   title: Scalars['String']['output'];
 };
 
@@ -130,6 +181,40 @@ export enum AcademyCourseModuleType {
   Video = 'Video'
 }
 
+export type AcademyCoursePaymentQuote = {
+  __typename?: 'AcademyCoursePaymentQuote';
+  alreadyEnrolled: Scalars['Boolean']['output'];
+  amountUsd: Scalars['Float']['output'];
+  amountVes: Scalars['Float']['output'];
+  canPurchase: Scalars['Boolean']['output'];
+  courseId: Scalars['ID']['output'];
+  enrollment?: Maybe<AcademyCourseEnrollment>;
+  exchangeRate: Scalars['Float']['output'];
+  payment?: Maybe<PaymentType>;
+  title: Scalars['String']['output'];
+};
+
+export type AcademyCoursePaymentResult = {
+  __typename?: 'AcademyCoursePaymentResult';
+  amountUsd: Scalars['Float']['output'];
+  amountVes: Scalars['Float']['output'];
+  courseId: Scalars['ID']['output'];
+  enrollment?: Maybe<AcademyCourseEnrollment>;
+  exchangeRate: Scalars['Float']['output'];
+  matched: Scalars['Boolean']['output'];
+  message: Scalars['String']['output'];
+  payment: PaymentType;
+};
+
+export type AcademyCoursePaymentStatus = {
+  __typename?: 'AcademyCoursePaymentStatus';
+  courseId: Scalars['ID']['output'];
+  enrolled: Scalars['Boolean']['output'];
+  enrollmentStatus?: Maybe<AcademyEnrollmentStatus>;
+  payment?: Maybe<PaymentType>;
+  title: Scalars['String']['output'];
+};
+
 export enum AcademyCourseStatus {
   Archived = 'Archived',
   Draft = 'Draft',
@@ -165,6 +250,15 @@ export enum AcademyEnrollmentStatus {
   Dropped = 'Dropped'
 }
 
+export type AcademyQuizAnswerInput = {
+  /** Answer for TrueFalse questions */
+  booleanAnswer?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Selected option text for MultipleChoice questions */
+  option?: InputMaybe<Scalars['String']['input']>;
+  /** Zero-based index of the question */
+  questionIndex: Scalars['Int']['input'];
+};
+
 export type AcademyQuizQuestion = {
   __typename?: 'AcademyQuizQuestion';
   correctBooleanAnswer?: Maybe<Scalars['Boolean']['output']>;
@@ -186,6 +280,21 @@ export enum AcademyQuizQuestionType {
   MultipleChoice = 'MultipleChoice',
   TrueFalse = 'TrueFalse'
 }
+
+export type AcademyQuizResult = {
+  __typename?: 'AcademyQuizResult';
+  /** Set when this submission (or a previous one) issued the certificate */
+  certificateCode?: Maybe<Scalars['String']['output']>;
+  completedModuleIndexes: Array<Scalars['Int']['output']>;
+  correctCount: Scalars['Int']['output'];
+  enrollmentStatus: AcademyEnrollmentStatus;
+  moduleIndex?: Maybe<Scalars['Int']['output']>;
+  passed: Scalars['Boolean']['output'];
+  passingScore: Scalars['Int']['output'];
+  /** Score 0-100 */
+  score: Scalars['Int']['output'];
+  total: Scalars['Int']['output'];
+};
 
 export type AcademyStudentCertificate = {
   __typename?: 'AcademyStudentCertificate';
@@ -232,6 +341,20 @@ export type AcademyStudentSummary = {
   name: Scalars['String']['output'];
 };
 
+export type AcademyVideoProgress = {
+  __typename?: 'AcademyVideoProgress';
+  /** Whether at least 90% was watched */
+  canComplete: Scalars['Boolean']['output'];
+  durationSeconds: Scalars['Int']['output'];
+  /** Last reported position, for resuming */
+  lastPositionSeconds: Scalars['Int']['output'];
+  moduleIndex: Scalars['Int']['output'];
+  /** watchedSeconds / durationSeconds, 0-100 */
+  percent: Scalars['Int']['output'];
+  /** Furthest position watched contiguously without skipping */
+  watchedSeconds: Scalars['Int']['output'];
+};
+
 export type AddressInputType = {
   cityId: Scalars['Int']['input'];
   countryId: Scalars['Int']['input'];
@@ -266,6 +389,24 @@ export type AdminUpdateEmailInputType = {
   newEmail: Scalars['String']['input'];
   skipVerification?: InputMaybe<Scalars['Boolean']['input']>;
   userId: Scalars['ID']['input'];
+};
+
+export type AdvertisementInputType = {
+  active?: InputMaybe<Scalars['Boolean']['input']>;
+  sponsorName: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  url: Scalars['String']['input'];
+};
+
+export type AdvertisementType = {
+  __typename?: 'AdvertisementType';
+  active: Scalars['Boolean']['output'];
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  sponsorName: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+  url: Scalars['String']['output'];
 };
 
 export type ApplePurchaseResultType = {
@@ -501,6 +642,16 @@ export type ConfirmAcademyCourseAssetUploadInput = {
   assetId: Scalars['String']['input'];
 };
 
+export type ConfirmAcademyCourseMobilePaymentInput = {
+  amountVes?: InputMaybe<Scalars['Float']['input']>;
+  bankCode: Scalars['String']['input'];
+  courseId: Scalars['ID']['input'];
+  payerDocument: Scalars['String']['input'];
+  payerPhone?: InputMaybe<Scalars['String']['input']>;
+  paymentId?: InputMaybe<Scalars['ID']['input']>;
+  reference: Scalars['String']['input'];
+};
+
 export type ConfirmImmediateDebitInputType = {
   holderName: Scalars['String']['input'];
   otp: Scalars['String']['input'];
@@ -534,13 +685,18 @@ export type CountryType = {
 };
 
 export type CreateAcademyCourseInput = {
+  courseType: AcademyCourseCategory;
   description: Scalars['String']['input'];
+  durationMinutes?: InputMaybe<Scalars['Int']['input']>;
   finalQuizQuestions?: InputMaybe<Array<AcademyQuizQuestionInput>>;
   imageUrl?: InputMaybe<Scalars['String']['input']>;
+  instructorName?: InputMaybe<Scalars['String']['input']>;
   level?: InputMaybe<AcademyCourseLevel>;
   location?: InputMaybe<Scalars['String']['input']>;
+  maxCapacity?: InputMaybe<Scalars['Int']['input']>;
   modality: AcademyCourseModality;
   modules?: InputMaybe<Array<AcademyCourseModuleInput>>;
+  passingScore?: InputMaybe<Scalars['Int']['input']>;
   priceUsd: Scalars['Float']['input'];
   scheduledAt?: InputMaybe<Scalars['DateTime']['input']>;
   streamingUrl?: InputMaybe<Scalars['String']['input']>;
@@ -794,6 +950,11 @@ export type ImmediateDebitBillingDataInputType = {
   phone: Scalars['String']['input'];
 };
 
+export type InitiateAcademyCourseImmediateDebitInput = {
+  billingData: ImmediateDebitBillingDataInputType;
+  courseId: Scalars['ID']['input'];
+};
+
 export type InitiateDirectDebitInputType = {
   autoRenew: Scalars['Boolean']['input'];
   billingData: DirectDebitBillingDataInputType;
@@ -1030,17 +1191,24 @@ export type Mutation = {
   changeOrganizationFeature: PublicOrganizationType;
   changeOrganizationPlan: OrganizationType;
   changeOrganizationVisibility: OrganizationType;
+  /** Marks a Text/Video module as completed. With ACADEMY_STRICT_PROGRESS=true it rejects Quiz modules (use submitAcademyQuiz), requires 90% watched videos and sequential order. */
+  completeAcademyLesson: Scalars['Boolean']['output'];
   confirmAcademyCourseAssetUpload: AcademyCourseAsset;
+  confirmAcademyCourseImmediateDebit: AcademyCoursePaymentResult;
+  confirmAcademyCourseMobilePayment: AcademyCoursePaymentResult;
   /** Step 2: Confirm immediate debit with OTP code. */
   confirmImmediateDebit: InitiatePaymentResultType;
   /** Confirm Pago Móvil after R4 notification evidence exists. */
   confirmMobilePayment: ConfirmMobilePaymentResultType;
   createAcademyCourse: AcademyCourse;
+  createAdvertisement: AdvertisementType;
   createCalendarEvent: CalendarEventType;
   createModule: ModuleType;
   createNews: NewsType;
   createSurvey: SurveyType;
   createTracking: TrackingType;
+  deleteAcademyCourse: Scalars['Boolean']['output'];
+  deleteAdvertisement: Scalars['Boolean']['output'];
   deleteFileFromModule: ModuleType;
   deleteModule: Scalars['Boolean']['output'];
   deleteMyAccount: Scalars['Boolean']['output'];
@@ -1050,6 +1218,8 @@ export type Mutation = {
   deleteTracking: Scalars['Boolean']['output'];
   generateAcademyAttendanceQr: AcademyAttendanceQr;
   getModuleUploadUrl: UploadFileSignedUrlResponse;
+  /** Start a one-time Academy course payment with immediate debit. */
+  initiateAcademyCourseImmediateDebit: OtpResultType;
   /** Process direct debit payment with optional auto-renewal. */
   initiateDirectDebit: InitiatePaymentResultType;
   /** Step 1: Initiate immediate debit. Sends OTP to customer phone. */
@@ -1067,6 +1237,8 @@ export type Mutation = {
   registerAsOther: RegisterAsOrganizationResponseType;
   registerAsSupplier: RegisterAsOrganizationResponseType;
   registerDevice: Scalars['Boolean']['output'];
+  /** Video playback heartbeat (send every ~10s while playing). Only real-time contiguous playback increases watchedSeconds. */
+  reportAcademyVideoProgress: AcademyVideoProgress;
   requestAcademyCourseAssetUpload: AcademyCourseAssetUpload;
   requestAutoQuote: AutoQuoteType;
   requestHealthQuote: HealthQuoteType;
@@ -1078,11 +1250,15 @@ export type Mutation = {
   savePropertyQuote: PropertyQuoteType;
   sendPasswordResetRequest: Scalars['Boolean']['output'];
   sendVerificationEmail: Scalars['Boolean']['output'];
+  startAcademyCourse: Scalars['Boolean']['output'];
+  /** Grades a Quiz module (moduleIndex) or the course final quiz (moduleIndex omitted) on the server. Passing a module quiz completes the module; passing the final quiz approves the enrollment and issues the certificate. */
+  submitAcademyQuiz: AcademyQuizResult;
   submitFeedback: FeedbackType;
   submitNews: NewsType;
   submitSurveyResponse: SurveyResponseType;
   unregisterDevice: Scalars['Boolean']['output'];
   updateAcademyCourse: AcademyCourse;
+  updateAdvertisement: AdvertisementType;
   updateBrokerageSociety: BrokerageSocietyType;
   updateCalendarEvent: CalendarEventType;
   updateCustomer: CustomerType;
@@ -1165,8 +1341,24 @@ export type MutationChangeOrganizationVisibilityArgs = {
 };
 
 
+export type MutationCompleteAcademyLessonArgs = {
+  courseId: Scalars['String']['input'];
+  moduleIndex: Scalars['Int']['input'];
+};
+
+
 export type MutationConfirmAcademyCourseAssetUploadArgs = {
   input: ConfirmAcademyCourseAssetUploadInput;
+};
+
+
+export type MutationConfirmAcademyCourseImmediateDebitArgs = {
+  input: ConfirmImmediateDebitInputType;
+};
+
+
+export type MutationConfirmAcademyCourseMobilePaymentArgs = {
+  input: ConfirmAcademyCourseMobilePaymentInput;
 };
 
 
@@ -1183,6 +1375,12 @@ export type MutationConfirmMobilePaymentArgs = {
 export type MutationCreateAcademyCourseArgs = {
   coverPhoto?: InputMaybe<Scalars['File']['input']>;
   input: CreateAcademyCourseInput;
+};
+
+
+export type MutationCreateAdvertisementArgs = {
+  image?: InputMaybe<Scalars['File']['input']>;
+  input: AdvertisementInputType;
 };
 
 
@@ -1209,6 +1407,17 @@ export type MutationCreateSurveyArgs = {
 
 export type MutationCreateTrackingArgs = {
   input: TrackingInputType;
+};
+
+
+export type MutationDeleteAcademyCourseArgs = {
+  force?: InputMaybe<Scalars['Boolean']['input']>;
+  id: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteAdvertisementArgs = {
+  id: Scalars['String']['input'];
 };
 
 
@@ -1258,6 +1467,11 @@ export type MutationGetModuleUploadUrlArgs = {
   fileName: Scalars['String']['input'];
   moduleId: Scalars['ID']['input'];
   size: Scalars['Int']['input'];
+};
+
+
+export type MutationInitiateAcademyCourseImmediateDebitArgs = {
+  input: InitiateAcademyCourseImmediateDebitInput;
 };
 
 
@@ -1331,6 +1545,13 @@ export type MutationRegisterDeviceArgs = {
 };
 
 
+export type MutationReportAcademyVideoProgressArgs = {
+  courseId: Scalars['String']['input'];
+  moduleIndex: Scalars['Int']['input'];
+  positionSeconds: Scalars['Float']['input'];
+};
+
+
 export type MutationRequestAcademyCourseAssetUploadArgs = {
   input: RequestAcademyCourseAssetUploadInput;
 };
@@ -1386,6 +1607,16 @@ export type MutationSendVerificationEmailArgs = {
 };
 
 
+export type MutationStartAcademyCourseArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type MutationSubmitAcademyQuizArgs = {
+  input: SubmitAcademyQuizInput;
+};
+
+
 export type MutationSubmitFeedbackArgs = {
   input: SubmitFeedbackInput;
 };
@@ -1412,6 +1643,13 @@ export type MutationUpdateAcademyCourseArgs = {
   coverPhoto?: InputMaybe<Scalars['File']['input']>;
   id: Scalars['String']['input'];
   input: UpdateAcademyCourseInput;
+};
+
+
+export type MutationUpdateAdvertisementArgs = {
+  id: Scalars['String']['input'];
+  image?: InputMaybe<Scalars['File']['input']>;
+  input: AdvertisementInputType;
 };
 
 
@@ -1560,10 +1798,14 @@ export type MyAcademyCalendarItem = {
 
 export type MyAcademyCourse = {
   __typename?: 'MyAcademyCourse';
+  courseType?: Maybe<AcademyCourseCategory>;
+  durationMinutes?: Maybe<Scalars['Int']['output']>;
   id: Scalars['String']['output'];
   imageUrl?: Maybe<Scalars['String']['output']>;
   level?: Maybe<AcademyCourseLevel>;
+  modality?: Maybe<AcademyCourseModality>;
   progress: Scalars['Int']['output'];
+  scheduledAt?: Maybe<Scalars['DateTime']['output']>;
   title: Scalars['String']['output'];
 };
 
@@ -1822,6 +2064,13 @@ export enum PaymentMethod {
   MobilePayment = 'MobilePayment'
 }
 
+/** Business purpose of a payment transaction */
+export enum PaymentPurpose {
+  AcademyCourse = 'AcademyCourse',
+  Subscription = 'Subscription',
+  UnassignedMobile = 'UnassignedMobile'
+}
+
 /** Payment transaction status */
 export enum PaymentStatus {
   Completed = 'Completed',
@@ -1837,6 +2086,8 @@ export type PaymentType = {
   amountUsd: Scalars['Float']['output'];
   amountVes: Scalars['Float']['output'];
   concept?: Maybe<Scalars['String']['output']>;
+  courseId?: Maybe<Scalars['String']['output']>;
+  courseTitle?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   currency: Currency;
   errorMessage?: Maybe<Scalars['String']['output']>;
@@ -1847,6 +2098,7 @@ export type PaymentType = {
   internalReference?: Maybe<Scalars['String']['output']>;
   method: PaymentMethod;
   paidAt?: Maybe<Scalars['DateTime']['output']>;
+  purpose: PaymentPurpose;
   status: PaymentStatus;
   subscriptionPeriod: SubscriptionPeriod;
   subscriptionPlan: SubscriptionPlan;
@@ -1876,6 +2128,40 @@ export type PropertyQuoteType = {
   read: Scalars['Boolean']['output'];
   residentialComplex: Scalars['Boolean']['output'];
   updatedAt: Scalars['DateTime']['output'];
+};
+
+/** Published Academy course safe for anonymous, SEO-indexable pages. */
+export type PublicAcademyCourse = {
+  __typename?: 'PublicAcademyCourse';
+  /** Reference price in VES at the current rate; the amount to pay is fixed by academyCoursePaymentQuote */
+  amountVes?: Maybe<Scalars['Float']['output']>;
+  courseType?: Maybe<AcademyCourseCategory>;
+  description: Scalars['String']['output'];
+  durationMinutes?: Maybe<Scalars['Int']['output']>;
+  enrolledCount: Scalars['Int']['output'];
+  /** Current USD->VES rate used for amountVes; null for free courses or when the rate is unavailable */
+  exchangeRate?: Maybe<Scalars['Float']['output']>;
+  id: Scalars['String']['output'];
+  imageUrl?: Maybe<Scalars['String']['output']>;
+  instructorName?: Maybe<Scalars['String']['output']>;
+  level?: Maybe<AcademyCourseLevel>;
+  /** Only for Presential courses */
+  location?: Maybe<Scalars['String']['output']>;
+  maxCapacity?: Maybe<Scalars['Int']['output']>;
+  modality?: Maybe<AcademyCourseModality>;
+  priceUsd: Scalars['Float']['output'];
+  scheduledAt?: Maybe<Scalars['DateTime']['output']>;
+  slug?: Maybe<Scalars['String']['output']>;
+  syllabus: Array<PublicAcademyCourseSyllabusItem>;
+  title: Scalars['String']['output'];
+};
+
+/** Public outline of a course module. Never exposes lesson content, video URLs, attachments or quiz questions. */
+export type PublicAcademyCourseSyllabusItem = {
+  __typename?: 'PublicAcademyCourseSyllabusItem';
+  durationSeconds?: Maybe<Scalars['Int']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+  type: AcademyCourseModuleType;
 };
 
 export type PublicOrganizationFilterAddressType = {
@@ -1922,12 +2208,16 @@ export type Query = {
   __typename?: 'Query';
   academyCalendarItems: Array<AcademyCalendarItem>;
   academyCourse?: Maybe<AcademyCourse>;
+  academyCoursePaymentQuote: AcademyCoursePaymentQuote;
+  academyCoursePaymentStatus: AcademyCoursePaymentStatus;
   academyCourses: Array<AcademyCourseListItem>;
   academyDashboard: AcademyDashboard;
   academyStudent: AcademyStudentDetail;
   academyStudents: Array<AcademyStudentSummary>;
+  activeAdvertisements: Array<AdvertisementType>;
   adminUserById?: Maybe<AdminType>;
   adminUsers: Array<AdminType>;
+  advertisements: Array<AdvertisementType>;
   allModules: Array<ModuleType>;
   /** Admin: Get all payments */
   allPayments: Array<PaymentType>;
@@ -1969,6 +2259,10 @@ export type Query = {
   payment?: Maybe<PaymentType>;
   profile: UserType;
   propertyQuoteById: PropertyQuoteType;
+  /** Public: a Published Academy course by id or slug (no authentication) */
+  publicAcademyCourse?: Maybe<PublicAcademyCourse>;
+  /** Public: Published Academy courses (no authentication) */
+  publicAcademyCourses: Array<PublicAcademyCourse>;
   publicBrokerageSocieties: BrokerageSocietyPaginatedType;
   publicBrokerageSocietyById: BrokerageSocietyType;
   publicExclusiveAgentById: ExclusiveAgentType;
@@ -1998,6 +2292,8 @@ export type Query = {
   trackingByEventType: Array<TrackingType>;
   trackingById?: Maybe<TrackingType>;
   unreadNotificationCount: Scalars['Int']['output'];
+  /** Public: verifies an Academy certificate by its code (e.g. CERT-1A2B3C4D). Null when not found. */
+  verifyAcademyCertificate?: Maybe<AcademyCertificateVerification>;
 };
 
 
@@ -2006,7 +2302,19 @@ export type QueryAcademyCourseArgs = {
 };
 
 
+export type QueryAcademyCoursePaymentQuoteArgs = {
+  courseId: Scalars['String']['input'];
+};
+
+
+export type QueryAcademyCoursePaymentStatusArgs = {
+  courseId: Scalars['String']['input'];
+};
+
+
 export type QueryAcademyCoursesArgs = {
+  courseType?: InputMaybe<AcademyCourseCategory>;
+  modality?: InputMaybe<AcademyCourseModality>;
   status?: InputMaybe<AcademyCourseStatus>;
 };
 
@@ -2119,6 +2427,17 @@ export type QueryPaymentArgs = {
 
 export type QueryPropertyQuoteByIdArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type QueryPublicAcademyCourseArgs = {
+  idOrSlug: Scalars['String']['input'];
+};
+
+
+export type QueryPublicAcademyCoursesArgs = {
+  courseType?: InputMaybe<AcademyCourseCategory>;
+  modality?: InputMaybe<AcademyCourseModality>;
 };
 
 
@@ -2244,6 +2563,11 @@ export type QueryTrackingByEventTypeArgs = {
 
 export type QueryTrackingByIdArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type QueryVerifyAcademyCertificateArgs = {
+  code: Scalars['String']['input'];
 };
 
 export type QuoteCityType = {
@@ -2490,6 +2814,13 @@ export type StudyType = {
   institution: Scalars['String']['output'];
   startDate: Scalars['DateTime']['output'];
   title: Scalars['String']['output'];
+};
+
+export type SubmitAcademyQuizInput = {
+  answers: Array<AcademyQuizAnswerInput>;
+  courseId: Scalars['String']['input'];
+  /** Index of the Quiz module. Omit (or null) to submit the course final quiz. */
+  moduleIndex?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type SubmitFeedbackInput = {
@@ -2824,13 +3155,18 @@ export type TrackingUserType = {
 };
 
 export type UpdateAcademyCourseInput = {
+  courseType?: InputMaybe<AcademyCourseCategory>;
   description?: InputMaybe<Scalars['String']['input']>;
+  durationMinutes?: InputMaybe<Scalars['Int']['input']>;
   finalQuizQuestions?: InputMaybe<Array<AcademyQuizQuestionInput>>;
   imageUrl?: InputMaybe<Scalars['String']['input']>;
+  instructorName?: InputMaybe<Scalars['String']['input']>;
   level?: InputMaybe<AcademyCourseLevel>;
   location?: InputMaybe<Scalars['String']['input']>;
+  maxCapacity?: InputMaybe<Scalars['Int']['input']>;
   modality?: InputMaybe<AcademyCourseModality>;
   modules?: InputMaybe<Array<AcademyCourseModuleInput>>;
+  passingScore?: InputMaybe<Scalars['Int']['input']>;
   priceUsd?: InputMaybe<Scalars['Float']['input']>;
   scheduledAt?: InputMaybe<Scalars['DateTime']['input']>;
   streamingUrl?: InputMaybe<Scalars['String']['input']>;
@@ -2921,6 +3257,7 @@ export type UploadFileTemplateResult = {
 };
 
 export enum UserGroups {
+  AcademyAdmin = 'AcademyAdmin',
   Admin = 'Admin',
   Customer = 'Customer',
   Member = 'Member',
@@ -2954,7 +3291,7 @@ export type ValidateAcademyQrResult = {
 };
 
 export type ValidateApplePurchaseInputType = {
-  /** Apple product identifier (e.g., com.sektor.subscription.gold.monthly) */
+  /** Apple product identifier (e.g., com.sektorApp.gold.monthly) */
   productId: Scalars['String']['input'];
   /** JWS transaction token from StoreKit 2 */
   transactionToken: Scalars['String']['input'];

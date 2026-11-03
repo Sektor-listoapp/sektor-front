@@ -20,16 +20,14 @@ const DefaultHeroBannerContent = () => {
         </div>
       </header>
 
-      <div
-        className="md:relative lg:col-span-7 bg-no-repeat bg-cover bg-center"
-        style={{ backgroundImage: "url('/images/workers_2.png')" }}
-      >
+      <div className="relative lg:col-span-7 flex items-end justify-end">
         <Image
-          className="absolute inset-0 m-auto object-contain max-w-[160px] md:max-w-[240px] lg:max-w-[350px]"
-          src="/images/workers.png"
-          width={1000}
-          height={1000}
-          alt=""
+          className="w-full h-auto object-contain object-bottom"
+          src="/images/intermediaries-team.webp"
+          width={900}
+          height={441}
+          alt="Equipo de intermediarios de Sektor"
+          priority
         />
       </div>
     </div>

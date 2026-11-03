@@ -33,3 +33,4 @@ export * from "./herramientas/upload-file-to-module";
 export * from "./herramientas/get-module-upload-url";
 export * from "./herramientas/delete-file-from-module";
 export * from "./news";
+export * from "./academy";

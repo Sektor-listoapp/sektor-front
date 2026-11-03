@@ -1,0 +1,50 @@
+import React from "react";
+import { useRouter } from "next/router";
+import { Tabs } from "antd";
+import withAuth from "@/components/shared/with-auth";
+import AcademyLayout, {
+  AcademyLoader,
+  useAcademyRoleGuard,
+} from "@/components/academy/academy-layout";
+import { isAcademyAdmin } from "@/components/academy/constants";
+import {
+  CalendarPanel,
+  CoursesPanel,
+  DashboardPanel,
+  StudentsPanel,
+} from "@/components/academy/admin/admin-panels";
+
+const TABS = [
+  { key: "resumen", label: "Resumen", children: <DashboardPanel /> },
+  { key: "cursos", label: "Cursos", children: <CoursesPanel /> },
+  { key: "calendario", label: "Calendario", children: <CalendarPanel /> },
+  { key: "estudiantes", label: "Estudiantes", children: <StudentsPanel /> },
+];
+
+const AcademyAdminPage = () => {
+  const router = useRouter();
+  const allowed = useAcademyRoleGuard(isAcademyAdmin);
+  const tab = (router.query.tab as string) || "resumen";
+
+  return (
+    <AcademyLayout title="Administrar academia">
+      <h1 className="text-2xl font-bold mb-4">Administrar academia</h1>
+      {!allowed ? (
+        <AcademyLoader />
+      ) : (
+        <Tabs
+          activeKey={TABS.some((t) => t.key === tab) ? tab : "resumen"}
+          onChange={(key) =>
+            router.replace({ query: { tab: key } }, undefined, {
+              shallow: true,
+            })
+          }
+          items={TABS}
+          destroyInactiveTabPane
+        />
+      )}
+    </AcademyLayout>
+  );
+};
+
+export default withAuth(AcademyAdminPage);

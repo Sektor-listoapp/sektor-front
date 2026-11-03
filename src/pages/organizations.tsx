@@ -1,5 +1,6 @@
 import { ORGANIZATION_COMPONENTS } from "@/components/organizations/constants";
 import HeroBanner from "@/components/organizations/hero-banner";
+import AdvertisementBanner from "@/components/shared/advertisement-banner";
 import Searchbar from "@/components/organizations/searchbar";
 import OrganizationDetailsModal from "@/components/shared/organization-details-modal";
 import Spinner from "@/components/ui/spinner";
@@ -39,6 +40,7 @@ const Organizations = () => {
       <HeroBanner />
       <main className="text-blue-500 w-full max-w-screen-xl flex flex-col items-center justify-center gap-8 py-10 px-7 pb-36 2xl:px-0">
         <Searchbar />
+        <AdvertisementBanner />
         {isLoadingPublicOrganizations ? (
           <div className="w-full transition-all py-20 lg:py-10">
             <Spinner className="m-auto w-10 h-10 text-blue-500 text-opacity-70" />

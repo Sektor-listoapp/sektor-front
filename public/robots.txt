@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /academia/admin
+Disallow: /academia/aprender
+Disallow: /academia/mis-cursos
+
+Sitemap: https://sektor.app/sitemap.xml

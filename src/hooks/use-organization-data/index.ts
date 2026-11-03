@@ -16,7 +16,8 @@ export const useOrganizationData = () => {
     error,
   } = useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
     variables: { id: userId },
-  
+    skip: !userId,
+    fetchPolicy: "cache-and-network",
   });
 
   return {

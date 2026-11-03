@@ -179,6 +179,15 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
           >
             Noticias
           </Link>
+          <Link
+            className={cn(
+              " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
+              { "font-bold": pathname.startsWith(ROUTES.ACADEMY) }
+            )}
+            href={ROUTES.ACADEMY}
+          >
+            Academia
+          </Link>
           <div className="border-b border-b-gray-300 pb-2">
             <span className="text-blue-500 text-lg">Descarga la app mobile</span>
             <div className="mt-2 pl-4 flex flex-col gap-2">
@@ -363,6 +372,20 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
             >
               Noticias
             </Link>
+            <Link
+              className={cn(
+                "focus:outline-none",
+                variant === "light"
+                  ? "hover:text-blue-400"
+                  : "hover:text-gray-200",
+                {
+                  "font-bold": pathname.startsWith(ROUTES.ACADEMY),
+                }
+              )}
+              href={ROUTES.ACADEMY}
+            >
+              Academia
+            </Link>
             <AppDownloadDropdown variant={variant} />
           </div>
 
@@ -446,6 +469,15 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
               href={ROUTES.NOTICIAS}
             >
               Noticias
+            </Link>
+            <Link
+              className={cn(
+                " hover:text-blue-400 border-b border-b-gray-300 pb-2 focus:outline-none text-blue-500 text-lg",
+                { "font-bold": pathname.startsWith(ROUTES.ACADEMY) }
+              )}
+              href={ROUTES.ACADEMY}
+            >
+              Academia
             </Link>
             <div className="border-b border-b-gray-300 pb-2">
               <span className="text-blue-500 text-lg">Descarga la app mobile</span>
@@ -615,6 +647,20 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
             href={ROUTES.NOTICIAS}
           >
             Noticias
+          </Link>
+          <Link
+            className={cn(
+              "focus:outline-none",
+              variant === "light"
+                ? "hover:text-blue-400"
+                : "hover:text-gray-200",
+              {
+                "font-bold": pathname.startsWith(ROUTES.ACADEMY),
+              }
+            )}
+            href={ROUTES.ACADEMY}
+          >
+            Academia
           </Link>
           <AppDownloadDropdown variant={variant} />
           {isAdmin && (

@@ -12,4 +12,12 @@ export const ROUTES = {
   MODULES: "/herramientas/modulos",
   ADMIN_NEWS: "/herramientas/noticias",
   NOTICIAS: "/noticias",
+  ACADEMY: "/academia",
+  ACADEMY_MY_COURSES: "/academia/mis-cursos",
+  ACADEMY_LEARN: "/academia/aprender",
+  ACADEMY_ADMIN: "/academia/admin",
+  ACADEMY_ADMIN_NEW_COURSE: "/academia/admin/cursos/nuevo",
+  ACADEMY_ADMIN_COURSE: "/academia/admin/cursos",
+  ACADEMY_ADMIN_STUDENT: "/academia/admin/estudiantes",
+  ACADEMY_ADMIN_ATTENDANCE: "/academia/admin/asistencia",
 } as const;

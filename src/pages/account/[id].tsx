@@ -39,6 +39,7 @@ export default function AccountPage() {
     variables: { id: userId },
     skip: !userId,
     errorPolicy: "all",
+    fetchPolicy: "cache-and-network",
   });
 
   const organizationData = organizationDataResponse?.organizationById;

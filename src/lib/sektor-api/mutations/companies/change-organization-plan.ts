@@ -5,6 +5,7 @@ export const CHANGE_ORGANIZATION_PLAN = gql`
     changeOrganizationPlan(input: $input) {
       id
       name
+      plan
     }
   }
 `;
