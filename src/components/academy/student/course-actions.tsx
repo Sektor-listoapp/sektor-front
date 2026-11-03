@@ -106,18 +106,6 @@ const CourseActions = ({ course }: { course: PublicAcademyCourse }) => {
     );
   }
 
-  if (!student) {
-    return (
-      <Box>
-        {price}
-        <p className="text-sm text-gray-500">
-          Los cursos están disponibles para cuentas de corredores, organizaciones y
-          asegurados. Inicia sesión con una de esas cuentas para inscribirte.
-        </p>
-      </Box>
-    );
-  }
-
   if (loading && !data) {
     return (
       <Box>
