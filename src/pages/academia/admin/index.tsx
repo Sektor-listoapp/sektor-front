@@ -15,8 +15,8 @@ import {
 } from "@/components/academy/admin/admin-panels";
 
 const TABS = [
-  { key: "resumen", label: "Resumen", children: <DashboardPanel /> },
   { key: "cursos", label: "Cursos", children: <CoursesPanel /> },
+  { key: "resumen", label: "Resumen", children: <DashboardPanel /> },
   { key: "calendario", label: "Calendario", children: <CalendarPanel /> },
   { key: "estudiantes", label: "Estudiantes", children: <StudentsPanel /> },
 ];
@@ -24,7 +24,7 @@ const TABS = [
 const AcademyAdminPage = () => {
   const router = useRouter();
   const allowed = useAcademyRoleGuard(isAcademyAdmin);
-  const tab = (router.query.tab as string) || "resumen";
+  const tab = (router.query.tab as string) || "cursos";
 
   return (
     <AcademyLayout title="Administrar academia">
@@ -33,7 +33,7 @@ const AcademyAdminPage = () => {
         <AcademyLoader />
       ) : (
         <Tabs
-          activeKey={TABS.some((t) => t.key === tab) ? tab : "resumen"}
+          activeKey={TABS.some((t) => t.key === tab) ? tab : "cursos"}
           onChange={(key) =>
             router.replace({ query: { tab: key } }, undefined, {
               shallow: true,
