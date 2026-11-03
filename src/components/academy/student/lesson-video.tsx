@@ -15,11 +15,11 @@ interface LessonVideoProps {
   initialWatchedSeconds?: number;
   /** Fraction (0-1) of the video watched without skipping. */
   onProgress?: (fraction: number, watchedSeconds: number) => void;
-  /** Sent every ~10s while playing, for server-side progress tracking. */
+  /** Sent on play, every ~5s while playing, on pause and on end. */
   onHeartbeat?: (positionSeconds: number) => void;
 }
 
-const HEARTBEAT_MS = 10_000;
+const HEARTBEAT_MS = 5_000;
 /** Small slack so normal buffering jitter doesn't count as a skip. */
 const SEEK_TOLERANCE = 1.5;
 
@@ -88,7 +88,11 @@ const LessonVideo = ({
       report();
       onHeartbeatRef.current?.(video.duration);
     };
-    const onPlay = () => setPlaying(true);
+    const onPlay = () => {
+      setPlaying(true);
+      // Gives the server a starting point, so short videos get credited.
+      onHeartbeatRef.current?.(video.currentTime);
+    };
     const onPause = () => {
       setPlaying(false);
       if (!video.ended) onHeartbeatRef.current?.(video.currentTime);

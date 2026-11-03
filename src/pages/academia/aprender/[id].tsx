@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
@@ -47,6 +47,9 @@ import {
   Query,
 } from "@/lib/sektor-api/__generated__/types";
 import { cn } from "@/utils/class-name";
+
+/** Server-side minimum spacing between heartbeats is 4s; keep a margin. */
+const HEARTBEAT_MIN_GAP_MS = 4_300;
 
 const MODULE_ICON = {
   [AcademyCourseModuleType.Video]: faVideo,
@@ -133,12 +136,45 @@ const LearnPage = () => {
 
   // Server-side tracking: heartbeats while playing, plus one as soon as the
   // student crosses the threshold so "Siguiente" unlocks without waiting.
-  const heartbeat = (positionSeconds: number) =>
-    reportVideo({ variables: { courseId, moduleIndex: index, positionSeconds } })
+  // The server ignores heartbeats closer than 4s to the previous one, so a
+  // beat that comes too soon (e.g. "ended" right after the 90% beat on a short
+  // video) is delayed instead of sent and lost.
+  const lastBeatAt = useRef(0);
+  const pendingBeat = useRef<{ timer: number; position: number } | null>(null);
+  const sendBeat = (moduleIndex: number, positionSeconds: number) => {
+    lastBeatAt.current = Date.now();
+    reportVideo({ variables: { courseId, moduleIndex, positionSeconds } })
       .then((res) => {
         if (res.data?.reportAcademyVideoProgress.canComplete) setServerVideoOk(true);
       })
       .catch(() => undefined);
+  };
+  const cancelPendingBeat = () => {
+    if (pendingBeat.current) window.clearTimeout(pendingBeat.current.timer);
+    pendingBeat.current = null;
+  };
+  const heartbeat = (positionSeconds: number) => {
+    const wait = HEARTBEAT_MIN_GAP_MS - (Date.now() - lastBeatAt.current);
+    if (wait <= 0) {
+      cancelPendingBeat();
+      sendBeat(index, positionSeconds);
+      return;
+    }
+    if (pendingBeat.current) {
+      pendingBeat.current.position = Math.max(pendingBeat.current.position, positionSeconds);
+      return;
+    }
+    const moduleIndex = index;
+    pendingBeat.current = {
+      position: positionSeconds,
+      timer: window.setTimeout(() => {
+        const position = pendingBeat.current?.position ?? positionSeconds;
+        pendingBeat.current = null;
+        sendBeat(moduleIndex, position);
+      }, wait),
+    };
+  };
+  useEffect(() => cancelPendingBeat, []);
 
   const onVideoProgress = (fraction: number, positionSeconds: number) => {
     if (fraction >= VIDEO_REQUIRED_FRACTION && videoFraction < VIDEO_REQUIRED_FRACTION)
@@ -147,6 +183,8 @@ const LearnPage = () => {
   };
 
   const goTo = (i: number) => {
+    cancelPendingBeat();
+    lastBeatAt.current = 0;
     setVideoFraction(0);
     setServerVideoOk(false);
     setOpenedAttachment(false);
