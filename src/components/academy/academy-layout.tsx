@@ -8,6 +8,7 @@ import FullScreenLoaderLogo from "@/components/ui/full-screen-loader-logo";
 import { ROUTES } from "@/constants/router";
 import { useAuthStore } from "@/store/auth";
 import { cn } from "@/utils/class-name";
+import { BUTTON_VARIANTS } from "@/components/ui/button/constants";
 import { isAcademyAdmin, isAcademyStudent } from "./constants";
 
 interface AcademyLayoutProps {
@@ -50,7 +51,7 @@ const AcademyLayout = ({
   const pageTitle = title ? `${title} | Academia Sektor` : "Academia Sektor";
 
   return (
-    <div className="min-h-svh bg-gray-50 w-full flex flex-col items-center">
+    <div className="min-h-svh bg-white w-full flex flex-col items-center">
       <Head>
         <title>{pageTitle}</title>
         {description && <meta name="description" content={description} />}
@@ -60,29 +61,29 @@ const AcademyLayout = ({
       <Navbar />
 
       {!hideTabs && tabs.length > 1 && (
-        <div className="w-full bg-white border-b border-gray-200">
-          <nav className="w-11/12 max-w-screen-xl mx-auto flex gap-6 overflow-x-auto font-century-gothic text-sm">
-            {tabs.map((tab) => {
-              const active =
-                tab.href === ROUTES.ACADEMY
-                  ? pathname === ROUTES.ACADEMY ||
-                    pathname === `${ROUTES.ACADEMY}/[slug]`
-                  : pathname.startsWith(tab.href);
-              return (
-                <Link
-                  key={tab.href}
-                  href={tab.href}
-                  className={cn(
-                    "py-3 border-b-2 whitespace-nowrap text-blue-500 hover:text-blue-400",
-                    active ? "border-blue-500 font-bold" : "border-transparent"
-                  )}
-                >
-                  {tab.label}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
+        <nav className="w-11/12 max-w-screen-xl mx-auto flex gap-2 overflow-x-auto pt-6 font-century-gothic">
+          {tabs.map((tab) => {
+            const active =
+              tab.href === ROUTES.ACADEMY
+                ? pathname === ROUTES.ACADEMY ||
+                  pathname === `${ROUTES.ACADEMY}/[slug]`
+                : pathname.startsWith(tab.href);
+            return (
+              <Link
+                key={tab.href}
+                href={tab.href}
+                aria-current={active ? "page" : undefined}
+                className={cn(
+                  BUTTON_VARIANTS.base,
+                  active ? BUTTON_VARIANTS["solid-blue"] : BUTTON_VARIANTS.outline,
+                  "text-sm px-4 py-2 whitespace-nowrap"
+                )}
+              >
+                {tab.label}
+              </Link>
+            );
+          })}
+        </nav>
       )}
 
       <main

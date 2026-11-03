@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import dayjs from "dayjs";
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { Empty, Modal, Progress, Spin, Tabs, Tag } from "antd";
+import { Empty, Modal, Progress, Spin } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faQrcode, faTowerBroadcast } from "@fortawesome/free-solid-svg-icons";
 import QRCode from "react-qr-code";
@@ -29,6 +29,7 @@ import {
   MyAcademyCalendarItem,
   Query,
 } from "@/lib/sektor-api/__generated__/types";
+import { ButtonTabs, Panel, Pill } from "@/components/academy/ui";
 
 const MyCoursesTab = () => {
   const { data, loading, error } = useQuery<Query>(MY_ACADEMY_COURSES_QUERY, {
@@ -65,8 +66,8 @@ const MyCoursesTab = () => {
             )}
             <div className="p-4 flex flex-col gap-2 flex-1 text-blue-500">
               <div className="flex gap-1 flex-wrap">
-                {c.modality && <Tag color="blue">{MODALITY_LABEL[c.modality]}</Tag>}
-                {c.level && <Tag>{LEVEL_LABEL[c.level]}</Tag>}
+                {c.modality && <Pill solid>{MODALITY_LABEL[c.modality]}</Pill>}
+                {c.level && <Pill>{LEVEL_LABEL[c.level]}</Pill>}
               </div>
               <h3 className="font-bold">{c.title}</h3>
               {online ? (
@@ -194,19 +195,23 @@ const MyCalendarTab = () => {
 
 const MyCoursesPage = () => {
   const allowed = useAcademyRoleGuard(isAcademyStudent);
+  const [tab, setTab] = useState<"cursos" | "calendario">("cursos");
   return (
     <AcademyLayout title="Mis cursos">
       <h1 className="text-2xl font-bold mb-4">Mis cursos</h1>
       {!allowed ? (
         <AcademyLoader />
       ) : (
-        <Tabs
-          destroyInactiveTabPane
-          items={[
-            { key: "cursos", label: "Cursos", children: <MyCoursesTab /> },
-            { key: "calendario", label: "Calendario", children: <MyCalendarTab /> },
-          ]}
-        />
+        <Panel>
+          <ButtonTabs
+            items={[
+              { key: "cursos", label: "Cursos", children: <MyCoursesTab /> },
+              { key: "calendario", label: "Calendario", children: <MyCalendarTab /> },
+            ]}
+            activeKey={tab}
+            onChange={setTab}
+          />
+        </Panel>
       )}
     </AcademyLayout>
   );

@@ -3,13 +3,15 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import dayjs from "dayjs";
 import { useMutation, useQuery } from "@apollo/client";
-import { Empty, Input, Modal, Segmented, Tag } from "antd";
+import { Empty, Modal } from "antd";
+import TextInput from "@/components/ui/text-input";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendarDays,
   faPen,
   faPlus,
   faQrcode,
+  faSearch,
   faTrash,
   faUsers,
 } from "@fortawesome/free-solid-svg-icons";
@@ -39,6 +41,7 @@ import {
   formatUsd,
   friendlyError,
 } from "../constants";
+import { Pill, ToggleButtons } from "../ui";
 
 const ErrorBox = ({ error }: { error: unknown }) => (
   <p className="text-red-500 py-10 text-center">{friendlyError(error)}</p>
@@ -210,15 +213,17 @@ export const CoursesPanel = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col md:flex-row gap-3 md:items-center">
-        <Segmented
+        <ToggleButtons
           options={STATUS_FILTERS}
           value={status}
-          onChange={(value) => setStatus(value as AcademyCourseStatus)}
+          onChange={setStatus}
         />
-        <Input.Search
-          allowClear
+        <TextInput
           placeholder="Buscar curso"
-          className="md:max-w-xs"
+          icon={faSearch}
+          iconPosition="end"
+          wrapperClassName="md:max-w-xs"
+          value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
         <Button
@@ -256,10 +261,10 @@ export const CoursesPanel = () => {
               <div className="p-4 flex flex-col gap-2 flex-1">
                 <div className="flex gap-1 flex-wrap">
                   {course.modality && (
-                    <Tag color="blue">{MODALITY_LABEL[course.modality]}</Tag>
+                    <Pill solid>{MODALITY_LABEL[course.modality]}</Pill>
                   )}
                   {course.courseType && (
-                    <Tag>{CATEGORY_LABEL[course.courseType]}</Tag>
+                    <Pill>{CATEGORY_LABEL[course.courseType]}</Pill>
                   )}
                 </div>
                 <h3 className="font-bold">{course.title}</h3>
@@ -372,10 +377,12 @@ export const StudentsPanel = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <Input.Search
-        allowClear
+      <TextInput
         placeholder="Buscar estudiante"
-        className="md:max-w-xs"
+        icon={faSearch}
+        iconPosition="end"
+        wrapperClassName="md:max-w-xs"
+        value={search}
         onChange={(e) => setSearch(e.target.value)}
       />
       {loading && !data ? (

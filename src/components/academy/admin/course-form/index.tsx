@@ -1,19 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import { useMutation } from "@apollo/client";
-import {
-  Alert,
-  DatePicker,
-  Input,
-  InputNumber,
-  Progress,
-  Select,
-  Slider,
-  Steps,
-  Switch,
-  Tag,
-  Upload,
-} from "antd";
+import { Alert, DatePicker, Input, InputNumber, Progress, Select, Slider, Steps, Switch, Upload } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowDown,
@@ -67,6 +55,7 @@ import {
   newKey,
   validateStep,
 } from "./types";
+import { Pill } from "../../ui";
 
 const STEPS = ["Información", "Formato", "Contenido", "Publicar"];
 
@@ -505,7 +494,7 @@ const CourseForm = ({ course }: CourseFormProps) => {
                 {lesson.videoFile?.name ?? decodeURIComponent(lesson.videoUrl!.split("/").pop()!)}
               </span>
               {lesson.durationSeconds ? (
-                <Tag>{formatDuration(lesson.durationSeconds)}</Tag>
+                <Pill>{formatDuration(lesson.durationSeconds)}</Pill>
               ) : null}
             </div>
           )}
@@ -671,9 +660,9 @@ const CourseForm = ({ course }: CourseFormProps) => {
       )}
       <div className="p-5 flex flex-col gap-3">
         <div className="flex gap-1 flex-wrap">
-          <Tag color="blue">{MODALITY_LABEL[draft.modality]}</Tag>
-          {draft.courseType && <Tag>{CATEGORY_LABEL[draft.courseType]}</Tag>}
-          {draft.level && <Tag>{LEVEL_LABEL[draft.level]}</Tag>}
+          <Pill solid>{MODALITY_LABEL[draft.modality]}</Pill>
+          {draft.courseType && <Pill>{CATEGORY_LABEL[draft.courseType]}</Pill>}
+          {draft.level && <Pill>{LEVEL_LABEL[draft.level]}</Pill>}
         </div>
         <h2 className="text-xl font-bold">{draft.title}</h2>
         <p className="text-sm text-gray-600 whitespace-pre-line">{draft.description}</p>

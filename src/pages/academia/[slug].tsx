@@ -3,7 +3,7 @@ import type { GetServerSideProps } from "next";
 import Head from "next/head";
 import Link from "next/link";
 import dayjs from "dayjs";
-import { Tag } from "antd";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
@@ -35,6 +35,7 @@ import {
   PublicAcademyCourse,
   Query,
 } from "@/lib/sektor-api/__generated__/types";
+import { Pill } from "@/components/academy/ui";
 
 interface Props {
   course: PublicAcademyCourse;
@@ -112,9 +113,9 @@ const CourseDetailPage = ({ course, siteUrl }: Props) => {
           )}
           <header className="flex flex-col gap-3">
             <div className="flex gap-1 flex-wrap">
-              {course.modality && <Tag color="blue">{MODALITY_LABEL[course.modality]}</Tag>}
-              {course.courseType && <Tag>{CATEGORY_LABEL[course.courseType]}</Tag>}
-              {course.level && <Tag>{LEVEL_LABEL[course.level]}</Tag>}
+              {course.modality && <Pill solid>{MODALITY_LABEL[course.modality]}</Pill>}
+              {course.courseType && <Pill>{CATEGORY_LABEL[course.courseType]}</Pill>}
+              {course.level && <Pill>{LEVEL_LABEL[course.level]}</Pill>}
             </div>
             <h1 className="text-3xl font-bold">{course.title}</h1>
             <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600">

@@ -1,6 +1,5 @@
 import React from "react";
 import { useRouter } from "next/router";
-import { Tabs } from "antd";
 import withAuth from "@/components/shared/with-auth";
 import AcademyLayout, {
   AcademyLoader,
@@ -13,6 +12,7 @@ import {
   DashboardPanel,
   StudentsPanel,
 } from "@/components/academy/admin/admin-panels";
+import { ButtonTabs, Panel } from "@/components/academy/ui";
 
 const TABS = [
   { key: "cursos", label: "Cursos", children: <CoursesPanel /> },
@@ -32,16 +32,17 @@ const AcademyAdminPage = () => {
       {!allowed ? (
         <AcademyLoader />
       ) : (
-        <Tabs
-          activeKey={TABS.some((t) => t.key === tab) ? tab : "cursos"}
-          onChange={(key) =>
-            router.replace({ query: { tab: key } }, undefined, {
-              shallow: true,
-            })
-          }
-          items={TABS}
-          destroyInactiveTabPane
-        />
+        <Panel>
+          <ButtonTabs
+            items={TABS}
+            activeKey={TABS.some((t) => t.key === tab) ? tab : "cursos"}
+            onChange={(key) =>
+              router.replace({ query: { tab: key } }, undefined, {
+                shallow: true,
+              })
+            }
+          />
+        </Panel>
       )}
     </AcademyLayout>
   );

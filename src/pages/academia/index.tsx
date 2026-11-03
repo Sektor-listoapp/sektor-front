@@ -1,7 +1,11 @@
 import React, { useMemo, useState } from "react";
 import type { GetServerSideProps } from "next";
 import Head from "next/head";
-import { Empty, Input, Segmented, Select } from "antd";
+import { Empty } from "antd";
+import { faSearch } from "@fortawesome/free-solid-svg-icons";
+import Select from "@/components/ui/select";
+import TextInput from "@/components/ui/text-input";
+import { Panel, ToggleButtons } from "@/components/academy/ui";
 import AcademyLayout from "@/components/academy/academy-layout";
 import CourseCard, { courseHref } from "@/components/academy/student/course-card";
 import { CATEGORY_LABEL, MODALITY_LABEL } from "@/components/academy/constants";
@@ -26,7 +30,7 @@ const DESCRIPTION =
 const AcademyCatalogPage = ({ courses, siteUrl, failed }: Props) => {
   const [search, setSearch] = useState("");
   const [modality, setModality] = useState<AcademyCourseModality | "all">("all");
-  const [category, setCategory] = useState<AcademyCourseCategory>();
+  const [category, setCategory] = useState<AcademyCourseCategory | "">("");
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -62,44 +66,53 @@ const AcademyCatalogPage = ({ courses, siteUrl, failed }: Props) => {
         />
       </Head>
 
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold">Academia Sektor</h1>
-        <p className="text-gray-600 mt-2 max-w-2xl">{DESCRIPTION}</p>
-      </header>
+      <Panel className="mb-8">
+        <header className="flex flex-col gap-2">
+          <h1 className="text-lg md:text-2xl font-bold text-blue-500">Academia Sektor</h1>
+          <p className="text-gray-600 max-w-2xl text-sm md:text-base">{DESCRIPTION}</p>
+        </header>
 
-      <div className="flex flex-col md:flex-row gap-3 md:items-center mb-6">
-        <Input.Search
-          allowClear
-          placeholder="Buscar cursos"
-          className="md:max-w-xs"
-          onChange={(e) => setSearch(e.target.value)}
-          aria-label="Buscar cursos"
-        />
-        <div className="overflow-x-auto">
-          <Segmented
-            value={modality}
-            onChange={(v) => setModality(v as AcademyCourseModality | "all")}
+        <form
+          className="flex flex-col sm:flex-row gap-4 w-full xl:max-w-2xl"
+          onSubmit={(e) => e.preventDefault()}
+          role="search"
+        >
+          <TextInput
+            placeholder="Buscar cursos"
+            icon={faSearch}
+            iconPosition="end"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            aria-label="Buscar cursos"
+          />
+          <Select
+            wrapperClassName="sm:max-w-xs"
+            aria-label="Tipo de curso"
+            value={category}
+            onChange={(e) => setCategory(e.target.value as AcademyCourseCategory | "")}
             options={[
-              { label: "Todos", value: "all" },
-              ...Object.values(AcademyCourseModality).map((m) => ({
-                label: MODALITY_LABEL[m],
-                value: m,
+              { label: "Todos los tipos", value: "" },
+              ...Object.values(AcademyCourseCategory).map((c) => ({
+                value: c,
+                label: CATEGORY_LABEL[c],
               })),
             ]}
           />
-        </div>
-        <Select
-          allowClear
-          placeholder="Tipo de curso"
-          className="md:w-48"
-          value={category}
-          onChange={setCategory}
-          options={Object.values(AcademyCourseCategory).map((c) => ({
-            value: c,
-            label: CATEGORY_LABEL[c],
-          }))}
+        </form>
+
+        <ToggleButtons
+          label="Modalidad:"
+          value={modality}
+          onChange={setModality}
+          options={[
+            { label: "Todos", value: "all" as const },
+            ...Object.values(AcademyCourseModality).map((m) => ({
+              label: MODALITY_LABEL[m],
+              value: m,
+            })),
+          ]}
         />
-      </div>
+      </Panel>
 
       {failed ? (
         <p className="text-red-500 py-10 text-center">
