@@ -132,11 +132,10 @@ export const CONFIRM_ACADEMY_COURSE_MOBILE_PAYMENT = gql`
   }
 `;
 
-export const UPDATE_ORGANIZATION_FISCAL_ADDRESS = gql`
-  mutation UpdateOrganizationFiscalAddress(
-    $input: UpdateOrganizationFiscalAddressInputType!
-  ) {
-    updateOrganizationFiscalAddress(input: $input) {
+/** Saves the signed-in user's own fiscal address (any account type). */
+export const UPDATE_MY_FISCAL_ADDRESS = gql`
+  mutation UpdateMyFiscalAddress($input: FiscalAddressInputType!) {
+    updateMyFiscalAddress(input: $input) {
       id
     }
   }
