@@ -111,7 +111,8 @@ const CourseActions = ({ course }: { course: PublicAcademyCourse }) => {
       <Box>
         {price}
         <p className="text-sm text-gray-500">
-          Tu tipo de cuenta no puede inscribirse en cursos.
+          Los cursos están disponibles para cuentas de corredores, organizaciones y
+          asegurados. Inicia sesión con una de esas cuentas para inscribirte.
         </p>
       </Box>
     );
