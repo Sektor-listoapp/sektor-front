@@ -162,6 +162,9 @@ export const CoursesPanel = () => {
     { variables: { status }, fetchPolicy: "cache-and-network" }
   );
   const [deleteCourse] = useMutation(DELETE_ACADEMY_COURSE);
+  // Static Modal.confirm does not render under React 19 (antd 5), so the
+  // confirmations go through the hook and its contextHolder.
+  const [modal, modalContextHolder] = Modal.useModal();
 
   const courses = useMemo(
     () =>
@@ -185,7 +188,7 @@ export const CoursesPanel = () => {
         message === "Cannot delete a course with existing enrollments" &&
         group === UserGroups.Admin
       ) {
-        Modal.confirm({
+        modal.confirm({
           title: "El curso tiene alumnos inscritos",
           content:
             "Si lo eliminas, los alumnos perderán el acceso. ¿Eliminar de todas formas?",
@@ -201,7 +204,7 @@ export const CoursesPanel = () => {
   };
 
   const confirmDelete = (course: AcademyCourseListItem) =>
-    Modal.confirm({
+    modal.confirm({
       title: `¿Eliminar "${course.title}"?`,
       content: "Esta acción no se puede deshacer.",
       okText: "Eliminar",
@@ -212,6 +215,7 @@ export const CoursesPanel = () => {
 
   return (
     <div className="flex flex-col gap-4">
+      {modalContextHolder}
       <div className="flex flex-col md:flex-row gap-3 md:items-center">
         <ToggleButtons
           options={STATUS_FILTERS}
