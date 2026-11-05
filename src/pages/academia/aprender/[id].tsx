@@ -79,6 +79,8 @@ const LearnPage = () => {
   const [completeLesson, { loading: completing }] = useMutation(COMPLETE_ACADEMY_LESSON);
   const [submitQuiz, { loading: submitting }] = useMutation<Mutation>(SUBMIT_ACADEMY_QUIZ);
   const [reportVideo] = useMutation<Mutation>(REPORT_ACADEMY_VIDEO_PROGRESS);
+  // Static Modal.success/warning do not render under React 19 (antd 5).
+  const [modal, modalContextHolder] = Modal.useModal();
 
   // The course's final quiz (live courses) is shown as one more lesson at the
   // end; it is graded with moduleIndex omitted.
@@ -246,20 +248,42 @@ const LearnPage = () => {
           },
         });
         const result = res.data!.submitAcademyQuiz;
-        const passed = result.passed;
         await refetch();
-        Modal[passed ? "success" : "warning"]({
-          title: passed ? "¡Aprobaste!" : "No alcanzaste el puntaje mínimo",
-          content: `Obtuviste ${result.score}% (${result.correctCount} de ${result.total}). Se necesita ${result.passingScore}% para aprobar.${
-            result.certificateCode ? " ¡Ya tienes tu certificado!" : ""
-          }`,
-          okText: passed ? "Continuar" : "Intentar de nuevo",
-          onOk: () => {
-            if (!passed) return setAnswers({});
-            if (index < modules.length - 1) goTo(index + 1);
-            else router.push(backToCourse);
-          },
-        });
+        if (result.passed) {
+          modal.success({
+            title: "¡Aprobaste!",
+            content: `Obtuviste ${result.score}% (${result.correctCount} de ${result.total}). Se necesita ${result.passingScore}% para aprobar.${
+              result.certificateCode ? " ¡Ya tienes tu certificado!" : ""
+            }`,
+            okText: "Continuar",
+            onOk: () => {
+              if (index < modules.length - 1) goTo(index + 1);
+              else router.push(backToCourse);
+            },
+          });
+          return;
+        }
+        // On a failed quiz the server resets the lessons of that section, so
+        // the student reviews them before retrying (same as the app).
+        const reset = result.resetModuleIndexes ?? [];
+        const content = `Obtuviste ${result.score}% (${result.correctCount} de ${result.total}). Necesitas ${result.passingScore}% para aprobar.`;
+        if (reset.length) {
+          modal.confirm({
+            title: "No lograste el resultado",
+            content: `${content} Te invitamos a ver de nuevo los módulos anteriores antes de volver a intentarlo.`,
+            okText: "Volver a los módulos",
+            cancelText: "Cerrar",
+            onOk: () => goTo(reset[0]),
+            onCancel: () => setAnswers({}),
+          });
+        } else {
+          modal.warning({
+            title: "No lograste el resultado",
+            content,
+            okText: "Volver a intentar",
+            onOk: () => setAnswers({}),
+          });
+        }
         return;
       }
       if (!completed.has(index)) {
@@ -291,6 +315,7 @@ const LearnPage = () => {
 
   return (
     <AcademyLayout title={course.title} hideTabs>
+      {modalContextHolder}
       <Link href={backToCourse} className="text-sm text-blue-500 hover:text-blue-400 flex items-center gap-2 mb-4">
         <FontAwesomeIcon icon={faArrowLeft} /> {course.title}
       </Link>

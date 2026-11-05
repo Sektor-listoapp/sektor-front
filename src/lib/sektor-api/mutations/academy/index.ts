@@ -151,6 +151,7 @@ export const SUBMIT_ACADEMY_QUIZ = gql`
       total
       passingScore
       completedModuleIndexes
+      resetModuleIndexes
       enrollmentStatus
       certificateCode
     }

@@ -290,6 +290,8 @@ export type AcademyQuizResult = {
   moduleIndex?: Maybe<Scalars['Int']['output']>;
   passed: Scalars['Boolean']['output'];
   passingScore: Scalars['Int']['output'];
+  /** Lesson modules reset after failing this quiz; the student must take them again (empty when passed or nothing to reset) */
+  resetModuleIndexes: Array<Scalars['Int']['output']>;
   /** Score 0-100 */
   score: Scalars['Int']['output'];
   total: Scalars['Int']['output'];
