@@ -26,6 +26,50 @@ export const DELETE_ACADEMY_COURSE = gql`
   }
 `;
 
+/* ---------------------------- Admin: instructors --------------------------- */
+
+const INSTRUCTOR_RESULT_FIELDS = `
+  id
+  name
+  email
+  headline
+  bio
+  photoUrl
+  courseCount
+  canEdit
+`;
+
+export const CREATE_ACADEMY_INSTRUCTOR = gql`
+  mutation CreateAcademyInstructor($input: CreateAcademyInstructorInput!) {
+    createAcademyInstructor(input: $input) {
+      ${INSTRUCTOR_RESULT_FIELDS}
+    }
+  }
+`;
+
+export const UPDATE_ACADEMY_INSTRUCTOR = gql`
+  mutation UpdateAcademyInstructor(
+    $id: String!
+    $input: UpdateAcademyInstructorInput!
+  ) {
+    updateAcademyInstructor(id: $id, input: $input) {
+      ${INSTRUCTOR_RESULT_FIELDS}
+    }
+  }
+`;
+
+export const DELETE_ACADEMY_INSTRUCTOR = gql`
+  mutation DeleteAcademyInstructor($id: String!) {
+    deleteAcademyInstructor(id: $id)
+  }
+`;
+
+export const RESEND_ACADEMY_INSTRUCTOR_INVITE = gql`
+  mutation ResendAcademyInstructorInvite($id: String!) {
+    resendAcademyInstructorInvite(id: $id)
+  }
+`;
+
 export const REQUEST_ACADEMY_COURSE_ASSET_UPLOAD = gql`
   mutation RequestAcademyCourseAssetUpload(
     $input: RequestAcademyCourseAssetUploadInput!

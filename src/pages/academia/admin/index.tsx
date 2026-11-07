@@ -7,6 +7,12 @@ import AcademyLayout, {
 } from "@/components/academy/academy-layout";
 import { isAcademyAdmin } from "@/components/academy/constants";
 import {
+  InstructorsPanel,
+  MyInstructorPanel,
+} from "@/components/academy/admin/instructors-panel";
+import { UserGroups } from "@/lib/sektor-api/__generated__/types";
+import { useAuthStore } from "@/store/auth";
+import {
   CalendarPanel,
   CoursesPanel,
   DashboardPanel,
@@ -20,10 +26,18 @@ const TABS = [
   { key: "calendario", label: "Calendario", children: <CalendarPanel /> },
   { key: "estudiantes", label: "Estudiantes", children: <StudentsPanel /> },
 ];
+// Admin manages every instructor; an AcademyAdmin edits its own profile.
+const ADMIN_TABS = [...TABS, { key: "docentes", label: "Docentes", children: <InstructorsPanel /> }];
+const ACADEMY_ADMIN_TABS = [
+  ...TABS,
+  { key: "perfil", label: "Mi perfil", children: <MyInstructorPanel /> },
+];
 
 const AcademyAdminPage = () => {
   const router = useRouter();
   const allowed = useAcademyRoleGuard(isAcademyAdmin);
+  const group = useAuthStore((state) => state.user?.group);
+  const tabs = group === UserGroups.Admin ? ADMIN_TABS : ACADEMY_ADMIN_TABS;
   const tab = (router.query.tab as string) || "cursos";
 
   return (
@@ -34,8 +48,8 @@ const AcademyAdminPage = () => {
       ) : (
         <Panel>
           <ButtonTabs
-            items={TABS}
-            activeKey={TABS.some((t) => t.key === tab) ? tab : "cursos"}
+            items={tabs}
+            activeKey={tabs.some((t) => t.key === tab) ? tab : "cursos"}
             onChange={(key) =>
               router.replace({ query: { tab: key } }, undefined, {
                 shallow: true,

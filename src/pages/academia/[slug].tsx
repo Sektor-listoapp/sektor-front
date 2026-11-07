@@ -36,6 +36,7 @@ import {
   Query,
 } from "@/lib/sektor-api/__generated__/types";
 import { Pill } from "@/components/academy/ui";
+import { InstructorAvatar, instructorHref } from "@/components/academy/instructors";
 
 interface Props {
   course: PublicAcademyCourse;
@@ -63,9 +64,17 @@ const CourseDetailPage = ({ course, siteUrl }: Props) => {
     url,
     image: course.imageUrl || undefined,
     provider: { "@type": "Organization", name: "Sektor", sameAs: siteUrl },
-    ...(course.instructorName && {
-      instructor: { "@type": "Person", name: course.instructorName },
-    }),
+    ...(course.instructor
+      ? {
+          instructor: {
+            "@type": "Person",
+            name: course.instructor.name,
+            url: `${siteUrl}${instructorHref(course.instructor)}`,
+          },
+        }
+      : course.instructorName && {
+          instructor: { "@type": "Person", name: course.instructorName },
+        }),
     offers: {
       "@type": "Offer",
       category: course.priceUsd > 0 ? "Paid" : "Free",
@@ -121,7 +130,16 @@ const CourseDetailPage = ({ course, siteUrl }: Props) => {
             <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-gray-600">
               <li>
                 <FontAwesomeIcon icon={faChalkboardUser} className="mr-1" />
-                {course.instructorName || "Sektor"}
+                {course.instructor ? (
+                  <Link
+                    href={instructorHref(course.instructor)}
+                    className="text-blue-500 underline underline-offset-2 hover:text-blue-400"
+                  >
+                    {course.instructor.name}
+                  </Link>
+                ) : (
+                  course.instructorName || "Sektor"
+                )}
               </li>
               <li>
                 <FontAwesomeIcon icon={faUsers} className="mr-1" />
@@ -153,6 +171,23 @@ const CourseDetailPage = ({ course, siteUrl }: Props) => {
               )}
             </ul>
           </header>
+
+          {course.instructor && (
+            <Link
+              href={instructorHref(course.instructor)}
+              className="bg-white rounded-xl shadow-sm p-4 flex items-center gap-4 hover:shadow-md transition-shadow text-blue-500"
+            >
+              <InstructorAvatar instructor={course.instructor} className="w-14 h-14 text-lg" />
+              <span className="flex flex-col min-w-0">
+                <span className="text-xs uppercase tracking-wide text-gray-500">Docente / experto</span>
+                <span className="font-bold">{course.instructor.name}</span>
+                {course.instructor.headline && (
+                  <span className="text-sm text-gray-600 truncate">{course.instructor.headline}</span>
+                )}
+              </span>
+              <span className="ml-auto text-sm whitespace-nowrap">Ver perfil</span>
+            </Link>
+          )}
 
           <section>
             <h2 className="text-xl font-bold mb-2">Sobre este curso</h2>

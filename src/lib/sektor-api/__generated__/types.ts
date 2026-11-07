@@ -65,6 +65,9 @@ export type AcademyCourse = {
   finalQuizQuestions?: Maybe<Array<AcademyQuizQuestion>>;
   id: Scalars['String']['output'];
   imageUrl?: Maybe<Scalars['String']['output']>;
+  /** Teacher/expert profile of the course */
+  instructor?: Maybe<AcademyInstructor>;
+  instructorId?: Maybe<Scalars['ID']['output']>;
   instructorName?: Maybe<Scalars['String']['output']>;
   level?: Maybe<AcademyCourseLevel>;
   location?: Maybe<Scalars['String']['output']>;
@@ -140,6 +143,8 @@ export type AcademyCourseListItem = {
   enrolledCount: Scalars['Int']['output'];
   id: Scalars['String']['output'];
   imageUrl?: Maybe<Scalars['String']['output']>;
+  instructorId?: Maybe<Scalars['ID']['output']>;
+  instructorName?: Maybe<Scalars['String']['output']>;
   maxCapacity?: Maybe<Scalars['Int']['output']>;
   modality?: Maybe<AcademyCourseModality>;
   priceUsd: Scalars['Float']['output'];
@@ -249,6 +254,26 @@ export enum AcademyEnrollmentStatus {
   Dropped = 'Dropped'
 }
 
+/** Academy teacher/expert profile */
+export type AcademyInstructor = {
+  __typename?: 'AcademyInstructor';
+  bio?: Maybe<Scalars['String']['output']>;
+  /** Admin: always; AcademyAdmin: only its own profile */
+  canEdit: Scalars['Boolean']['output'];
+  /** Courses of the instructor (Published only for students) */
+  courseCount: Scalars['Int']['output'];
+  /** Courses of the instructor: Published for students, every status for Admin/AcademyAdmin */
+  courses: Array<AcademyCourseListItem>;
+  /** Only returned to Admin/AcademyAdmin callers */
+  email?: Maybe<Scalars['String']['output']>;
+  /** Short title, e.g. specialty */
+  headline?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  photoUrl?: Maybe<Scalars['String']['output']>;
+  userId: Scalars['ID']['output'];
+};
+
 export type AcademyQuizAnswerInput = {
   /** Answer for TrueFalse questions */
   booleanAnswer?: InputMaybe<Scalars['Boolean']['input']>;
@@ -290,7 +315,7 @@ export type AcademyQuizResult = {
   moduleIndex?: Maybe<Scalars['Int']['output']>;
   passed: Scalars['Boolean']['output'];
   passingScore: Scalars['Int']['output'];
-  /** Lesson modules reset after failing this quiz; the student must take them again (empty when passed or nothing to reset) */
+  /** Modules marked as not completed again after a failed module quiz; the student must redo them before retrying. Empty when passed or for the final quiz. */
   resetModuleIndexes: Array<Scalars['Int']['output']>;
   /** Score 0-100 */
   score: Scalars['Int']['output'];
@@ -691,6 +716,9 @@ export type CreateAcademyCourseInput = {
   durationMinutes?: InputMaybe<Scalars['Int']['input']>;
   finalQuizQuestions?: InputMaybe<Array<AcademyQuizQuestionInput>>;
   imageUrl?: InputMaybe<Scalars['String']['input']>;
+  /** Admin: instructor chosen from academyInstructors. Ignored for AcademyAdmin (always its own profile). */
+  instructorId?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Use instructorId; kept for older clients */
   instructorName?: InputMaybe<Scalars['String']['input']>;
   level?: InputMaybe<AcademyCourseLevel>;
   location?: InputMaybe<Scalars['String']['input']>;
@@ -702,6 +730,16 @@ export type CreateAcademyCourseInput = {
   scheduledAt?: InputMaybe<Scalars['DateTime']['input']>;
   streamingUrl?: InputMaybe<Scalars['String']['input']>;
   title: Scalars['String']['input'];
+};
+
+export type CreateAcademyInstructorInput = {
+  bio?: InputMaybe<Scalars['String']['input']>;
+  /** Login email. A new AcademyAdmin user is created and invited to set its password; an existing AcademyAdmin/Admin user is linked. */
+  email: Scalars['String']['input'];
+  headline?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  /** Alternative to the photo upload argument */
+  photoUrl?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CreateCalendarEventInput = {
@@ -1202,6 +1240,8 @@ export type Mutation = {
   /** Confirm Pago Móvil after R4 notification evidence exists. */
   confirmMobilePayment: ConfirmMobilePaymentResultType;
   createAcademyCourse: AcademyCourse;
+  /** Admin: registers a teacher/expert. Creates an AcademyAdmin user for the email and emails it an invitation to set its password. */
+  createAcademyInstructor: AcademyInstructor;
   createAdvertisement: AdvertisementType;
   createCalendarEvent: CalendarEventType;
   createModule: ModuleType;
@@ -1209,6 +1249,8 @@ export type Mutation = {
   createSurvey: SurveyType;
   createTracking: TrackingType;
   deleteAcademyCourse: Scalars['Boolean']['output'];
+  /** Admin: deletes a profile without courses. The user account is kept. */
+  deleteAcademyInstructor: Scalars['Boolean']['output'];
   deleteAdvertisement: Scalars['Boolean']['output'];
   deleteFileFromModule: ModuleType;
   deleteModule: Scalars['Boolean']['output'];
@@ -1245,6 +1287,8 @@ export type Mutation = {
   requestHealthQuote: HealthQuoteType;
   requestOtherQuote: OtherQuoteType;
   requestPropertyQuote: PropertyQuoteType;
+  /** Admin: resends the "create your password" invitation email */
+  resendAcademyInstructorInvite: Scalars['Boolean']['output'];
   saveAutoQuote: AutoQuoteType;
   saveHealthQuote: HealthQuoteType;
   saveOtherQuote: OtherQuoteType;
@@ -1259,6 +1303,8 @@ export type Mutation = {
   submitSurveyResponse: SurveyResponseType;
   unregisterDevice: Scalars['Boolean']['output'];
   updateAcademyCourse: AcademyCourse;
+  /** Admin: any profile; AcademyAdmin: only its own */
+  updateAcademyInstructor: AcademyInstructor;
   updateAdvertisement: AdvertisementType;
   updateBrokerageSociety: BrokerageSocietyType;
   updateCalendarEvent: CalendarEventType;
@@ -1271,6 +1317,8 @@ export type Mutation = {
   updateInsuranceCompany: InsuranceCompanyType;
   updateModule: ModuleType;
   updateModuleOrder: ModuleType;
+  /** Saves the authenticated user's fiscal address (any user group). Used for HKA fiscal invoices. */
+  updateMyFiscalAddress: UserType;
   updateNews?: Maybe<NewsType>;
   updateNotificationPreferences: NotificationPreferencesType;
   updateOrganizationFiscalAddress: OrganizationType;
@@ -1379,6 +1427,12 @@ export type MutationCreateAcademyCourseArgs = {
 };
 
 
+export type MutationCreateAcademyInstructorArgs = {
+  input: CreateAcademyInstructorInput;
+  photo?: InputMaybe<Scalars['File']['input']>;
+};
+
+
 export type MutationCreateAdvertisementArgs = {
   image?: InputMaybe<Scalars['File']['input']>;
   input: AdvertisementInputType;
@@ -1413,6 +1467,11 @@ export type MutationCreateTrackingArgs = {
 
 export type MutationDeleteAcademyCourseArgs = {
   force?: InputMaybe<Scalars['Boolean']['input']>;
+  id: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteAcademyInstructorArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -1578,6 +1637,11 @@ export type MutationRequestPropertyQuoteArgs = {
 };
 
 
+export type MutationResendAcademyInstructorInviteArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type MutationSaveAutoQuoteArgs = {
   input: AutoQuoteInputType;
 };
@@ -1647,6 +1711,13 @@ export type MutationUpdateAcademyCourseArgs = {
 };
 
 
+export type MutationUpdateAcademyInstructorArgs = {
+  id: Scalars['String']['input'];
+  input: UpdateAcademyInstructorInput;
+  photo?: InputMaybe<Scalars['File']['input']>;
+};
+
+
 export type MutationUpdateAdvertisementArgs = {
   id: Scalars['String']['input'];
   image?: InputMaybe<Scalars['File']['input']>;
@@ -1712,6 +1783,11 @@ export type MutationUpdateModuleArgs = {
 export type MutationUpdateModuleOrderArgs = {
   id: Scalars['ID']['input'];
   order: Scalars['Int']['input'];
+};
+
+
+export type MutationUpdateMyFiscalAddressArgs = {
+  input: FiscalAddressInputType;
 };
 
 
@@ -2144,6 +2220,8 @@ export type PublicAcademyCourse = {
   exchangeRate?: Maybe<Scalars['Float']['output']>;
   id: Scalars['String']['output'];
   imageUrl?: Maybe<Scalars['String']['output']>;
+  instructor?: Maybe<PublicAcademyInstructor>;
+  instructorId?: Maybe<Scalars['String']['output']>;
   instructorName?: Maybe<Scalars['String']['output']>;
   level?: Maybe<AcademyCourseLevel>;
   /** Only for Presential courses */
@@ -2163,6 +2241,20 @@ export type PublicAcademyCourseSyllabusItem = {
   durationSeconds?: Maybe<Scalars['Int']['output']>;
   title?: Maybe<Scalars['String']['output']>;
   type: AcademyCourseModuleType;
+};
+
+/** Academy teacher/expert profile safe for anonymous, SEO-indexable pages (no email). */
+export type PublicAcademyInstructor = {
+  __typename?: 'PublicAcademyInstructor';
+  bio?: Maybe<Scalars['String']['output']>;
+  /** Published courses of the instructor */
+  courseCount: Scalars['Int']['output'];
+  /** Published courses of the instructor */
+  courses: Array<PublicAcademyCourse>;
+  headline?: Maybe<Scalars['String']['output']>;
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  photoUrl?: Maybe<Scalars['String']['output']>;
 };
 
 export type PublicOrganizationFilterAddressType = {
@@ -2213,6 +2305,9 @@ export type Query = {
   academyCoursePaymentStatus: AcademyCoursePaymentStatus;
   academyCourses: Array<AcademyCourseListItem>;
   academyDashboard: AcademyDashboard;
+  academyInstructor?: Maybe<AcademyInstructor>;
+  /** Academy teachers/experts, sorted by name */
+  academyInstructors: Array<AcademyInstructor>;
   academyStudent: AcademyStudentDetail;
   academyStudents: Array<AcademyStudentSummary>;
   activeAdvertisements: Array<AdvertisementType>;
@@ -2239,6 +2334,8 @@ export type Query = {
   myAcademyAttendanceQr: AcademyAttendanceQr;
   myAcademyCalendarItems: Array<MyAcademyCalendarItem>;
   myAcademyCourses: Array<MyAcademyCourse>;
+  /** AcademyAdmin: the caller's own instructor profile (created on first access) */
+  myAcademyInstructor: AcademyInstructor;
   /** Get payment history for current user/organization */
   myPayments: Array<PaymentType>;
   /** Get subscription details for the current organization */
@@ -2264,6 +2361,10 @@ export type Query = {
   publicAcademyCourse?: Maybe<PublicAcademyCourse>;
   /** Public: Published Academy courses (no authentication) */
   publicAcademyCourses: Array<PublicAcademyCourse>;
+  /** Public: one Academy teacher/expert by id (no authentication) */
+  publicAcademyInstructor?: Maybe<PublicAcademyInstructor>;
+  /** Public: Academy teachers/experts (no authentication) */
+  publicAcademyInstructors: Array<PublicAcademyInstructor>;
   publicBrokerageSocieties: BrokerageSocietyPaginatedType;
   publicBrokerageSocietyById: BrokerageSocietyType;
   publicExclusiveAgentById: ExclusiveAgentType;
@@ -2317,6 +2418,11 @@ export type QueryAcademyCoursesArgs = {
   courseType?: InputMaybe<AcademyCourseCategory>;
   modality?: InputMaybe<AcademyCourseModality>;
   status?: InputMaybe<AcademyCourseStatus>;
+};
+
+
+export type QueryAcademyInstructorArgs = {
+  id: Scalars['String']['input'];
 };
 
 
@@ -2439,6 +2545,11 @@ export type QueryPublicAcademyCourseArgs = {
 export type QueryPublicAcademyCoursesArgs = {
   courseType?: InputMaybe<AcademyCourseCategory>;
   modality?: InputMaybe<AcademyCourseModality>;
+};
+
+
+export type QueryPublicAcademyInstructorArgs = {
+  id: Scalars['String']['input'];
 };
 
 
@@ -3161,6 +3272,9 @@ export type UpdateAcademyCourseInput = {
   durationMinutes?: InputMaybe<Scalars['Int']['input']>;
   finalQuizQuestions?: InputMaybe<Array<AcademyQuizQuestionInput>>;
   imageUrl?: InputMaybe<Scalars['String']['input']>;
+  /** Admin: changes the instructor. Ignored for AcademyAdmin (always its own profile). */
+  instructorId?: InputMaybe<Scalars['String']['input']>;
+  /** @deprecated Use instructorId; kept for older clients */
   instructorName?: InputMaybe<Scalars['String']['input']>;
   level?: InputMaybe<AcademyCourseLevel>;
   location?: InputMaybe<Scalars['String']['input']>;
@@ -3172,6 +3286,16 @@ export type UpdateAcademyCourseInput = {
   scheduledAt?: InputMaybe<Scalars['DateTime']['input']>;
   streamingUrl?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateAcademyInstructorInput = {
+  /** Empty string clears it */
+  bio?: InputMaybe<Scalars['String']['input']>;
+  /** Empty string clears it */
+  headline?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  /** Empty string removes the photo */
+  photoUrl?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateCalendarEventInput = {

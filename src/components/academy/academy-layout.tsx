@@ -37,6 +37,7 @@ const AcademyLayout = ({
 
   const tabs = [
     { label: "Catálogo", href: ROUTES.ACADEMY, show: true },
+    { label: "Docentes", href: ROUTES.ACADEMY_INSTRUCTORS, show: true },
     {
       label: "Mis cursos",
       href: ROUTES.ACADEMY_MY_COURSES,

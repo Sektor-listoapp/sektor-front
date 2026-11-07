@@ -32,6 +32,8 @@ const COURSE_DETAIL_FIELDS = `
   priceUsd
   passingScore
   instructorName
+  instructorId
+  instructor { id name headline photoUrl }
   createdByEmail
   createdByName
   modules {
@@ -139,6 +141,8 @@ export const ACADEMY_COURSES_QUERY = gql`
       canEdit
       createdBy
       slug
+      instructorId
+      instructorName
     }
   }
 `;
@@ -148,6 +152,58 @@ export const ACADEMY_COURSE_ADMIN_QUERY = gql`
     academyCourse(id: $id) {
       ${COURSE_DETAIL_FIELDS}
       canEdit
+    }
+  }
+`;
+
+/* ------------------------------ Instructors ------------------------------ */
+
+const INSTRUCTOR_FIELDS = `
+  id
+  userId
+  name
+  email
+  headline
+  bio
+  photoUrl
+  courseCount
+  canEdit
+`;
+
+const INSTRUCTOR_COURSE_FIELDS = `
+  id
+  title
+  modality
+  courseType
+  priceUsd
+  enrolledCount
+  imageUrl
+  maxCapacity
+  canEdit
+  slug
+`;
+
+export const ACADEMY_INSTRUCTORS_QUERY = gql`
+  query AcademyInstructors {
+    academyInstructors {
+      ${INSTRUCTOR_FIELDS}
+    }
+  }
+`;
+
+export const ACADEMY_INSTRUCTOR_QUERY = gql`
+  query AcademyInstructor($id: String!) {
+    academyInstructor(id: $id) {
+      ${INSTRUCTOR_FIELDS}
+      courses { ${INSTRUCTOR_COURSE_FIELDS} }
+    }
+  }
+`;
+
+export const MY_ACADEMY_INSTRUCTOR_QUERY = gql`
+  query MyAcademyInstructor {
+    myAcademyInstructor {
+      ${INSTRUCTOR_FIELDS}
     }
   }
 `;
@@ -291,6 +347,7 @@ const PUBLIC_COURSE_FIELDS = `
   level
   priceUsd
   instructorName
+  instructorId
   scheduledAt
   durationMinutes
   location
@@ -315,11 +372,38 @@ export const PUBLIC_ACADEMY_COURSE_QUERY = gql`
   query PublicAcademyCourse($idOrSlug: String!) {
     publicAcademyCourse(idOrSlug: $idOrSlug) {
       ${PUBLIC_COURSE_FIELDS}
+      instructor { id name headline photoUrl }
       syllabus {
         type
         title
         durationSeconds
       }
+    }
+  }
+`;
+
+const PUBLIC_INSTRUCTOR_FIELDS = `
+  id
+  name
+  headline
+  bio
+  photoUrl
+  courseCount
+`;
+
+export const PUBLIC_ACADEMY_INSTRUCTORS_QUERY = gql`
+  query PublicAcademyInstructors {
+    publicAcademyInstructors {
+      ${PUBLIC_INSTRUCTOR_FIELDS}
+    }
+  }
+`;
+
+export const PUBLIC_ACADEMY_INSTRUCTOR_QUERY = gql`
+  query PublicAcademyInstructor($id: String!) {
+    publicAcademyInstructor(id: $id) {
+      ${PUBLIC_INSTRUCTOR_FIELDS}
+      courses { ${PUBLIC_COURSE_FIELDS} }
     }
   }
 `;

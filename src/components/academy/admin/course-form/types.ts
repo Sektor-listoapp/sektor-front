@@ -45,7 +45,9 @@ export interface CourseDraft {
   imageFile?: File;
   title: string;
   description: string;
+  /** Kept to show older courses whose instructor is only a free-text name. */
   instructorName: string;
+  instructorId?: string;
   level?: AcademyCourseLevel;
   courseType?: AcademyCourseCategory;
   priceUsd: number;
@@ -124,6 +126,7 @@ export const draftFromCourse = (course: AcademyCourse): CourseDraft => {
   title: course.title,
   description: course.description,
   instructorName: course.instructorName ?? "",
+  instructorId: course.instructorId ?? undefined,
   level: course.level ?? undefined,
   courseType: course.courseType ?? undefined,
   priceUsd: course.priceUsd,
@@ -197,7 +200,8 @@ export const draftToInput = (d: CourseDraft): CreateAcademyCourseInput => {
     title: d.title.trim(),
     description: d.description.trim(),
     imageUrl: d.imageUrl,
-    instructorName: d.instructorName.trim() || undefined,
+    // The server fills instructorName from the instructor profile.
+    instructorId: d.instructorId,
     level: d.level,
     courseType: d.courseType!,
     priceUsd: d.priceUsd,
@@ -232,9 +236,15 @@ const validateQuestions = (questions: QuizQuestionDraft[], where: string) => {
   return errors;
 };
 
-export const validateStep = (step: number, d: CourseDraft): string[] => {
+export const validateStep = (
+  step: number,
+  d: CourseDraft,
+  { requireInstructor = false }: { requireInstructor?: boolean } = {}
+): string[] => {
   const errors: string[] = [];
   if (step === 0) {
+    if (requireInstructor && !d.instructorId)
+      errors.push("Selecciona el docente o experto");
     if (!d.imageUrl && !d.imageFile) errors.push("Agrega una portada");
     if (!d.title.trim()) errors.push("El título es obligatorio");
     if (!d.description.trim()) errors.push("La descripción es obligatoria");

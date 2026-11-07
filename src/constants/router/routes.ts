@@ -14,6 +14,7 @@ export const ROUTES = {
   NOTICIAS: "/noticias",
   ACADEMY: "/academia",
   ACADEMY_MY_COURSES: "/academia/mis-cursos",
+  ACADEMY_INSTRUCTORS: "/academia/docentes",
   ACADEMY_LEARN: "/academia/aprender",
   ACADEMY_ADMIN: "/academia/admin",
   ACADEMY_ADMIN_NEW_COURSE: "/academia/admin/cursos/nuevo",

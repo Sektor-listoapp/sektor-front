@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
+import { useShallow } from "zustand/shallow";
 import { Alert, DatePicker, Input, InputNumber, Progress, Select, Slider, Steps, Switch, Upload } from "antd";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -10,6 +11,7 @@ import {
   faFileLines,
   faImage,
   faPaperclip,
+  faPlus,
   faTrash,
   faVideo,
   faXmark,
@@ -21,7 +23,11 @@ import {
   CREATE_ACADEMY_COURSE,
   UPDATE_ACADEMY_COURSE,
 } from "@/lib/sektor-api/mutations";
-import { ACADEMY_COURSES_QUERY } from "@/lib/sektor-api/queries";
+import {
+  ACADEMY_COURSES_QUERY,
+  ACADEMY_INSTRUCTORS_QUERY,
+  MY_ACADEMY_INSTRUCTOR_QUERY,
+} from "@/lib/sektor-api/queries";
 import {
   AcademyCourse,
   AcademyCourseAssetType,
@@ -29,7 +35,11 @@ import {
   AcademyCourseLevel,
   AcademyCourseModality,
   AcademyCourseModuleType,
+  Query,
+  UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
+import { useAuthStore } from "@/store/auth";
+import { InstructorAvatar, InstructorFormModal } from "../../instructors";
 import { cn } from "@/utils/class-name";
 import {
   CATEGORY_LABEL,
@@ -81,6 +91,19 @@ const Field = ({
   </label>
 );
 
+const InstructorSummary = ({
+  name,
+  photoUrl,
+}: {
+  name: string;
+  photoUrl?: string | null;
+}) => (
+  <div className="flex items-center gap-3 py-1">
+    <InstructorAvatar instructor={{ name, photoUrl }} className="w-10 h-10 text-sm" />
+    <span className="font-bold">{name}</span>
+  </div>
+);
+
 interface CourseFormProps {
   course?: AcademyCourse & { canEdit?: boolean | null };
 }
@@ -100,6 +123,21 @@ const CourseForm = ({ course }: CourseFormProps) => {
   } | null>(null);
 
   const uploadAsset = useAcademyAssetUpload();
+
+  // Admin picks the instructor (required); an AcademyAdmin always teaches
+  // its own courses, which the server enforces.
+  const group = useAuthStore(useShallow((state) => state.user?.group));
+  const isAdmin = group === UserGroups.Admin;
+  const { data: instructorsData } = useQuery<Query>(ACADEMY_INSTRUCTORS_QUERY, {
+    skip: !isAdmin || readOnly,
+    fetchPolicy: "cache-and-network",
+  });
+  const { data: myInstructorData } = useQuery<Query>(MY_ACADEMY_INSTRUCTOR_QUERY, {
+    skip: group !== UserGroups.AcademyAdmin || readOnly,
+  });
+  const instructors = instructorsData?.academyInstructors ?? [];
+  const [creatingInstructor, setCreatingInstructor] = useState(false);
+  const stepOptions = { requireInstructor: isAdmin && !readOnly };
   const mutationOptions = {
     refetchQueries: [ACADEMY_COURSES_QUERY],
     awaitRefetchQueries: false,
@@ -149,7 +187,7 @@ const CourseForm = ({ course }: CourseFormProps) => {
 
   const goNext = () => {
     if (readOnly) return setStep((s) => Math.min(s + 1, STEPS.length - 1));
-    const stepErrors = validateStep(step, draft);
+    const stepErrors = validateStep(step, draft, stepOptions);
     setErrors(stepErrors);
     if (stepErrors.length === 0) {
       setStep((s) => s + 1);
@@ -163,7 +201,7 @@ const CourseForm = ({ course }: CourseFormProps) => {
   };
 
   const publish = async () => {
-    const allErrors = [0, 1, 2].flatMap((s) => validateStep(s, draft));
+    const allErrors = [0, 1, 2].flatMap((s) => validateStep(s, draft, stepOptions));
     if (allErrors.length) {
       setErrors(allErrors);
       return;
@@ -278,14 +316,56 @@ const CourseForm = ({ course }: CourseFormProps) => {
           />
         </Field>
       </div>
-      <Field label="Quién dicta el curso" hint="Déjalo vacío si lo dicta Sektor">
-        <Input
-          disabled={readOnly}
-          value={draft.instructorName}
-          placeholder="Ej: Adriana Machaca"
-          onChange={(e) => set({ instructorName: e.target.value })}
-        />
-      </Field>
+      <div className="md:col-span-2">
+        <Field
+          label="Docente / experto"
+          hint={
+            isAdmin && !readOnly
+              ? "Si no está en la lista, créalo con «Crear docente»"
+              : undefined
+          }
+        >
+          {isAdmin && !readOnly ? (
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Select
+                showSearch
+                className="flex-1"
+                placeholder="Selecciona el docente"
+                value={draft.instructorId}
+                optionFilterProp="label"
+                onChange={(instructorId) => set({ instructorId })}
+                options={instructors.map((i) => ({
+                  value: i.id,
+                  label: i.headline ? `${i.name} · ${i.headline}` : i.name,
+                }))}
+                notFoundContent="No hay docentes"
+              />
+              <Button
+                variant="outline"
+                type="button"
+                className="flex items-center gap-2 justify-center !py-1.5"
+                onClick={(e) => {
+                  e.preventDefault();
+                  setCreatingInstructor(true);
+                }}
+              >
+                <FontAwesomeIcon icon={faPlus} /> Crear docente
+              </Button>
+            </div>
+          ) : (
+            <InstructorSummary
+              name={
+                course?.instructor?.name ??
+                myInstructorData?.myAcademyInstructor.name ??
+                (draft.instructorName || "Sektor")
+              }
+              photoUrl={
+                course?.instructor?.photoUrl ?? myInstructorData?.myAcademyInstructor.photoUrl
+              }
+            />
+          )}
+        </Field>
+      </div>
       <Field label="Nivel">
         <Select
           disabled={readOnly}
@@ -652,6 +732,12 @@ const CourseForm = ({ course }: CourseFormProps) => {
     </div>
   );
 
+  const instructorLabel =
+    instructors.find((i) => i.id === draft.instructorId)?.name ??
+    course?.instructor?.name ??
+    myInstructorData?.myAcademyInstructor.name ??
+    draft.instructorName;
+
   const summaryStep = (
     <div className="bg-white rounded-xl shadow-sm overflow-hidden max-w-2xl">
       {coverPreview && (
@@ -671,10 +757,10 @@ const CourseForm = ({ course }: CourseFormProps) => {
           <dd>{formatUsd(draft.priceUsd)}</dd>
           <dt className="text-gray-500">Aprobación</dt>
           <dd>{draft.passingScore}%</dd>
-          {draft.instructorName && (
+          {instructorLabel && (
             <>
-              <dt className="text-gray-500">Dicta</dt>
-              <dd>{draft.instructorName}</dd>
+              <dt className="text-gray-500">Docente</dt>
+              <dd>{instructorLabel}</dd>
             </>
           )}
           {draft.scheduledAt && draft.modality !== AcademyCourseModality.Online && (
@@ -732,6 +818,12 @@ const CourseForm = ({ course }: CourseFormProps) => {
       )}
 
       {stepContent}
+
+      <InstructorFormModal
+        open={creatingInstructor}
+        onClose={() => setCreatingInstructor(false)}
+        onSaved={(instructor) => set({ instructorId: instructor.id })}
+      />
 
       {uploadStatus && (
         <div className="bg-white rounded-xl shadow-sm p-4">

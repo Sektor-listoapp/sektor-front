@@ -83,6 +83,11 @@ const FRIENDLY_ERRORS: Record<string, string> = {
   "Course is not available": "El curso no está disponible",
   "Invalid country/state/city fiscal address codes.":
     "El estado o la ciudad no son válidos. Selecciónalos de nuevo.",
+  "Instructor not found": "No encontramos al docente",
+  "Instructor name is required": "El nombre del docente es obligatorio",
+  "A valid email is required": "Ingresa un correo válido",
+  "Only an admin or the instructor can edit this profile":
+    "Solo un administrador o el propio docente puede editar este perfil",
   "Academy asset must be uploaded first":
     "Uno de los archivos no terminó de subirse. Intenta de nuevo.",
 };

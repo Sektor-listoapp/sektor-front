@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import AuthLayout from "@/components/auth/common/layout";
 import Stepper from "@/components/auth/forgot-password/stepper";
 import SektorFullHorizontalLogo from "@/components/icons/sektor-full-horizontal-logo";
@@ -22,6 +22,12 @@ const ResetPassword = () => {
     resetAuthStore();
   };
 
+  // Academy instructors get this page as "create your password" (invite=1);
+  // remember it before the query string is cleared.
+  const [isInvite, setIsInvite] = useState(false);
+  useEffect(() => {
+    if (query?.invite === "1") setIsInvite(true);
+  }, [query.invite]);
   useEffect(() => {
     if (query?.token) {
       setResetPasswordToken(query.token as string);
@@ -36,11 +42,14 @@ const ResetPassword = () => {
           <header className="w-full flex flex-col items-center gap-2 text-center text-balance lg:text-pretty lg:gap-4">
             <FontAwesomeIcon size="5x" icon={faLock} className="lg:mb-4" />
             <h1 className="font-bold text-xl md:text-4xl">
-              ¡Ya casi estas listo para acceder de nuevo a tu cuenta!
+              {isInvite
+                ? "Crea tu contraseña"
+                : "¡Ya casi estas listo para acceder de nuevo a tu cuenta!"}
             </h1>
             <p className="font-century-gothic md:text-xl">
-              Coloca acá tu nueva contraseña, la cual siempre sea fácil de
-              recordar
+              {isInvite
+                ? "Elige la contraseña con la que vas a iniciar sesión en Sektor para administrar tus cursos de la Academia."
+                : "Coloca acá tu nueva contraseña, la cual siempre sea fácil de recordar"}
             </p>
           </header>
 
