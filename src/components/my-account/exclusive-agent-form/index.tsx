@@ -9,6 +9,7 @@ import UploadInput from "@/components/ui/upload-input";
 import { useShallow } from "zustand/shallow";
 import { useAuthStore } from "@/store/auth";
 import { toast } from "react-toastify";
+import { parseApiError } from "@/utils/form/api-errors";
 import Image from "next/image";
 import { Space } from "antd";
 import Button from "@/components/ui/button";
@@ -527,52 +528,12 @@ const ExclusiveAgentForm = ({ userId }: ExclusiveAgentIdProps) => {
         refetchExclusiveAgent();
       })
       .catch((error: unknown) => {
-        const errorObj = error as {
-          message?: string;
-          graphQLErrors?: Array<{
-            message?: string;
-            extensions?: {
-              code?: string;
-              errors?: Record<string, string[]>;
-            };
-          }>;
-        };
-
-        const validationErrors: string[] = [];
-        if (errorObj?.graphQLErrors && errorObj.graphQLErrors.length > 0) {
-          errorObj.graphQLErrors.forEach((gqlError) => {
-            if (gqlError?.extensions?.errors) {
-              const errors = gqlError.extensions.errors;
-              if (Array.isArray(errors)) {
-                errors.forEach((err: { message?: string; field?: string }) => {
-                  if (err?.message) {
-                    validationErrors.push(err.message);
-                  }
-                });
-              } else if (typeof errors === 'object') {
-                Object.keys(errors).forEach((field) => {
-                  const fieldErrors = errors[field];
-                  if (Array.isArray(fieldErrors)) {
-                    validationErrors.push(...fieldErrors);
-                  } else if (typeof fieldErrors === 'string') {
-                    validationErrors.push(fieldErrors);
-                  } else if (typeof fieldErrors === 'object' && fieldErrors !== null) {
-                    const errObj = fieldErrors as { message?: string };
-                    if (errObj.message) {
-                      validationErrors.push(errObj.message);
-                    }
-                  }
-                });
-              }
-            }
-          });
-        }
-
-        const errorMessage = validationErrors.length > 0
-          ? validationErrors[0]
-          : errorObj?.message || GENERIC_TOAST_ERROR_MESSAGE;
-
-        toast.error(errorMessage);
+        const { message, fieldErrors } = parseApiError(error, GENERIC_TOAST_ERROR_MESSAGE);
+        console.error("[ExclusiveAgentForm] Error al guardar la información:", {
+          error,
+          fieldErrors,
+        });
+        toast.error(message);
       })
       .finally(() => setIsUpdatingExclusiveAgent(false));
   };

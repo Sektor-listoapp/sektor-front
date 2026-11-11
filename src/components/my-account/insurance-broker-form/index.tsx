@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import SelectMultiple from "@/components/ui/select-multiple";
 import TextInput from "@/components/ui/text-input";
 import { Mutation, OrganizationOfficeInputType, Query, StudyInputType, OrganizationClientType, SocialMediaLinkType } from "@/lib/sektor-api/__generated__/types";
@@ -48,6 +48,20 @@ import LocalOfficesInput from "../local-offices-input";
 import SocialMediaInput from "../social-media-input";
 import { UPDATE_ORGANIZATION_LOGO } from "@/lib/sektor-api/mutations/my-account/update-organization-logo";
 import { UPDATE_INSURANCE_BROKER_CLIENT_LOGO } from "@/lib/sektor-api/mutations/my-account/update-insurance-broker-client-logo";
+import { focusFieldWithError, parseApiError } from "@/utils/form/api-errors";
+
+// Where each API field lives in this form, to scroll to it when the save fails.
+const FIELD_LOCATORS: Record<string, { selector?: string; text?: string }> = {
+  insuranceCompanies: { selector: "#insuranceCompanies" },
+  lineOfBusiness: { selector: "#lineOfBusiness" },
+  coverageStates: { selector: "#coverageStates" },
+  allies: { selector: "#allies" },
+  foundationYear: { selector: '[name="yearsOfExperience"]' },
+  offices: { text: "Oficinas" },
+  clients: { text: "Clientes con los que has trabajado" },
+  studies: { text: "Estudios realizados" },
+  socialMediaLinks: { text: "Redes Sociales" },
+};
 
 type InsuranceBrokerIdProps = FormProps;
 
@@ -78,6 +92,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
   const targetUserId = userId || loggedUserId;
   const [isUpdatingInsuranceBroker, setIsUpdatingInsuranceBroker] =
     useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const {
     error: insuranceBrokerError,
@@ -256,7 +271,8 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
         variables: { clientId, logo: logoFile, organizationId }
       });
     } catch (error) {
-      console.error("Error al actualizar logo:", error);
+      console.error("Error al actualizar logo del cliente:", error);
+      toast.error(parseApiError(error, "No se pudo actualizar el logo de un cliente").message);
     }
   };
 
@@ -527,52 +543,16 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
         }
       }
     } catch (error: unknown) {
-      const errorObj = error as {
-        message?: string;
-        graphQLErrors?: Array<{
-          message?: string;
-          extensions?: {
-            code?: string;
-            errors?: Record<string, string[]>;
-          };
-        }>;
-      };
-
-      const validationErrors: string[] = [];
-      if (errorObj?.graphQLErrors && errorObj.graphQLErrors.length > 0) {
-        errorObj.graphQLErrors.forEach((gqlError) => {
-          if (gqlError?.extensions?.errors) {
-            const errors = gqlError.extensions.errors;
-            if (Array.isArray(errors)) {
-              errors.forEach((err: { message?: string; field?: string }) => {
-                if (err?.message) {
-                  validationErrors.push(err.message);
-                }
-              });
-            } else if (typeof errors === 'object') {
-              Object.keys(errors).forEach((field) => {
-                const fieldErrors = errors[field];
-                if (Array.isArray(fieldErrors)) {
-                  validationErrors.push(...fieldErrors);
-                } else if (typeof fieldErrors === 'string') {
-                  validationErrors.push(fieldErrors);
-                } else if (typeof fieldErrors === 'object' && fieldErrors !== null) {
-                  const errObj = fieldErrors as { message?: string };
-                  if (errObj.message) {
-                    validationErrors.push(errObj.message);
-                  }
-                }
-              });
-            }
-          }
-        });
-      }
-
-      const errorMessage = validationErrors.length > 0
-        ? validationErrors[0]
-        : errorObj?.message || "Error de validación en los datos proporcionados";
-
-      toast.error(errorMessage);
+      const { message, fieldErrors } = parseApiError(
+        error,
+        "Error de validación en los datos proporcionados"
+      );
+      console.error("[InsuranceBrokerForm] Error al guardar la información:", {
+        error,
+        fieldErrors,
+      });
+      toast.error(message);
+      focusFieldWithError(formRef.current, fieldErrors[0]?.field, FIELD_LOCATORS);
     } finally {
       setIsUpdatingInsuranceBroker(false);
     }
@@ -582,6 +562,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
 
   return (
     <form
+      ref={formRef}
       className="py-5 w-full flex flex-col items-center justify-center gap-10 font-century-gothic relative"
       onSubmit={handleSubmit}
     >
@@ -654,6 +635,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
           wrapperClassName="w-full"
           error={!requiredFields.insuranceCompanies}
           selectProps={{
+            id: "insuranceCompanies",
             disabled: loadingInsuranceCompanies || isUpdatingInsuranceBroker,
             placeholder: "Compañias con las que trabajas",
             options: insuranceCompanyOptions,
@@ -711,6 +693,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
           wrapperClassName="w-full"
           error={!requiredFields.segment}
           selectProps={{
+            id: "lineOfBusiness",
             placeholder: "Ramos con los que trabajas",
             options: SELECT_LINE_OF_BUSINESS_OPTIONS,
             notFoundContent: "No hay opciones disponibles",
@@ -798,6 +781,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
           wrapperClassName="w-full"
           error={!requiredFields.coverageState}
           selectProps={{
+            id: "coverageStates",
             placeholder: "Zona de alcance (estado)",
             options: countryStateOptions,
             notFoundContent: "No hay opciones disponibles",
@@ -901,6 +885,7 @@ const InsuranceBrokerForm = ({ userId }: InsuranceBrokerIdProps) => {
               loadingExclusiveAgents ||
               loadingBrokerageSocieties ||
               isUpdatingInsuranceBroker,
+            id: "allies",
             placeholder: "Aliados",
             options: [
               {
