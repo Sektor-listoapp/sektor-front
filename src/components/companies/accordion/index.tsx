@@ -10,6 +10,7 @@ import {
   faChevronDown,
   faEye,
   faTrashCan,
+  faUserTie,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Switch from "@/components/ui/switch";
@@ -29,6 +30,7 @@ interface CompaniesAccordionProps {
   setOpenDeleteModal: React.Dispatch<
     React.SetStateAction<DeleteCompanyTarget | null>
   >;
+  onConvertToBroker?: (item: AdminCompanyListItem) => void;
 }
 
 const { Premium, Standard } = OrganizationPlans;
@@ -40,6 +42,7 @@ const CompaniesAccordion = ({
   changeOrgPlan,
   changeOrgVisibility,
   setOpenDeleteModal,
+  onConvertToBroker,
 }: CompaniesAccordionProps) => {
   return (
     <Collapse
@@ -60,7 +63,10 @@ const CompaniesAccordion = ({
     >
       {data?.map(
         (
-          {
+          item,
+          index
+        ) => {
+          const {
             id,
             coverageStates,
             createdAt,
@@ -71,9 +77,7 @@ const CompaniesAccordion = ({
             clicks,
             email,
             isCustomer,
-          },
-          index
-        ) => {
+          } = item;
           const label = ADMIN_USER_TYPE_SELECT_OPTIONS?.find(
             (option) => option.value === type
           )?.label;
@@ -135,6 +139,21 @@ const CompaniesAccordion = ({
                         <Switch checked={isPremium} />
                       </button>
                     </>
+                  )}
+
+                  {isCustomer && onConvertToBroker && (
+                    <button
+                      className="w-fit flex flex-col items-center justify-center gap-3"
+                      onClick={() => onConvertToBroker(item)}
+                      disabled={disabled}
+                    >
+                      <span className="text-xs">Hacer corredor</span>
+                      <FontAwesomeIcon
+                        icon={faUserTie}
+                        size="xl"
+                        className="text-blue-500"
+                      />
+                    </button>
                   )}
 
                   <Link

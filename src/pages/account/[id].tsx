@@ -20,6 +20,7 @@ import { Empty } from "antd";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useShallow } from "zustand/shallow";
+import { UserTypeSelector } from "@/components/companies/change-user-type";
 
 const { Admin } = UserGroups;
 
@@ -35,6 +36,7 @@ export default function AccountPage() {
   const {
     data: organizationDataResponse,
     loading: organizationLoading,
+    refetch: refetchOrganization,
   } = useQuery<Query>(ORGANIZATION_BY_ID_QUERY, {
     variables: { id: userId },
     skip: !userId,
@@ -114,6 +116,17 @@ export default function AccountPage() {
                 cada campo necesario y <b>Sektor</b> potenciará tu marca
               </p>
             </header>
+          )}
+          {isAdmin && userId && accountEntity && (
+            <UserTypeSelector
+              key={`${userId}-${organizationData?.type ?? "customer"}`}
+              userId={userId}
+              name={accountEntity.name}
+              currentType={
+                organizationData?.type ?? (isCustomer ? UserGroups.Customer : "")
+              }
+              onChanged={() => refetchOrganization()}
+            />
           )}
           {FormComponent &&
             (isCustomer ? (

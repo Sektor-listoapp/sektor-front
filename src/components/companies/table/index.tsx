@@ -5,7 +5,7 @@ import {
   StateType,
   UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
-import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faTrashCan, faUserTie } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Table } from "antd";
 import { ADMIN_USER_TYPE_SELECT_OPTIONS } from "@/constants/forms";
@@ -26,6 +26,7 @@ interface CompaniesTableProps {
   setOpenDeleteModal: React.Dispatch<
     React.SetStateAction<DeleteCompanyTarget | null>
   >;
+  onConvertToBroker?: (item: AdminCompanyListItem) => void;
 }
 
 const { Premium, Standard } = OrganizationPlans;
@@ -37,6 +38,7 @@ const CompaniesTable = ({
   changeOrgVisibility,
   countryStates,
   setOpenDeleteModal,
+  onConvertToBroker,
 }: CompaniesTableProps) => {
   const columns: ColumnProps<AdminCompanyListItem>[] = [
     {
@@ -178,10 +180,20 @@ const CompaniesTable = ({
     {
       title: "",
       key: "action",
-      width: 60,
+      width: 90,
       align: "center",
       render: (_, record: AdminCompanyListItem) => (
-        <div className="text-blue-500">
+        <div className="text-blue-500 flex items-center justify-center gap-4">
+          {record.isCustomer && onConvertToBroker && (
+            <button
+              onClick={() => onConvertToBroker(record)}
+              disabled={disabled}
+              title="Convertir a corredor de seguros"
+              aria-label="Convertir a corredor de seguros"
+            >
+              <FontAwesomeIcon icon={faUserTie} size="xl" />
+            </button>
+          )}
           <button
             onClick={() =>
               setOpenDeleteModal({
@@ -203,7 +215,7 @@ const CompaniesTable = ({
       dataSource={data}
       className={cn("hidden xl:block w-full !text-blue-500", styles.table)}
       columns={columns}
-      scroll={{ x: 1160 }}
+      scroll={{ x: 1190 }}
       pagination={{
         defaultPageSize: 6,
         pageSizeOptions: [6, 10, 20, 50, 100],

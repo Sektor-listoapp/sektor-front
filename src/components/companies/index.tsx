@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import {
   COUNTRY_BY_CODE_QUERY,
@@ -11,6 +11,7 @@ import {
   Mutation,
   OrganizationPlans,
   OrganizationType,
+  OrganizationTypes,
   Query,
   SurveyTarget,
   SurveyTargetCandidateType,
@@ -41,12 +42,34 @@ import {
   CompanySortOption,
 } from "./constants";
 import CompanySortControls from "./company-sort-controls";
+import {
+  ChangeUserTypeModal,
+  ChangeUserTypeTarget,
+  useChangeUserType,
+} from "./change-user-type";
+import { cn } from "@/utils/class-name";
 
-const CUSTOMER_FILTER_TYPE = UserGroups.Customer;
+export type CompaniesView = "organizations" | "customers";
+
+const VIEW_TABS: { value: CompaniesView; label: string }[] = [
+  { value: "organizations", label: "Empresas" },
+  { value: "customers", label: "Personas naturales" },
+];
 
 type CompaniesSearchFilter = {
   name?: string;
+  email?: string;
   type?: string;
+};
+
+// The admin list is fully loaded client-side, so email filtering happens here
+// (searchOrganizations / surveyTargetCandidates have no email filter).
+const filterByEmail = (items: AdminCompanyListItem[], email?: string) => {
+  const normalizedEmail = email?.trim().toLowerCase();
+  if (!normalizedEmail) return items;
+  return items.filter((item) =>
+    item.email?.toLowerCase().includes(normalizedEmail)
+  );
 };
 
 const CompanyList = () => {
@@ -61,6 +84,11 @@ const CompanyList = () => {
   const [isDeletingOrganization, setIsDeletingOrganization] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] =
     useState<DeleteCompanyTarget | null>(null);
+  const [view, setView] = useState<CompaniesView>("organizations");
+  const viewRef = useRef<CompaniesView>("organizations");
+  const [changeTypeTarget, setChangeTypeTarget] =
+    useState<ChangeUserTypeTarget | null>(null);
+  const { changeUserType, isChangingUserType } = useChangeUserType();
 
   const [changeOrgVisibility] = useMutation<Mutation>(
     CHANGE_ORGANIZATION_VISIBILITY
@@ -90,6 +118,7 @@ const CompanyList = () => {
     isLoadingCompanies ||
     isChangingVisibility ||
     isChangingPlan ||
+    isChangingUserType ||
     isLoadingCountryData;
 
   const enrichCustomerCandidates = async (
@@ -154,61 +183,54 @@ const CompanyList = () => {
     }
 
     const nameFilter = nextFilters.name?.trim();
+    const emailFilter = nextFilters.email;
     const selectedType = nextFilters.type?.trim();
-    const isCustomerFilter = selectedType === CUSTOMER_FILTER_TYPE;
-    const shouldFetchOrganizations = !isCustomerFilter;
-    const shouldFetchCustomers = !selectedType || isCustomerFilter;
+    const isCustomerView = viewRef.current === "customers";
 
     try {
-      let organizations: OrganizationType[] = [];
-      let customers: SurveyTargetCandidateType[] = [];
-
-      if (shouldFetchOrganizations) {
-        const organizationFilter: Record<string, string> = {};
-
-        if (nameFilter) {
-          organizationFilter.name = nameFilter;
-        }
-
-        if (selectedType && !isCustomerFilter) {
-          organizationFilter.type = selectedType;
-        }
-
-        const response = await getOrganizations({
-          variables: {
-            pagination: { offset: 0, limit: 10000 },
-            filter:
-              Object.keys(organizationFilter).length > 0
-                ? organizationFilter
-                : null,
-          },
-        });
-        organizations = response?.data?.searchOrganizations?.items || [];
-      }
-
-      if (shouldFetchCustomers) {
+      if (isCustomerView) {
         const candidates = await fetchCustomers(nameFilter);
-
-        if (isCustomerFilter) {
-          const enrichedCustomers = await enrichCustomerCandidates(candidates);
-          setCompanies(sortCompanyListItems(enrichedCustomers, companySort));
-          return;
-        }
-
-        customers = candidates;
+        const enrichedCustomers = await enrichCustomerCandidates(candidates);
+        setCompanies(
+          sortCompanyListItems(
+            filterByEmail(enrichedCustomers, emailFilter),
+            companySort
+          )
+        );
+        return;
       }
 
-      const mergedCompanies = sortCompanyListItems(
-        [
-          ...organizations.map(mapOrganizationToListItem),
-          ...customers.map((candidate) =>
-            mapSurveyTargetCandidateToListItem(candidate)
-          ),
-        ],
-        companySort
-      );
+      const organizationFilter: Record<string, string> = {};
 
-      setCompanies(mergedCompanies);
+      if (nameFilter) {
+        organizationFilter.name = nameFilter;
+      }
+
+      if (selectedType) {
+        organizationFilter.type = selectedType;
+      }
+
+      const response = await getOrganizations({
+        variables: {
+          pagination: { offset: 0, limit: 10000 },
+          filter:
+            Object.keys(organizationFilter).length > 0
+              ? organizationFilter
+              : null,
+        },
+      });
+      const organizations: OrganizationType[] =
+        response?.data?.searchOrganizations?.items || [];
+
+      setCompanies(
+        sortCompanyListItems(
+          filterByEmail(
+            organizations.map(mapOrganizationToListItem),
+            emailFilter
+          ),
+          companySort
+        )
+      );
     } catch (error) {
       console.error(error);
       toast.error(
@@ -265,6 +287,32 @@ const CompanyList = () => {
       .finally(() => setIsDeletingOrganization(false));
   };
 
+  const handleChangeView = (nextView: CompaniesView) => {
+    if (nextView === viewRef.current) return;
+    viewRef.current = nextView;
+    setView(nextView);
+    setCompanies([]);
+    // CompaniesHeader re-runs the search with whatever is typed when the view changes.
+  };
+
+  const handleConvertCustomer = ({ id, name }: AdminCompanyListItem) =>
+    setChangeTypeTarget({
+      id,
+      name,
+      currentType: UserGroups.Customer,
+      newType: OrganizationTypes.InsuranceBroker,
+    });
+
+  const handleConfirmChangeType = async ({
+    id,
+    newType,
+  }: ChangeUserTypeTarget) => {
+    const ok = await changeUserType(id, newType);
+    if (!ok) return;
+    setChangeTypeTarget(null);
+    handleGetCompanies();
+  };
+
   const handleChangeOrgVisibility = (id: string, isActive: boolean) => {
     setIsChangingVisibility(true);
     changeOrgVisibility({ variables: { input: { id, isActive } } })
@@ -288,11 +336,40 @@ const CompanyList = () => {
   return (
     <>
       <section className="bg-white w-full py-5 md:py-10 flex flex-col items-center justify-center gap-10 xl:shadow-2xl rounded-xl xl:px-10">
+        <nav
+          role="tablist"
+          aria-label="Tipo de listado"
+          className="w-full max-w-xl xl:max-w-full flex gap-2 border-b border-blue-500/30"
+        >
+          {VIEW_TABS.map((tab) => (
+            <button
+              key={tab.value}
+              type="button"
+              role="tab"
+              aria-selected={view === tab.value}
+              disabled={isLoadingCompanies}
+              onClick={() => handleChangeView(tab.value)}
+              className={cn(
+                "px-4 py-2 -mb-px font-century-gothic text-sm md:text-base border-b-2 transition-colors",
+                view === tab.value
+                  ? "border-blue-500 font-bold text-blue-500"
+                  : "border-transparent text-blue-500/60 hover:text-blue-500"
+              )}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>
+
         <CompaniesHeader
+          view={view}
           handleGetCompanies={handleGetCompanies}
           searchFilters={searchFilters}
           disabled={
-            isLoadingCompanies || isChangingVisibility || isChangingPlan
+            isLoadingCompanies ||
+            isChangingVisibility ||
+            isChangingPlan ||
+            isChangingUserType
           }
         />
 
@@ -314,6 +391,7 @@ const CompanyList = () => {
           <>
             <CompaniesTable
               data={companies}
+              onConvertToBroker={handleConvertCustomer}
               disabled={disableActions}
               countryStates={countryStates}
               changeOrgPlan={handleChangeOrgPlan}
@@ -322,6 +400,7 @@ const CompanyList = () => {
             />
             <CompaniesAccordion
               data={companies}
+              onConvertToBroker={handleConvertCustomer}
               disabled={disableActions}
               countryStates={countryStates}
               changeOrgPlan={handleChangeOrgPlan}
@@ -331,6 +410,12 @@ const CompanyList = () => {
           </>
         )}
       </section>
+      <ChangeUserTypeModal
+        target={changeTypeTarget}
+        onClose={() => setChangeTypeTarget(null)}
+        onConfirm={handleConfirmChangeType}
+        loading={isChangingUserType}
+      />
       <DeleteOrgModal
         target={openDeleteModal}
         setOpen={setOpenDeleteModal}

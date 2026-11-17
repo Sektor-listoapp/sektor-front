@@ -411,6 +411,11 @@ export type AdminType = {
   verifiedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
+export type AdminChangeUserTypeInputType = {
+  type: OrganizationTypes;
+  userId: Scalars['String']['input'];
+};
+
 export type AdminUpdateEmailInputType = {
   newEmail: Scalars['String']['input'];
   skipVerification?: InputMaybe<Scalars['Boolean']['input']>;
@@ -1220,6 +1225,7 @@ export type ModuleType = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  adminChangeUserType: OrganizationType;
   adminDeleteUser: Scalars['Boolean']['output'];
   adminUpdateUserEmail: UpdateEmailResponseType;
   batchUpdateExclusiveAgentClientLogos: ExclusiveAgentType;
@@ -1334,6 +1340,11 @@ export type Mutation = {
   validateAcademyQr: ValidateAcademyQrResult;
   /** Validate an Apple In-App Purchase transaction from StoreKit 2 */
   validateApplePurchase: ApplePurchaseResultType;
+};
+
+
+export type MutationAdminChangeUserTypeArgs = {
+  input: AdminChangeUserTypeInputType;
 };
 
 
