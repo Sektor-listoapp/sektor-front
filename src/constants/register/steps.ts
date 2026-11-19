@@ -10,6 +10,7 @@ const {
   INSURANCE_COMPANY,
   INSURANCE_COMPANY_COOPERATIVE,
   SUPPLIER,
+  OTHER,
 } = USER_TYPES;
 
 const {
@@ -18,6 +19,7 @@ const {
   INSURANCE_BROKER_FORM,
   INSURANCE_COMPANY_FORM,
   SUPPLIER_FORM,
+  OTHER_FORM,
   SENT_EMAIL_VERIFICATION,
   EXCLUSIVE_AGENT_FORM,
   BROKERAGE_SOCIETY_FORM,
@@ -48,6 +50,7 @@ export const REGISTER_STEPS: Record<
       [INSURANCE_COMPANY]: INSURANCE_COMPANY_FORM,
       [INSURANCE_COMPANY_COOPERATIVE]: INSURANCE_COMPANY_FORM,
       [SUPPLIER]: SUPPLIER_FORM,
+      [OTHER]: OTHER_FORM,
     },
     prevStep: {},
   },
@@ -103,6 +106,13 @@ export const REGISTER_STEPS: Record<
     component: SUPPLIER_FORM,
     isForm: true,
     nextStep: { [SUPPLIER]: SENT_EMAIL_VERIFICATION },
+    prevStep: { default: COMPANY_TYPES },
+  },
+  OtherForm: {
+    index: 1,
+    component: OTHER_FORM,
+    isForm: true,
+    nextStep: { [OTHER]: SENT_EMAIL_VERIFICATION },
     prevStep: { default: COMPANY_TYPES },
   },
   BrokerageSocietyForm: {

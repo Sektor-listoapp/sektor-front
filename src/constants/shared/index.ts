@@ -10,6 +10,7 @@ export const USER_TYPES = {
   INSURANCE_COMPANY_INSURTECH: "InsuranceCompanyInsurtech", // insurtech
   INSURANCE_COMPANY_PREPAID_MEDICINE: "InsuranceCompanyPrepaidMedicine", // medicina prepagada
   SUPPLIER_WORKSHOP: "SupplierWorkshop", // talleres
+  OTHER: "Other", // otros (personal técnico/comercial sin credencial)
 } as const;
 
 export const SERVICE_SUPPLIER_TYPES = {

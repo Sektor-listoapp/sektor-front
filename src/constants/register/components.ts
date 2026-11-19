@@ -10,6 +10,7 @@ export const REGISTER_COMPONENTS = {
   INSURANCE_BROKER_FORM: "InsuranceBrokerForm",
   INSURANCE_COMPANY_FORM: "InsuranceCompanyForm",
   SUPPLIER_FORM: "SupplierForm",
+  OTHER_FORM: "OtherForm",
   SENT_EMAIL_VERIFICATION: "SentEmailVerification",
   EMAIL_VERIFICATION_SUCCESS: "EmailVerificationSuccess",
   DATA_SENT_TO_CONFIRM: "DataSentToConfirm",
@@ -41,6 +42,7 @@ export const REGISTER_COMPONENTS_MAP = {
   SupplierForm: dynamic(
     () => import("@/components/auth/register/supplier-form")
   ),
+  OtherForm: dynamic(() => import("@/components/auth/register/other-form")),
   SentEmailVerification: dynamic(
     () => import("@/components/auth/register/sent-email-verification")
   ),

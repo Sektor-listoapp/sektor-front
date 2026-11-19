@@ -3,6 +3,10 @@ import { InsuranceCompanySubtype } from "@/lib/sektor-api/__generated__/types";
 import { useRegistrationStore } from "@/store/registration";
 import Image from "next/image";
 import { cn } from "@/utils/class-name";
+import { USER_TYPES } from "@/constants/shared";
+import { Popover } from "antd";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faUsersGear } from "@fortawesome/free-solid-svg-icons";
 
 const CompanyTypes = () => {
   const userType = useRegistrationStore((state) => state.userType);
@@ -11,8 +15,12 @@ const CompanyTypes = () => {
     (state) => state.setInsuranceCompanySubtype
   );
 
+  const isOtherSelected = userType === USER_TYPES.OTHER;
+
   const handleSelect = (
-    selectedUserType: (typeof REGISTRATION_COMPANY_OPTIONS)[number]["userType"],
+    selectedUserType:
+      | (typeof REGISTRATION_COMPANY_OPTIONS)[number]["userType"]
+      | typeof USER_TYPES.OTHER,
     insuranceCompanySubtype?: InsuranceCompanySubtype
   ) => {
     const isSameSelection = userType === selectedUserType;
@@ -74,7 +82,44 @@ const CompanyTypes = () => {
             </button>
           );
         })}
+
+        <Popover
+          placement="bottom"
+          color="#1B475D"
+          trigger={["hover", "focus"]}
+          overlayStyle={{ maxWidth: 260 }}
+          content={
+            <p className="text-xs text-white font-century-gothic">
+              <b>Personal técnico y comercial</b>, así como otros actores que
+              hacen vida en el mercado asegurador y que no tienen credencial.
+            </p>
+          }
+        >
+          <button
+            type="button"
+            aria-pressed={isOtherSelected}
+            aria-label="Otros: personal técnico y comercial, así como otros actores del mercado asegurador sin credencial"
+            className="col-start-2 flex flex-col items-center gap-2 sm:gap-3"
+            onClick={() => handleSelect(USER_TYPES.OTHER)}
+          >
+            <div
+              className={cn(
+                "border-2 rounded-2xl flex items-center justify-center transition-all size-20 sm:size-24 lg:size-28 bg-white text-blue-500",
+                isOtherSelected ? "border-blue-500 scale-105" : "border-gray-300"
+              )}
+            >
+              <FontAwesomeIcon
+                icon={faUsersGear}
+                className="!w-10 !h-10 sm:!w-12 sm:!h-12 lg:!w-14 lg:!h-14"
+              />
+            </div>
+            <span className="font-bold font-arial-rounded text-[10px] sm:text-xs lg:text-sm text-center text-balance leading-tight px-1">
+              Otros
+            </span>
+          </button>
+        </Popover>
       </div>
+
     </>
   );
 };
