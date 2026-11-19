@@ -6,6 +6,7 @@ import Suppliers from "@/components/home/suppliers";
 import JoinOurTeam from "@/components/home/join-our-team";
 import Footer from "@/components/home/footer";
 import QuickFilterOptions from "@/components/home/quick-filter-options";
+import AdvertisementBanner from "@/components/shared/advertisement-banner";
 
 const Home = () => {
   return (
@@ -13,6 +14,7 @@ const Home = () => {
       <HeroBanner />
       <main className="text-blue-500 w-full max-w-screen-xl flex flex-col items-center justify-center py-10 px-7 2xl:px-0">
         <QuickFilterOptions/>
+        <AdvertisementBanner className="mt-6 mb-12" />
         <InsuranceCompanies />
         <Intermediaries />
         <InsuranceBrokers />
