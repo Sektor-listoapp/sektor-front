@@ -4,7 +4,7 @@ import {
   ValidateFormFields,
 } from "./types";
 
-const { PASSWORD, GENERAL, EMAIL, LICENSE } = INPUT_ERROR_MESSAGES;
+const { PASSWORD, GENERAL, EMAIL, LICENSE, PHONE } = INPUT_ERROR_MESSAGES;
 
 export const handleInsuranceBrokerFormInputChange = ({
   input,
@@ -50,6 +50,14 @@ export const handleInsuranceBrokerFormInputChange = ({
     return;
   }
 
+  if (name === "phone") {
+    setErrors((prev) => ({
+      ...prev,
+      phone: REGEX.PHONE.test(trimmedValue) ? [] : [PHONE.LENGTH],
+    }));
+    return;
+  }
+
   if (name === "confirmPassword") {
     setErrors((prev) => ({
       ...prev,
@@ -84,6 +92,7 @@ export const validateFormFields = ({
       ...prev,
       name: !input.name.trim().length ? [GENERAL.REQUIRED] : prev.name,
       email: !input.email.trim().length ? [GENERAL.REQUIRED] : prev.email,
+      phone: !input.phone.trim().length ? [GENERAL.REQUIRED] : prev.phone,
       sex: !input.sex.trim().length ? [GENERAL.REQUIRED] : prev.sex,
       license: !input.license.trim().length ? [GENERAL.REQUIRED] : prev.license,
       password: !input.password.trim().length

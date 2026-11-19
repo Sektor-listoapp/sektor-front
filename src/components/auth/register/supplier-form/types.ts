@@ -3,6 +3,8 @@ import { FormEvent } from "react";
 export interface SupplierFormInput {
   name: string;
   email: string;
+  phone: string;
+  phoneCode: string;
   serviceType: string;
   password: string;
   confirmPassword: string;
@@ -11,6 +13,8 @@ export interface SupplierFormInput {
 export interface SupplierFormInputErrors {
   name: string[];
   email: string[];
+  phone: string[];
+  phoneCode: string[];
   serviceType: string[];
   password: string[];
   confirmPassword: string[];

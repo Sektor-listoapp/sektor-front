@@ -1,4 +1,6 @@
 import React, { FormEvent, useState } from "react";
+import RegisterPhoneField from "../phone-field";
+import { DEFAULT_PHONE_CODE } from "@/constants/forms";
 import RegisterFormHeader from "../register-form-header";
 import TextInput from "@/components/ui/text-input";
 import PasswordInput from "@/components/ui/password-input";
@@ -33,6 +35,8 @@ const SupplierForm = ({ formRef, setIsSubmittingForm }: SupplierFormProps) => {
   const [input, setInput] = useState<SupplierFormInput>({
     name: "",
     email: "",
+    phone: "",
+    phoneCode: DEFAULT_PHONE_CODE,
     serviceType: "",
     password: "",
     confirmPassword: "",
@@ -41,6 +45,8 @@ const SupplierForm = ({ formRef, setIsSubmittingForm }: SupplierFormProps) => {
   const [errors, setErrors] = useState<SupplierFormInputErrors>({
     name: [],
     email: [],
+    phone: [],
+    phoneCode: [],
     serviceType: [],
     password: [],
     confirmPassword: [],
@@ -60,12 +66,13 @@ const SupplierForm = ({ formRef, setIsSubmittingForm }: SupplierFormProps) => {
     if (!isValidForm) return;
 
     setIsSubmittingForm(true);
-    const { name, email, password, serviceType } = input;
+    const { name, email, password, serviceType, phone, phoneCode } = input;
     registerAsSupplier({
       variables: {
         input: {
           name,
           email,
+          phone: `${phoneCode}${phone}`,
           password,
           serviceType,
         },
@@ -115,6 +122,13 @@ const SupplierForm = ({ formRef, setIsSubmittingForm }: SupplierFormProps) => {
           disabled={loading}
           onChange={handleInputChange}
           value={input.email}
+        />
+        <RegisterPhoneField
+          phone={input.phone}
+          phoneCode={input.phoneCode}
+          errors={errors.phone}
+          disabled={loading}
+          onChange={handleInputChange}
         />
         <PasswordInput
           name="password"

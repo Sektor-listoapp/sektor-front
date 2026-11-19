@@ -1,4 +1,6 @@
 import React, { FormEvent, useState } from "react";
+import RegisterPhoneField from "../phone-field";
+import { DEFAULT_PHONE_CODE } from "@/constants/forms";
 import RegisterFormHeader from "../register-form-header";
 import TextInput from "@/components/ui/text-input";
 import PasswordInput from "@/components/ui/password-input";
@@ -36,6 +38,8 @@ const CustomerForm = ({ formRef, setIsSubmittingForm }: CustomerFormProps) => {
   const [input, setInput] = useState<CustomerFormInput>({
     name: "",
     email: "",
+    phone: "",
+    phoneCode: DEFAULT_PHONE_CODE,
     sex: "",
     birthdate: null,
     password: "",
@@ -45,6 +49,8 @@ const CustomerForm = ({ formRef, setIsSubmittingForm }: CustomerFormProps) => {
   const [errors, setErrors] = useState<CustomerFormInputErrors>({
     name: [],
     email: [],
+    phone: [],
+    phoneCode: [],
     sex: [],
     birthdate: [],
     password: [],
@@ -65,12 +71,13 @@ const CustomerForm = ({ formRef, setIsSubmittingForm }: CustomerFormProps) => {
     if (!isValidForm) return;
 
     setIsSubmittingForm(true);
-    const { name, email, birthdate, password, sex } = input;
+    const { name, email, birthdate, password, sex, phone, phoneCode } = input;
     registerAsCustomer({
       variables: {
         input: {
           name,
           email,
+          phone: `${phoneCode}${phone}`,
           password,
           birthdate,
           sex,
@@ -121,6 +128,13 @@ const CustomerForm = ({ formRef, setIsSubmittingForm }: CustomerFormProps) => {
           disabled={loading}
           onChange={handleInputChange}
           value={input.email}
+        />
+        <RegisterPhoneField
+          phone={input.phone}
+          phoneCode={input.phoneCode}
+          errors={errors.phone}
+          disabled={loading}
+          onChange={handleInputChange}
         />
         <PasswordInput
           name="password"

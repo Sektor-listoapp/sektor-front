@@ -1,4 +1,6 @@
 import React, { FormEvent, useState } from "react";
+import RegisterPhoneField from "../phone-field";
+import { DEFAULT_PHONE_CODE } from "@/constants/forms";
 import { GENERIC_ERROR_MESSAGE, LICENSE_TYPE_OPTIONS } from "./constants";
 import SelectWithTextInput from "@/components/ui/select-with-text-input";
 import PasswordInput from "@/components/ui/password-input";
@@ -43,6 +45,8 @@ const ExclusiveAgentForm = ({
   const [input, setInput] = useState<ExclusiveAgentFormInput>({
     name: "",
     email: "",
+    phone: "",
+    phoneCode: DEFAULT_PHONE_CODE,
     sex: "",
     license: "",
     licenseType: LICENSE_TYPE_OPTIONS[0].value,
@@ -53,6 +57,8 @@ const ExclusiveAgentForm = ({
   const [errors, setErrors] = useState<ExclusiveAgentFormInputErrors>({
     name: [],
     email: [],
+    phone: [],
+    phoneCode: [],
     sex: [],
     license: [],
     licenseType: [],
@@ -71,7 +77,7 @@ const ExclusiveAgentForm = ({
     const isValidForm = validateFormFields({ input, errors, setErrors });
     if (!isValidForm) return;
 
-    const { name, email, password, sex, license, licenseType } = input;
+    const { name, email, password, sex, license, licenseType, phone, phoneCode } = input;
     const formattedLicense = `${licenseType}${license}`;
 
     setIsSubmittingForm(true);
@@ -80,6 +86,7 @@ const ExclusiveAgentForm = ({
         input: {
           name,
           email,
+          phone: `${phoneCode}${phone}`,
           sex,
           password,
           license: formattedLicense,
@@ -130,6 +137,13 @@ const ExclusiveAgentForm = ({
           disabled={loading}
           onChange={handleInputChange}
           value={input.email}
+        />
+        <RegisterPhoneField
+          phone={input.phone}
+          phoneCode={input.phoneCode}
+          errors={errors.phone}
+          disabled={loading}
+          onChange={handleInputChange}
         />
         <PasswordInput
           name="password"

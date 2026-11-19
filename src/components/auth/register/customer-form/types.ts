@@ -4,6 +4,8 @@ import { FormEvent } from "react";
 export interface CustomerFormInput {
   name: string;
   email: string;
+  phone: string;
+  phoneCode: string;
   sex: string;
   birthdate: Dayjs | null;
   password: string;
@@ -13,6 +15,8 @@ export interface CustomerFormInput {
 export interface CustomerFormInputErrors {
   name: string[];
   email: string[];
+  phone: string[];
+  phoneCode: string[];
   sex: string[];
   birthdate: string[];
   password: string[];

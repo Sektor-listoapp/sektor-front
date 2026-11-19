@@ -4,7 +4,7 @@ import {
   ValidateFormFields,
 } from "./types";
 
-const { PASSWORD, GENERAL, EMAIL } = INPUT_ERROR_MESSAGES;
+const { PASSWORD, GENERAL, EMAIL, PHONE } = INPUT_ERROR_MESSAGES;
 
 export const handleCustomerFormInputChange = ({
   input,
@@ -38,6 +38,14 @@ export const handleCustomerFormInputChange = ({
       ].filter(Boolean),
       confirmPassword:
         trimmedValue === input.confirmPassword ? [] : [PASSWORD.MATCH],
+    }));
+    return;
+  }
+
+  if (name === "phone") {
+    setErrors((prev) => ({
+      ...prev,
+      phone: REGEX.PHONE.test(trimmedValue) ? [] : [PHONE.LENGTH],
     }));
     return;
   }
@@ -76,6 +84,7 @@ export const validateFormFields = ({
       ...prev,
       name: !input.name.trim().length ? [GENERAL.REQUIRED] : prev.name,
       email: !input.email.trim().length ? [GENERAL.REQUIRED] : prev.email,
+      phone: !input.phone.trim().length ? [GENERAL.REQUIRED] : prev.phone,
       sex: !input.sex.trim().length ? [GENERAL.REQUIRED] : prev.sex,
       birthdate: !input.birthdate ? [GENERAL.REQUIRED] : prev.birthdate,
       password: !input.password.trim().length
