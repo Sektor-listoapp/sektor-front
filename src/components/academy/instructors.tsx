@@ -24,6 +24,7 @@ import {
 import { cn } from "@/utils/class-name";
 import { friendlyError } from "./constants";
 import { useAcademyAssetUpload } from "./use-academy-asset-upload";
+import ImageCropModal from "@/components/ui/image-crop-modal";
 
 type InstructorLike = Pick<PublicAcademyInstructor, "id" | "name"> & {
   headline?: string | null;
@@ -136,6 +137,7 @@ export const InstructorFormModal = ({
   const [headline, setHeadline] = useState("");
   const [bio, setBio] = useState("");
   const [photoFile, setPhotoFile] = useState<File>();
+  const [photoToCrop, setPhotoToCrop] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const uploadAsset = useAcademyAssetUpload();
@@ -234,7 +236,7 @@ export const InstructorFormModal = ({
             accept="image/*"
             showUploadList={false}
             beforeUpload={(file) => {
-              setPhotoFile(file);
+              setPhotoToCrop(file);
               return false;
             }}
             className="!p-0"
@@ -249,6 +251,17 @@ export const InstructorFormModal = ({
               </div>
             )}
           </Upload.Dragger>
+          <ImageCropModal
+            file={photoToCrop}
+            aspect={1}
+            cropShape="round"
+            title="Ajustar foto"
+            onConfirm={({ file }) => {
+              setPhotoFile(file);
+              setPhotoToCrop(null);
+            }}
+            onCancel={() => setPhotoToCrop(null)}
+          />
         </Field>
         <Field label="Nombre">
           <Input value={name} placeholder="Ej: Adriana Machaca" onChange={(e) => setName(e.target.value)} />

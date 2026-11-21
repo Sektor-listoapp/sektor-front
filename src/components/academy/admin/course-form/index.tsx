@@ -66,6 +66,7 @@ import {
   validateStep,
 } from "./types";
 import { Pill } from "../../ui";
+import ImageCropModal from "@/components/ui/image-crop-modal";
 
 const STEPS = ["Información", "Formato", "Contenido", "Publicar"];
 
@@ -117,6 +118,7 @@ const CourseForm = ({ course }: CourseFormProps) => {
   const [step, setStep] = useState(0);
   const [errors, setErrors] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
+  const [coverToCrop, setCoverToCrop] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<{
     label: string;
     percent: number;
@@ -278,7 +280,7 @@ const CourseForm = ({ course }: CourseFormProps) => {
             accept="image/*"
             showUploadList={false}
             beforeUpload={(file) => {
-              set({ imageFile: file });
+              setCoverToCrop(file);
               return false;
             }}
             className="!p-0"
@@ -293,6 +295,16 @@ const CourseForm = ({ course }: CourseFormProps) => {
               </div>
             )}
           </Upload.Dragger>
+          <ImageCropModal
+            file={coverToCrop}
+            aspect={16 / 9}
+            title="Ajustar portada"
+            onConfirm={({ file }) => {
+              set({ imageFile: file });
+              setCoverToCrop(null);
+            }}
+            onCancel={() => setCoverToCrop(null)}
+          />
         </Field>
       </div>
       <div className="md:col-span-2">

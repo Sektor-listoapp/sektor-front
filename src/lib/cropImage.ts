@@ -11,12 +11,21 @@ export interface CropResult {
 }
 
 
+export interface CropImageOptions {
+    /** Rounded corners on the output (used by profile/logo photos). Default true. */
+    rounded?: boolean;
+    /** Max output width in px, to keep uploads light. Default 1600. */
+    maxWidth?: number;
+}
+
 export const cropImage = async (
     imageSrc: string,
     crop: CropArea,
-    aspect: number = 1,
-    quality: number = 0.8
+    quality: number = 0.8,
+    options: CropImageOptions = {}
 ): Promise<CropResult> => {
+    const { rounded = true, maxWidth = 1600 } = options;
+
     return new Promise((resolve, reject) => {
         const image = new Image();
         image.src = imageSrc;
@@ -30,30 +39,30 @@ export const cropImage = async (
                 return;
             }
 
+            const scale = crop.width > maxWidth ? maxWidth / crop.width : 1;
+            const width = Math.round(crop.width * scale);
+            const height = Math.round(crop.height * scale);
 
-            const maxSize = Math.min(crop.width, crop.height);
-            const size = maxSize * aspect;
-
-            canvas.width = size;
-            canvas.height = size;
-
+            canvas.width = width;
+            canvas.height = height;
 
             ctx.save();
-            ctx.beginPath();
 
-            const radius = Math.min(24, size * 0.15);
-
-            ctx.moveTo(radius, 0);
-            ctx.lineTo(size - radius, 0);
-            ctx.quadraticCurveTo(size, 0, size, radius);
-            ctx.lineTo(size, size - radius);
-            ctx.quadraticCurveTo(size, size, size - radius, size);
-            ctx.lineTo(radius, size);
-            ctx.quadraticCurveTo(0, size, 0, size - radius);
-            ctx.lineTo(0, radius);
-            ctx.quadraticCurveTo(0, 0, radius, 0);
-            ctx.closePath();
-            ctx.clip();
+            if (rounded) {
+                const radius = Math.min(24, Math.min(width, height) * 0.15);
+                ctx.beginPath();
+                ctx.moveTo(radius, 0);
+                ctx.lineTo(width - radius, 0);
+                ctx.quadraticCurveTo(width, 0, width, radius);
+                ctx.lineTo(width, height - radius);
+                ctx.quadraticCurveTo(width, height, width - radius, height);
+                ctx.lineTo(radius, height);
+                ctx.quadraticCurveTo(0, height, 0, height - radius);
+                ctx.lineTo(0, radius);
+                ctx.quadraticCurveTo(0, 0, radius, 0);
+                ctx.closePath();
+                ctx.clip();
+            }
 
             ctx.drawImage(
                 image,
@@ -63,8 +72,8 @@ export const cropImage = async (
                 crop.height,
                 0,
                 0,
-                size,
-                size
+                width,
+                height
             );
 
             ctx.restore();

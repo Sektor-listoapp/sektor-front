@@ -25,6 +25,7 @@ import { ROUTES } from "@/constants/router";
 import { toast } from "react-toastify";
 import { cn } from "@/utils/class-name";
 import { quillDeltaToText } from "@/utils/quill-delta-to-text";
+import ImageCropModal from "@/components/ui/image-crop-modal";
 
 const { Admin, News } = UserGroups;
 
@@ -39,6 +40,7 @@ const EditarNoticia = () => {
   const [mediaType, setMediaType] = useState<"photo" | "video">("photo");
   const [photo, setPhoto] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [photoToCrop, setPhotoToCrop] = useState<File | null>(null);
   const [videoUrl, setVideoUrl] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -311,7 +313,7 @@ const EditarNoticia = () => {
                 accept="image/*"
                 showUploadList={false}
                 beforeUpload={(file) => {
-                  handlePhotoChange({ file });
+                  setPhotoToCrop(file);
                   return false;
                 }}
               >
@@ -334,6 +336,16 @@ const EditarNoticia = () => {
                   )}
                 </div>
               </Upload>
+              <ImageCropModal
+                file={photoToCrop}
+                aspect={16 / 9}
+                title="Ajustar foto de la noticia"
+                onConfirm={({ file }) => {
+                  handlePhotoChange({ file });
+                  setPhotoToCrop(null);
+                }}
+                onCancel={() => setPhotoToCrop(null)}
+              />
             </div>
           ) : (
             <input
