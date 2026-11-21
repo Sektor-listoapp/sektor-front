@@ -313,12 +313,12 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
 
 
         {/* Desktop version */}
-        <div className="hidden lg:flex items-center justify-between w-full max-w-screen-2xl mx-auto">
+        <div className="hidden lg:flex items-center justify-between gap-6 w-full max-w-screen-2xl mx-auto">
           <SektorFullHorizontalLogo
             width={200}
             onClick={() => pathname !== ROUTES.HOME && push(ROUTES.HOME)}
             className={cn(
-              "lg:w-52",
+              "shrink-0 w-40 xl:w-52",
               variant === "light" ? "text-blue-500" : "text-white",
               {
                 "cursor-pointer": pathname !== ROUTES.HOME,
@@ -329,7 +329,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
 
           <div
             className={cn(
-              "transition-all duration-300 flex items-center justify-center gap-8 font-century-gothic xl:ml-auto xl: mr-20",
+              "transition-all duration-300 flex items-center justify-center gap-5 xl:gap-8 font-century-gothic min-w-0 xl:ml-auto xl:mr-20",
               variant === "light" ? "text-blue-500" : "text-white"
             )}
           >
@@ -593,12 +593,12 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
 
 
       {/* Desktop version */}
-      <div className="hidden lg:flex items-center justify-between w-full max-w-screen-2xl mx-auto">
+      <div className="hidden lg:flex items-center justify-between gap-6 w-full max-w-screen-2xl mx-auto">
         <SektorFullHorizontalLogo
           width={200}
           onClick={() => pathname !== ROUTES.HOME && push(ROUTES.HOME)}
           className={cn(
-            "lg:w-52",
+            "shrink-0 w-40 xl:w-52",
             variant === "light" ? "text-blue-500" : "text-white",
             {
               "cursor-pointer": pathname !== ROUTES.HOME,
@@ -609,7 +609,7 @@ const Navbar = ({ className, variant = "dark", ...props }: NavbarProps) => {
 
         <div
           className={cn(
-            "transition-all duration-300 flex items-center justify-center gap-8 font-century-gothic xl:ml-auto xl: mr-20",
+            "transition-all duration-300 flex items-center justify-center gap-5 xl:gap-8 font-century-gothic min-w-0 xl:ml-auto xl:mr-20",
             variant === "light" ? "text-blue-500" : "text-white"
           )}
         >
