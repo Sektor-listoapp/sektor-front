@@ -1,11 +1,13 @@
 import React from "react";
 import {
   OrganizationPlans,
-  OrganizationTypes,
   StateType,
-  UserGroups,
 } from "@/lib/sektor-api/__generated__/types";
-import { faTrashCan, faUserTie } from "@fortawesome/free-solid-svg-icons";
+import {
+  faPen,
+  faTrashCan,
+  faUserTie,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Table } from "antd";
 import { ADMIN_USER_TYPE_SELECT_OPTIONS } from "@/constants/forms";
@@ -27,6 +29,7 @@ interface CompaniesTableProps {
     React.SetStateAction<DeleteCompanyTarget | null>
   >;
   onConvertToBroker?: (item: AdminCompanyListItem) => void;
+  onEditAcademy?: (item: AdminCompanyListItem) => void;
 }
 
 const { Premium, Standard } = OrganizationPlans;
@@ -39,6 +42,7 @@ const CompaniesTable = ({
   countryStates,
   setOpenDeleteModal,
   onConvertToBroker,
+  onEditAcademy,
 }: CompaniesTableProps) => {
   const columns: ColumnProps<AdminCompanyListItem>[] = [
     {
@@ -48,6 +52,20 @@ const CompaniesTable = ({
       width: 200,
       render: (name: string, record: AdminCompanyListItem) => {
         const { id } = record;
+
+        if (record.isAcademy) {
+          return (
+            <button
+              type="button"
+              onClick={() => onEditAcademy?.(record)}
+              disabled={disabled}
+              title="Editar academia"
+              className="text-left cursor-pointer hover:text-blue-700 transition-all leading-snug break-words"
+            >
+              {name}
+            </button>
+          );
+        }
 
         return (
           <Link
@@ -64,7 +82,7 @@ const CompaniesTable = ({
       dataIndex: "type",
       key: "type",
       width: 160,
-      render: (type: OrganizationTypes | UserGroups.Customer) => {
+      render: (type: AdminCompanyListItem["type"]) => {
         const label = ADMIN_USER_TYPE_SELECT_OPTIONS.find(
           (option) => option.value === type
         )?.label;
@@ -78,7 +96,7 @@ const CompaniesTable = ({
       width: 80,
       align: "center",
       render: (clicks: number | undefined, record: AdminCompanyListItem) => {
-        if (record.isCustomer) {
+        if (record.isCustomer || record.isAcademy) {
           return <p>—</p>;
         }
 
@@ -123,7 +141,7 @@ const CompaniesTable = ({
         coverageStates: number[] | undefined,
         record: AdminCompanyListItem
       ) => {
-        if (record.isCustomer) {
+        if (record.isCustomer || record.isAcademy) {
           return <span>—</span>;
         }
 
@@ -141,7 +159,9 @@ const CompaniesTable = ({
       align: "center",
       render: (isActive: boolean, record: AdminCompanyListItem) => (
         <div className="w-full flex justify-center items-center">
-          {record.isCustomer ? (
+          {record.isAcademy ? (
+            <span>—</span>
+          ) : record.isCustomer ? (
             <span>{isActive ? "Sí" : "No"}</span>
           ) : (
             <Switch
@@ -160,7 +180,7 @@ const CompaniesTable = ({
       width: 90,
       align: "center",
       render: (plan: OrganizationPlans, record: AdminCompanyListItem) => {
-        if (record.isCustomer) {
+        if (record.isCustomer || record.isAcademy) {
           return <span>—</span>;
         }
 
@@ -184,6 +204,16 @@ const CompaniesTable = ({
       align: "center",
       render: (_, record: AdminCompanyListItem) => (
         <div className="text-blue-500 flex items-center justify-center gap-4">
+          {record.isAcademy && onEditAcademy && (
+            <button
+              onClick={() => onEditAcademy(record)}
+              disabled={disabled}
+              title="Editar academia"
+              aria-label="Editar academia"
+            >
+              <FontAwesomeIcon icon={faPen} size="xl" />
+            </button>
+          )}
           {record.isCustomer && onConvertToBroker && (
             <button
               onClick={() => onConvertToBroker(record)}
@@ -199,6 +229,7 @@ const CompaniesTable = ({
               setOpenDeleteModal({
                 id: record.id,
                 isCustomer: record.isCustomer,
+                isAcademy: record.isAcademy,
               })
             }
             disabled={disabled}

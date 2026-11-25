@@ -1,4 +1,5 @@
 import {
+  AcademyInstructor,
   OrganizationPlans,
   OrganizationType,
   OrganizationTypes,
@@ -11,8 +12,14 @@ export type AdminCompanyListItem = {
   id: string;
   name: string;
   email?: string | null;
-  type: OrganizationTypes | typeof UserGroups.Customer;
+  type:
+    | OrganizationTypes
+    | typeof UserGroups.Customer
+    | typeof UserGroups.AcademyAdmin;
   isCustomer: boolean;
+  /** Academy account: row opens the profile editor instead of /account. */
+  isAcademy?: boolean;
+  instructor?: AcademyInstructor;
   clicks?: number | null;
   createdAt?: string | null;
   isActive?: boolean;
@@ -23,7 +30,20 @@ export type AdminCompanyListItem = {
 export type DeleteCompanyTarget = {
   id: string;
   isCustomer: boolean;
+  isAcademy?: boolean;
 };
+
+export const mapAcademyInstructorToListItem = (
+  instructor: AcademyInstructor
+): AdminCompanyListItem => ({
+  id: instructor.id,
+  name: instructor.name,
+  email: instructor.email,
+  type: UserGroups.AcademyAdmin,
+  isCustomer: false,
+  isAcademy: true,
+  instructor,
+});
 
 export const mapOrganizationToListItem = (
   organization: OrganizationType

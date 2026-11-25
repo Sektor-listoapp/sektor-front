@@ -126,8 +126,15 @@ export const CUSTOMER_TYPE_SELECT_OPTION = {
   value: UserGroups.Customer,
 };
 
+/** Academy accounts (teacher/expert profile with an AcademyAdmin user). */
+export const ACADEMY_TYPE_SELECT_OPTION = {
+  label: "Academia",
+  value: UserGroups.AcademyAdmin,
+};
+
 export const ADMIN_USER_TYPE_SELECT_OPTIONS = [
   ...ORGANIZATION_TYPE_SELECT_OPTIONS,
+  ACADEMY_TYPE_SELECT_OPTION,
   CUSTOMER_TYPE_SELECT_OPTION,
 ];
 

@@ -3,7 +3,10 @@ import React, { useEffect, useRef, useState } from "react";
 import Button from "@/components/ui/button";
 import Select from "@/components/ui/select";
 import TextInput from "@/components/ui/text-input";
-import { ORGANIZATION_TYPE_SELECT_OPTIONS } from "@/constants/forms";
+import {
+  ACADEMY_TYPE_SELECT_OPTION,
+  ORGANIZATION_TYPE_SELECT_OPTIONS,
+} from "@/constants/forms";
 import type { CompaniesView } from "..";
 import { faEnvelope, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { pickBy } from "lodash";
@@ -172,6 +175,7 @@ const CompaniesHeader = ({
               { label: "Buscar por", value: "", disabled: true, hidden: true },
               { label: "Todos", value: "" },
               ...ORGANIZATION_TYPE_SELECT_OPTIONS,
+              ACADEMY_TYPE_SELECT_OPTION,
             ]}
             value={input.type}
             disabled={disabled}

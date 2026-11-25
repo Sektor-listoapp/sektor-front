@@ -2,12 +2,14 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import {
+  ACADEMY_INSTRUCTORS_QUERY,
   COUNTRY_BY_CODE_QUERY,
   CUSTOMER_BY_ID_QUERY,
   LIST_CUSTOMERS_FOR_ADMIN,
   SEARCH_ORGANIZATIONS,
 } from "@/lib/sektor-api/queries";
 import {
+  AcademyInstructor,
   Mutation,
   OrganizationPlans,
   OrganizationType,
@@ -20,6 +22,7 @@ import {
 import CompaniesTable from "./table";
 import {
   ADMIN_DELETE_USER,
+  DELETE_ACADEMY_INSTRUCTOR,
   CHANGE_ORGANIZATION_PLAN,
   CHANGE_ORGANIZATION_VISIBILITY,
   DELETE_ORGANIZATION,
@@ -33,6 +36,7 @@ import DeleteOrgModal from "./delete-org-modal";
 import {
   AdminCompanyListItem,
   DeleteCompanyTarget,
+  mapAcademyInstructorToListItem,
   mapOrganizationToListItem,
   mapSurveyTargetCandidateToListItem,
   sortCompanyListItems,
@@ -48,6 +52,8 @@ import {
   useChangeUserType,
 } from "./change-user-type";
 import { cn } from "@/utils/class-name";
+import { InstructorFormModal } from "@/components/academy/instructors";
+import { friendlyError } from "@/components/academy/constants";
 
 export type CompaniesView = "organizations" | "customers";
 
@@ -89,6 +95,10 @@ const CompanyList = () => {
   const [changeTypeTarget, setChangeTypeTarget] =
     useState<ChangeUserTypeTarget | null>(null);
   const { changeUserType, isChangingUserType } = useChangeUserType();
+  // undefined = closed; otherwise the academy profile being edited.
+  const [editingAcademy, setEditingAcademy] = useState<
+    AcademyInstructor | undefined
+  >(undefined);
 
   const [changeOrgVisibility] = useMutation<Mutation>(
     CHANGE_ORGANIZATION_VISIBILITY
@@ -96,6 +106,14 @@ const CompanyList = () => {
   const [changeOrgPlan] = useMutation<Mutation>(CHANGE_ORGANIZATION_PLAN);
   const [deleteOrganization] = useMutation<Mutation>(DELETE_ORGANIZATION);
   const [deleteUser] = useMutation<Mutation>(ADMIN_DELETE_USER);
+  const [deleteAcademyInstructor] = useMutation<Mutation>(
+    DELETE_ACADEMY_INSTRUCTOR
+  );
+
+  const [getAcademyInstructors] = useLazyQuery<Query>(
+    ACADEMY_INSTRUCTORS_QUERY,
+    { fetchPolicy: "no-cache" }
+  );
 
   const [getOrganizations, { error: companiesError }] = useLazyQuery<Query>(
     SEARCH_ORGANIZATIONS,
@@ -170,6 +188,28 @@ const CompanyList = () => {
     }
   };
 
+  const fetchAcademies = async (name?: string) => {
+    try {
+      const { data, error } = await getAcademyInstructors();
+      if (error) throw error;
+
+      const normalizedName = name?.trim().toLowerCase();
+      return (data?.academyInstructors ?? [])
+        .filter(
+          (instructor) =>
+            !normalizedName ||
+            instructor.name.toLowerCase().includes(normalizedName)
+        )
+        .map(mapAcademyInstructorToListItem);
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        "No se pudo cargar el listado de academias, por favor intenta de nuevo más tarde."
+      );
+      return [];
+    }
+  };
+
   const handleGetCompanies = async (
     variables: { filter?: CompaniesSearchFilter } = {}
   ) => {
@@ -200,6 +240,19 @@ const CompanyList = () => {
         return;
       }
 
+      const isAcademyType = selectedType === UserGroups.AcademyAdmin;
+
+      if (isAcademyType) {
+        const academies = await fetchAcademies(nameFilter);
+        setCompanies(
+          sortCompanyListItems(
+            filterByEmail(academies, emailFilter),
+            companySort
+          )
+        );
+        return;
+      }
+
       const organizationFilter: Record<string, string> = {};
 
       if (nameFilter) {
@@ -210,22 +263,26 @@ const CompanyList = () => {
         organizationFilter.type = selectedType;
       }
 
-      const response = await getOrganizations({
-        variables: {
-          pagination: { offset: 0, limit: 10000 },
-          filter:
-            Object.keys(organizationFilter).length > 0
-              ? organizationFilter
-              : null,
-        },
-      });
+      // "Todos" also lists academies, which are not organizations.
+      const [response, academies] = await Promise.all([
+        getOrganizations({
+          variables: {
+            pagination: { offset: 0, limit: 10000 },
+            filter:
+              Object.keys(organizationFilter).length > 0
+                ? organizationFilter
+                : null,
+          },
+        }),
+        selectedType ? Promise.resolve([]) : fetchAcademies(nameFilter),
+      ]);
       const organizations: OrganizationType[] =
         response?.data?.searchOrganizations?.items || [];
 
       setCompanies(
         sortCompanyListItems(
           filterByEmail(
-            organizations.map(mapOrganizationToListItem),
+            [...organizations.map(mapOrganizationToListItem), ...academies],
             emailFilter
           ),
           companySort
@@ -260,8 +317,24 @@ const CompanyList = () => {
       .finally(() => setIsChangingPlan(false));
   };
 
-  const handleDeleteCompany = ({ id, isCustomer }: DeleteCompanyTarget) => {
+  const handleDeleteCompany = ({
+    id,
+    isCustomer,
+    isAcademy,
+  }: DeleteCompanyTarget) => {
     setIsDeletingOrganization(true);
+
+    if (isAcademy) {
+      deleteAcademyInstructor({ variables: { id } })
+        .then(() => {
+          setOpenDeleteModal(null);
+          toast.success("Academia eliminada correctamente.");
+          handleGetCompanies();
+        })
+        .catch((error) => toast.error(friendlyError(error)))
+        .finally(() => setIsDeletingOrganization(false));
+      return;
+    }
 
     const deletePromise = isCustomer
       ? deleteUser({ variables: { userId: id } })
@@ -392,6 +465,7 @@ const CompanyList = () => {
             <CompaniesTable
               data={companies}
               onConvertToBroker={handleConvertCustomer}
+              onEditAcademy={(item) => setEditingAcademy(item.instructor)}
               disabled={disableActions}
               countryStates={countryStates}
               changeOrgPlan={handleChangeOrgPlan}
@@ -401,6 +475,7 @@ const CompanyList = () => {
             <CompaniesAccordion
               data={companies}
               onConvertToBroker={handleConvertCustomer}
+              onEditAcademy={(item) => setEditingAcademy(item.instructor)}
               disabled={disableActions}
               countryStates={countryStates}
               changeOrgPlan={handleChangeOrgPlan}
@@ -410,6 +485,12 @@ const CompanyList = () => {
           </>
         )}
       </section>
+      <InstructorFormModal
+        open={editingAcademy !== undefined}
+        instructor={editingAcademy}
+        onClose={() => setEditingAcademy(undefined)}
+        onSaved={() => handleGetCompanies()}
+      />
       <ChangeUserTypeModal
         target={changeTypeTarget}
         onClose={() => setChangeTypeTarget(null)}

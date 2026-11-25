@@ -20,6 +20,7 @@ const DeleteOrgModal = ({
 }: DeleteOrgModalProps) => {
   const handleClose = () => setOpen(null);
   const isCustomer = target?.isCustomer;
+  const isAcademy = target?.isAcademy;
 
   return (
     <Modal
@@ -32,8 +33,16 @@ const DeleteOrgModal = ({
         <h2 className="text-2xl font-bold font-arial-rounded text-center">
           {isCustomer
             ? "¿Estás seguro de que deseas eliminar esta persona natural?"
-            : "¿Estás seguro de que deseas eliminar esta organización?"}
+            : isAcademy
+              ? "¿Estás seguro de que deseas eliminar esta academia?"
+              : "¿Estás seguro de que deseas eliminar esta organización?"}
         </h2>
+        {isAcademy && (
+          <p className="text-center -mt-8">
+            Se borra su perfil de academia; su usuario sigue existiendo. Solo
+            se puede eliminar si no tiene cursos.
+          </p>
+        )}
 
         <footer className="flex flex-col gap-5 w-full md:flex-row md:gap-10">
           <Button

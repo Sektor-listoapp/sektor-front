@@ -9,6 +9,7 @@ import { cn } from "@/utils/class-name";
 import {
   faChevronDown,
   faEye,
+  faPen,
   faTrashCan,
   faUserTie,
 } from "@fortawesome/free-solid-svg-icons";
@@ -31,6 +32,7 @@ interface CompaniesAccordionProps {
     React.SetStateAction<DeleteCompanyTarget | null>
   >;
   onConvertToBroker?: (item: AdminCompanyListItem) => void;
+  onEditAcademy?: (item: AdminCompanyListItem) => void;
 }
 
 const { Premium, Standard } = OrganizationPlans;
@@ -43,6 +45,7 @@ const CompaniesAccordion = ({
   changeOrgVisibility,
   setOpenDeleteModal,
   onConvertToBroker,
+  onEditAcademy,
 }: CompaniesAccordionProps) => {
   return (
     <Collapse
@@ -77,7 +80,9 @@ const CompaniesAccordion = ({
             clicks,
             email,
             isCustomer,
+            isAcademy,
           } = item;
+          const hideOrgFields = isCustomer || isAcademy;
           const label = ADMIN_USER_TYPE_SELECT_OPTIONS?.find(
             (option) => option.value === type
           )?.label;
@@ -89,6 +94,9 @@ const CompaniesAccordion = ({
 
           const listItems = [
             { title: "Tipo de usuario:", value: label ?? "No disponible" },
+            ...(isAcademy && item.instructor?.headline
+              ? [{ title: "Especialidad:", value: item.instructor.headline }]
+              : []),
             {
               title: "Fecha de creación:",
               value: createdAt
@@ -98,9 +106,12 @@ const CompaniesAccordion = ({
             { title: "Email:", value: email ?? "No disponible" },
             {
               title: "Ubicaciòn:",
-              value: isCustomer ? "—" : (state ?? "No disponible"),
+              value: hideOrgFields ? "—" : (state ?? "No disponible"),
             },
-            { title: "Clicks:", value: isCustomer ? "—" : clicks ? clicks : 0 },
+            {
+              title: "Clicks:",
+              value: hideOrgFields ? "—" : clicks ? clicks : 0,
+            },
           ];
 
           return (
@@ -119,7 +130,7 @@ const CompaniesAccordion = ({
                 </ul>
 
                 <footer className="w-full flex items-center gap-1 justify-evenly font-bold">
-                  {!isCustomer && (
+                  {!hideOrgFields && (
                     <>
                       <button
                         className="w-fit flex flex-col items-center justify-center gap-3"
@@ -156,22 +167,37 @@ const CompaniesAccordion = ({
                     </button>
                   )}
 
-                  <Link
-                    href={`/account/${id}`}
-                    className="cursor-pointer hover:text-blue-700 transition-all hover:scale-105"
-                  >
-                    <span className="text-xs">Detalles</span>
-                    <FontAwesomeIcon
-                      icon={faEye}
-                      size="xl"
-                      className="text-blue-500"
-                    />
-                  </Link>
+                  {isAcademy ? (
+                    <button
+                      className="w-fit flex flex-col items-center justify-center gap-3"
+                      onClick={() => onEditAcademy?.(item)}
+                      disabled={disabled}
+                    >
+                      <span className="text-xs">Editar</span>
+                      <FontAwesomeIcon
+                        icon={faPen}
+                        size="xl"
+                        className="text-blue-500"
+                      />
+                    </button>
+                  ) : (
+                    <Link
+                      href={`/account/${id}`}
+                      className="cursor-pointer hover:text-blue-700 transition-all hover:scale-105"
+                    >
+                      <span className="text-xs">Detalles</span>
+                      <FontAwesomeIcon
+                        icon={faEye}
+                        size="xl"
+                        className="text-blue-500"
+                      />
+                    </Link>
+                  )}
 
                   <button
                     className="w-fit flex flex-col items-center justify-center gap-3"
                     onClick={() =>
-                      setOpenDeleteModal({ id, isCustomer })
+                      setOpenDeleteModal({ id, isCustomer, isAcademy })
                     }
                   >
                     <span className="text-xs">Eliminar</span>
